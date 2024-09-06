@@ -5,11 +5,34 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'test',
+      name: 'homePage',
+      component: () => import('../views/home/HomePage.vue')
+    },
+    {
+      path: '/assignment',
+      name: 'assignment',
       component: () => import('../views/AssignmentAttempt.vue')
     },
+    {
+      path: '/sign-in',
+      name: 'sign.in',
+      component: () => import('../views/auth/SignIn.vue')
+    }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      next('/sign-in');
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
 
 export default router
 router.beforeEach((to, from, next) => {
