@@ -22,8 +22,7 @@ export const register = async (username, email, password) => {
       Email: email,
       Password: password,
     };
-
-    const response = await api.post('/Auth/SignIn', requestBody);
+    const response = await api.post('/Users', requestBody);
     return response.data;
   } catch (error) {
     console.error('Registration failed:', error.response ? error.response.data : error.message);
