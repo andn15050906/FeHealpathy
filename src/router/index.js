@@ -6,17 +6,22 @@ const router = createRouter({
     {
       path: '/',
       name: 'homePage',
-      component: () => import('../views/home/HomePage.vue')
+      component: () => import('../components/HomeLayout/HomePage.vue')
     },
     {
       path: '/assignment',
-      name: 'assignment',
-      component: () => import('../views/AssignmentAttempt.vue')
+      name: 'assignmentPage',
+      component: () => import('../views/Assignment/AssignmentAttempt.vue')
     },
     {
       path: '/sign-in',
-      name: 'sign.in',
-      component: () => import('../views/auth/SignIn.vue')
+      name: 'signinPage',
+      component: () => import('../views/Auth/SignIn.vue')
+    },
+    {
+      path: '/courses',
+      name: 'coursePage',
+      component: () => import('../views/Courses/CourseList.vue')
     }
   ]
 })
@@ -36,7 +41,7 @@ router.beforeEach((to, from, next) => {
 
 export default router
 router.beforeEach((to, from, next) => {
-//   const publicPages = ['/shop','/'];
+  // const publicPages = ['/','/sign-in','/courses'];
 //   const adminPages = ['/product'];
 //   const authRequired = !publicPages.includes(to.path);
 //   const loggedIn = localStorage.getItem('accessToken');

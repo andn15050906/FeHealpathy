@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import HeaderPage from './views/home/HeaderPage.vue';
-import FooterPage from './views/home/FooterPage.vue';
+import HeaderPage from './components/HomeLayout/HeaderPage.vue';
+import FooterPage from './components/HomeLayout/FooterPage.vue';
 </script>
 <template>
   <div id="app">

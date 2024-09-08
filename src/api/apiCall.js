@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Tạo một instance của Axios với cấu hình mặc định 7277 dùng chung
 const api = axios.create({
   baseURL: 'https://localhost:7277/api', 
   headers: {
@@ -18,7 +17,6 @@ api.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
-// Xử lý lỗi response từ API
 api.interceptors.response.use(response => {
   return response;
 }, error => {

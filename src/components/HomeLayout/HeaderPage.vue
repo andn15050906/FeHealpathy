@@ -2,7 +2,7 @@
     <div class="header">
         <div class="navbar">
             <div class="logo">
-                <router-link class="text-dark" to="/"><img src="../home/images/logo.png"></router-link>
+                <router-link class="text-dark" to="/"><img src="../../../public/assets/images/logo.png"></router-link>
             </div>
             <div class="menu">
                 <ul>
