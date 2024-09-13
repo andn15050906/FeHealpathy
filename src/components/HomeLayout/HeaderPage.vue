@@ -3,7 +3,7 @@
     <div class="navbar">
       <div class="logo">
         <router-link class="text-dark" to="/">
-          <img src="@/assets/images/logo.png" alt="Logo">
+          <img src="../../../public/assets/images/logo.png" alt="Logo">
         </router-link>
       </div>
       <div class="menu">
@@ -114,12 +114,51 @@ export default {
 </script>
 
 <style scoped>
-.header {
-  width: 100%;
-  height: 80px;
-  background-color: #fff;
-  position: fixed;
-  top: 0;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+a{
+    text-decoration: none;
+}
+
+ul{
+    list-style: none;
+}
+
+.header{
+    width: 100%;
+    height: 80px;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+}
+
+.header .navbar{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    margin-top: 30px;
+}
+
+.logo img{
+    margin-left: 100px;
+}
+
+.menu ul li{
+    display: inline-block;
+    padding: 0 25px;
+    cursor: pointer;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 80px;
+    align-items: center;
 }
 
 .navbar {
@@ -128,15 +167,6 @@ export default {
   align-items: center;
   padding: 0 100px;
   height: 100%;
-}
-
-.menu ul {
-  list-style: none;
-  display: flex;
-}
-
-.menu ul li {
-  margin-right: 25px;
 }
 
 .user-actions {
@@ -164,10 +194,14 @@ export default {
   padding: 5px 10px;
 }
 
-.login-btn {
-  background-color: #f3ef51;
-  padding: 8px 40px;
-  border-radius: 30px;
-  font-weight: bold;
+.login-btn{
+    display: block;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: #f3ef51;
+    padding: 8px 40px;
+    margin-right: 100px;
 }
 </style>

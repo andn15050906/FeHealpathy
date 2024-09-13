@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/assignment',
       name: 'assignmentPage',
-      component: () => import('../views/Assignment/AssignmentAttempt.vue')
+      component: () => import('../views/Assignments/AssignmentAttempt.vue')
     },
     {
       path: '/sign-in',

@@ -1,4 +1,4 @@
-import api from './apiCall';
+import api from '@/api/apiCall';
 
 export const getNotifications = async (receiverId) => {
   try {
