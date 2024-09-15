@@ -16,6 +16,5 @@
   
   <style scoped>
   
-  /* CSS cho layout chính */
   </style>
   

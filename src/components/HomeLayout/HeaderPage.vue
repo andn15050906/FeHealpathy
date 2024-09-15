@@ -69,10 +69,10 @@ export default {
     async checkUserStatus() {
       try {
         const clientData = await getClientInfo();
-        if (clientData.isLoggedIn) {
+        if (clientData.status) {
           this.isLoggedIn = true;
           this.user = { name: clientData.name, role: clientData.role };
-          // this.notifications = clientData.notifications;
+          this.notifications = clientData.notifications;
         }
       } catch (error) {
         console.error('Error fetching user status:', error);
