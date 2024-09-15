@@ -134,7 +134,7 @@
                   <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.JoinDate }}</h3>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
-                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled :value="form.joinDate" />
+                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled :value="form.creationTime" />
                     </div>
                   </div>
                 </div>
@@ -174,14 +174,11 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { useStore } from 'vuex';
 // import Alert from '@/components/Alert.vue'; 
 import { getClientInfo } from '../../services/userService.js';
 
 export default {
   setup() {
-    const store = useStore();
-
     const form = ref({
       fullName: '',
       bio: '',
@@ -191,7 +188,7 @@ export default {
       dateOfBirth: '',
       enrollmentCount: '',
       role: '',
-      joinDate: ''
+      creationTime: ''
     });
     const loading = ref(true);
     const alertMessage = ref(null);
@@ -219,9 +216,18 @@ export default {
       ConfirmQuestion: 'Update your profile?'
     };
 
+    const roleMapping = {
+      1: 'Instructor',
+      2: 'Learner',
+      3: 'Admin'
+    };
+
     const fetchProfile = async () => {
       try {
         const clientData = await getClientInfo(); 
+        clientData.role = roleMapping[clientData.role] || 'Unknown';
+        clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
+        clientData.creationTime = formatDate(clientData.creationTime);
         if (clientData.avatarUrl) {
           clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id); 
         }
@@ -234,15 +240,24 @@ export default {
       }
     };
 
-    const getAvatarApiUrl = (avatarUrl, userId) => {
-      if (!avatarUrl) return '/img/User_Empty.png'; // Đường dẫn mặc định nếu không có avatar
-      return avatarUrl.startsWith('http') ? avatarUrl : `http://localhost:7277/api/users/avatar/${userId}`;
+    const formatDate = (date) => {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toISOString().split('T')[0]; // YYYY-MM-DD format
     };
+
+    const getAvatarApiUrl = (avatarUrl, userId) => {
+      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png'; // Default image path if not available
+      return avatarUrl.startsWith('http')
+        ? avatarUrl
+        : `https://localhost:7277/api/Users/avatar/${userId}`; // Replace with actual base URL
+    };
+
 
     const handleAvatarChange = event => {
       const file = event.target.files[0];
       if (file) {
-        form.value.avatarUrl = URL.createObjectURL(file);
+        form.value.avatar = URL.createObjectURL(file);
       }
     };
 
@@ -291,4 +306,12 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@import '../../../public/assets/css/Profile/1643.ad151cd3.chunk.css';
+@import '../../../public/assets/css/Profile/793.a40e2718.chunk.css';
+@import '../../../public/assets/css/Profile/821.2ca926ad.chunk.css';
+@import '../../../public/assets/css/Profile/8282.7278d4b3.chunk.css';
+@import '../../../public/assets/css/Profile/main.16480feb.css';
+@import '../../../public/assets/css/Profile/style.css';
+@import '../../../public/assets/css/Profile/styleProfile.css';
+</style>
