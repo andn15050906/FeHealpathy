@@ -2,7 +2,7 @@
   <div v-if="loading">Loading...</div>
   <div v-else-if="error">Error: {{ error.message }}</div>
   <div v-else>
-    <header id="page-header" class="row">
+    <header id="page-header" class="row" style="margin-top: 100px; margin-bottom: 20px;">
       <div class="col-12 pt-3 pb-3">
         <div class="card">
           <div class="card-body ">
@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { getAssignment } from '../services/assignmentService'; 
+import { getAssignment } from '@/services/assignmentService'; 
 
 export default {
   data() {
