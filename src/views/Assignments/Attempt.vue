@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { getAssignment } from '../services/assignmentService'; 
+import { getAssignment } from '@/services/assignmentService'; 
 
 export default {
   data() {

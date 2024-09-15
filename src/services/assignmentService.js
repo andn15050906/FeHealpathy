@@ -10,3 +10,12 @@ export const getAssignment = async (id) => {
   }
 };
 
+export const getAssignments = async () => {
+  try {
+    const response = await api.get(`/assignments`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch assignment:', error);
+    throw error;
+  }
+};

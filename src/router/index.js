@@ -1,4 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import CreateAssignment from '@/views/Assignment/Create.vue'
+import ManageAssignments from '@/views/Assignment/Manage.vue'
+import OverviewAssignment from '@/views/Assignment/Overview.vue'
+import ReviewAssignment from '@/views/Assignment/Review.vue'
+import AttemptAssignment from '@/views/Assignment/Attempt.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,14 +14,34 @@ const router = createRouter({
       component: () => import('../components/HomeLayout/HomePage.vue')
     },
     {
-      path: '/assignment',
-      name: 'assignmentPage',
-      component: () => import('../views/Assignments/AssignmentAttempt.vue')
+      path: '/assignments/create',
+      name: 'CreateAssignment',
+      component: CreateAssignment
+    },
+    {
+      path: '/assignments/manage',
+      name: 'ManageAssignments',
+      component: ManageAssignments
+    },
+    {
+      path: '/assignments/overview',
+      name: 'OverviewAssignment',
+      component: OverviewAssignment
+    },
+    {
+      path: '/assignments/:assignmentId/review/:submissionId',
+      name: 'ReviewAssignment',
+      component: ReviewAssignment,
+    },
+    {
+      path: '/assignments/:id/attempt',
+      name: 'AttemptAssignment',
+      component: AttemptAssignment
     },
     {
       path: '/sign-in',
       name: 'signinPage',
-      component: () => import('../views/Auth/SignIn.vue')
+      component: () => import('../views/auth/SignIn.vue')
     },
     {
       path: '/courses',
@@ -42,18 +67,4 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
-});
-
-export default router
-router.beforeEach((to, from, next) => {
-  // const publicPages = ['/','/sign-in','/courses'];
-//   const adminPages = ['/product'];
-//   const authRequired = !publicPages.includes(to.path);
-//   const loggedIn = localStorage.getItem('accessToken');
-//   if (authRequired && !loggedIn) {
-//     next('/');
-//   } else {
-//     next();
-//   }
-    next();
 });
