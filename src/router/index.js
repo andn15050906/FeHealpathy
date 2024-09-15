@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import CreateAssignment from '@/views/Assignment/Create.vue'
-import ManageAssignments from '@/views/Assignment/Manage.vue'
-import OverviewAssignment from '@/views/Assignment/Overview.vue'
-import ReviewAssignment from '@/views/Assignment/Review.vue'
-import AttemptAssignment from '@/views/Assignment/Attempt.vue'
+import CreateAssignment from '@/views/Assignments/Create.vue'
+import ManageAssignments from '@/views/Assignments/Manage.vue'
+import OverviewAssignment from '@/views/Assignments/Overview.vue'
+import ReviewAssignment from '@/views/Assignments/Review.vue'
+import AttemptAssignment from '@/views/Assignments/Attempt.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,3 +68,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
+export default router;
