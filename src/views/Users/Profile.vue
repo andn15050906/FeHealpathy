@@ -134,7 +134,8 @@
                   <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.JoinDate }}</h3>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
-                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled :value="form.creationTime" />
+                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled
+                        :value="form.creationTime" />
                     </div>
                   </div>
                 </div>
@@ -175,13 +176,14 @@
 <script>
 import { ref, onMounted } from 'vue';
 // import Alert from '@/components/Alert.vue'; 
-import { getClientInfo } from '../../services/userService.js';
+import { getClientInfo, updateUserProfile } from '../../services/userService.js';
 
 export default {
   setup() {
     const form = ref({
       fullName: '',
       bio: '',
+      avatar: null,
       avatarUrl: '',
       email: '',
       userName: '',
@@ -224,15 +226,15 @@ export default {
 
     const fetchProfile = async () => {
       try {
-        const clientData = await getClientInfo(); 
+        const clientData = await getClientInfo();
         clientData.role = roleMapping[clientData.role] || 'Unknown';
         clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
         clientData.creationTime = formatDate(clientData.creationTime);
         if (clientData.avatarUrl) {
-          clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id); 
+          clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id);
         }
         Object.assign(form.value, clientData);
-        loading.value = false; 
+        loading.value = false;
       } catch (error) {
         console.error('Error fetching client info:', error);
         alertMessage.value = 'Error fetching profile information.';
@@ -247,17 +249,18 @@ export default {
     };
 
     const getAvatarApiUrl = (avatarUrl, userId) => {
-      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png'; // Default image path if not available
+      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png';
       return avatarUrl.startsWith('http')
         ? avatarUrl
-        : `https://localhost:7277/api/Users/avatar/${userId}`; // Replace with actual base URL
+        : `https://localhost:7277/api/Users/avatar/${userId}`;
     };
 
 
     const handleAvatarChange = event => {
       const file = event.target.files[0];
       if (file) {
-        form.value.avatar = URL.createObjectURL(file);
+        form.value.avatar = file; // Save the file to send to the server
+        form.value.avatarUrl = URL.createObjectURL(file); // Preview the image
       }
     };
 
@@ -273,7 +276,15 @@ export default {
     const confirmChanges = async () => {
       try {
         const formData = new FormData();
-        Object.keys(form.value).forEach(key => formData.append(key, form.value[key]));
+        formData.append('fullName', form.value.fullName);
+        formData.append('bio', form.value.bio);
+        formData.append('dateOfBirth', form.value.dateOfBirth);
+        if (form.value.avatar) {
+          formData.append('avatar', form.value.avatar); // Append avatar if it's updated
+        }
+        formData.forEach((value, key) => {
+          console.log(`FormData - ${key}:`, value);
+        });
         await updateUserProfile(formData);
         alertMessage.value = 'Profile updated successfully!';
       } catch (error) {

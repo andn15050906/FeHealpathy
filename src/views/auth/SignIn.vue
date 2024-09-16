@@ -81,7 +81,6 @@
   const handleSignIn = async () => {
     try {
       const data = await signIn(identifier.value, password.value);
-      localStorage.setItem('token', data.token);
       isSuccess.value = true;
       errorMessage.value = '';
       router.push('/');
