@@ -85,6 +85,21 @@ export const updateUserProfile = async (formData) => {
     }
   };
 
+  // export const changePassword = async (formData) => {
+//   try {
+//     const response = await api.patch('/Users', formData, {
+//       headers: {
+//         'Content-Type': 'multipart/form-data',
+//       },
+//     });
+
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error updating password:', error.response ? error.response.data : error.message);
+//     throw error;
+//   }
+// };
+
 export const requestPasswordReset = async (email) => {
   try {
     const response = await api.post(`/Users/ForgotPassword`, { email });
@@ -114,3 +129,32 @@ export const checkValidity = async (email, token) => {
     throw error;
   }
 };
+
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post('/Users/ForgotPassword', email);
+    return response.data; 
+  } catch (error) {
+    console.error('Forgot password failed:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+
+
+
+
+// export const resetPassword = async (email, token, newPassword) => {
+//   try {
+//     const requestBody = {
+//       Email: email,
+//       Token: token,
+//       NewPassword: newPassword,
+//     };
+//     const response = await api.post('/Users/ResetPassword', requestBody);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Reset password failed:', error.response ? error.response.data : error.message);
+//     throw error;
+//   }
+// };

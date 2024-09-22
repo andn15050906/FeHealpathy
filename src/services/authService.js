@@ -30,16 +30,7 @@ export const register = async (username, email, password) => {
   }
 };
 
-export const forgotPassword = async (email) => {
-  try {
-    const response = await api.post('/Users/ForgotPassword', email);
-    return response.data; // Trả về link hoặc token từ server
-  } catch (error) {
-    // Xử lý lỗi chi tiết
-    console.error('Forgot password failed:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
+
 
 
 export const resetPassword = async (email, token, newPassword) => {
@@ -57,20 +48,7 @@ export const resetPassword = async (email, token, newPassword) => {
   }
 };
 
-export const changePassword = async (currentPassword, newPassword) => {
-  try {
-    const requestBody = {
-      CurrentPassword: currentPassword,
-      NewPassword: newPassword
-    };
 
-    
-    const response = await api.patch('/Users', requestBody);
-    return response.data;
-  } catch (error) {
-    console.error('Update password failed:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
+
 
 
