@@ -1,3 +1,4 @@
+import { resetPassword } from '@/services/authService';
 import { createRouter, createWebHistory } from 'vue-router'
 import CreateAssignment from '@/views/Assignments/Create.vue'
 import ManageAssignments from '@/views/Assignments/Manage.vue'
@@ -49,6 +50,21 @@ const router = createRouter({
       component: () => import('../views/Courses/CourseList.vue')
     },
     {
+      path: '/change-password',
+      name: 'changePassword',
+      component: () => import('../views/Auth/ChangePassword.vue')
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgotPassword',
+      component: () => import('../views/auth/ForgotPassword.vue')
+    },
+    {
+      path: '/reset-password/:email/:resetToken',
+      name: 'resetPassword',
+      component: () => import('../views/Auth/ResetPassword.vue'),
+      props: true
+    },{
       path: '/profile',
       name: 'profilePage',
       component: () => import('../views/Users/Profile.vue')
