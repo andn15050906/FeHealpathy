@@ -19,7 +19,7 @@
                     <nav role="navigation" aria-label="Breadcrumb trail">
                       <ol class="breadcrumb">
                         <li class="breadcrumb-item">
-                          <router-link :to="{ name: 'AssignmentOverview', params: { id: assignmentId } }">
+                          <router-link :to="{ name: 'OverviewAssignment', params: { id: assignmentId } }">
                             {{ assignmentName }}
                           </router-link>
                         </li>
