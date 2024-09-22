@@ -62,7 +62,9 @@ export const getAllMinUsers = async () => {
 
 export const getUserAvatar = async (resourceId) => {
   try {
-    const response = await api.get(`/users/avatar/${resourceId}`, { responseType: 'blob' });
+    const response = await api.get(`/Users/avatar/${resourceId}`, {
+      responseType: "blob",
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching user avatar:', error.response ? error.response.data : error.message);
@@ -72,20 +74,23 @@ export const getUserAvatar = async (resourceId) => {
 
 // Update user profile
 export const updateUserProfile = async (formData) => {
-    try {
-      const response = await api.patch(`/Users`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error updating user profile:', error.response ? error.response.data : error.message);
-      throw error;
-    }
-  };
+  try {
+    const response = await api.patch(`/Users`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user profile:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
 
-  // export const changePassword = async (formData) => {
+// export const changePassword = async (formData) => {
 //   try {
 //     const response = await api.patch('/Users', formData, {
 //       headers: {
@@ -100,29 +105,26 @@ export const updateUserProfile = async (formData) => {
 //   }
 // };
 
-export const requestPasswordReset = async (email) => {
+export const resetPassword = async (email, token, newPassword) => {
   try {
-    const response = await api.post(`/Users/ForgotPassword`, { email });
+    const requestBody = {
+      Email: email,
+      Token: token,
+      NewPassword: newPassword,
+    };
+    const response = await api.post('/Users/ResetPassword', requestBody);
     return response.data;
   } catch (error) {
-    console.error('Error requesting password reset:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-export const resetPassword = async (dto) => {
-  try {
-    const response = await api.post(`/Users/ResetPassword`, dto);
-    return response.data;
-  } catch (error) {
-    console.error('Error resetting password:', error.response ? error.response.data : error.message);
+    console.error('Reset password failed:', error.response ? error.response.data : error.message);
     throw error;
   }
 };
 
 export const checkValidity = async (email, token) => {
   try {
-    const response = await api.get(`/Users/CheckValidity`, { params: { email, token } });
+    const response = await api.get(`/Users/CheckValidity`, {
+      params: { email, token },
+    });
     return response.data;
   } catch (error) {
     console.error('Error checking token validity:', error.response ? error.response.data : error.message);
@@ -133,28 +135,9 @@ export const checkValidity = async (email, token) => {
 export const forgotPassword = async (email) => {
   try {
     const response = await api.post('/Users/ForgotPassword', email);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error('Forgot password failed:', error.response ? error.response.data : error.message);
     throw error;
   }
 };
-
-
-
-
-
-// export const resetPassword = async (email, token, newPassword) => {
-//   try {
-//     const requestBody = {
-//       Email: email,
-//       Token: token,
-//       NewPassword: newPassword,
-//     };
-//     const response = await api.post('/Users/ResetPassword', requestBody);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Reset password failed:', error.response ? error.response.data : error.message);
-//     throw error;
-//   }
-// };
