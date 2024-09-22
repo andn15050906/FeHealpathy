@@ -1,148 +1,152 @@
 <template>
-<div :class="['container', { 'right-panel-active': isSignUp }]">
-  <div class="form-container sign-up-container">
-    <form @submit.prevent="handleSignUp">
-      <h1>New Account</h1>
-      <div class="social-container">
-        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-      </div>
-      <label for="username">Username:</label>
-      <input v-model="form.username" type="text" id="username" required />
-      <label for="email">Email:</label>
-      <input v-model="form.email" type="email" id="email" required />
-      <label for="password">Password:</label>
-      <input v-model="form.password" type="password" id="password" required />
-      <label for="rePassword">Retype Password:</label>
-      <input v-model="form.rePassword" type="password" id="rePassword" required />
-      <button style="margin-top: 5px;" type="submit">Sign Up</button>
+	<div :class="['container', { 'right-panel-active': isSignUp }]">
+		<div class="form-container sign-up-container">
+			<form @submit.prevent="handleSignUp">
+				<h1>New Account</h1>
+				<div class="social-container">
+					<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+				</div>
+				<label for="username">Username:</label>
+				<input v-model="form.username" type="text" id="username" required />
+				<label for="email">Email:</label>
+				<input v-model="form.email" type="email" id="email" required />
+				<label for="password">Password:</label>
+				<input v-model="form.password" type="password" id="password" required />
+				<label for="rePassword">Retype Password:</label>
+				<input v-model="form.rePassword" type="password" id="rePassword" required />
+				<button style="margin-top: 5px;" type="submit">Sign Up</button>
 
-      <div :class="{'error-message': !isSuccess, 'success-message': isSuccess}" v-if="errorMessage">
-        {{ errorMessage }}
-      </div>
-    </form>
-  </div>
+				<div :class="{ 'error-message': !isSuccess, 'success-message': isSuccess }" v-if="errorMessage">
+					{{ errorMessage }}
+				</div>
+			</form>
+		</div>
 
-  <div class="form-container sign-in-container">
-    <form @submit.prevent="handleSignIn">
-      <h1>Sign in</h1>
-      <div class="social-container">
-        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-      </div>
-      <label>Username or Email:</label>
-      <input v-model="identifier" type="text" required />
-      <label>Password:</label>
-      <input v-model="password" type="password" required />
-      <router-link to="/forgot-password">Forgot your password?</router-link>
-      <button type="submit">Sign In</button>
+		<div class="form-container sign-in-container">
+			<form @submit.prevent="handleSignIn">
+				<h1>Sign in</h1>
+				<div class="social-container">
+					<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+				</div>
+				<label>Username or Email:</label>
+				<input v-model="identifier" type="text" required />
+				<label>Password:</label>
+				<input v-model="password" type="password" required />
+				<router-link to="/forgot-password">Forgot your password?</router-link>
+				<button type="submit">Sign In</button>
 
-      <div class="error-message" v-if="errorMessage && !isSuccess">
-        {{ errorMessage }}
-      </div>
-    </form>
-  </div>
+				<div class="error-message" v-if="errorMessage && !isSuccess">
+					{{ errorMessage }}
+				</div>
+			</form>
+		</div>
 
-  
-  
-  <div class="overlay-container">
-    <div class="overlay">
-      <div class="overlay-panel overlay-left">
-        <h1>Welcome Back!</h1>
-        <p>To keep connected with us please login with your personal info</p>
-        <button @click="showSignIn" class="ghost" id="signIn">Sign In</button>
-      </div>
-      <div class="overlay-panel overlay-right">
-        <h1>Hello, Friend!</h1>
-        <p>Enter your personal details and start journey with us</p>
-        <button @click="showSignUp" class="ghost" id="signUp">Sign Up</button>
-      </div>
-    </div>
-  </div>
-</div>
-
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-left">
+					<h1>Welcome Back!</h1>
+					<p>To keep connected with us please login with your personal info</p>
+					<button @click="showSignIn" class="ghost" id="signIn">Sign In</button>
+				</div>
+				<div class="overlay-panel overlay-right">
+					<h1>Hello, Friend!</h1>
+					<p>Enter your personal details and start journey with us</p>
+					<button @click="showSignUp" class="ghost" id="signUp">Sign Up</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
-  
+
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { signIn, register } from '../../services/authService.js';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { signIn, register } from '../../services/authService.js'; // Add new requestPasswordReset service
 
-  const form = ref({
-    username: '',
-    email: '',
-    password: '',
-    rePassword: ''
-  });
+const form = ref({
+	username: '',
+	email: '',
+	password: '',
+	rePassword: ''
+});
 
-  const identifier = ref('');
-  const password = ref('');
-  const errorMessage = ref('');
-  const isSuccess = ref(false);
-  const isSignUp = ref(false);
-  const router = useRouter();
+const identifier = ref('');
+const password = ref('');
+const email = ref('');
+const errorMessage = ref('');
+const successMessage = ref('');
+const isSuccess = ref(false);
+const isSignUp = ref(false);
+const isForgotPassword = ref(false);
+const router = useRouter();
 
-  const handleSignIn = async () => {
-    try {
-      const data = await signIn(identifier.value, password.value);
-      isSuccess.value = true;
-      errorMessage.value = '';
-      router.push('/');
-    } catch (error) {
-      console.error("Sign-in error:", error);
-      errorMessage.value = 'Login failed. Please try again.';
-      isSuccess.value = false;
-    }
-  };
+const handleSignIn = async () => {
+	try {
+		const data = await signIn(identifier.value, password.value);
+		console.log("Token:", data.token);
+		localStorage.setItem('token', data.token);
+		isSuccess.value = true;
+		errorMessage.value = '';
+		router.push('/');
+	} catch (error) {
+		console.error("Sign-in error:", error);
+		errorMessage.value = 'Login failed. Please try again.';
+		isSuccess.value = false;
+	}
+};
 
-  const handleSignUp = async () => {
-    if (form.value.password !== form.value.rePassword) {
-      errorMessage.value = 'Passwords do not match!';
-      isSuccess.value = false;
-      return;
-    }
+const handleSignUp = async () => {
+	if (form.value.password !== form.value.rePassword) {
+		errorMessage.value = 'Passwords do not match!';
+		isSuccess.value = false;
+		return;
+	}
 
-    try {
-      await register(form.value.username, form.value.email, form.value.password);
-      errorMessage.value = 'Registration successful! Please check your email to verify your account.';
-      isSuccess.value = true;
-      setTimeout(() => router.push('/sign-in'), 2000);
-    } catch (error) {
-      console.error('Registration error:', error);
-      errorMessage.value = 'Registration failed. Please try again.';
-      isSuccess.value = false;
-    }
-  };
+	try {
+		await register(form.value.username, form.value.email, form.value.password);
+		errorMessage.value = 'Registration successful! Please check your email to verify your account.';
+		isSuccess.value = true;
+		setTimeout(() => router.push('/sign-in'), 2000);
+	} catch (error) {
+		console.error('Registration error:', error);
+		errorMessage.value = 'Registration failed. Please try again.';
+		isSuccess.value = false;
+	}
+};
 
-  const showSignUp = () => {
-    isSignUp.value = true;
-  };
+const showSignUp = () => {
+	isSignUp.value = true;
+};
 
-  const showSignIn = () => {
-    isSignUp.value = false;
-  };
+const showSignIn = () => {
+	isSignUp.value = false;
+};
 </script>
 
 
 <style scoped>
 .error-message {
-  color: red;
-  margin-top: 10px;
+	color: red;
+	margin-top: 10px;
 }
+
 .success-message {
-  color: green;
-  margin-top: 10px;
+	color: green;
+	margin-top: 10px;
 }
+
 * {
 	box-sizing: border-box;
 }
 
 body {
-  background: #f6f5f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  font-family: 'Montserrat', sans-serif;
+	background: #f6f5f7;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
 }
 
 h1 {
@@ -219,16 +223,16 @@ input {
 }
 
 .container {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
-              0 10px 10px rgba(0,0,0,0.22);
-  position: relative;
-  overflow: hidden;
-  width: 768px;
-  max-width: 100%;
-  min-height: 550px;
-  margin-top: 200px;
+	background-color: #fff;
+	border-radius: 10px;
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+		0 10px 10px rgba(0, 0, 0, 0.22);
+	position: relative;
+	overflow: hidden;
+	width: 768px;
+	max-width: 100%;
+	min-height: 550px;
+	margin-top: 200px;
 }
 
 .form-container {
@@ -263,12 +267,15 @@ input {
 }
 
 @keyframes show {
-	0%, 49.99% {
+
+	0%,
+	49.99% {
 		opacity: 0;
 		z-index: 1;
 	}
-	
-	50%, 100% {
+
+	50%,
+	100% {
 		opacity: 1;
 		z-index: 5;
 	}
@@ -285,7 +292,7 @@ input {
 	z-index: 100;
 }
 
-.container.right-panel-active .overlay-container{
+.container.right-panel-active .overlay-container {
 	transform: translateX(-100%);
 }
 
@@ -301,12 +308,12 @@ input {
 	left: -100%;
 	height: 100%;
 	width: 200%;
-  	transform: translateX(0);
+	transform: translateX(0);
 	transition: transform 0.6s ease-in-out;
 }
 
 .container.right-panel-active .overlay {
-  	transform: translateX(50%);
+	transform: translateX(50%);
 }
 
 .overlay-panel {
