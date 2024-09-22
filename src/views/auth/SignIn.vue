@@ -32,7 +32,7 @@
       <input v-model="identifier" type="text" required />
       <label>Password:</label>
       <input v-model="password" type="password" required />
-      <a href="#">Forgot your password?</a>
+      <router-link to="/forgot-password">Forgot your password?</router-link>
       <button type="submit">Sign In</button>
 
       <div class="error-message" v-if="errorMessage && !isSuccess">
@@ -41,6 +41,8 @@
     </form>
   </div>
 
+  
+  
   <div class="overlay-container">
     <div class="overlay">
       <div class="overlay-panel overlay-left">
