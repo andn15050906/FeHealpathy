@@ -32,7 +32,7 @@
       <input v-model="identifier" type="text" required />
       <label>Password:</label>
       <input v-model="password" type="password" required />
-      <a href="#">Forgot your password?</a>
+      <router-link to="/forgot-password">Forgot your password?</router-link>
       <button type="submit">Sign In</button>
 
       <div class="error-message" v-if="errorMessage && !isSuccess">
@@ -41,6 +41,8 @@
     </form>
   </div>
 
+  
+  
   <div class="overlay-container">
     <div class="overlay">
       <div class="overlay-panel overlay-left">
@@ -60,64 +62,68 @@
 </template>
   
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { signIn, register } from '../../services/authService.js';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { signIn, register} from '../../services/authService.js'; // Add new requestPasswordReset service
 
-  const form = ref({
-    username: '',
-    email: '',
-    password: '',
-    rePassword: ''
-  });
+const form = ref({
+  username: '',
+  email: '',
+  password: '',
+  rePassword: ''
+});
 
-  const identifier = ref('');
-  const password = ref('');
-  const errorMessage = ref('');
-  const isSuccess = ref(false);
-  const isSignUp = ref(false);
-  const router = useRouter();
+const identifier = ref('');
+const password = ref('');
+const email = ref('');
+const errorMessage = ref('');
+const successMessage = ref('');
+const isSuccess = ref(false);
+const isSignUp = ref(false);
+const isForgotPassword = ref(false);
+const router = useRouter();
 
-  const handleSignIn = async () => {
-    try {
-      const data = await signIn(identifier.value, password.value);
-      localStorage.setItem('token', data.token);
-      isSuccess.value = true;
-      errorMessage.value = '';
-      router.push('/');
-    } catch (error) {
-      console.error("Sign-in error:", error);
-      errorMessage.value = 'Login failed. Please try again.';
-      isSuccess.value = false;
-    }
-  };
+const handleSignIn = async () => {
+  try {
+    const data = await signIn(identifier.value, password.value);
+	console.log("Token:", data.token);
+    localStorage.setItem('token', data.token);
+    isSuccess.value = true;
+    errorMessage.value = '';
+    router.push('/');
+  } catch (error) {
+    console.error("Sign-in error:", error);
+    errorMessage.value = 'Login failed. Please try again.';
+    isSuccess.value = false;
+  }
+};
 
-  const handleSignUp = async () => {
-    if (form.value.password !== form.value.rePassword) {
-      errorMessage.value = 'Passwords do not match!';
-      isSuccess.value = false;
-      return;
-    }
+const handleSignUp = async () => {
+  if (form.value.password !== form.value.rePassword) {
+    errorMessage.value = 'Passwords do not match!';
+    isSuccess.value = false;
+    return;
+  }
 
-    try {
-      await register(form.value.username, form.value.email, form.value.password);
-      errorMessage.value = 'Registration successful! Please check your email to verify your account.';
-      isSuccess.value = true;
-      setTimeout(() => router.push('/sign-in'), 2000);
-    } catch (error) {
-      console.error('Registration error:', error);
-      errorMessage.value = 'Registration failed. Please try again.';
-      isSuccess.value = false;
-    }
-  };
+  try {
+    await register(form.value.username, form.value.email, form.value.password);
+    errorMessage.value = 'Registration successful! Please check your email to verify your account.';
+    isSuccess.value = true;
+    setTimeout(() => router.push('/sign-in'), 2000);
+  } catch (error) {
+    console.error('Registration error:', error);
+    errorMessage.value = 'Registration failed. Please try again.';
+    isSuccess.value = false;
+  }
+};
 
-  const showSignUp = () => {
-    isSignUp.value = true;
-  };
+const showSignUp = () => {
+  isSignUp.value = true;
+};
 
-  const showSignIn = () => {
-    isSignUp.value = false;
-  };
+const showSignIn = () => {
+  isSignUp.value = false;
+};
 </script>
 
 
