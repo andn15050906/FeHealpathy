@@ -29,26 +29,3 @@ export const register = async (username, email, password) => {
     throw error;
   }
 };
-
-
-
-
-export const resetPassword = async (email, token, newPassword) => {
-  try {
-    const requestBody = {
-      Email: email,
-      Token: token,
-      NewPassword: newPassword,
-    };
-    const response = await api.post('/Users/ResetPassword', requestBody);
-    return response.data;
-  } catch (error) {
-    console.error('Reset password failed:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-
-
-
-
