@@ -15,7 +15,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { forgotPassword } from '@/services/authService.js';
+import { forgotPassword } from '@/services/userService.js';
 
 const email = ref('');
 const message = ref('');
