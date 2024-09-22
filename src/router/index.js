@@ -19,12 +19,12 @@ const router = createRouter({
       component: CreateAssignment
     },
     {
-      path: '/assignments/manage',
+      path: '/assignments/:courseId/manage',
       name: 'ManageAssignments',
       component: ManageAssignments
     },
     {
-      path: '/assignments/overview',
+      path: '/assignments/:id/overview',
       name: 'OverviewAssignment',
       component: OverviewAssignment
     },
