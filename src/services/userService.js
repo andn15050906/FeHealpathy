@@ -62,7 +62,7 @@ export const getAllMinUsers = async () => {
 
 export const getUserAvatar = async (resourceId) => {
   try {
-    const response = await api.get(`/Users/avatar/${resourceId}`, { responseType: 'blob' });
+    const response = await api.get(`/users/avatar/${resourceId}`, { responseType: 'blob' });
     return response.data;
   } catch (error) {
     console.error('Error fetching user avatar:', error.response ? error.response.data : error.message);

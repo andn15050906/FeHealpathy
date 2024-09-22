@@ -6,9 +6,13 @@
         <div class="Setting_wrapper__TX8z0">
           <div class="GroupField_wrapper__1-jfw">
             <!-- Alert Component -->
-            <!-- <Alert v-if="alertMessage" :message="alertMessage" /> -->
+            <Alert v-if="alertMessage" :message="alertMessage" :status="alertStatus" />
 
-            <form @submit.prevent="handleSubmit" enctype="multipart/form-data">
+            <div v-if="loading" class="loading-spinner">
+              <span>Loading...</span>
+            </div>
+
+            <form v-else @submit.prevent="handleSubmit" enctype="multipart/form-data">
               <h2 class="GroupField_heading__PIaoN">{{ text.PersonalInfo }}</h2>
 
               <!-- Full Name Field -->
@@ -134,7 +138,8 @@
                   <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.JoinDate }}</h3>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
-                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled :value="form.creationTime" />
+                      <input type="date" class="InputField_fieldContentInput__lO21W" disabled
+                        :value="form.creationTime" />
                     </div>
                   </div>
                 </div>
@@ -163,7 +168,7 @@
             <p class="text-primary">{{ text.ConfirmQuestion }}</p>
           </div>
           <div class="modal-footer">
-            <button @click="confirmChanges" type="button" class="btn btn-outline-danger">Yes</button>
+            <button @click="confirmChanges" type="button" class="btn btn-outline-danger btn-space">Yes</button>
             <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
           </div>
         </div>
@@ -174,14 +179,18 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-// import Alert from '@/components/Alert.vue'; 
-import { getClientInfo } from '../../services/userService.js';
+import Alert from '../../components/Alert/Alert.vue';
+import { getClientInfo, updateUserProfile } from '../../services/userService.js';
 
 export default {
+  components: {
+    Alert
+  },
   setup() {
     const form = ref({
       fullName: '',
       bio: '',
+      avatar: null,
       avatarUrl: '',
       email: '',
       userName: '',
@@ -192,6 +201,7 @@ export default {
     });
     const loading = ref(true);
     const alertMessage = ref(null);
+    const alertStatus = ref(true);
 
     const text = {
       PersonalInfo: 'Personal Info',
@@ -224,40 +234,41 @@ export default {
 
     const fetchProfile = async () => {
       try {
-        const clientData = await getClientInfo(); 
+        const clientData = await getClientInfo();
         clientData.role = roleMapping[clientData.role] || 'Unknown';
         clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
         clientData.creationTime = formatDate(clientData.creationTime);
         if (clientData.avatarUrl) {
-          clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id); 
+          clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id);
         }
         Object.assign(form.value, clientData);
-        loading.value = false; 
+        loading.value = false;
       } catch (error) {
         console.error('Error fetching client info:', error);
         alertMessage.value = 'Error fetching profile information.';
+        alertStatus.value = false;
         loading.value = false;
       }
     };
 
     const formatDate = (date) => {
       if (!date) return '';
-      const d = new Date(date);
-      return d.toISOString().split('T')[0]; // YYYY-MM-DD format
+      return date.split('T')[0];
     };
 
     const getAvatarApiUrl = (avatarUrl, userId) => {
-      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png'; // Default image path if not available
+      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png';
       return avatarUrl.startsWith('http')
         ? avatarUrl
-        : `https://localhost:7277/api/Users/avatar/${userId}`; // Replace with actual base URL
+        : `https://localhost:7277/api/Users/avatar/${userId}`;
     };
 
 
     const handleAvatarChange = event => {
       const file = event.target.files[0];
       if (file) {
-        form.value.avatar = URL.createObjectURL(file);
+        form.value.avatar = file;
+        form.value.avatarUrl = URL.createObjectURL(file);
       }
     };
 
@@ -272,13 +283,41 @@ export default {
 
     const confirmChanges = async () => {
       try {
+        loading.value = true;
         const formData = new FormData();
-        Object.keys(form.value).forEach(key => formData.append(key, form.value[key]));
-        await updateUserProfile(formData);
+        formData.append('fullName', form.value.fullName);
+        formData.append('bio', form.value.bio);
+        formData.append('dateOfBirth', form.value.dateOfBirth);
+        if (form.value.avatar) {
+          formData.append('avatar.file', form.value.avatar);
+        }
+        formData.forEach((value, key) => {
+          console.log(`FormData - ${key}:`, value);
+        });
+        const response = await updateUserProfile(formData);
+        if (response.avatarUrl) {
+          form.value.avatarUrl = response.avatarUrl;
+        }
+
+        // Hide the modal
+        const modal = document.getElementById('app-confirm-modal');
+        if (modal) {
+          const bsModal = bootstrap.Modal.getInstance(modal);
+          bsModal.hide();
+        }
+
         alertMessage.value = 'Profile updated successfully!';
+        alertStatus.value = true;
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } catch (error) {
         console.error('Error updating profile:', error);
         alertMessage.value = 'Error updating profile.';
+        alertStatus.value = false;
+      } finally {
+        loading.value = false;
       }
     };
 
@@ -296,6 +335,7 @@ export default {
       text,
       loading,
       alertMessage,
+      alertStatus,
       handleAvatarChange,
       triggerAvatarUpload,
       openConfirmModal,
@@ -314,4 +354,43 @@ export default {
 @import '../../../public/assets/css/Profile/main.16480feb.css';
 @import '../../../public/assets/css/Profile/style.css';
 @import '../../../public/assets/css/Profile/styleProfile.css';
+
+.loading-spinner {
+  text-align: center;
+  font-size: 18px;
+  color: #007bff;
+}
+
+.modal-footer .btn-space {
+  margin-right: 15px;
+}
+
+.modal-footer .btn {
+  padding: 8px 15px; 
+  font-weight: bold;  
+  border-radius: 8px; 
+}
+
+.modal-footer .btn-outline-danger {
+  background-color: red; 
+  color: white;
+  border-color: red;
+}
+
+.modal-footer .btn-outline-danger:hover {
+  background-color: darkred; 
+  color: white;
+}
+
+.modal-footer .btn-outline-primary {
+  background-color: #007bff; 
+  color: white;
+  border-color: #007bff;
+}
+
+.modal-footer .btn-outline-primary:hover {
+  background-color: #0056b3; 
+  color: white;
+}
+
 </style>
