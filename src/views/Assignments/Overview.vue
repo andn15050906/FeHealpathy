@@ -34,7 +34,7 @@
                         <td class="cell c3" style="text-align:center;">{{ submission.mark }}</td>
                         <td class="cell c3" style="text-align:center;">{{ submission.timeSpentInSec }} seconds</td>
                         <td class="cell c4 lastcol" style="text-align:center;">
-                          <router-link :to="{ name: 'AssignmentReview', params: { assignmentId: assignment.id, submissionId: submission.id } }">
+                          <router-link :to="{ name: 'ReviewAssignment', params: { assignmentId: assignment.id, submissionId: submission.id } }">
                             Review
                           </router-link>
                         </td>
@@ -68,31 +68,20 @@
   </template>
   
   <script>
+  import { getMin, getByAssignmentId } from '@/services/assignmentService'; 
+
   export default {
+    props: {
+      id: String,
+    },
     data() {
       return {
-        assignment: {
-          name: 'Assignment Name',
-          duration: 120, // Example, replace with actual data
-          id: 1, // Example, replace with actual data
-        },
+        assignment: {},
         passGrade: 8,
-        submissions: [
-          // Example submissions, replace with actual data
-          {
-            id: 1,
-            lastModificationTime: '2024-09-08 12:00:00',
-            mark: 7.5,
-            timeSpentInSec: 300,
-          },
-          {
-            id: 2,
-            lastModificationTime: '2024-09-08 13:00:00',
-            mark: 9.0,
-            timeSpentInSec: 250,
-          },
-        ],
+        submissions: [],
       };
+    },
+    method :{
     },
     computed: {
       highestGrade() {
@@ -102,8 +91,8 @@
       },
     },
     mounted() {
-      // Fetch the assignment and submissions from the backend API here
-      // For now, we use hardcoded data for illustration
+      this.assignment = getMin(this.id);
+      this.submissions = getByAssignmentId(this.id);
     },
   };
   </script>

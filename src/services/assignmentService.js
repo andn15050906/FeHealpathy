@@ -19,3 +19,37 @@ export const getAssignments = async () => {
     throw error;
   }
 };
+
+export const getMin = async (id) => {
+  try {
+    const response = await api.get(`/${id}/min`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch assignment:', error);
+    throw error;
+  }
+};
+
+export const getByAssignmentId = async (assignmentId) => {
+  try {
+    const response = await api.get(`/submissions/ByAssignment`, {
+      params: { assignmentId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch assignment:', error);
+    throw error;
+  }
+};
+
+export const getByCourse = async (courseId) => {
+  try {
+    const response = await api.get(`/assignments/ByCourse`, {
+      params: { courseId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch assignment:', error);
+    throw error;
+  }
+};

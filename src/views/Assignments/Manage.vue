@@ -45,22 +45,33 @@
   </template>
   
   <script>
-  import { getAssignments } from '@/services/assignmentService'; 
-  
+  import { getByCourse } from '@/services/assignmentService';
+  import { getCourseDetail } from '@/services/courseService';
+
   export default {
+    props: {
+      courseId: String,
+    },
     data() {
       return {
+        courseId: this.courseId,
+        course: {},
         assignments: [], // Array to hold assignment data
       };
     },
     mounted() {
       // Fetch the assignment data when the component is mounted
-      this.getAssignments();
+      this.getCourseDetail();
+      this.getByCourse();
     },
     methods: {
-      async getAssignments() {
-        const data = await getAssignments();
+      async getByCourse() {
+        const data = await getByCourse(this.courseId);
         this.assignments = data;
+      },
+      async getCourseDetail() {
+        const data = await getCourseDetail(this.courseId);
+        this.course = data;
       },
     },
   };
