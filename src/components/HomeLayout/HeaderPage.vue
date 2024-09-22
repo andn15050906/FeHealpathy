@@ -15,7 +15,6 @@
         </ul>
       </div>
       <div class="user-actions">
-        <!-- Check if user is logged in -->
         <div v-if="isLoggedIn">
           <div class="notification dropdown" @click="toggleNotifications">
             <i class="fa fa-bell"></i>
@@ -45,8 +44,8 @@
 </template>
 
 <script>
-import { getClientInfo } from '@/services/userService'; 
-import { getNotifications, updateNotification } from '@/services/notificationService'; 
+import { getClientInfo } from '@/services/userService';
+import { getNotifications, updateNotification } from '@/services/notificationService';
 
 export default {
   data() {
@@ -81,7 +80,7 @@ export default {
     async fetchNotifications() {
       try {
         if (this.isLoggedIn) {
-          const notifications = await getNotifications(this.user.id); 
+          const notifications = await getNotifications(this.user.id);
           this.notifications = notifications;
         }
       } catch (error) {
@@ -114,59 +113,55 @@ export default {
 </script>
 
 <style scoped>
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Nunito', sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Nunito', sans-serif;
 }
 
-a{
-    text-decoration: none;
+a {
+  text-decoration: none;
 }
 
-ul{
-    list-style: none;
+ul {
+  list-style: none;
 }
 
-.header{
-    width: 100%;
-    height: 80px;
-    background-color: #fff;
-    position: fixed;
-    top: 0;
+.header {
+  width: 100%;
+  height: 60px; /* Giảm chiều cao */
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  z-index: 1000; /* Đảm bảo header luôn nằm trên cùng */
 }
 
-.header .navbar{
-    width: 100%;
-    height: 80px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: absolute;
-    margin-top: 30px;
-}
-
-.logo img{
-    margin-left: 100px;
-}
-
-.menu ul li{
-    display: inline-block;
-    padding: 0 25px;
-    cursor: pointer;
-    font-size: 19px;
-    font-weight: 700;
-    line-height: 80px;
-    align-items: center;
-}
-
-.navbar {
+.header .navbar {
+  width: 100%;
+  max-width: 1200px; /* Giới hạn chiều rộng */
+  margin: 0 auto; /* Canh giữa */
+  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 100px;
-  height: 100%;
+  padding: 0 20px; /* Giảm khoảng cách hai bên */
+}
+
+.logo img {
+  max-height: 40px; /* Giảm kích thước logo */
+}
+
+.menu ul {
+  display: flex;
+}
+
+.menu ul li {
+  padding: 0 15px; /* Giảm khoảng cách giữa các mục menu */
+  cursor: pointer;
+  font-size: 16px; /* Giảm kích thước font */
+  font-weight: 600;
+  line-height: 60px;
 }
 
 .user-actions {
@@ -176,7 +171,7 @@ ul{
 
 .notification, .profile {
   position: relative;
-  margin-left: 15px;
+  margin-left: 10px; /* Giảm khoảng cách giữa notification và profile */
   cursor: pointer;
 }
 
@@ -194,14 +189,13 @@ ul{
   padding: 5px 10px;
 }
 
-.login-btn{
-    display: block;
-    font-size: 19px;
-    font-weight: 700;
-    cursor: pointer;
-    border-radius: 30px;
-    background-color: #f3ef51;
-    padding: 8px 40px;
-    margin-right: 100px;
+.login-btn {
+  display: block;
+  font-size: 14px; /* Giảm kích thước chữ của nút login */
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 20px; /* Giảm bo góc */
+  background-color: #f3ef51;
+  padding: 5px 20px; /* Giảm padding */
 }
 </style>

@@ -1,99 +1,107 @@
 <template>
     <footer>
-        <div class="footerContainer">
-            <div class="socialIcons">
-                <a href=""><i class="fa-brands fa-facebook"></i></a>
-                <a href=""><i class="fa-brands fa-instagram"></i></a>
-                <a href=""><i class="fa-brands fa-twitter"></i></a>
-                <a href=""><i class="fa-brands fa-google-plus"></i></a>
-                <a href=""><i class="fa-brands fa-youtube"></i></a>
-            </div>
-            <div class="footerNav">
-                <ul>
-                    <li><a href="">Home</a></li>
-                    <li><a href="">News</a></li>
-                    <li><a href="">About</a></li>
-                    <li><a href="">Contact Us</a></li>
-                    <li><a href="">Our Team</a></li>
-                </ul>
-            </div>
+      <div class="footerContainer">
+        <div class="socialIcons">
+          <a href=""><i class="fa-brands fa-facebook"></i></a>
+          <a href=""><i class="fa-brands fa-instagram"></i></a>
+          <a href=""><i class="fa-brands fa-twitter"></i></a>
+          <a href=""><i class="fa-brands fa-google-plus"></i></a>
+          <a href=""><i class="fa-brands fa-youtube"></i></a>
         </div>
+        <div class="footerNav">
+          <ul>
+            <li><a href="">Home</a></li>
+            <li><a href="">News</a></li>
+            <li><a href="">About</a></li>
+            <li><a href="">Contact Us</a></li>
+            <li><a href="">Our Team</a></li>
+          </ul>
+        </div>
+      </div>
     </footer>
-</template>
-
-<style scoped>
-* {
+  </template>
+  
+  <style scoped>
+  * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-}
-
-body {
-    margin-bottom: 100px; /* Tạo khoảng trống cho footer */
-}
-
-footer {
+  }
+  
+  footer {
+    width: 100%;
+    background-color: #222;
+    padding: 5px 0; /* Giảm padding trên và dưới */
     position: fixed;
     bottom: 0;
-    width: 100%;
-    background-color: #111;
-}
-
-.footerContainer {
-    width: 100%;
-    padding: 10px;
-    margin: 0;
-}
-
-.socialIcons {
+  }
+  
+  .footerContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0; /* Loại bỏ padding để giảm chiều cao */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .socialIcons {
     display: flex;
     justify-content: center;
-}
-
-.socialIcons a {
+    margin-bottom: 5px;
+  }
+  
+  .socialIcons a {
     text-decoration: none;
     padding: 5px;
     background-color: white;
-    margin: 5px;
+    margin: 3px;
     border-radius: 50%;
-}
-
-.socialIcons a i {
-    font-size: 2em;
-    color: black;
-    opacity: 0.9;
-}
-
-.socialIcons a:hover {
-    background-color: #111;
-    transition: 0.5s;
-}
-
-.socialIcons a:hover i {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .socialIcons a i {
+    font-size: 1em;
+    color: #e00;
+  }
+  
+  .socialIcons a:hover {
+    background-color: #e00;
+    transition: 0.3s;
+  }
+  
+  .socialIcons a:hover i {
     color: white;
-    transition: 0.5s;
-}
-
-.footerNav {
-    margin: 20px 0;
-}
-
-.footerNav ul {
+  }
+  
+  .footerNav {
+    margin-top: 5px;
+  }
+  
+  .footerNav ul {
     display: flex;
     justify-content: center;
     list-style-type: none;
-}
-
-.footerNav ul li a {
+  }
+  
+  .footerNav ul li {
+    margin: 0 8px;
+  }
+  
+  .footerNav ul li a {
     color: white;
-    margin: 20px;
     text-decoration: none;
-    font-size: 1.3em;
+    font-size: 0.9em;
     opacity: 0.7;
-    transition: 0.5s;
-}
-
-.footerNav ul li a:hover {
+  }
+  
+  .footerNav ul li a:hover {
     opacity: 1;
-}
-</style>
+    color: #e00;
+  }
+  </style>
+  

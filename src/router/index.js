@@ -1,4 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
+import HomePage from '@/components/HomeLayout/HomePage.vue'
+
+import SignIn from '@/views/auth/SignIn.vue'
+import ChangePassword from '@/views/auth/ChangePassword.vue'
+import ForgotPassword from '@/views/auth/ForgotPassword.vue'
+import ResetPassword from '@/views/auth/ResetPassword.vue'
+import Profile from '@/views/Users/Profile.vue'
+import CourseList from '@/views/Courses/CourseList.vue'
 import CreateAssignment from '@/views/Assignments/Create.vue'
 import ManageAssignments from '@/views/Assignments/Manage.vue'
 import OverviewAssignment from '@/views/Assignments/Overview.vue'
@@ -11,7 +20,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'homePage',
-      component: () => import('../components/HomeLayout/HomePage.vue')
+      component: HomePage
     },
     {
       path: '/assignments/create',
@@ -19,12 +28,12 @@ const router = createRouter({
       component: CreateAssignment
     },
     {
-      path: '/assignments/manage',
+      path: '/assignments/:courseId/manage',
       name: 'ManageAssignments',
       component: ManageAssignments
     },
     {
-      path: '/assignments/overview',
+      path: '/assignments/:id/overview',
       name: 'OverviewAssignment',
       component: OverviewAssignment
     },
@@ -41,17 +50,33 @@ const router = createRouter({
     {
       path: '/sign-in',
       name: 'signinPage',
-      component: () => import('../views/auth/SignIn.vue')
+      component: SignIn
     },
     {
       path: '/courses',
       name: 'coursePage',
-      component: () => import('../views/Courses/CourseList.vue')
+      component: CourseList
+    },
+    {
+      path: '/change-password',
+      name: 'changePassword',
+      component: ChangePassword
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgotPassword',
+      component: ForgotPassword
+    },
+    {
+      path: '/reset-password/:email/:resetToken',
+      name: 'resetPassword',
+      component: ResetPassword,
+      props: true
     },
     {
       path: '/profile',
       name: 'profilePage',
-      component: () => import('../views/Users/Profile.vue')
+      component: Profile
     }
   ]
 })
