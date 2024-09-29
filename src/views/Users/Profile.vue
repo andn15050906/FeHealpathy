@@ -1,18 +1,14 @@
 <template>
   <div class="Setting_pageWrapper__PM+M5">
+    <!-- SweetAlert component -->
+    <SweetAlert ref="sweetAlert" />
     <section class="index-module_row__-AHgh">
       <section
         class="index-module_col__2EQm9 index-module_c-12__u7UXF index-module_m-12__2CxUL index-module_l-12__340Ve">
         <div class="Setting_wrapper__TX8z0">
           <div class="GroupField_wrapper__1-jfw">
-            <!-- Alert Component -->
-            <Alert v-if="alertMessage" :message="alertMessage" :status="alertStatus" />
 
-            <div v-if="loading" class="loading-spinner">
-              <span>Loading...</span>
-            </div>
-
-            <form v-else @submit.prevent="handleSubmit" enctype="multipart/form-data">
+            <form @submit.prevent="handleSubmit" enctype="multipart/form-data">
               <h2 class="GroupField_heading__PIaoN">{{ text.PersonalInfo }}</h2>
 
               <!-- Full Name Field -->
@@ -178,14 +174,11 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import Alert from '../../components/Alert/Alert.vue';
+import { inject, ref, onMounted } from 'vue';
+// import SweetAlert from '../../components/Helper/SweetAlert.vue';
 import { getClientInfo, updateUserProfile } from '../../services/userService.js';
 
 export default {
-  components: {
-    Alert
-  },
   setup() {
     const form = ref({
       fullName: '',
@@ -199,9 +192,8 @@ export default {
       role: '',
       creationTime: ''
     });
-    const loading = ref(true);
-    const alertMessage = ref(null);
-    const alertStatus = ref(true);
+    const loadingSpinner = inject('loadingSpinner');
+    // const sweetAlert = ref(null);
 
     const text = {
       PersonalInfo: 'Personal Info',
@@ -234,6 +226,7 @@ export default {
 
     const fetchProfile = async () => {
       try {
+        loadingSpinner.showSpinner();
         const clientData = await getClientInfo();
         clientData.role = roleMapping[clientData.role] || 'Unknown';
         clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
@@ -242,12 +235,14 @@ export default {
           clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id);
         }
         Object.assign(form.value, clientData);
-        loading.value = false;
       } catch (error) {
-        console.error('Error fetching client info:', error);
-        alertMessage.value = 'Error fetching profile information.';
-        alertStatus.value = false;
-        loading.value = false;
+        // await sweetAlert.value.showAlert({
+        //   title: 'Error!',
+        //   text: 'Error fetching profile information.',
+        //   icon: 'error',
+        //   confirmButtonText: 'OK'
+        // });
+        loadingSpinner.hideSpinner();
       }
     };
 
@@ -283,7 +278,7 @@ export default {
 
     const confirmChanges = async () => {
       try {
-        loading.value = true;
+        loadingSpinner.showSpinner();
         const formData = new FormData();
         formData.append('fullName', form.value.fullName);
         formData.append('bio', form.value.bio);
@@ -298,27 +293,32 @@ export default {
         if (response.avatarUrl) {
           form.value.avatarUrl = response.avatarUrl;
         }
-
         // Hide the modal
         const modal = document.getElementById('app-confirm-modal');
         if (modal) {
           const bsModal = bootstrap.Modal.getInstance(modal);
           bsModal.hide();
+          // await sweetAlert.value.showAlert({
+          //   title: 'Success!',
+          //   text: 'Profile updated successfully!',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // });
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         }
-
-        alertMessage.value = 'Profile updated successfully!';
-        alertStatus.value = true;
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       } catch (error) {
-        console.error('Error updating profile:', error);
-        alertMessage.value = 'Error updating profile.';
-        alertStatus.value = false;
+        // await sweetAlert.value.showAlert({
+        //   title: 'Error!',
+        //   text: 'Error updating profile.',
+        //   icon: 'error',
+        //   confirmButtonText: 'OK'
+        // });
       } finally {
-        loading.value = false;
+        loadingSpinner.hideSpinner();
       }
+
     };
 
     const handleSubmit = event => {
@@ -333,9 +333,7 @@ export default {
     return {
       form,
       text,
-      loading,
-      alertMessage,
-      alertStatus,
+      // sweetAlert,
       handleAvatarChange,
       triggerAvatarUpload,
       openConfirmModal,
@@ -355,10 +353,24 @@ export default {
 @import '../../../public/assets/css/Profile/style.css';
 @import '../../../public/assets/css/Profile/styleProfile.css';
 
-.loading-spinner {
-  text-align: center;
-  font-size: 18px;
-  color: #007bff;
+.Setting_wrapper__TX8z0 {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.GroupField_wrapper__1-jfw {
+  padding: 20px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
 }
 
 .modal-footer .btn-space {
@@ -366,31 +378,30 @@ export default {
 }
 
 .modal-footer .btn {
-  padding: 8px 15px; 
-  font-weight: bold;  
-  border-radius: 8px; 
+  padding: 8px 15px;
+  font-weight: bold;
+  border-radius: 8px;
 }
 
 .modal-footer .btn-outline-danger {
-  background-color: red; 
+  background-color: red;
   color: white;
   border-color: red;
 }
 
 .modal-footer .btn-outline-danger:hover {
-  background-color: darkred; 
+  background-color: darkred;
   color: white;
 }
 
 .modal-footer .btn-outline-primary {
-  background-color: #007bff; 
+  background-color: #007bff;
   color: white;
   border-color: #007bff;
 }
 
 .modal-footer .btn-outline-primary:hover {
-  background-color: #0056b3; 
+  background-color: #0056b3;
   color: white;
 }
-
 </style>
