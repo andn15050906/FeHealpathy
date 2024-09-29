@@ -1,5 +1,5 @@
 <template>
-  <div class="Setting_pageWrapper__PM+M5">
+   <CenterLayout>
     <!-- SweetAlert component -->
     <SweetAlert ref="sweetAlert" />
     <section class="index-module_row__-AHgh">
@@ -9,12 +9,12 @@
           <div class="GroupField_wrapper__1-jfw">
 
             <form @submit.prevent="handleSubmit" enctype="multipart/form-data">
-              <h2 class="GroupField_heading__PIaoN">{{ text.PersonalInfo }}</h2>
+              <h4 class="GroupField_heading__PIaoN">{{ text.PersonalInfo }}</h4>
 
               <!-- Full Name Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.FullName }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.FullName }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input v-model="form.fullName" type="text" class="InputField_fieldContentInput__lO21W"
@@ -30,7 +30,7 @@
               <!-- Bio Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.Bio }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.Bio }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input v-model="form.bio" type="text" class="InputField_fieldContentInput__lO21W" maxlength="900"
@@ -46,7 +46,7 @@
               <!-- Avatar Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="PhotoField_fieldContent__QiVzm">
-                  <h3 class="PhotoField_fieldContentLabel__rBtfX">{{ text.Avatar }}</h3>
+                  <h4 class="PhotoField_fieldContentLabel__rBtfX">{{ text.Avatar }}</h4>
                   <div class="PhotoField_fieldContentEdit__8iE7p">
                     <div class="PhotoField_contentImage__zbcdo">
                       <div class="PhotoField_avatar__Qdo+k">
@@ -68,7 +68,7 @@
               <!-- Email Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">Email</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">Email</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input type="text" class="InputField_fieldContentInput__lO21W" maxlength="50" disabled
@@ -81,7 +81,7 @@
               <!-- UserName Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.UserName }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.UserName }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input type="text" class="InputField_fieldContentInput__lO21W" maxlength="50"
@@ -94,7 +94,7 @@
               <!-- Date of Birth Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.DateOfBirth }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.DateOfBirth }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input v-model="form.dateOfBirth" type="date" class="InputField_fieldContentInput__lO21W" />
@@ -106,7 +106,7 @@
               <!-- Enrollment Count Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.EnrollmentCount }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.EnrollmentCount }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input type="text" class="InputField_fieldContentInput__lO21W" disabled
@@ -119,7 +119,7 @@
               <!-- Role Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.Role }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.Role }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input type="text" class="InputField_fieldContentInput__lO21W" disabled :value="form.role" />
@@ -131,7 +131,7 @@
               <!-- Join Date Field -->
               <div class="FieldWrapper_wrapper__QcEfS">
                 <div class="InputField_fieldContent__iWttQ">
-                  <h3 class="InputField_fieldContentLabel__wJO4a">{{ text.JoinDate }}</h3>
+                  <h4 class="InputField_fieldContentLabel__wJO4a">{{ text.JoinDate }}</h4>
                   <div>
                     <div class="InputField_fieldContentEdit__KYEiF">
                       <input type="date" class="InputField_fieldContentInput__lO21W" disabled
@@ -170,15 +170,17 @@
         </div>
       </div>
     </div>
-  </div>
+</CenterLayout>
 </template>
 
 <script>
 import { inject, ref, onMounted } from 'vue';
+import CenterLayout from '../../components/HomeLayout/CenterLayout.vue';
 // import SweetAlert from '../../components/Helper/SweetAlert.vue';
 import { getClientInfo, updateUserProfile } from '../../services/userService.js';
 
 export default {
+  components: { CenterLayout },
   setup() {
     const form = ref({
       fullName: '',
@@ -306,7 +308,7 @@ export default {
           // });
           setTimeout(() => {
             window.location.reload();
-          }, 2000);
+          }, 1000);
         }
       } catch (error) {
         // await sweetAlert.value.showAlert({
@@ -359,7 +361,26 @@ export default {
   padding: 20px;
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.GroupField_heading__PIaoN {
+  font-size: 18px;
+}
+
+.GroupField_wrapper__1-jfw {
+  padding: 15px;
+}
+
+.InputField_fieldContentInput__lO21W, .Button_fieldButton__B93oZ {
+  font-size: 14px;
+}
+
+.InputField_fieldContentLabel__wJO4a, .PhotoField_fieldContentLabel__rBtfX {
+  font-size: 16px;
+}
+
+p {
+  font-size: 12px; 
 }
 
 .GroupField_wrapper__1-jfw {
