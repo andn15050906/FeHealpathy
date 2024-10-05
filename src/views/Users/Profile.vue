@@ -1,5 +1,5 @@
 <template>
-   <CenterLayout>
+  <CenterLayout layoutMode="centered">
     <!-- SweetAlert component -->
     <SweetAlert ref="sweetAlert" />
     <section class="index-module_row__-AHgh">
@@ -142,7 +142,7 @@
               </div>
 
               <div class="row">
-                <div @click="openConfirmModal" class="InputField_fieldBtn__OG6ZB">
+                <div @click="handleSubmit" class="InputField_fieldBtn__OG6ZB">
                   <div class="Button_fieldButton__B93oZ Button_fieldButtonDefault__7a6UD">{{ text.Save }}</div>
                 </div>
               </div>
@@ -152,31 +152,12 @@
       </section>
     </section>
 
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="app-confirm-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-uppercase text-danger">{{ text.Confirm }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p class="text-primary">{{ text.ConfirmQuestion }}</p>
-          </div>
-          <div class="modal-footer">
-            <button @click="confirmChanges" type="button" class="btn btn-outline-danger btn-space">Yes</button>
-            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
-          </div>
-        </div>
-      </div>
-    </div>
-</CenterLayout>
+  </CenterLayout>
 </template>
 
 <script>
 import { inject, ref, onMounted } from 'vue';
 import CenterLayout from '../../components/HomeLayout/CenterLayout.vue';
-// import SweetAlert from '../../components/Helper/SweetAlert.vue';
 import { getClientInfo, updateUserProfile } from '../../services/userService.js';
 
 export default {
@@ -194,9 +175,10 @@ export default {
       role: '',
       creationTime: ''
     });
-    const loadingSpinner = inject('loadingSpinner');
-    // const sweetAlert = ref(null);
 
+    const loadingSpinner = inject('loadingSpinner');
+    const sweetAlert = inject('sweetAlert');
+    
     const text = {
       PersonalInfo: 'Personal Info',
       FullName: 'Full Name',
@@ -238,12 +220,8 @@ export default {
         }
         Object.assign(form.value, clientData);
       } catch (error) {
-        // await sweetAlert.value.showAlert({
-        //   title: 'Error!',
-        //   text: 'Error fetching profile information.',
-        //   icon: 'error',
-        //   confirmButtonText: 'OK'
-        // });
+        await sweetAlert.showError('Error fetching profile information.');
+      } finally {
         loadingSpinner.hideSpinner();
       }
     };
@@ -274,10 +252,6 @@ export default {
       avatarInput.click();
     };
 
-    const openConfirmModal = () => {
-      new bootstrap.Modal(document.getElementById('app-confirm-modal')).show();
-    };
-
     const confirmChanges = async () => {
       try {
         loadingSpinner.showSpinner();
@@ -288,44 +262,39 @@ export default {
         if (form.value.avatar) {
           formData.append('avatar.file', form.value.avatar);
         }
-        formData.forEach((value, key) => {
-          console.log(`FormData - ${key}:`, value);
-        });
+
         const response = await updateUserProfile(formData);
         if (response.avatarUrl) {
           form.value.avatarUrl = response.avatarUrl;
         }
-        // Hide the modal
-        const modal = document.getElementById('app-confirm-modal');
-        if (modal) {
-          const bsModal = bootstrap.Modal.getInstance(modal);
-          bsModal.hide();
-          // await sweetAlert.value.showAlert({
-          //   title: 'Success!',
-          //   text: 'Profile updated successfully!',
-          //   icon: 'success',
-          //   confirmButtonText: 'OK'
-          // });
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        }
-      } catch (error) {
-        // await sweetAlert.value.showAlert({
-        //   title: 'Error!',
-        //   text: 'Error updating profile.',
-        //   icon: 'error',
-        //   confirmButtonText: 'OK'
-        // });
-      } finally {
-        loadingSpinner.hideSpinner();
-      }
 
+        loadingSpinner.hideSpinner();
+
+        await sweetAlert.showAlert({
+          icon: 'success',
+          title: 'Profile Updated',
+          text: 'Your profile has been successfully updated!'
+        }).then(() => {
+          window.location.reload(); 
+        });
+      } catch (error) {
+        sweetAlert.showError('Error updating profile.');
+      }
     };
 
-    const handleSubmit = event => {
-      event.preventDefault();
-      openConfirmModal();
+    const handleSubmit = async () => {
+      const result = await sweetAlert.showAlert({
+        title: text.Confirm,
+        text: text.ConfirmQuestion,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, update it!',
+        cancelButtonText: 'No, cancel!'
+      });
+
+      if (result.isConfirmed) {
+        await confirmChanges();
+      }
     };
 
     onMounted(() => {
@@ -335,11 +304,8 @@ export default {
     return {
       form,
       text,
-      // sweetAlert,
       handleAvatarChange,
       triggerAvatarUpload,
-      openConfirmModal,
-      confirmChanges,
       handleSubmit
     };
   }
@@ -363,6 +329,11 @@ export default {
   border-radius: 8px;
 }
 
+::selection {
+  color: #ffffff;
+  background: #3468d5;
+}
+
 .GroupField_heading__PIaoN {
   font-size: 18px;
 }
@@ -371,16 +342,18 @@ export default {
   padding: 15px;
 }
 
-.InputField_fieldContentInput__lO21W, .Button_fieldButton__B93oZ {
+.InputField_fieldContentInput__lO21W,
+.Button_fieldButton__B93oZ {
   font-size: 14px;
 }
 
-.InputField_fieldContentLabel__wJO4a, .PhotoField_fieldContentLabel__rBtfX {
+.InputField_fieldContentLabel__wJO4a,
+.PhotoField_fieldContentLabel__rBtfX {
   font-size: 16px;
 }
 
 p {
-  font-size: 12px; 
+  font-size: 12px;
 }
 
 .GroupField_wrapper__1-jfw {
