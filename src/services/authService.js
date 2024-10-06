@@ -29,3 +29,13 @@ export const register = async (username, email, password) => {
     throw error;
   }
 };
+
+export const signOut = async () => {
+  try {
+    const response = await api.post('/Auth/SignOut');
+    return response.data;
+  } catch (error) {
+    console.error('Error signing out:', error);
+    throw error;
+  }
+};
