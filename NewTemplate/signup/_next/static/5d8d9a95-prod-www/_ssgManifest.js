@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F404","\u002F[campaignSlug]","\u002Fapp\u002Fprofile\u002Fmanage-subscription\u002Fcancel-confirm","\u002Fapp\u002Fprofile\u002Fmanage-subscription\u002Fleave-confirm","\u002Fapp\u002Fscenes"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

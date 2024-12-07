@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html id="show-wpadminbar" lang="en-US">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Blog | Calm</title>
+
+    <style>
+        .marked-img {
+            width: 100%;
+            height: 100%;
+            background-color: green
+        }
+    </style>
+    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="./resources.css">
+    <link rel="stylesheet" href="./critical.css">
+</head>
+
+<body class="blog">
+    <div class="title-bar">
+        <a href="https://business.calm.com">
+            <img class="marked-img" />
+        </a>
+        <div class="hamburger hamburger--slider" id="hamburger">
+            <div class="hamburger-box">
+                <div class="hamburger-inner"></div>
+            </div>
+        </div>
+    </div>
+    <nav class="main-menu" id="mainMenu">
+        <div class="main-menu__wrapper">
+            <div class="main-menu__container container">
+                <div class="main-menu__left">
+                    <a href="https://business.calm.com" title="Calm" class="main-menu__logo" title="Calm">
+                        <img class="marked-img" />
+                    </a>
+                    <ul class="main-menu__menu">
+                        <li class="main-menu__item main-menu__has-submenu">
+                            <button class="main-menu__link main-menu__submenu-btn">Solutions</button>
+                            <ul class="main-menu__submenu">
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/calm-for-employees/"
+                                        class="main-menu__link main-menu__submenu-link ">Calm for Employees</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/management-resources/"
+                                        class="main-menu__link main-menu__submenu-link ">Management Resources</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/calm-workshops/"
+                                        class="main-menu__link main-menu__submenu-link ">Calm Workshops</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/integrations/"
+                                        class="main-menu__link main-menu__submenu-link ">Integrations</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="main-menu__item main-menu__has-submenu">
+                            <button class="main-menu__link main-menu__submenu-btn">Results</button>
+                            <ul class="main-menu__submenu">
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/our-impact/"
+                                        class="main-menu__link main-menu__submenu-link ">Our Impact</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/customer-stories/"
+                                        class="main-menu__link main-menu__submenu-link ">Customer Stories</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/clinical-studies/"
+                                        class="main-menu__link main-menu__submenu-link ">Clinical Studies</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="main-menu__item main-menu__has-submenu">
+                            <a class="main-menu__link " href="https://business.calm.com/plans/">Plans</a>
+                        </li>
+                        <li class="main-menu__item main-menu__has-submenu">
+                            <button class="main-menu__link main-menu__submenu-btn"
+                                data-menu="megamenuResources">Resources</button>
+                            <ul class="main-menu__submenu">
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/"
+                                        class="main-menu__link main-menu__submenu-link ">View All</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/blog/"
+                                        class="main-menu__link main-menu__submenu-link active-page">Blog</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/webinars/"
+                                        class="main-menu__link main-menu__submenu-link ">Webinars</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/guides/"
+                                        class="main-menu__link main-menu__submenu-link ">Reports & Guides</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/customer-stories/"
+                                        class="main-menu__link main-menu__submenu-link ">Customer Stories</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/resources/events/"
+                                        class="main-menu__link main-menu__submenu-link ">Events</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="main-menu__item main-menu__has-submenu">
+                            <button class="main-menu__link main-menu__submenu-btn" data-menu="megamenuWho We Serve">
+                                Who We Serve</button>
+                            <ul class="main-menu__submenu">
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/hr-benefits-leaders/"
+                                        class="main-menu__link main-menu__submenu-link ">HR and Benefit Leaders</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/enterprise-plan/"
+                                        class="main-menu__link main-menu__submenu-link ">Smaller Groups</a>
+                                </li>
+                                <li class="main-menu__item main-menu__submenu-item">
+                                    <a href="https://business.calm.com/for-consultants/"
+                                        class="main-menu__link main-menu__submenu-link ">Consultants</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <ul class="main-menu__right">
+                    <li class="main-menu__item main-menu__item--right ">
+                        <a href="https://partner.calm.com/" class="main-menu__link main-menu__item--right "
+                            target="_blank" rel="noopener noreferrer">Customer Login</a>
+                    </li>
+                    <li class="main-menu__item main-menu__item--right main-menu__item--btn">
+                        <a href="https://business.calm.com/self-serve-checkout"
+                            class="main-menu__link main-menu__item--right btn btn--primary main-menu__btn">Get
+                            Started</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-menu__megamenus">
+            <div class="main-menu__megamenu" id="megamenuSolutions">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7 main-menu__megamenu__menus">
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/calm-for-employees/">
+                                <p class="main-menu__megamenu__menu-title">Calm for Employees</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Explore Calm's diverse and effective
+                                    content</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu "
+                                href="https://business.calm.com/management-resources/">
+                                <p class="main-menu__megamenu__menu-title">Management Resources</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Maximize engagement with enterprise-grade
+                                    tools</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/calm-workshops/">
+                                <p class="main-menu__megamenu__menu-title">Calm Workshops</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Tailored workshops to help build community
+                                </p>
+                            </a>
+                        </div>
+                        <div class="col-xs-12 col-lg-5 main-menu__megamenu__feature">
+                            <div class="main-menu__megamenu__feature-img"><img class="marked-img" />
+                            </div>
+                            <div class="main-menu__megamenu__feature-content">
+                                <p class="overline">An Introduction</p>
+                                <p class="main-menu__megamenu__feature-title">What is Calm Health?</p>
+                                <p class="main-menu__megamenu__feature-text"></p>
+                                <p class="main-menu__megamenu__feature-link">
+                                    <button class="btn btn--arrow modal-btn"
+                                        data-content="https://player.vimeo.com/video/948922495?h=1fa819e536&amp;title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                                        data-modal-type="video">Watch Now</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-menu__megamenu" id="megamenuResults">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7 main-menu__megamenu__menus">
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/our-impact/">
+                                <p class="main-menu__megamenu__menu-title">Our Impact</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Drive meaningful results with Calm </p>
+                            </a>
+                            <a class="main-menu__megamenu__menu "
+                                href="https://business.calm.com/resources/customer-stories/">
+                                <p class="main-menu__megamenu__menu-title">Customer Stories</p>
+                                <p class="main-menu__megamenu__menu-subtitle">How others found success with Calm</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu "
+                                href="https://business.calm.com/resources/clinical-studies/">
+                                <p class="main-menu__megamenu__menu-title">Clinical Studies</p>
+                                <p class="main-menu__megamenu__menu-subtitle">See our evidence-based research</p>
+                            </a>
+                        </div>
+                        <div class="col-xs-12 col-lg-5 main-menu__megamenu__feature">
+                            <div class="main-menu__megamenu__feature-img"><img class="marked-img" />
+                            </div>
+                            <div class="main-menu__megamenu__feature-content">
+                                <p class="overline">Customer Story</p>
+                                <p class="main-menu__megamenu__feature-title">Ogilvy Case Study</p>
+                                <p class="main-menu__megamenu__feature-text">Ogilvy partnered with Calm to implement a
+                                    Mindful Manager Program that resulted in 60% of managers reporting reduced stress.
+                                </p>
+                                <p class="main-menu__megamenu__feature-link">
+                                    <a class="main-menu__megamenu__feature-link__btn btn btn--arrow"
+                                        href="https://business.calm.com/resources/case-studies/how-ogilvys-mindful-manager-program-improved-workplace-stress-and-mental-well-being/">Download
+                                        now</a>
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-menu__megamenu" id="megamenuResources">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7 main-menu__megamenu__menus">
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/resources/">
+                                <p class="main-menu__megamenu__menu-title">View All</p>
+                                <p class="main-menu__megamenu__menu-subtitle">View our library of resources</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu active-page"
+                                href="https://business.calm.com/resources/blog/">
+                                <p class="main-menu__megamenu__menu-title">Blog</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Learn about best practices and industry
+                                    insights</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/resources/webinars/">
+                                <p class="main-menu__megamenu__menu-title">Webinars</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Hear from industry leaders</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/resources/guides/">
+                                <p class="main-menu__megamenu__menu-title">Reports & Guides</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Get the latest benefits strategies and
+                                    tools</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu "
+                                href="https://business.calm.com/resources/customer-stories/">
+                                <p class="main-menu__megamenu__menu-title">Customer Stories</p>
+                                <p class="main-menu__megamenu__menu-subtitle">How others found success with Calm</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/resources/events/">
+                                <p class="main-menu__megamenu__menu-title">Events</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Join Calm at our upcoming events</p>
+                            </a>
+                        </div>
+                        <div class="col-xs-12 col-lg-5 main-menu__megamenu__feature">
+                            <div class="main-menu__megamenu__feature-img"><img class="marked-img" />
+                            </div>
+                            <div class="main-menu__megamenu__feature-content">
+                                <p class="overline">Resources for Education</p>
+                                <p class="main-menu__megamenu__feature-title">Calm for Educators</p>
+                                <p class="main-menu__megamenu__feature-text">Want to learn more about how Calm can
+                                    support your faculty and staff? Talk to our team today on how we've supported
+                                    colleges, universities, school districts and smaller schools</p>
+                                <p class="main-menu__megamenu__feature-link">
+                                    <a class="main-menu__megamenu__feature-link__btn btn btn--arrow"
+                                        href="https://business.calm.com/calm-business-for-education/">Learn more</a>
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-menu__megamenu" id="megamenuWho We Serve">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-7 main-menu__megamenu__menus">
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/hr-benefits-leaders/">
+                                <p class="main-menu__megamenu__menu-title">HR and Benefit Leaders</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Everything you need to make mental health
+                                    actionable</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/enterprise-plan/">
+                                <p class="main-menu__megamenu__menu-title">Smaller Groups and Organizations</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Activate a self-serve plan for your team
+                                    within minutes</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/for-consultants/">
+                                <p class="main-menu__megamenu__menu-title">Consultants</p>
+                                <p class="main-menu__megamenu__menu-subtitle">See how a Calm partnership can improve
+                                    outcomes for your clients</p>
+                            </a>
+                            <a class="main-menu__megamenu__menu " href="https://business.calm.com/mindful-manager/">
+                                <p class="main-menu__megamenu__menu-title">Managers and Department Leaders</p>
+                                <p class="main-menu__megamenu__menu-subtitle">Give your team the tools they need</p>
+                            </a>
+                        </div>
+                        <div class="col-xs-12 col-lg-5 main-menu__megamenu__feature">
+                            <div class="main-menu__megamenu__feature-img"><img class="marked-img" />
+                            </div>
+                            <div class="main-menu__megamenu__feature-content">
+                                <p class="overline">Get Started </p>
+                                <p class="main-menu__megamenu__feature-title">Ready to purchase?</p>
+                                <p class="main-menu__megamenu__feature-text">Select a Calm package that best suits your
+                                    needs</p>
+                                <p class="main-menu__megamenu__feature-link">
+                                    <a class="main-menu__megamenu__feature-link__btn btn btn--arrow"
+                                        href="https://business.calm.com/plans/">See plans</a>
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main role="main" class="main">
+
+        <header class="section resources-header resources-header--post">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 resources-header__title">
+                        <h1>Blog</h1>
+
+                        <hr>
+                    </div>
+                </div>
+                <div class="row row--aic">
+                    <div class="col-xs-12 col-lg-6 col-xl-offset-1 resources-header__image">
+                        <a href="https://business.calm.com/resources/blog/7-ways-to-help-employees-feel-less-stressed-over-the-holidays/"
+                            class="resources-header__image__card"><img class="marked-img" />
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-lg-6 col-xl-5 resources-header__content">
+                        <p class="overline resources-header__content__overline">
+                            Featured</p>
+                        <h2 class="h3 resources-header__content__title">7 Ways to Help Employees Feel Less Stressed Over
+                            the Holidays</h2>
+                        <a href="https://business.calm.com/resources/blog/7-ways-to-help-employees-feel-less-stressed-over-the-holidays/"
+                            class="btn btn--primary resources-header__content__btn">Read more</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="resource-topics">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 resource-topics__pills pills">
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/benefits-strategy?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Benefits Strategy</p>
+                        </a>
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/employee-wellness?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Employee Wellness</p>
+                        </a>
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/mindful-managers?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Mindful Managers</p>
+                        </a>
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/prevention?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Prevention</p>
+                        </a>
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/retention?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Retention</p>
+                        </a>
+                        <a class="pills__pill resource-topics__pill"
+                            href="https://business.calm.com/resources/topic/stress-burnout?type=post">
+                            <p class="pills__pill__topic resource-topics__pill__topics">Stress &amp; Burnout</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+
+        <section class="posts " id="posts">
+            <div class="container">
+
+                <div class="row">
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/calms-mental-health-resources-for-native-american-employees/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Calm's Mental Well-being Resources for Native American
+                                    Employees</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/is-gratitude-the-missing-link-in-your-workplace-culture/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Is Gratitude the Missing Link in Your Workplace
+                                    Culture?</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/calm-health-launches-programs-to-support-the-mental-health-of-veterans/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Calm Health Launches Programs to Support the Mental
+                                    Health of Veterans</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/calm-launches-stress-and-burnout-program-by-dr-aditi-nerurkar/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Calm Launches Stress and Burnout Program by Dr. Aditi
+                                    Nerurkar</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/seasonal-depression-what-it-is-and-how-to-overcome-it/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Seasonal Depression: What It Is, What Causes It, and
+                                    How to Overcome It</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/calms-chief-clinical-officer-on-supporting-the-mental-health-of-cancer-patients/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Calm's Chief Clinical Officer on Supporting the Mental
+                                    Health of Cancer Patients </h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/supporting-mental-wellbeing-of-employees-with-adhd/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Supporting the Mental Well-being of Employees Who Have
+                                    ADHD</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/5-takeaways-from-cultivate-your-calm/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">5 Takeaways from Calm Your Mind to Thrive at Work: A
+                                    World Mental Health Day Conversation</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/using-mindfulness-to-improve-the-lives-of-veterans-in-australia/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Using Mindfulness to Improve the Lives of Veterans in
+                                    Australia </h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/calms-mental-health-screening-helps-people-get-the-right-level-of-support/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Calm's Mental Health Screening Helps People Get the
+                                    Right Level of Support</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/5-ways-to-support-employee-mental-health-and-business-performance/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">5 Ways to Support Employee Mental Health,
+                                    Productivity, and Business Performance</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6 col-lg-4 posts__col">
+                        <a href="  https://business.calm.com/resources/blog/menopause-takes-a-toll-on-working-women-and-their-organizations/"
+                            class="posts__card card">
+                            <div class="posts__image card__image card__image--post"><img class="marked-img" />
+                            </div>
+                            <div class="posts__content card__content">
+
+                                <h3 class="posts__content__title">Menopause Takes a Toll on Working Women and Their
+                                    Organizations</h3>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <nav class="pagination">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 pagination__pagination">
+
+                        <ul class="pagination__pages">
+                            <li class="pagination__page pagination__page--current">
+                                <span class="page-number page-numbers current">1</span>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">2</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">3</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">4</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">5</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">6</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">7</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">8</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">9</a>
+                            </li>
+                            <li class="pagination__page ">
+                                <span class="dots">&hellip;</span>
+                            </li>
+                            <li class="pagination__page ">
+                                <a href="#" class="page-number page-numbers">15</a>
+                            </li>
+                        </ul>
+
+                        <a href="#" class="pagination__next ">
+                            Next
+                            <svg width="15" height="13" viewBox="0 0 15 13" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M14.4287 6.09235C14.7215 6.38524 14.7215 6.86012 14.4287 7.15301L9.80598 11.7757C9.51309 12.0686 9.03821 12.0686 8.74532 11.7757C8.45243 11.4828 8.45243 11.0079 8.74532 10.715L12.8377 6.62268L8.74532 2.53034C8.45243 2.23744 8.45243 1.76257 8.74532 1.46968C9.03821 1.17678 9.51309 1.17678 9.80598 1.46968L14.4287 6.09235Z"
+                                    fill="#717171" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M0.25 6.62256C0.25 6.20835 0.585786 5.87256 1 5.87256L12.9057 5.87256C13.3199 5.87256 13.6557 6.20834 13.6557 6.62256C13.6557 7.03677 13.3199 7.37256 12.9057 7.37256L1 7.37256C0.585786 7.37256 0.25 7.03677 0.25 6.62256Z"
+                                    fill="#717171" />
+                            </svg> </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+
+        <header class="block-- team-pricing team-pricing--multi team-pricing--video block" id="enterprise-pricing">
+
+            <div class="container">
+                <div class="row row--jcc">
+                    <div class="col-xs-12 text-center col-lg-8 col-xl-7 team-pricing__content">
+                        <nav class="team-pricing__nav" id="teamsNav" style="display:none;">
+                            <button class="team-pricing__nav__item active-complete to-step-1">
+                                <span class="team-pricing__nav__item__num">1</span>
+                                <span class="team-pricing__nav__item__label">Company Size</span>
+                            </button>
+                            <div class="team-pricing__nav__item active-complete">
+                                <span class="team-pricing__nav__item__num">2</span>
+                                <span class="team-pricing__nav__item__label">Info</span>
+                            </div>
+                            <div class="team-pricing__nav__item">
+                                <span class="team-pricing__nav__item__num">3</span>
+                                <span class="team-pricing__nav__item__label">Payment</span>
+                            </div>
+                        </nav>
+
+                        <div class="team-pricing__infobox" id="infobox">
+                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10.6236 19.5023L19.2517 10.8628C19.9547 10.1599 20 9.74035 20 8.81065V5.43198C20 4.43425 19.7392 4.12811 19.0589 3.45919L17.0408 1.4297C16.3719 0.760783 16.0544 0.5 15.068 0.5H11.6894C10.7597 0.5 10.3401 0.534018 9.6372 1.23698L0.99774 9.87642C-0.317441 11.1916 -0.351456 12.5521 1.00909 13.89L6.61 19.4909C7.97052 20.8401 9.30841 20.8288 10.6236 19.5023ZM9.52382 18.2778C8.9456 18.8673 8.31067 18.8787 7.69843 18.2664L2.22224 12.7902C1.62133 12.1893 1.63267 11.5544 2.21089 10.9649L10.7936 2.39342C10.9524 2.24605 11.0998 2.13266 11.3832 2.13266H15.1247C15.3855 2.13266 15.5329 2.23469 15.7029 2.39342L18.0952 4.79706C18.2653 4.95579 18.356 5.11452 18.356 5.37528V9.11678C18.356 9.38889 18.254 9.54762 18.0952 9.70635L9.52382 18.2778ZM14.0023 7.79025C14.7506 7.79025 15.3061 7.21202 15.3061 6.4864C15.3061 5.77211 14.7506 5.19389 14.0023 5.19389C13.2653 5.19389 12.7098 5.77211 12.7098 6.4864C12.7098 7.21202 13.2653 7.79025 14.0023 7.79025Z"
+                                    fill="#1C1C1C" />
+                            </svg>
+                            <p class="team-pricing__infobox__text">Enterprise Plan: $<span id="infoboxPrice"></span> /
+                                year for <span id="infoboxUsers"></span> individuals</p>
+                            <button class="team-pricing__infobox__edit to-step-1">Edit</button>
+                        </div>
+
+                        <div class="team-pricing__content__copy" id="step1Copy">
+                            <h1 class="h3">You're one step closer to supporting your people's mental well-being</h1>
+                            <p>Better sleep, reduced stress, and increased productivity — all possible with Calm, a
+                                brand loved and trusted by individuals around the world.</p>
+                        </div>
+
+                        <div class="team-pricing__content__step-2-copy" id="step2Copy" style="display:none;">
+                            <h1 class="h3">Hi, we just need a little information about you</h1>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-xs-12 col-lg-5 col-xl-6 team-pricing__video team-pricing__video--lg">
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+        <section class="team-pricing__sec">
+            <div class="container">
+                <div class="row row--jcc">
+                    <div class="col-xs-12 col-lg-7 col-xl-6">
+                        <div class="team-pricing__sec__wrapper">
+                            <div class="team-pricing__sec__content" id="step1">
+                                <div class="calculator team-pricing__sec__calculator" id="calculator">
+                                    <div class="calculator__details calculator__details--multi">
+                                        <div class="calculator__users-num">
+                                            <span class="calculator__details__label calculator__users-num__label">Choose
+                                                between 5 - 500</span>
+                                            <input type="number" min="5" max="501" default="5" value="5"
+                                                class="calculator__users-num__input" id="price-picker-input">
+                                        </div>
+                                        <div class="calculator__per-person">
+                                            <span id="price-per-user" class="calculator__details__value dollar"></span>
+                                            <span class="calculator__details__label"><strong>Individual /
+                                                    year</strong><br><s><span id="savings-per-user-amount"
+                                                        class="dollar">70.00</span> / year</span></s>
+                                        </div>
+                                        <div class="calculator__total">
+                                            <span id="total-price" class="calculator__details__value dollar"></span>
+                                            <span class="calculator__details__label"><strong>Total /
+                                                    year</strong><br>Save <span id="savings-total"
+                                                    class="dollar"></span></span>
+                                        </div>
+                                    </div>
+                                    <div class="team-pricing__sec__next-btn">
+                                        <button class=" btn btn--primary" id="teamsNext">Next</button>
+                                    </div>
+                                    <div class="calculator__optional-over">
+                                        <h3>Prefer to speak with a specialist first?</h3>
+                                        <p>Connect with our team to learn how to achieve the results that matter most to
+                                            your organization.</p>
+                                        <a href="https://business.calm.com/meet-with-a-specialist/" target="_blank"
+                                            rel="noopener nofollow"
+                                            class="btn btn--link team-pricing__sec__calculator ">
+                                            Book a consultation
+                                        </a>
+                                    </div>
+                                    <div class="calculator__over">
+                                        <h3>Buying for more than 500 employees?</h3>
+                                        <p>Talk to us for a comprehensive solution that will help your organization
+                                            achieve it's mental health and productivity goals.</p>
+                                        <button class="btn btn--link" id="over-back-btn">Back</button>
+                                        <a href="https://business.calm.com/meet-with-a-specialist/"
+                                            class="btn btn--primary team-pricing__sec__calculator ">
+                                            Meet with a specialist
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="team-pricing__sec__form" style="display:none;" id="step2">
+                                <div class="form">
+                                    <div class="text-center">
+                                        <span class="loader form-loader"></span>
+                                    </div>
+                                    <form id="mktoForm_1020"></form>
+                                </div>
+                                <div class="team-pricing__sec__back-btn">
+                                    <button class="btn btn--link to-step-1">Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <nav class="col-xs-12 col-sm-6 col-lg-3 footer__menu">
+                    <ul>
+                        <li>
+                            <span class="footer__menu__title">Solutions</span>
+                            <ul class="footer__menu__submenu">
+                                <li><a href="https://business.calm.com/calm-for-employees/">Calm for Employees</a></li>
+                                <li><a href="https://business.calm.com/calm-workshops/">Calm Workshops</a></li>
+                                <li><a href="https://business.calm.com/management-resources/">Management Resources</a>
+                                </li>
+                                <li><a href="https://health.calm.com/">Calm Health</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                <nav class="col-xs-12 col-sm-6 col-lg-3 footer__menu">
+                    <ul>
+                        <li>
+                            <span class="footer__menu__title">Results</span>
+                            <ul class="footer__menu__submenu">
+                                <li><a href="https://business.calm.com/our-impact/">Our Impact</a></li>
+                                <li><a href="https://business.calm.com/resources/customer-stories/">Customer Stories</a>
+                                </li>
+                                <li><a href="https://business.calm.com/resources/clinical-studies/">Clinical Studies</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                <nav class="col-xs-12 col-sm-6 col-lg-3 footer__menu">
+                    <ul>
+                        <li>
+                            <span class="footer__menu__title">Calm</span>
+                            <ul class="footer__menu__submenu">
+                                <li><a href="https://business.calm.com/plans/">Plans</a></li>
+                                <li><a href="https://business.calm.com/resources/">Resources</a></li>
+                                <li><a href="https://business.calm.com/resources/press/">Press</a></li>
+                                <li><a href="https://business.calm.com/for-consultants/">For Consultants</a></li>
+                                <li><a href="https://partner.calm.com/" target="_blank" rel="noopener nofollow">Customer
+                                        Login</a></li>
+                                <li><a href="https://business.calm.com/contact-us/">Contact Us</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="col-xs-12 col-sm-6 col-lg-3 footer__newsletter-stores">
+                    <div class="footer__newsletter-stores__newsletter">
+                        <div class="form">
+                            <p class="footer__newsletter-stores__newsletter-title">Subscribe to our newsletter</p>
+                            <script src="//info.calm.com/js/forms2/js/forms2.min.js"></script>
+                            <form id="mktoForm_1544"></form>
+                            <script>MktoForms2.loadForm("//info.calm.com", "541-LYF-023", 1544);</script>
+                        </div>
+                    </div>
+                    <p class="footer__newsletter-stores__stores-title">Get the Calm App</p>
+                    <div class="footer__newsletter-stores__stores">
+                        <a href="https://apps.apple.com/us/app/calm/id571800810" rel="noopener nofollow"
+                            title="Get Calm on the Apple App Store">
+                            <img data-src="https://business.calm.com/wp-content/themes/calm_business/assets/img/App_Store.png"
+                                alt="Get Calm on the Apple App Store" class="lazyload">
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=com.calm.android&hl=en_CA&gl=US"
+                            rel="noopener nofollow" title="Get Calm on the Google Play Store">
+                            <img data-src="https://business.calm.com/wp-content/themes/calm_business/assets/img/Play_Store.png"
+                                alt="Get Calm on the Google Play Store" class="lazyload">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-lg-3">
+                    <ul class="footer__social footer__social--alone">
+                        <li><a href="https://www.linkedin.com/company/calm-com" target="_blank" rel="noopener nofollow"
+                                title="LinkedIn"><img
+                                    src="https://business.calm.com/wp-content/uploads/2022/09/LinkedIn.svg"
+                                    alt="LinkedIn"></a></li>
+                        <li><a href="https://www.instagram.com/calm" target="_blank" rel="noopener nofollow"
+                                title="Instagram"><img
+                                    src="https://business.calm.com/wp-content/uploads/2022/09/Instagram.svg"
+                                    alt="Instagram"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row row--aic footer__bottom">
+                <div class="col-xs-12">
+                    <hr>
+                </div>
+                <div class="col-xs-12 col-lg-3 footer__logo">
+                    <a href="https://business.calm.com" title="Calm">
+                        <svg width="55" height="56" viewBox="0 0 55 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M42.4642 0.466797H12.5358C5.61249 0.466797 0 6.07928 0 13.0026V42.931C0 49.8543 5.61249 55.4668 12.5358 55.4668H42.4642C49.3875 55.4668 55 49.8543 55 42.931V13.0026C55 6.07928 49.3875 0.466797 42.4642 0.466797Z"
+                                fill="url(#footer1)" />
+                            <path
+                                d="M42.4642 0.466797H12.5358C5.61249 0.466797 0 6.07928 0 13.0026V42.931C0 49.8543 5.61249 55.4668 12.5358 55.4668H42.4642C49.3875 55.4668 55 49.8543 55 42.931V13.0026C55 6.07928 49.3875 0.466797 42.4642 0.466797Z"
+                                fill="url(#footer2)" />
+                            <path
+                                d="M51.6169 34.4059C51.5957 34.3677 51.5672 34.3341 51.533 34.3069C51.4988 34.2798 51.4596 34.2596 51.4176 34.2476C51.3756 34.2356 51.3316 34.2319 51.2883 34.2369C51.2449 34.2419 51.2029 34.2554 51.1647 34.2766C50.8154 34.4701 49.6523 34.8587 49.2848 34.9907C47.9061 35.216 46.2181 35.1653 45.3864 33.1517C45.1358 32.5454 44.8879 31.9989 44.4594 31.4271C43.9743 30.7803 42.3892 30.0053 40.9081 31.3985C40.5533 31.7329 40.2451 32.1136 39.9919 32.5303C39.8911 32.6893 39.7984 32.8494 39.7106 33.0095C39.7052 32.9879 39.6998 32.9669 39.6938 32.9459C39.5629 32.4953 39.1441 30.8283 37.4032 30.5577C37.1639 30.5383 36.1949 30.4289 34.8545 31.8992C34.4053 32.3995 33.9969 32.935 33.6332 33.5005C33.569 33.2019 33.492 32.9302 33.4176 32.8111C32.2787 31.0595 30.554 32.4581 29.8108 32.9804C28.1459 34.1505 27.3741 35.7232 26.3614 32.1498C26.2295 31.6438 26.1243 31.1313 26.0461 30.6143C27.0578 28.8966 29.1182 23.6702 27.9325 20.1664C27.8554 19.9449 27.4442 18.8136 26.4552 18.8864C26.3129 18.9004 25.1865 18.7823 24.5688 21.9299C23.9921 24.9729 24.1193 28.895 24.2594 30.195C24.2751 30.3297 24.3042 30.596 24.357 30.9441C23.3809 32.6122 22.1009 34.5083 21.3199 34.5967C20.3061 34.7115 20.5885 33.778 19.9725 31.7035C19.8647 31.4341 19.5241 30.1519 17.9864 30.2155C17.2318 30.2467 16.4385 30.4424 15.3514 31.6313C13.5863 33.5614 9.56072 36.4653 6.68155 34.6404C6.36841 34.3978 4.81295 33.1264 5.38803 29.3165C5.56288 28.2676 5.87341 27.246 6.31182 26.2772C6.73443 25.3317 7.26507 24.4382 7.89315 23.6147C10.851 19.9826 13.4133 19.5585 13.9188 19.58C15.215 19.58 15.5519 21.2584 15.5508 21.2427C15.556 21.3141 15.5754 21.3837 15.6078 21.4474C15.6403 21.5112 15.6852 21.5678 15.7399 21.6139C15.7946 21.6601 15.858 21.6948 15.9263 21.716C15.9946 21.7373 16.0665 21.7447 16.1377 21.7377C16.2089 21.7308 16.278 21.7097 16.3409 21.6756C16.4039 21.6416 16.4593 21.5953 16.5041 21.5394C16.5488 21.4836 16.582 21.4194 16.6015 21.3506C16.6211 21.2818 16.6267 21.2097 16.618 21.1387C16.6105 20.7767 16.5363 20.4191 16.3991 20.0839C16.1959 19.4237 15.6112 18.8098 15.2711 18.584C13.6461 17.4522 9.9768 18.3641 6.42393 22.4646C5.68236 23.3921 5.05852 24.4079 4.56665 25.4887C4.05355 26.6093 3.69109 27.7929 3.48871 29.0087C2.52611 35.7636 6.63844 36.8377 7.33963 36.9693C10.9437 37.3896 13.5981 35.4283 14.8528 34.2254C15.305 36.4799 17.5601 36.5074 18.5485 35.4892C18.8008 35.2209 19.0074 34.913 19.1603 34.5779C19.7461 36.7089 21.6244 35.9835 21.8454 35.8886C22.8926 35.4968 23.9873 34.0394 24.7612 32.8165C25.2528 34.4927 26.2024 36.2885 28.0263 36.0961C29.1252 36.0697 31.881 33.1415 32.1359 33.5236C32.3903 33.8395 32.4593 34.4199 32.441 35.2861C32.4226 36.1522 33.112 36.1958 33.424 36.1096C33.9053 35.9765 34.2082 35.0279 34.7122 34.2033C35.0206 33.6852 35.3832 33.2014 35.7939 32.7599C35.9917 32.5476 36.8864 31.6222 37.5186 31.9364C38.1508 32.2506 38.2144 32.8963 38.258 33.2536C38.3017 33.6109 38.3071 33.992 38.3222 34.407C38.3039 35.8417 38.9776 36.0444 39.1678 36.0972C40.7276 36.5181 40.8241 33.5872 41.9704 32.4991C42.0782 32.388 43.0775 31.3564 43.6483 33.038C44.4729 36.0805 47.0098 37.2172 50.4252 35.5259C51.0585 35.2122 51.183 35.0893 51.529 34.8322C51.5924 34.7835 51.6361 34.7137 51.6522 34.6354C51.6684 34.5572 51.6558 34.4757 51.6169 34.4059ZM18.2063 33.7888C17.525 35.1901 16.024 35.106 16.045 33.5775C16.0671 32.0145 18.0166 31.0282 18.5399 32.118C18.5815 32.2113 18.615 32.3079 18.6402 32.4069C18.5491 32.6947 18.513 33.1588 18.2063 33.7888ZM26.5948 20.61C26.8815 21.1419 27.4997 24.4722 25.8133 28.1135C25.809 27.9976 25.8047 27.8817 25.8014 27.7653C25.7874 21.8496 26.5398 20.507 26.5948 20.61Z"
+                                fill="white" />
+                            <defs>
+                                <linearGradient id="footer1" x1="27.5003" y1="55.4668" x2="27.5003" y2="0.466797"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#3478DD" />
+                                    <stop offset="1" stop-color="#3BBEEC" />
+                                </linearGradient>
+                                <linearGradient id="footer2" x1="-0.0932395" y1="79.9241" x2="30.3045" y2="22.6857"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#793BEB" />
+                                    <stop offset="1" stop-color="#793BEB" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-lg-5">
+                    <ul class="footer__legal">
+                        <li><a href="https://www.calm.com/privacy-policy">Privacy Policy</a></li>
+                        <li><a href="https://www.calm.com/terms">Terms of Service</a></li>
+                        <li>
+                            <a href="https://business.calm.com/optout" class="footer__legal__privacy">Your Privacy
+                                Choices <img
+                                    data-src="https://business.calm.com/wp-content/themes/calm_business/assets/img/privacy.png"
+                                    alt="Your Privacy Choices icon" class="lazyload" width="32" height="17"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-lg-4 footer__copy">
+                    <p>&copy;2024 Calm.com, Inc. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <aside class="modal" id="modal" style="display:none;">
+        <div class="modal__inner">
+            <button class="modal__close" id="close-modal">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 19L18.9688 1.03117" stroke="#1B3E8E" stroke-width="2" />
+                    <path d="M1.03114 0.999997L19 18.9688" stroke="#1B3E8E" stroke-width="2" />
+                </svg>
+            </button>
+        </div>
+    </aside>
+    <script type="text/javascript"
+        src="https://business.calm.com/wp-content/themes/calm_business/assets/js/main.js?ver=1.9" id="main-js"></script>
+</body>
+
+</html>
