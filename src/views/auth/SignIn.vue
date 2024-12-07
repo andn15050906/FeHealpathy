@@ -61,7 +61,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { signIn, register } from '../../services/authService.js'; // Add new requestPasswordReset service
+import { signIn, register } from '../../services/authService.js';
 
 const form = ref({
 	username: '',

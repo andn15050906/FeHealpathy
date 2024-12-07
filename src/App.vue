@@ -5,6 +5,7 @@ import { ref, provide, onMounted } from 'vue';
 import HeaderPage from './components/HomeLayout/HeaderPage.vue';
 import FooterPage from './components/HomeLayout/FooterPage.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
+import SweetAlert from './components/Helper/SweetAlert.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -17,13 +18,11 @@ provide('loadingSpinner', {
 });
 
 provide('sweetAlert', {
-  showAlert: (options) => {
-    if (sweetAlert.value && typeof sweetAlert.value.showAlert === 'function') {
-      return sweetAlert.value.showAlert(options);
-    } else {
-      console.error('SweetAlert is not initialized or showAlert is not defined');
-    }
-  }
+  showAlert: (options) => sweetAlert.value.showAlert(options),
+  showSuccess: (message) => sweetAlert.value.showAlert({ icon: 'success', title: 'Success', text: message }),
+  showError: (message) => sweetAlert.value.showAlert({ icon: 'error', title: 'Error', text: message }),
+  showWarning: (message) => sweetAlert.value.showAlert({ icon: 'warning', title: 'Warning', text: message }),
+  showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
 });
 
 onMounted(() => {
