@@ -1,27 +1,100 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomePage from '@/components/HomeLayout/HomePage.vue'
-
-import SignIn from '@/views/Auth/SignIn.vue'
-import ChangePassword from '@/views/Auth/ChangePassword.vue'
-import ForgotPassword from '@/views/Auth/ForgotPassword.vue'
-import ResetPassword from '@/views/Auth/ResetPassword.vue'
-import Profile from '@/views/Users/Profile.vue'
+import HomePage from '@/views/HomePage.vue'
+import SignIn from '@/views/Profile/SignInAndRegister.vue'
+import ChangePassword from '@/views/Profile/ChangePassword.vue'
+import ForgotPassword from '@/views/Profile/ForgotPassword.vue'
+import ResetPassword from '@/views/Profile/ResetPassword.vue'
 import CourseList from '@/views/Courses/CourseList.vue'
-import CreateAssignment from '@/views/Assignments/Create.vue'
-import ManageAssignments from '@/views/Assignments/Manage.vue'
-import OverviewAssignment from '@/views/Assignments/Overview.vue'
-import ReviewAssignment from '@/views/Assignments/Review.vue'
-import AttemptAssignment from '@/views/Assignments/Attempt.vue'
+import CreateAssignment from '@/views/Assignments_Old/Create.vue'
+import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
+import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
+import ReviewAssignment from '@/views/Assignments_Old/Review.vue'
+import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'
+import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
+import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
+import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
+import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
+import CommunityOverall from '@/views/Community/CommunityOverall.vue'
+import AboutUs from '@/views/AboutUs/AboutUs.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'homePage',
+      name: 'Home',
       component: HomePage
     },
+    {
+      path: '/blogs',
+      name: 'blogCatalog',
+      component: BlogCatalog
+    },
+    {
+      path: '/practice',
+      name: 'practiceToolList',
+      component: PracticeToolList
+    },
+    {
+      path: '/courses',
+      name: 'courseList',
+      component: CourseList
+    },
+    {
+      path: '/community',
+      name: 'communityOverall',
+      component: CommunityOverall
+    },
+    {
+      path: '/about-us',
+      name: 'aboutUs',
+      component: AboutUs
+    },
+    {
+      path: '/sign-in',
+      name: 'signIn',
+      component: SignIn
+    },
+    {
+      path: '/change-password',
+      name: 'changePassword',
+      component: ChangePassword
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgotPassword',
+      component: ForgotPassword
+    },
+    {
+      path: '/reset-password/:email/:resetToken',
+      name: 'resetPassword',
+      component: ResetPassword,
+      props: true
+    },
+    {
+      path: '/profile',
+      name: 'editProfile',
+      component: EditUserProfile
+    },
+    {
+      path: '/profile/:id',
+      name: 'viewProfile',
+      component: ViewUserProfile
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
     {
       path: '/assignments/create',
       name: 'CreateAssignment',
@@ -47,37 +120,6 @@ const router = createRouter({
       name: 'AttemptAssignment',
       component: AttemptAssignment
     },
-    {
-      path: '/sign-in',
-      name: 'signinPage',
-      component: SignIn
-    },
-    {
-      path: '/courses',
-      name: 'coursePage',
-      component: CourseList
-    },
-    {
-      path: '/change-password',
-      name: 'changePassword',
-      component: ChangePassword
-    },
-    {
-      path: '/forgot-password',
-      name: 'forgotPassword',
-      component: ForgotPassword
-    },
-    {
-      path: '/reset-password/:email/:resetToken',
-      name: 'resetPassword',
-      component: ResetPassword,
-      props: true
-    },
-    {
-      path: '/profile',
-      name: 'profilePage',
-      component: Profile
-    }
   ]
 })
 

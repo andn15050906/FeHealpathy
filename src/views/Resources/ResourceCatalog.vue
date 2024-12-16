@@ -1,0 +1,1 @@
+<template>Resource Catalog Page</template>

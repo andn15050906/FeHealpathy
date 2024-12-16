@@ -1,0 +1,1 @@
+<template>Search Blog Result Page</template>

@@ -2,8 +2,8 @@
 import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router';
 import { ref, provide, onMounted } from 'vue';
-import HeaderPage from './components/HomeLayout/HeaderPage.vue';
-import FooterPage from './components/HomeLayout/FooterPage.vue';
+import Header from './components/Layouts/Header.vue';
+import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
 import SweetAlert from './components/Helper/SweetAlert.vue';
 
@@ -27,14 +27,14 @@ provide('sweetAlert', {
 
 onMounted(() => {
   router.beforeEach((to, from, next) => {
-    loadingSpinner.value.showSpinner(); 
+    loadingSpinner.value.showSpinner();
     next();
   });
 
   router.afterEach(() => {
     setTimeout(() => {
-      loadingSpinner.value.hideSpinner(); 
-    }, 300); 
+      loadingSpinner.value.hideSpinner();
+    }, 300);
   });
 });
 
@@ -43,11 +43,11 @@ onMounted(() => {
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <HeaderPage />
+    <Header />
     <main>
       <RouterView />
     </main>
-    <FooterPage />
+    <Footer />
   </div>
 </template>
 
@@ -58,5 +58,9 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+footer {
+  z-index: 100;
 }
 </style>

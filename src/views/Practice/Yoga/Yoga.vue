@@ -1,0 +1,1 @@
+<template>Yoga Page</template>

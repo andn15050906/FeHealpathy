@@ -1,5 +1,5 @@
 {
-  "name": "housecleaning",
+  "name": "healpathy",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -22,10 +22,11 @@
     "chart.js": "^4.4.2",
     "firebase": "^10.8.1",
     "sweetalert2": "^11.10.6",
+    "vite-plugin-vuetify": "^2.0.4",
     "vue": "^3.4.15",
     "vue-apexcharts": "^1.6.2",
     "vue-router": "^4.3.0",
-    "vuetify": "^3.5.7",
+    "vuetify": "^3.7.5",
     "vuex": "^4.1.0",
     "webfontloader": "^1.6.28"
   },

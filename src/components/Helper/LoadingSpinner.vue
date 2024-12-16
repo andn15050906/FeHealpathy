@@ -33,7 +33,7 @@ export default {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.15);
     z-index: 9999;
 }
 
