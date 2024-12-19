@@ -1,7 +1,7 @@
 <template>
     <div class="search-container">
-        <form class="search-form" role="search">
-            <input type="search" id="search" class="search-input" :placeholder="placeHolder"
+        <form class="search-form" role="search" @submit.prevent="onSearch">
+            <input type="search" id="search" class="search-input" v-model="searchInput" :placeholder="placeHolder"
                 :aria-label="placeHolder" />
             <button type="submit" class="search-button" aria-label="Search">
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/4f7ae77af3c87898e20a40930c274447641587a7d6bf7955ae5a37c10cc2aebd?apiKey=581cb509eedd462787009da53a17f69a&"
@@ -13,10 +13,21 @@
 
 <script>
 export default {
-    name: 'SearchBar',
+    props: {
+        initialQuery: {
+            type: String,
+            default: ''
+        }
+    },
     data() {
         return {
-            placeHolder: "Tìm kiếm trên Healpathy"
+            placeHolder: "Tìm kiếm trên Healpathy",
+            searchInput: this.initialQuery
+        };
+    },
+    methods: {
+        onSearch() {
+            this.$emit('search', this.searchInput);
         }
     }
 }
