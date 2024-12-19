@@ -17,6 +17,7 @@ import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import CommunityOverall from '@/views/Community/CommunityOverall.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
+import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -120,6 +121,11 @@ const router = createRouter({
       name: 'AttemptAssignment',
       component: AttemptAssignment
     },
+    {
+      path: '/practice/yoga',
+      name: 'yoga',
+      component: YogaView
+    }
   ]
 })
 
