@@ -14,6 +14,7 @@ import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'
 import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
 import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
+import SearchBlogResult from '@/views/Blogs/SearchBlogResult.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import CommunityOverall from '@/views/Community/CommunityOverall.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
@@ -30,6 +31,11 @@ const router = createRouter({
       path: '/blogs',
       name: 'blogCatalog',
       component: BlogCatalog
+    },
+    {
+      path: '/search-blogs',
+      name: 'searchBlogs',
+      component: SearchBlogResult
     },
     {
       path: '/practice',

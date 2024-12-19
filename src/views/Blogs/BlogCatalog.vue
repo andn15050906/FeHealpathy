@@ -4,7 +4,7 @@
             <div class="content-wrapper">
                 <div class="article-search-bar-wrapper">
                     <div class="article-search-bar">
-                        <SearchBar />
+                        <SearchBar @search="handleSearch" />
                     </div>
                 </div>
 
@@ -27,7 +27,8 @@
                         </div>
                         <div class="article-content">
                             <div class="tag-list">
-                                <Tag v-for="(tag, index) in article.Tags" :key="index" :text="tag" :color="'Primary'" />
+                                <Tag v-for="(tag, index) in article.Tags" :key="index" :text="tag" :color="'Primary'"
+                                    @click.native="handleTagClick(tag)" />
                             </div>
                             <h2 class="article-title">{{ article.Title }}</h2>
                             <p class="article-excerpt">{{ article.Excerpt }}</p>
@@ -64,6 +65,7 @@
 import SearchBar from '@/components/Helper/SearchBar.vue';
 import Tag from '@/components/Helper/Tag.vue';
 import data from '../../api/data.json';
+import { useRouter } from "vue-router";
 
 export default {
     name: 'ArticleList',
@@ -77,7 +79,47 @@ export default {
     components: {
         SearchBar,
         Tag
-    }
+    },
+    setup() {
+        const router = useRouter();
+
+        const handleSearch = (query) => {
+            const queryParams = {
+                title: query.trim() || "",
+                tag: "",  
+            };
+
+            if (queryParams.title || queryParams.tag) {
+                router.push({
+                    path: "/search-blogs",
+                    query: queryParams,
+                });
+            } else {
+                console.log("No search term provided");
+            }
+        };
+
+
+        const handleTagClick = (tag) => {
+            if (tag.trim()) {
+                router.push({
+                    path: "/search-blogs",
+                    query: {
+                        title: "",
+                        tag: tag
+                    },
+                });
+            } else {
+                console.log("No tag clicked");
+            }
+        };
+
+
+        return {
+            handleSearch,
+            handleTagClick,
+        };
+    },
 }
 </script>
 
