@@ -9,12 +9,25 @@
                 </div>
 
                 <nav class="category-nav">
-                    <Tag :text="'Meditation & Mindfulness'" :color="'red'" />
-                    <Tag :text="'Stress & Anxiety'" :color="'red'" />
-                    <Tag :text="'Sleep'" :color="'red'" />
-                    <Tag :text="'Mental Health'" :color="'red'" />
-                    <Tag :text="'Personal Growth'" :color="'red'" />
+                    <Tag v-for="(tag, index) in ['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
+                        :key="index" :text="tag" :color="'red'" @click.native="handleTagClick(tag)" />
                 </nav>
+
+                <div class="sort-wrapper">
+                    <label for="sort-select" class="sort-label">Sort By:</label>
+                    <div class="sort-options">
+                        <!-- Nút bấm cho 'Newest' -->
+                        <button class="sort-btn" :class="{ 'active': sortOrder === 'newest' }"
+                            @click="handleSort('newest')">
+                            Newest
+                        </button>
+                        <!-- Nút bấm cho 'Most View' -->
+                        <button class="sort-btn" :class="{ 'active': sortOrder === 'mostView' }"
+                            @click="handleSort('mostView')">
+                            Most View
+                        </button>
+                    </div>
+                </div>
 
                 <h1 class="featured-heading">New & Featured Articles</h1>
 
@@ -46,7 +59,7 @@
                 </div>
 
                 <div class="article-grid">
-                    <article class="article-card" v-for="article in articles.splice(0, 4)" :key="article.id">
+                    <article class="article-card" v-for="article in articles.slice(0, 4)" :key="article.id">
                         <a :href="article.Link" class="article-link">
                             <img :src="article.Thumb" :alt="article.Title" class="article-image" loading="lazy" />
                         </a>
@@ -62,6 +75,7 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import SearchBar from '@/components/Helper/SearchBar.vue';
 import Tag from '@/components/Helper/Tag.vue';
 import data from '../../api/data.json';
@@ -69,59 +83,52 @@ import { useRouter } from "vue-router";
 
 export default {
     name: 'ArticleList',
-    data() {
-        return {
-            categories: data.BlogList.Categories,
-            featuredArticles: data.BlogList.FeaturedArticles,
-            articles: data.BlogList.Articles
-        }
-    },
     components: {
         SearchBar,
         Tag
     },
     setup() {
         const router = useRouter();
+        const sortOrder = ref('newest');
+        const categories = data.BlogList.Categories;
+        const featuredArticles = data.BlogList.FeaturedArticles;
+        const articles = data.BlogList.Articles;
 
         const handleSearch = (query) => {
-            const queryParams = {
-                title: query.trim() || "",
-                tag: "",  
-            };
-
-            if (queryParams.title || queryParams.tag) {
-                router.push({
-                    path: "/search-blogs",
-                    query: queryParams,
-                });
-            } else {
-                console.log("No search term provided");
-            }
+            router.push({
+                path: '/search-blogs',
+                query: { title: query.trim(), sort: sortOrder.value },
+            });
         };
-
 
         const handleTagClick = (tag) => {
-            if (tag.trim()) {
-                router.push({
-                    path: "/search-blogs",
-                    query: {
-                        title: "",
-                        tag: tag
-                    },
-                });
-            } else {
-                console.log("No tag clicked");
-            }
+            router.push({
+                path: '/search-blogs',
+                query: { title: '', tag: tag, sort: sortOrder.value },
+            });
         };
 
+        const handleSort = (sortBy) => {
+            sortOrder.value = sortBy; // Cập nhật giá trị mới cho sortOrder
+            router.push({
+                path: '/search-blogs',
+                query: { title: '', sort: sortOrder.value }, // Cập nhật query với sortOrder mới
+            });
+        };
 
         return {
+            categories,
+            featuredArticles,
+            articles,
+            sortOrder,
             handleSearch,
             handleTagClick,
+            handleSort,
         };
     },
-}
+};
 </script>
+
 
 <style scoped>
 .article-container {
@@ -254,6 +261,41 @@ a.article-title {
     color: #555be4;
     text-decoration: none;
 }
+
+.sort-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.sort-label {
+    font-size: 16px;
+    color: #555;
+}
+
+.sort-btn {
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sort-btn.active {
+    background-color: #5488c7;
+    color: #fff;
+    border-color: #5488c7;
+}
+
+.sort-btn:hover {
+    background-color: #f1f1f1;
+}
+
 
 @media (max-width: 1000px) {
     .category-nav {
