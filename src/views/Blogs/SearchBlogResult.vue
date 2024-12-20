@@ -2,13 +2,13 @@
     <div class="search-results-container">
         <h1 class="search-results-heading">Kết quả tìm kiếm</h1>
 
-        <div v-if="filteredArticles.length === 0" class="no-results">
-            <p>Không tìm thấy bài viết nào.</p>
+        <div v-if="filteredResults.articles.length === 0" class="no-results">
+            <p>Không tìm thấy kết quả nào.</p>
         </div>
 
         <div v-else>
             <div class="articles-list">
-                <div v-for="article in filteredArticles" :key="article.id" class="article-card">
+                <div v-for="article in filteredResults.articles" :key="article.id" class="article-card">
                     <a :href="article.Link" class="article-link">
                         <img :src="article.Thumb" :alt="article.Title" class="article-image" />
                     </a>
@@ -16,6 +16,14 @@
                         <a :href="article.Link" class="article-title">{{ article.Title }}</a>
                         <time class="article-date">{{ article.Date }}</time>
                     </div>
+                </div>
+            </div>
+
+            <div class="categories-list">
+                <div v-for="category in filteredResults.categories" :key="category.Id" class="category-card">
+                    <a :href="category.Link" class="category-link">
+                        <span class="category-title">{{ category.Title }}</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -27,41 +35,37 @@ import data from '../../api/data.json';
 
 export default {
     name: 'SearchBlogResult',
-
     mounted() {
         console.log("Route query params:", this.$route.query);
     },
     data() {
         return {
-            articles: data.BlogList.FeaturedArticles,
+            featuredArticles: data.BlogList.FeaturedArticles,
+            articles: data.BlogList.Articles,
+            categories: data.BlogList.Categories,
             query: this.$route.query,
         };
     },
     computed: {
-        filteredArticles() {
+        filteredResults() {
             const { title, tag } = this.$route.query;
-            console.log("Searching for:", title);
-            console.log("Searching for tag:", tag);
-            console.log("data", data);
             const searchTerm = title ? title.trim().toLowerCase() : "";
 
-            let result = [];
-
-            for (let article of this.articles) {
+            let filteredArticles = this.articles.filter(article => {
                 const normalizedTitle = article.Title.trim().toLowerCase();
                 const matchesTitle = normalizedTitle.includes(searchTerm);
                 const matchesTag = tag ? article.Tags.some(t => t.toLowerCase() === tag.toLowerCase()) : true;
-                if (matchesTitle && matchesTag) {
-                    result.push(article);
-                }
-            }
-            return result;
+                return matchesTitle && matchesTag;
+            });
+
+            return {
+                articles: filteredArticles,
+            };
         }
     }
-
-
 };
 </script>
+
 
 <style scoped>
 .search-results-container {
@@ -102,12 +106,6 @@ a.article-title {
     text-decoration: none;
 }
 
-.article-excerpt {
-    margin-top: 10px;
-    font: 400 17px/25px Inter, sans-serif;
-    color: #000;
-}
-
 .article-image {
     width: 100%;
     border-radius: 10px;
@@ -118,5 +116,42 @@ a.article-title {
     margin-top: 5px;
     font-size: 14px;
     color: #666;
+}
+
+.categories-list {
+    margin-top: 40px;
+}
+
+.category-card {
+    padding: 10px;
+}
+
+.category-title {
+    font-size: 20px;
+    color: #000;
+    text-decoration: none;
+}
+
+@media (max-width: 1000px) {
+    .category-nav {
+        padding: 0 20px;
+    }
+
+    .featured-heading {
+        margin-top: 40px;
+    }
+
+    .featured-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .article-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .article-title {
+        font-size: 28px;
+        line-height: 36px;
+    }
 }
 </style>
