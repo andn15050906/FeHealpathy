@@ -2,7 +2,8 @@
     <div class="search-results-container">
         <BlogFilters
             :tags="['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
-            :currentSort="currentSort" @search="handleSearch" @tag-click="handleTagClick" @sort="handleSort" />
+            :currentSort="currentSort" @search="handleSearch" @tag-click="handleTagClick"
+            @sort-change="handleSortChange" />
 
         <div v-if="filteredResults.articles.length === 0" class="no-results">
             <p>Không tìm thấy kết quả nào.</p>
@@ -10,7 +11,7 @@
 
         <div v-else>
             <div class="articles-list">
-                <div v-for="article in filteredResults.articles" :key="article.id" class="article-card">
+                <div v-for="article in paginatedArticles" :key="article.id" class="article-card">
                     <a :href="article.Link" class="article-link">
                         <img :src="article.Thumb" :alt="article.Title" class="article-image" />
                     </a>
@@ -34,6 +35,9 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <Pagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage" />
         </div>
     </div>
 </template>
@@ -41,17 +45,22 @@
 <script>
 import data from '../../api/data.json';
 import BlogFilters from './Components/BlogFilters.vue';
+import Pagination from '@/components/Helper/Pagination.vue';
 
 export default {
     name: 'SearchBlogResult',
     components: {
-        BlogFilters
+        BlogFilters,
+        Pagination
     },
     data() {
         return {
             featuredArticles: data.BlogList.FeaturedArticles,
             articles: data.BlogList.Articles,
             categories: data.BlogList.Categories,
+            currentPage: 1,
+            perPage: 6,
+            currentSort: this.$route.query.sort || 'newest',
             query: this.$route.query,
         };
     },
@@ -80,21 +89,55 @@ export default {
                 return matchesTitle && matchesTag && matchesCategory;
             });
 
-            let filteredCategories = this.categories.filter(categoryItem => {
-                console.log('category', this.categories)
-                return selectedCategory
-                    ? categoryItem.Id.toLowerCase() === selectedCategory
-                    : true;
-            });
+            if (this.currentSort === 'mostView') {
+                filteredArticles.sort((a, b) => b.Views - a.Views);
+            } else if (this.currentSort === 'newest') {
+                filteredArticles.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+            }
 
             return {
                 articles: filteredArticles
             };
+        },
+
+        totalPages() {
+            return Math.ceil(this.filteredResults.articles.length / this.perPage);
+        },
+
+        paginatedArticles() {
+            const start = (this.currentPage - 1) * this.perPage;
+            const end = start + this.perPage;
+            return this.filteredResults.articles.slice(start, end);
+        }
+    },
+
+    methods: {
+        handleSearch(query) {
+            this.$router.push({ path: '/search-blogs', query: { title: query, page: 1 } });
+        },
+
+        handleTagClick(tagOrCategory) {
+            if (tagOrCategory.Title) {
+                this.$router.push({ path: '/search-blogs', query: { category: tagOrCategory.Id, page: 1 } });
+            } else {
+                this.$router.push({ path: '/search-blogs', query: { tag: tagOrCategory, page: 1 } });
+            }
+        },
+
+        goToPage(page) {
+            if (page > 0 && page <= this.totalPages) {
+                this.currentPage = page;
+                this.$router.push({ path: '/search-blogs', query: { ...this.$route.query, page: this.currentPage } });
+            }
+        },
+
+        handleSortChange(sort) {
+            this.currentSort = sort;
+            this.$router.push({ path: '/search-blogs', query: { ...this.$route.query, page: 1, sort: this.currentSort } });
         }
     }
 };
 </script>
-
 
 <style scoped>
 .search-results-container {
