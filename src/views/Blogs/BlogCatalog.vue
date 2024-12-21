@@ -2,32 +2,9 @@
     <div class="article-container">
         <section class="hero-section">
             <div class="content-wrapper">
-                <div class="article-search-bar-wrapper">
-                    <div class="article-search-bar">
-                        <SearchBar @search="handleSearch" />
-                    </div>
-                </div>
-
-                <nav class="category-nav">
-                    <Tag v-for="(tag, index) in ['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
-                        :key="index" :text="tag" :color="'red'" @click.native="handleTagClick(tag)" />
-                </nav>
-
-                <div class="sort-wrapper">
-                    <label for="sort-select" class="sort-label">Sort By:</label>
-                    <div class="sort-options">
-                        <!-- Nút bấm cho 'Newest' -->
-                        <button class="sort-btn" :class="{ 'active': sortOrder === 'newest' }"
-                            @click="handleSort('newest')">
-                            Newest
-                        </button>
-                        <!-- Nút bấm cho 'Most View' -->
-                        <button class="sort-btn" :class="{ 'active': sortOrder === 'mostView' }"
-                            @click="handleSort('mostView')">
-                            Most View
-                        </button>
-                    </div>
-                </div>
+                <BlogFilters
+                    :tags="['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
+                    :currentSort="sortOrder" @search="handleSearch" @tag-click="handleTagClick" @sort="handleSort" />
 
                 <h1 class="featured-heading">New & Featured Articles</h1>
 
@@ -76,7 +53,7 @@
 
 <script>
 import { ref } from 'vue';
-import SearchBar from '@/components/Helper/SearchBar.vue';
+import BlogFilters from './Components/BlogFilters.vue';
 import Tag from '@/components/Helper/Tag.vue';
 import data from '../../api/data.json';
 import { useRouter } from "vue-router";
@@ -84,7 +61,7 @@ import { useRouter } from "vue-router";
 export default {
     name: 'ArticleList',
     components: {
-        SearchBar,
+        BlogFilters,
         Tag
     },
     setup() {
@@ -94,26 +71,31 @@ export default {
         const featuredArticles = data.BlogList.FeaturedArticles;
         const articles = data.BlogList.Articles;
 
-        const handleSearch = (query) => {
-            router.push({
-                path: '/search-blogs',
-                query: { title: query.trim(), sort: sortOrder.value },
-            });
+        const updateQueryParams = (newParams) => {
+            const currentQuery = { ...router.currentRoute.value.query };
+            const updatedQuery = { ...currentQuery, ...newParams };
+            for (const key in updatedQuery) {
+                if (!updatedQuery[key]) delete updatedQuery[key];
+            }
+            router.push({ path: '/search-blogs', query: updatedQuery });
         };
 
-        const handleTagClick = (tag) => {
-            router.push({
-                path: '/search-blogs',
-                query: { title: '', tag: tag, sort: sortOrder.value },
-            });
+        const handleSearch = (query) => {
+            const searchQuery = String(query || '').trim();
+            updateQueryParams({ title: searchQuery, tag: null, sort: null });
+        };
+
+        const handleTagClick = (tagOrCategory) => {
+            if (tagOrCategory.Title) {
+                updateQueryParams({ category: tagOrCategory.Id, tag: null, title: null });
+            } else {
+                updateQueryParams({ tag: tagOrCategory, category: null, title: null });
+            }
         };
 
         const handleSort = (sortBy) => {
-            sortOrder.value = sortBy; // Cập nhật giá trị mới cho sortOrder
-            router.push({
-                path: '/search-blogs',
-                query: { title: '', sort: sortOrder.value }, // Cập nhật query với sortOrder mới
-            });
+            sortOrder.value = sortBy;
+            updateQueryParams({ sort: sortOrder.value, title: null, tag: null });
         };
 
         return {
