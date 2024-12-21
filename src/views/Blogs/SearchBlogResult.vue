@@ -1,6 +1,8 @@
 <template>
     <div class="search-results-container">
-        <h1 class="search-results-heading">Kết quả tìm kiếm</h1>
+        <BlogFilters
+            :tags="['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
+            :currentSort="currentSort" @search="handleSearch" @tag-click="handleTagClick" @sort="handleSort" />
 
         <div v-if="filteredResults.articles.length === 0" class="no-results">
             <p>Không tìm thấy kết quả nào.</p>
@@ -15,6 +17,12 @@
                     <div class="article-content">
                         <a :href="article.Link" class="article-title">{{ article.Title }}</a>
                         <time class="article-date">{{ article.Date }}</time>
+                        <div class="article-tags">
+                            <span v-for="tag in article.Tags" :key="tag" class="article-tag"
+                                @click="handleTagClick(tag)">
+                                {{ tag }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -32,11 +40,12 @@
 
 <script>
 import data from '../../api/data.json';
+import BlogFilters from './Components/BlogFilters.vue';
 
 export default {
     name: 'SearchBlogResult',
-    mounted() {
-        console.log("Route query params:", this.$route.query);
+    components: {
+        BlogFilters
     },
     data() {
         return {
@@ -48,18 +57,38 @@ export default {
     },
     computed: {
         filteredResults() {
-            const { title, tag } = this.$route.query;
+            const { title, tag, category } = this.$route.query;
             const searchTerm = title ? title.trim().toLowerCase() : "";
+            const selectedTag = tag ? tag.trim().toLowerCase() : null;
+            const selectedCategory = category ? category.trim().toLowerCase() : null;
 
-            let filteredArticles = this.articles.filter(article => {
-                const normalizedTitle = article.Title.trim().toLowerCase();
-                const matchesTitle = normalizedTitle.includes(searchTerm);
-                const matchesTag = tag ? article.Tags.some(t => t.toLowerCase() === tag.toLowerCase()) : true;
-                return matchesTitle && matchesTag;
+            const allArticles = [...this.featuredArticles, ...this.articles];
+
+            let filteredArticles = allArticles.filter(article => {
+                const matchesTitle = searchTerm
+                    ? article.Title.trim().toLowerCase().includes(searchTerm)
+                    : true;
+
+                const matchesTag = selectedTag
+                    ? article.Tags.some(t => t.trim().toLowerCase() === selectedTag)
+                    : true;
+
+                const matchesCategory = selectedCategory
+                    ? article.Tags.some(t => t.trim().toLowerCase() === selectedCategory)
+                    : true;
+
+                return matchesTitle && matchesTag && matchesCategory;
+            });
+
+            let filteredCategories = this.categories.filter(categoryItem => {
+                console.log('category', this.categories)
+                return selectedCategory
+                    ? categoryItem.Id.toLowerCase() === selectedCategory
+                    : true;
             });
 
             return {
-                articles: filteredArticles,
+                articles: filteredArticles
             };
         }
     }
@@ -113,9 +142,10 @@ a.article-title {
 }
 
 .article-date {
-    margin-top: 5px;
-    font-size: 14px;
-    color: #666;
+    display: block;
+    margin-top: 10px;
+    font: 400 13px/1 Inter, sans-serif;
+    color: #999;
 }
 
 .categories-list {
@@ -130,6 +160,27 @@ a.article-title {
     font-size: 20px;
     color: #000;
     text-decoration: none;
+}
+
+.article-tags {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.article-tag {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #007bff;
+    transition: background-color 0.3s;
+}
+
+.article-tag:hover {
+    background-color: #e0e0e0;
 }
 
 @media (max-width: 1000px) {
