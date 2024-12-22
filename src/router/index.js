@@ -16,6 +16,7 @@ import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import CommunityOverall from '@/views/Community/CommunityOverall.vue'
+import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
 
 const router = createRouter({
@@ -81,6 +82,11 @@ const router = createRouter({
       path: '/profile/:id',
       name: 'viewProfile',
       component: ViewUserProfile
+    },
+    {
+      path: '/Practice/Yoga/YogaExerciseDetail',
+      name: 'YogaExerciseDetail',
+      component: YogaExerciseDetail
     },
 
 
