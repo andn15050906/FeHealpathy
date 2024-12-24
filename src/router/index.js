@@ -18,6 +18,8 @@ import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import CommunityOverall from '@/views/Community/CommunityOverall.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
 import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
+import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -125,6 +127,11 @@ const router = createRouter({
       path: '/practice/yoga',
       name: 'yoga',
       component: YogaView
+    },
+    {
+      path: '/practice/habit-tracking',
+      name: 'habitTracking',
+      component: HabitTracking,
     }
   ]
 })
