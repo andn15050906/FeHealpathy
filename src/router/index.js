@@ -15,6 +15,8 @@ import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
 import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
+import CommunityOverall from '@/views/Community/CommunityOverall.vue'
+import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
 import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
@@ -108,6 +110,11 @@ const router = createRouter({
       path: '/profile/:id',
       name: 'viewProfile',
       component: ViewUserProfile
+    },
+    {
+      path: '/Practice/Yoga/YogaExerciseDetail',
+      name: 'YogaExerciseDetail',
+      component: YogaExerciseDetail
     },
 
 
