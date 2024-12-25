@@ -16,6 +16,8 @@ import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
+import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
+import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
@@ -145,6 +147,16 @@ const router = createRouter({
       name: 'AttemptAssignment',
       component: AttemptAssignment
     },
+    {
+      path: '/practice/yoga',
+      name: 'yoga',
+      component: YogaView
+    },
+    {
+      path: '/practice/habit-tracking',
+      name: 'habitTracking',
+      component: HabitTracking,
+    }
   ]
 })
 
