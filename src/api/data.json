@@ -1,29 +1,29 @@
 {
     "HomePage": {
-        "Title": "Calm your mind. Change your life.",
-        "SubTitle": "The #1 app for sleep, meditation and relaxation",
-        "TryIt": "Try Calm for Free",
+        "Title": "Healpathy - Where your mind revives",
+        "SubTitle": "Nurture the spirit, unleash the potential.",
+        "TryIt": "Try Healpathy for Free",
         "AlreadyHaveAccount": "Already have an account?",
         "Section1": {
             "Title": "We're here to help you feel better.",
-            "SubTitle": "Stress less.",
-            "Description": "Get in-the-moment relief for stress and anxiety so you can get back to living.",
-            "LearnMore": "Learn More"
-        },
-        "Section2": {
-            "Title": "Sleep more.",
-            "SubTitle": "",
-            "Description": "Fall asleep (and stay asleep) naturally and peacefully.",
-            "LearnMore": "Learn More"
-        },
-        "Section3": {
-            "Title": "Live mindfully.",
-            "SubTitle": "",
+            "SubTitle": "Live mindfully.",
             "Description": "Navigate life's ups and downs with resilience, confidence and guided support.",
             "LearnMore": "Learn More"
         },
+        "Section2": {
+            "Title": "Empower skills.",
+            "SubTitle": "",
+            "Description": "Master skills that will help you conquer your life objectives",
+            "LearnMore": "Learn More"
+        },
+        "Section3": {
+            "Title": "Strengthen body.",
+            "SubTitle": "",
+            "Description": "Build your strength in motion and growth in action",
+            "LearnMore": "Learn More"
+        },
         "Section4": {
-            "Title": "Over 2 million 5-star reviews.",
+            "Title": "Over two thousand 5-star reviews.",
             "SubTitle": "",
             "Description": "",
             "LearnMore": "Learn More"
@@ -31,33 +31,33 @@
         "Testimonial": [
             {
                 "Text": "When I cannot fall asleep, I turn on this app and am out within 5 minutes.",
-                "UserText": "Brandy from Houston"
+                "UserText": "A from America"
             },
             {
                 "Text": "I have a very busy brain and can find it hard to unwind. Now a daily practice is actually so wonderful and healing for me.",
-                "UserText": "John from Chicago"
+                "UserText": "B from Viet Nam"
             },
             {
-                "Text": "Calm has changed my life in immeasurable ways. I am more resilient and feel so much more connected to myself.",
-                "UserText": "Allison from San Jose"
+                "Text": "Healpathy has changed my life in immeasurable ways. I am more resilient and feel so much more connected to myself.",
+                "UserText": "C from England"
             }
         ],
         "Pricing": {
-            "Title": "Start your free trial of Calm Premium.",
+            "Title": "Start your free trial of Healpathy Premium.",
             "Yearly": {
                 "Text": "Yearly",
-                "Price": "$179.88 $69.99/yr."
+                "Price": "$100/yr."
             },
             "Trial": {
                 "Text": "14-Day Free Trial",
-                "Price": "$5.83/mo."
+                "Price": "Free."
             },
             "Monthly": {
                 "Text": "Monthly",
-                "Price": "$14.99/mo."
+                "Price": "$10/mo."
             },
             "Terms": {
-                "Text": "After your free trial, the yearly subscription is $69.99 and automatically renews each year until cancelled.",
+                "Text": "",
                 "Title": "Terms",
                 "CancelText": "Cancel anytime",
                 "Continue": "Continue"
@@ -126,7 +126,7 @@
                     "Stress & Anxiety"
                 ],
                 "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
-                "Excerpt": "Calm's 'New Year Reset' is a 30-day mental health journey to help you recharge, restore, refresh & reconnect. All it takes is Just One Step each day for 30 days."
+                "Excerpt": "Healpathy's 'New Year Reset' is a 30-day mental health journey to help you recharge, restore, refresh & reconnect. All it takes is Just One Step each day for 30 days."
             },
             {
                 "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/16a730674da83ae93a1649184c08b7a13cbb35ade295530aa913f1471c4f098f?apiKey=581cb509eedd462787009da53a17f69a&",
@@ -295,7 +295,7 @@
                 "Link": "#"
             },
             {
-                "Title": "Calm and NCT partner to give new mothers the gift of time and peace of mind",
+                "Title": "Healpathy and NCT partner to give new mothers the gift of time and peace of mind",
                 "Date": "Dec 3, 2024",
                 "Tags": [
                     "Relationship",
@@ -374,5 +374,117 @@
             "DateOfBirth": "2024-01-01T00:00:00.000Z",
             "CreatedAt": "2024-01-01T00:00:00.000Z"
         }
+    },
+    "Community": {
+        "Groups": {
+            "Joined": [
+                {
+                    "id": "1",
+                    "name": "Name1",
+                    "isPublic": true,
+                    "description": "Description1",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
+                    "totalMembers": 1,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "1",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "2",
+                    "name": "Name2",
+                    "isPublic": true,
+                    "description": "Description2",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
+                    "totalMembers": 2,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "2",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "3",
+                    "name": "Name3",
+                    "isPublic": true,
+                    "description": "Description3",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 3,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "3",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                }
+            ],
+            "Recommended": [
+                {
+                    "id": "1",
+                    "name": "Name1",
+                    "isPublic": true,
+                    "description": "Description1",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
+                    "totalMembers": 1,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "1",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "2",
+                    "name": "Name2",
+                    "isPublic": true,
+                    "description": "Description2",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
+                    "totalMembers": 2,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "2",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "3",
+                    "name": "Name3",
+                    "isPublic": true,
+                    "description": "Description3",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 3,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "3",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                }
+            ]
+        }
+    },
+    "GroupOverview": {
+        "Posts": [
+            {
+                "Id": 1,
+                "CreatedBy": 1,
+                "CreatedAt": "2024-01-01T00:00:00.000Z",
+                "Content": "Content1",
+                "TotalLikes": 1,
+                "PublicLevel": 0,
+                "AllowComment": true,
+                "Creator": {
+                    "Id": 1,
+                    "Avatar": "/assets/images/avatars/marc.jpg",
+                    "UserName": "Alec 123"
+                },
+                "Medias": [],
+                "LikeCount": 10
+            }
+        ]
     }
 }

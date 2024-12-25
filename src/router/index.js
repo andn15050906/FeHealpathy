@@ -15,8 +15,12 @@ import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
 import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
-import CommunityOverall from '@/views/Community/CommunityOverall.vue'
 import AboutUs from '@/views/AboutUs/AboutUs.vue'
+import CommunityOverview from '@/views/Community/CommunityOverview.vue'
+import GroupOverview from '@/views/Community/GroupOverview.vue'
+import CreateGroup from '@/views/Community/CreateGroup.vue'
+import EditGroup from '@/views/Community/EditGroup.vue'
+import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,8 +47,29 @@ const router = createRouter({
     },
     {
       path: '/community',
-      name: 'communityOverall',
-      component: CommunityOverall
+      name: 'communityOverview',
+      component: CommunityOverview
+    },
+    {
+      path: '/group/:id',
+      name: 'groupOverview',
+      component: GroupOverview,
+      props: true
+    },
+    {
+      path: '/group/:id/detail',
+      name: 'viewGroup',
+      component: ViewGroup
+    },
+    {
+      path: '/create-group',
+      name: 'createGroup',
+      component: CreateGroup
+    },
+    {
+      path: '/edit-group',
+      name: 'editGroup',
+      component: EditGroup
     },
     {
       path: '/about-us',

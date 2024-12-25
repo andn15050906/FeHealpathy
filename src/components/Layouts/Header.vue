@@ -5,8 +5,8 @@
       <div class="menu">
         <ul>
           <li><router-link class="hovered-link" to="/">Home</router-link></li>
-          <li><router-link class="hovered-link" to="/blogs">Blogs</router-link></li>
           <li><router-link class="hovered-link" to="/practice">Practice</router-link></li>
+          <li><router-link class="hovered-link" to="/blogs">Blogs</router-link></li>
           <li><router-link class="hovered-link" to="/courses">Courses</router-link></li>
           <li><router-link class="hovered-link" to="/community">Community</router-link></li>
           <li><router-link class="hovered-link" to="/about-us">About us</router-link></li>
@@ -155,6 +155,7 @@ ul {
   position: fixed;
   top: 0;
   z-index: 1000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .header .navbar {

@@ -1,1 +1,3 @@
-<template>Practice Tool List</template>
+<template>
+    <div>Practice Tool List</div>
+</template>
