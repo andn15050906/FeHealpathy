@@ -85,8 +85,6 @@ export default {
 .article-container {
     display: flex;
     flex-direction: column;
-    margin-top: 120px;
-    margin-bottom: 40px;
 }
 
 .hero-section {
@@ -136,6 +134,10 @@ export default {
     margin: 60px;
 }
 
+.article-card {
+    max-width: 280px;
+}
+
 .article-image {
     width: 100%;
     border-radius: 20px;
@@ -177,7 +179,7 @@ a.article-title {
 
 .article-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(279px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 17px;
 }

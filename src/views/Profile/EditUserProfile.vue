@@ -1,6 +1,5 @@
 <template>
   <div class="content">
-    <!-- SweetAlert component -->
     <SweetAlert ref="sweetAlert" />
     <v-container id="user-profile" fluid tag="section">
       <v-row justify="center">
@@ -26,7 +25,7 @@
                 <v-row>
                   <!--Hidden if not current user-->
                   <v-col cols="12" md="6">
-                    <v-text-field label="User Name" v-model="UserProfile.UserInfo.UserName" maxlength="50" readonly
+                    <v-text-field label="User Name" v-model="UserProfile.UserName" maxlength="50" readonly
                       class="purple-input" persistent-placeholder />
                   </v-col>
                   <v-col cols="12" md="6">
@@ -39,7 +38,7 @@
                       class="purple-input" persistent-placeholder />
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-text-field label="Enrollment Count" v-model="UserProfile.UserInfo.EnrollmentCount" type="number"
+                    <v-text-field label="Enrollment Count" v-model="UserProfile.EnrollmentCount" type="number"
                       class="purple-input" value="1231" persistent-placeholder />
                   </v-col>
                 </v-row>
@@ -60,18 +59,18 @@
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-card class="v-card-profile" :avatar="UserProfile.UserInfo.Avatar">
+          <v-card class="v-card-profile" :avatar="UserProfile.Avatar">
             <v-card-text class="text-center">
               <div>
                 <div @click="triggerAvatarUpload" class="v-avatar">
-                  <img :src="UserProfile.UserInfo.Avatar" alt="User Avatar" id="app-avatar-img" class="img">
+                  <img :src="UserProfile.Avatar" alt="User Avatar" id="app-avatar-img" class="img">
                 </div>
                 <input @change="handleAvatarChange" ref="avatarInput" type="file" hidden accept=".jpg, .jpeg, .png" />
               </div>
-              <h6 class="mb-1 grey--text">{{ UserProfile.UserInfo.Role }}</h6>
-              <h4 class="mb-3 black--text">{{ UserProfile.UserInfo.UserName }}</h4>
-              <h6 class="font-weight-light grey--text">{{ UserProfile.UserInfo.Description }}</h6>
-              <h6 class="font-weight-light grey--text">{{ UserProfile.UserInfo.CreatedAt }}</h6>
+              <h6 class="mb-1 grey--text">{{ UserProfile.Role }}</h6>
+              <h4 class="mb-3 black--text">{{ UserProfile.UserName }}</h4>
+              <h6 class="font-weight-light grey--text">{{ UserProfile.Description }}</h6>
+              <h6 class="font-weight-light grey--text">{{ UserProfile.CreatedAt }}</h6>
             </v-card-text>
           </v-card>
         </v-col>
@@ -81,18 +80,20 @@
 </template>
 
 <script>
-import data from '../../api/data.json';
-import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
 import { inject, ref, onMounted } from 'vue';
+import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
 import { getClientInfo, updateUserProfile } from '../../services/userService.js';
+import { handleFormSubmit } from '@/helpers/validation';
+import GlobalState from '@/helpers/globalState';
 
 export default {
   data() {
-    // ex data
+    var userProfile = GlobalState.getUserProfile();
+
     return {
-      UserProfile: data.UserProfile,
-      UserProfile_UserInfo_DateOfBirth: ConvertTo_yyyy_mm_dd(new Date(data.UserProfile.DateOfBirth)),
-      UserProfile_UserInfo_JoinDate: ConvertTo_yyyy_mm_dd(new Date(data.UserProfile.JoinDate))
+      UserProfile: userProfile,
+      UserProfile_UserInfo_DateOfBirth: ConvertTo_yyyy_mm_dd(new Date(userProfile.DateOfBirth)),
+      UserProfile_UserInfo_JoinDate: ConvertTo_yyyy_mm_dd(new Date(userProfile.JoinDate))
     }
   },
   setup() {
@@ -130,9 +131,7 @@ export default {
       DateOfBirth: 'Date of Birth',
       JoinDate: 'Join Date',
       EnrollmentCount: 'Enrollment Count',
-      Save: 'Save Changes',
-      Confirm: 'Confirm',
-      ConfirmQuestion: 'Update your profile?'
+      Confirm: 'Confirm'
     };
 
     const roleMapping = {
@@ -215,20 +214,7 @@ export default {
       }
     };
 
-    const handleSubmit = async () => {
-      const result = await sweetAlert.showAlert({
-        title: text.Confirm,
-        text: text.ConfirmQuestion,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, update it!',
-        cancelButtonText: 'No, cancel!'
-      });
-
-      if (result.isConfirmed) {
-        await confirmChanges();
-      }
-    };
+    const handleSubmit = () => handleFormSubmit(confirmChanges, sweetAlert);
 
     onMounted(() => {
       fetchProfile();
