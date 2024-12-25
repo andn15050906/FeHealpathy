@@ -166,8 +166,6 @@ export default {
 <style scoped>
 .home-container {
     background: #fff;
-    font-family: Inter, sans-serif;
-    margin-top: 80px;
 }
 
 .main-header {

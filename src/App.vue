@@ -45,7 +45,9 @@ onMounted(() => {
     <SweetAlert ref="sweetAlert" />
     <Header />
     <main>
-      <RouterView />
+      <div class="page-container">
+        <RouterView />
+      </div>
     </main>
     <Footer />
   </div>
@@ -58,6 +60,19 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-image: url("/assets/background/green-bg1.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center top;
+  background-attachment: fixed;
+}
+
+.page-container {
+  min-height: 100vh;
+  width: 1200px;
+  background-color: #fff;
+  margin-top: 60px;
+  padding: 40px;
 }
 
 footer {
