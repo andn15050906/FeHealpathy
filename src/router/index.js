@@ -25,6 +25,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -120,6 +121,11 @@ const router = createRouter({
       path: '/Practice/Yoga/:id',
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
+    },
+    {
+      path: '/mood-overview',
+      name: 'moodOverview',
+      component: MoodOverview
     },
 
 
