@@ -63,8 +63,8 @@
 
 <script setup>
 import { ref } from "vue";
-import CommentInputField from "../Helper/CommentInputField.vue";
-import ConfirmPopup from "@/components/Helper/ConfirmPopup.vue";
+import CommentInputField from "@/components/CommentComponents/CommentInputField.vue";
+import ConfirmPopup from "@/components/Common/ConfirmPopup.vue";
 
 const props = defineProps({
     comment: {

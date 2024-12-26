@@ -11,7 +11,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import UserComment from "./UserComment.vue";
-import CommentInputField from "../Helper/CommentInputField.vue";
+import CommentInputField from "@/components/CommentComponents/CommentInputField.vue";
 
 var comments = ref([]);
 const route = useRoute();

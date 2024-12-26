@@ -82,11 +82,11 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from "vue-router";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import PostCreateSection from '@/components/GroupComponents/CreatePostSection.vue';
-//import EditGroupComponent from '@/components/GroupComponents/EditGroupComponent.vue';
-import JoinRequest from '@/components/GroupComponents/JoinRequest.vue';
-import GroupMemberSection from '@/components/GroupComponents/GroupMemberSection.vue';
-import GroupPost from '@/components/GroupComponents/GroupPost.vue';
+import PostCreateSection from '@/components/CommunityComponents/CreatePostSection.vue';
+//import EditGroupComponent from '@/components/CommunityComponents/EditGroupComponent.vue';
+import JoinRequest from '@/components/CommunityComponents/JoinRequest.vue';
+import GroupMemberSection from '@/components/CommunityComponents/GroupMemberSection.vue';
+import GroupPost from '@/components/CommunityComponents/GroupPost.vue';
 import GlobalState from '@/helpers/globalState';
 import dict from '@/api/dictionary';
 import data from '@/api/data';

@@ -36,15 +36,7 @@
                 </div>
 
                 <div class="article-grid">
-                    <article class="article-card" v-for="article in articles.slice(0, 4)" :key="article.id">
-                        <a :href="article.Link" class="article-link">
-                            <img :src="article.Thumb" :alt="article.Title" class="article-image" loading="lazy" />
-                        </a>
-                        <div class="article-content">
-                            <a :href="article.Link" class="article-title">{{ article.Title }}</a>
-                            <time class="article-date">{{ article.Date }}</time>
-                        </div>
-                    </article>
+                    <BlogCard v-for="article in articles.slice(0, 4)" :key="article.id" :article="article" />
                 </div>
             </div>
         </section>
@@ -53,16 +45,18 @@
 
 <script>
 import { ref } from 'vue';
-import BlogFilters from './Components/BlogFilters.vue';
-import Tag from '@/components/Helper/Tag.vue';
+import BlogFilters from '../../components/BlogComponents/BlogFilters.vue';
+import Tag from '@/components/Common/Tag.vue';
 import data from '../../api/data.json';
 import { useRouter } from "vue-router";
+import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 
 export default {
     name: 'ArticleList',
     components: {
         BlogFilters,
-        Tag
+        Tag,
+        BlogCard
     },
     setup() {
         const router = useRouter();
@@ -160,20 +154,9 @@ export default {
 
 .featured-grid {
     display: grid;
-    grid-template-columns: 36% 64%;
+    grid-template-columns: 30% 70%;
     gap: 20px;
     margin: 60px;
-}
-
-.article-card {
-    max-width: 280px;
-}
-
-.article-image {
-    width: 100%;
-    border-radius: 20px;
-    aspect-ratio: 1;
-    object-fit: cover;
 }
 
 .tag-list {
@@ -211,21 +194,8 @@ a.article-title {
 .article-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 40px;
     margin-top: 17px;
-}
-
-.article-card {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-}
-
-.article-date {
-    display: block;
-    margin-top: 10px;
-    font: 400 13px/1 Inter, sans-serif;
-    color: #999;
 }
 
 .section-header {

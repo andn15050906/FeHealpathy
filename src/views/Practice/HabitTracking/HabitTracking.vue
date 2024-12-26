@@ -3,21 +3,12 @@
     <!-- Phần Mood Chart -->
     <div class="mood-chart-section">
       <h2>Biểu Đồ Tâm Trạng</h2>
-      <line-chart
-        :chart-data="moodChartData"
-        :options="moodChartOptions"
-        :width="400"
-        :height="200"
-      />
+      <!--<line-chart :chart-data="moodChartData" :options="moodChartOptions" :width="400" :height="200" />-->
       <div class="mood-selection">
         <h3>Tâm trạng hôm nay của bạn?</h3>
         <div class="mood-icons">
-          <span 
-            v-for="mood in moods" 
-            :key="mood.id" 
-            @click="selectMood(mood)"
-            :class="{ active: currentMood === mood.id }"
-          >
+          <span v-for="mood in moods" :key="mood.id" @click="selectMood(mood)"
+            :class="{ active: currentMood === mood.id }">
             {{ mood.icon }}
           </span>
         </div>
@@ -32,24 +23,14 @@
         <div class="sleep-input">
           <div class="input-group">
             <label>Hôm nay bạn ngủ mấy tiếng?</label>
-            <input 
-              type="number" 
-              v-model="sleepData.hours" 
-              min="0" 
-              max="24"
-              @change="updateSleepData"
-              class="cute-input"
-            />
+            <input type="number" v-model="sleepData.hours" min="0" max="24" @change="updateSleepData"
+              class="cute-input" />
           </div>
           <div class="input-group">
             <label>Chất lượng giấc ngủ?</label>
             <div class="sleep-quality-rating">
-              <span 
-                v-for="n in 5" 
-                :key="n"
-                @click="setSleepQuality(n)"
-                :class="{ active: sleepData.quality >= n * 2 }"
-              >⭐</span>
+              <span v-for="n in 5" :key="n" @click="setSleepQuality(n)"
+                :class="{ active: sleepData.quality >= n * 2 }">⭐</span>
             </div>
           </div>
         </div>
@@ -63,30 +44,17 @@
             <span class="value">{{ sleepQuality }}/10</span>
           </div>
         </div>
-        <bar-chart
-          :chart-data="sleepChartData"
-          :options="sleepChartOptions"
-          :width="400"
-          :height="200"
-        />
+        <!--<bar-chart :chart-data="sleepChartData" :options="sleepChartOptions" :width="400" :height="200" />-->
       </div>
 
       <!-- Nutrition Card -->
       <div class="tracking-card nutrition-card">
         <h3>Dinh Dưỡng Hôm Nay</h3>
-        <pie-chart
-          :chart-data="nutritionChartData"
-          :options="nutritionChartOptions"
-          :width="400"
-          :height="200"
-        />
+        <!--<pie-chart :chart-data="nutritionChartData" :options="nutritionChartOptions" :width="400" :height="200" />-->
         <div class="nutrition-recommendations">
           <h4>Gợi ý cho bạn:</h4>
           <ul>
-            <li 
-              v-for="(rec, index) in currentNutritionRecommendation.split('\n')" 
-              :key="index"
-            >
+            <li v-for="(rec, index) in currentNutritionRecommendation.split('\n')" :key="index">
               {{ rec }}
             </li>
           </ul>
@@ -115,7 +83,7 @@
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .mood-icons {
@@ -134,7 +102,7 @@
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sleep-stats {
@@ -143,7 +111,8 @@
   margin-bottom: 15px;
 }
 
-.total-sleep, .sleep-quality {
+.total-sleep,
+.sleep-quality {
   font-size: 24px;
   font-weight: bold;
   color: #5488c7;
@@ -312,7 +281,7 @@ export default {
           data: [30, 50, 20],
           backgroundColor: [
             'rgba(255, 99, 132, 0.8)',
-            'rgba(75, 192, 192, 0.8)', 
+            'rgba(75, 192, 192, 0.8)',
             'rgba(255, 205, 86, 0.8)'
           ]
         }]
@@ -357,17 +326,17 @@ export default {
     },
     generateRecommendation() {
       let recommendations = [];
-      
+
       // Kiểm tra giấc ngủ
       if (this.sleepData.hours < 6) {
         recommendations.push(...this.nutritionRecommendations.lowSleep);
       } else if (this.sleepData.hours > 9) {
         recommendations.push(...this.nutritionRecommendations.highSleep);
       }
-      
+
       // Kiểm tra tâm trạng
       if (this.currentMood) {
-        switch(this.currentMood) {
+        switch (this.currentMood) {
           case 'stressed':
             recommendations.push('Thực phẩm giàu omega-3', 'Vitamin C');
             break;
@@ -376,7 +345,7 @@ export default {
             break;
         }
       }
-      
+
       return recommendations.join('\n');
     },
     updateMoodChart() {
@@ -386,7 +355,7 @@ export default {
         'sad': 2,
         'stressed': 1
       };
-      
+
       const newData = [...this.moodChartData.datasets[0].data];
       newData.shift();
       newData.push(moodValues[this.currentMood]);
@@ -399,7 +368,7 @@ export default {
     updateSleepData() {
       this.totalSleepHours = this.sleepData.hours;
       this.sleepQuality = this.sleepData.quality;
-      
+
       // Cập nhật biểu đồ
       const newData = [...this.sleepChartData.datasets[0].data];
       newData.shift();

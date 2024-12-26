@@ -1,34 +1,20 @@
 <template>
   <div class="yoga-detail">
-    
     <button class="back-button" @click="goBack">← Quay lại</button>
-
-    
     <h1 class="title">Yoga For Beginners | Day 01 | Hye Yoga</h1>
-
-    
     <p class="category">Cơ Bản</p>
-
-    
     <div class="video-container">
-      <iframe
-        class="video"
-        src="https://www.youtube.com/embed/iSS4asEmIfE"
-        title="Yoga For Beginners | Day 01 | Hye Yoga"
-        frameborder="0"
+      <iframe class="video" src="https://www.youtube.com/embed/iSS4asEmIfE"
+        title="Yoga For Beginners | Day 01 | Hye Yoga" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
+        allowfullscreen></iframe>
     </div>
 
-    
     <div class="actions">
       <button @click="likeExercise" class="btn like">Like</button>
       <button @click="shareExercise" class="btn share">Share</button>
     </div>
-
     <div class="divider"></div>
-    
     <div class="description">
       <h2>Mô tả bài tập</h2>
       <p>
@@ -36,61 +22,38 @@
         Các bài tập yoga giúp tăng cường sự linh hoạt, giảm căng thẳng và cải thiện chất lượng cuộc sống.
       </p>
     </div>
-
     <div class="divider"></div>
-    
     <div class="equipment">
       <h2>Thiết bị cần chuẩn bị</h2>
       <ul>
         <li>Không yêu cầu thiết bị</li>
       </ul>
     </div>
-
     <div class="divider"></div>
-    
     <div class="related-exercises">
       <h2>Bài tập liên quan</h2>
       <div class="exercise-list">
-        <div
-          class="exercise-item"
-          v-for="exercise in relatedExercises"
-          :key="exercise.id"
-        >
-          <img :src="exercise.image" :alt="exercise.title" />
+
+        <YogaExerciseCard v-for="excercise in relatedExercises" :key="excercise.id" :excercise="excercise" />
+
+        <!--<div class="exercise-item" v-for="exercise in relatedExercises" :key="exercise.id">
+          <img :src="exercise.thumbnail" :alt="exercise.title" />
           <p>{{ exercise.title }}</p>
-        </div>
+        </div>-->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import data from '@/api/data';
+import YogaExerciseCard from '@/components/PracticeComponents/YogaExerciseCard.vue';
+
 export default {
   name: "YogaDetailPage",
   data() {
     return {
-      relatedExercises: [
-        {
-          id: 1,
-          title: "Yoga for Relaxation",
-          image: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2021/9/11/photo-1631370026092-1631370027286282190795.jpg",
-        },
-        {
-          id: 2,
-          title: "Morning Yoga Flow",
-          image: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2021/9/11/photo-1631370026092-1631370027286282190795.jpg",
-        },
-        {
-          id: 3,
-          title: "Stretching Yoga",
-          image: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2021/9/11/photo-1631370026092-1631370027286282190795.jpg",
-        },
-        {
-          id: 4,
-          title: "Yoga for Better Sleep",
-          image: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2021/9/11/photo-1631370026092-1631370027286282190795.jpg",
-        },
-      ],
+      relatedExercises: data.YogaCatalog.Lessons.slice(0, 4)
     };
   },
   methods: {
@@ -98,11 +61,13 @@ export default {
       this.$router.go(-1);
     },
   },
+  components: {
+    YogaExerciseCard
+  }
 };
 </script>
 
 <style scoped>
-
 .yoga-detail {
   font-family: "Poppins", Arial, sans-serif;
   line-height: 1.8;
@@ -212,6 +177,7 @@ export default {
   text-align: center;
   flex: 1;
   transition: transform 0.3s;
+  cursor: pointer;
 }
 
 .exercise-item img {

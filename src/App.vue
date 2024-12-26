@@ -5,7 +5,7 @@ import { ref, provide, onMounted } from 'vue';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
-import SweetAlert from './components/Helper/SweetAlert.vue';
+import SweetAlert from './components/Common/SweetAlert.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);

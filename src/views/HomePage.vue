@@ -5,8 +5,10 @@
                 <h1 class="hero-title">{{ HomePage.Title }}</h1>
                 <p class="hero-subtitle">{{ HomePage.SubTitle }}</p>
                 <div class="cta-buttons">
-                    <button class="primary-button">{{ HomePage.TryIt }}</button>
-                    <button class="secondary-button">{{ HomePage.AlreadyHaveAccount }}</button>
+                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">{{
+                        HomePage.TryIt }}</GlowingButton>
+                    <GlowingButton primary-color="transparent" secondary-color="transparent" textColor="#000">{{
+                        HomePage.AlreadyHaveAccount }}</GlowingButton>
                 </div>
             </section>
 
@@ -42,32 +44,13 @@
             <section class="testimonials-section">
                 <h2 class="section-title">{{ HomePage.Section4.Title }}</h2>
                 <div class="testimonial-cards">
-                    <article class="testimonial-card">
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/cb345c283f9a7c8a9a29683bd155b2c4107ab62f7ca96b78530877123fa6c23a?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="User Avatar" class="testimonial-avatar" />
-                        <p class="testimonial-text">{{ HomePage.Testimonial[0].Text }}</p>
-                        <p class="testimonial-author">{{ HomePage.Testimonial[0].UserText }}</p>
+                    <GlowingCard v-for="(testimonial, index) in HomePage.Testimonial.slice(0, 3)" :key="index"
+                        class="testimonial-card" primaryColor="#4facfe" secondaryColor="#0062fe">
+                        <p class="testimonial-text">{{ testimonial.Text }}</p>
+                        <p class="testimonial-author">{{ testimonial.UserText }}</p>
                         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/d5a98f91b646a7b4cb93d02735f1d1e73d79681afb5f662e1440d344c0c94336?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
                             alt="" class="rating-stars" />
-                    </article>
-
-                    <article class="testimonial-card">
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/4db67621847e30780caf32be0777537ed3be10d4865ce5d94cbe61a5ef9e6ae6?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="User Avatar" class="testimonial-avatar" />
-                        <p class="testimonial-text">{{ HomePage.Testimonial[1].Text }}</p>
-                        <p class="testimonial-author">{{ HomePage.Testimonial[1].UserText }}</p>
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/6135b90f63f73038b068fb7844a97eff52f9b4db9fe0153b9838a6d68bf9e264?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="" class="rating-stars" />
-                    </article>
-
-                    <article class="testimonial-card">
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/b44add15ef1af971bbbfb03a11a21ccae33b90f450a4adc2f881d70e9e7e44df?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="User Avatar" class="testimonial-avatar" />
-                        <p class="testimonial-text">{{ HomePage.Testimonial[2].Text }}</p>
-                        <p class="testimonial-author">{{ HomePage.Testimonial[2].UserText }}</p>
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/31ff5de254f9a6044ea93b4a03af46e5fe7921712ac61eda7f3ed0993cd8f995?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="" class="rating-stars" />
-                    </article>
+                    </GlowingCard>
                 </div>
             </section>
 
@@ -96,61 +79,19 @@
                     <a href="#terms" class="terms-link">{{ HomePage.Pricing.Terms.Title }}</a> |
                     <a href="#cancel" class="terms-link">{{ HomePage.Pricing.Terms.CancelText }}</a>
                 </p>
-                <button class="primary-button">{{ HomePage.Pricing.Terms.Continue }}</button>
+                <div style="display: flex; justify-content: center;">
+                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">
+                        {{ HomePage.Pricing.Terms.Continue }}
+                    </GlowingButton>
+                </div>
             </section>
         </main>
-
-        <!--<footer class="main-footer">
-            <div class="footer-content">
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h4 class="footer-title">Company</h4>
-                        <nav class="footer-nav">
-                            <a href="#about" class="footer-link">About</a>
-                            <a href="#careers" class="footer-link">Careers</a>
-                            <a href="#press" class="footer-link">Press</a>
-                            <a href="#blog" class="footer-link">Blog</a>
-                            <a href="#instructors" class="footer-link">Meet our Instructors</a>
-                            <a href="#science" class="footer-link">Calm Science</a>
-                        </nav>
-                    </div>
-
-                    <div class="footer-column">
-                        <h4 class="footer-title">Offers</h4>
-                        <nav class="footer-nav">
-                            <a href="#buy-gift" class="footer-link">Buy a Gift</a>
-                            <a href="#redeem-gift" class="footer-link">Redeem a Gift</a>
-                            <a href="#family" class="footer-link">Family Plan</a>
-                            <a href="#health" class="footer-link">Calm Health</a>
-                            <a href="#business" class="footer-link">Calm Business</a>
-                        </nav>
-                    </div>
-
-                    <div class="footer-column">
-                        <h4 class="footer-title">Help</h4>
-                        <nav class="footer-nav">
-                            <a href="#faq" class="footer-link">FAQ</a>
-                            <a href="#contact" class="footer-link">Contact Us</a>
-                            <a href="#terms" class="footer-link">Terms</a>
-                            <a href="#privacy" class="footer-link">Privacy Policy</a>
-                            <a href="#ccpa" class="footer-link">CCPA Notice</a>
-                            <a href="#privacy-choices" class="footer-link privacy-choices">
-                                Your Privacy Choices
-                                <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/587cf2f017f26d85da76c35f00a3e413c50d36c4f5de90b6f08442917fda15a0?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                                    alt="" class="privacy-icon" />
-                            </a>
-                            <a href="#cookies" class="footer-link">Cookies</a>
-                            <a href="#accessibility" class="footer-link">Accessibility Statement</a>
-                        </nav>
-                    </div>
-                </div>
-                <p class="copyright">Copyright © 2024 Calm. All rights reserved</p>
-            </div>
-        </footer>-->
     </div>
 </template>
 
 <script>
+import GlowingCard from '@/components/Common/GlowingCard.vue';
+import GlowingButton from '@/components/Common/GlowingButton.vue';
 import json from '../api/data.json'
 
 export default {
@@ -159,6 +100,10 @@ export default {
         return {
             HomePage: json.HomePage
         }
+    },
+    components: {
+        GlowingButton,
+        GlowingCard
     }
 }
 </script>
@@ -198,30 +143,6 @@ export default {
     text-decoration: none;
     font-weight: 700;
     font-size: 17px;
-}
-
-.primary-button {
-    background: linear-gradient(180deg,
-            rgb(36, 119, 170) 0%,
-            rgb(100, 97, 224) 100%);
-    color: #fff;
-    border: none;
-    border-radius: 100px;
-    padding: 14px 29px;
-    font-weight: 700;
-    font-size: 17px;
-    cursor: pointer;
-}
-
-.secondary-button {
-    background: transparent;
-    color: #383838;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 100px;
-    padding: 14px 29px;
-    font-weight: 700;
-    font-size: 17px;
-    cursor: pointer;
 }
 
 .main-content {
@@ -339,7 +260,7 @@ export default {
 }
 
 .testimonial-text {
-    font-size: 22px;
+    font-size: 16px;
     line-height: 2;
     color: #fff;
     margin: 17px 0;

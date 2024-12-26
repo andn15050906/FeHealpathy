@@ -10,8 +10,8 @@
             </v-btn>
         </div>
     </div>
-    <div class="d-flex flex-wrap mx-8">
-        <GroupCard v-for="group in joinedGroups" :key="group.id" class="col-3 px-2 mb-4" style="overflow: auto;"
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
+        <GroupCard v-for="group in joinedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
             :group-info="group" :to-link="'/group/' + group.id" />
     </div>
     <div class="mx-8 mt-4 pa-4">
@@ -19,12 +19,12 @@
             Groups you might like
         </span>
     </div>
-    <div class="d-flex flex-wrap mx-8">
-        <GroupCard v-for="group in recommendedGroups" :key="group.id" class="col-3 px-2 mb-4" style="overflow: auto;"
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
+        <GroupCard v-for="group in recommendedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
             :group-info="group" :to-link="'/group/' + group.id" />
     </div>
     <div class="d-flex flex-wrap mx-8" v-if="!isDataFetched">
-        <div v-for="i in 8" :key="i" class="col-3 px-2 mb-4">
+        <div v-for="i in 8" :key="i" class="px-2 mb-4">
             <div class="pa-2">
                 <v-card>
                     <v-skeleton-loader type="image" height="180px" width="100%" class="rounded-0" />
@@ -45,7 +45,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import GroupCard from '@/components/GroupComponents/GroupCard.vue';
+import GroupCard from '@/components/CommunityComponents/GroupCard.vue';
 import data from '../../api/data.json';
 
 const joinedGroups = ref([]);

@@ -1,33 +1,32 @@
 <template>
   <div class="container">
-    <div class="box yoga">
+    <GlowingCard primaryColor="#4facfe" secondaryColor="#00f2fe">
       <h2>YOGA</h2>
-      <p>
-        Khám phá sự cân bằng và thư giãn qua các bài tập Yoga chuyên nghiệp, cải thiện cả thể chất và tinh thần.
-      </p>
-      <button @click="navigateToYoga">→</button>
-    </div>
-
-    <div class="box gym">
+      <p>Khám phá sự cân bằng và thư giãn qua các bài tập Yoga chuyên nghiệp, cải thiện cả thể chất và tinh thần.</p>
+      <RouterLink :to="'practice/yoga'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
+    <GlowingCard primaryColor="#ff4b5c" secondaryColor="#F29492">
       <h2>GYM</h2>
       <p>
         Nâng cao thể lực, sức khỏe và hình thể qua các bài tập Gym hiệu quả cùng chương trình tập luyện thông minh.
       </p>
-      <button @click="navigateToGym">→</button>
-    </div>
+      <RouterLink :to="'GymExerciseDetail'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
+    <GlowingCard primaryColor="#5614B0" secondaryColor="#DBD65C">
+      <h2>HABIT TRACKER</h2>
+      <p>Hình thành lối sống lành mạnh thông qua sự rèn luyện và thích nghi.</p>
+      <RouterLink :to="'practice/habit-tracking'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
   </div>
 </template>
 
 <script>
+import GlowingCard from '@/components/Common/GlowingCard.vue';
+
 export default {
-  name: "FitnessBoxes",
-  methods: {
-    navigateToYoga() {
-      this.$router.push({ name: 'YogaExerciseDetail' });
-    },
-    navigateToGym() {
-      this.$router.push({ name: 'GymExerciseDetail' });
-    },
+  name: "PracticeToolList",
+  components: {
+    GlowingCard
   },
 };
 </script>
@@ -37,38 +36,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 40px;
   height: 100%;
-  width: 100vw;
-}
-
-.box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  max-width: 400px;
-  padding: 20px;
-  text-align: center;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  height: 50vh;
-}
-
-.box:hover {
-  transform: scale(1.05);
-}
-
-.yoga {
-  background: linear-gradient(to bottom, #4facfe, #00f2fe);
-}
-
-.gym {
-  background: linear-gradient(to bottom, #ff4b5c, #ff0844);
 }
 
 h2 {
@@ -82,7 +51,7 @@ p {
   margin-bottom: 20px;
 }
 
-button {
+.arrow-btn {
   background: transparent;
   border: 2px solid white;
   color: white;
@@ -91,9 +60,10 @@ button {
   font-size: 18px;
   cursor: pointer;
   transition: background 0.3s ease;
+  text-decoration: none;
 }
 
-button:hover {
+.arrow-btn:hover {
   background: white;
   color: #333;
 }

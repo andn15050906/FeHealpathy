@@ -11,21 +11,8 @@
 
         <div v-else>
             <div class="articles-list">
-                <div v-for="article in paginatedArticles" :key="article.id" class="article-card">
-                    <a :href="article.Link" class="article-link">
-                        <img :src="article.Thumb" :alt="article.Title" class="article-image" />
-                    </a>
-                    <div class="article-content">
-                        <a :href="article.Link" class="article-title">{{ article.Title }}</a>
-                        <time class="article-date">{{ article.Date }}</time>
-                        <div class="article-tags">
-                            <span v-for="tag in article.Tags" :key="tag" class="article-tag"
-                                @click="handleTagClick(tag)">
-                                {{ tag }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                <BlogCardWithTags v-for="article in paginatedArticles" :article="article" :key="article.id"
+                    class="article-card" />
             </div>
 
             <div class="categories-list">
@@ -43,13 +30,15 @@
 </template>
 
 <script>
+import BlogCardWithTags from '@/components/BlogComponents/BlogCardWithTags.vue';
 import data from '../../api/data.json';
-import BlogFilters from './Components/BlogFilters.vue';
-import Pagination from '@/components/Helper/Pagination.vue';
+import BlogFilters from '../../components/BlogComponents/BlogFilters.vue';
+import Pagination from '@/components/Common/Pagination.vue';
 
 export default {
     name: 'SearchBlogResult',
     components: {
+        BlogCardWithTags,
         BlogFilters,
         Pagination
     },
@@ -116,6 +105,7 @@ export default {
             this.$router.push({ path: '/search-blogs', query: { title: query, page: 1 } });
         },
 
+        // keep in both BlogCardWithTags and SearchBlogResult
         handleTagClick(tagOrCategory) {
             if (tagOrCategory.Title) {
                 this.$router.push({ path: '/search-blogs', query: { category: tagOrCategory.Id, page: 1 } });

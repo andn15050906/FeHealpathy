@@ -13,9 +13,9 @@
 
 <script>
 import HeroImg from '../../components/Helper/HeroImg.vue'
-import BlogMeta from './Components/BlogMeta.vue'
-import BlogContent from './Components/BlogContent.vue'
-import ScrollToTop from '../../components/Helper/ScrollToTop.vue'
+import BlogMeta from '../../components/BlogComponents/BlogMeta.vue'
+import BlogContent from '../../components/BlogComponents/BlogContent.vue'
+import ScrollToTop from '../../components/Misc/ScrollToTop.vue'
 
 export default {
   name: 'BlogLayout',

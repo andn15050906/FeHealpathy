@@ -381,192 +381,192 @@
                 "id": 1,
                 "title": "Transition to Camel",
                 "instructor": "Anna Arkan",
-                "thumbnail": "/assets/images/yoga/1.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "47:57",
                 "level": "Intermediate",
                 "ratingCount": 245
-              },
-              {
+            },
+            {
                 "id": 2,
                 "title": "Strength and Stretch II",
                 "instructor": "Julia Crouch",
-                "thumbnail": "/assets/images/yoga/2.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "28:54",
                 "level": "Intermediate",
                 "ratingCount": 189
-              },
-              {
+            },
+            {
                 "id": 3,
                 "title": "Meet The Need",
                 "instructor": "Nina Morris",
-                "thumbnail": "/assets/images/yoga/3.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "35:29",
                 "level": "Intermediate",
                 "ratingCount": 167
-              },
-              {
+            },
+            {
                 "id": 4,
                 "title": "Flying Crow",
                 "instructor": "Sarah Van Tassel",
-                "thumbnail": "/assets/images/yoga/4.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "1:15:11",
                 "level": "Intermediate",
                 "ratingCount": 203
-              },
-              {
+            },
+            {
                 "id": 5,
                 "title": "Hips Love You",
                 "instructor": "Alicia Cooper",
-                "thumbnail": "/assets/images/yoga/5.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "53:15",
                 "level": "Beginner",
                 "ratingCount": 178
-              },
-              {
+            },
+            {
                 "id": 6,
                 "title": "Mindful Bow Breathing",
                 "instructor": "Ariana Adams",
-                "thumbnail": "/assets/images/yoga/6.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "01:23",
                 "level": "Beginner",
                 "ratingCount": 156
-              },
-              {
+            },
+            {
                 "id": 7,
                 "title": "Practice for Embracing Body Changes",
                 "instructor": "Helen Gardner",
-                "thumbnail": "/assets/images/yoga/7.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "44:56",
                 "level": "Beginner",
                 "ratingCount": 234
-              },
-              {
+            },
+            {
                 "id": 8,
                 "title": "Dancing Crane",
                 "instructor": "Brooke Morgan",
-                "thumbnail": "/assets/images/yoga/8.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "08:12",
                 "level": "Beginner",
                 "ratingCount": 145
-              },
-              {
+            },
+            {
                 "id": 9,
                 "title": "Cherry Child Stand",
                 "instructor": "Sarah Van Tassel",
-                "thumbnail": "/assets/images/yoga/9.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "59:29",
                 "level": "Intermediate",
                 "ratingCount": 267
-              },
-              {
+            },
+            {
                 "id": 10,
                 "title": "Good Morning Sunshine",
                 "instructor": "Julia Crouch",
-                "thumbnail": "/assets/images/yoga/10.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "27:14",
                 "level": "Beginner",
                 "ratingCount": 198
-              },
-              {
+            },
+            {
                 "id": 11,
                 "title": "Practice for Spreading Your Wings",
                 "instructor": "Helen Gardner",
-                "thumbnail": "/assets/images/yoga/11.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "25:30",
                 "level": "Beginner",
                 "ratingCount": 176
-              },
-              {
+            },
+            {
                 "id": 12,
                 "title": "Gentle Slow Flow Yoga",
                 "instructor": "Melissa Harper",
-                "thumbnail": "/assets/images/yoga/12.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "54:45",
                 "level": "Beginner",
                 "ratingCount": 289
-              },
-              {
+            },
+            {
                 "id": 13,
                 "title": "Viloma Pranayama",
                 "instructor": "Tia McKenzie",
-                "thumbnail": "/assets/images/yoga/13.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "05:26",
                 "level": "Beginner",
                 "ratingCount": 134
-              },
-              {
+            },
+            {
                 "id": 14,
                 "title": "Foot Therapy for Dancers",
                 "instructor": "Julia Crouch",
-                "thumbnail": "/assets/images/yoga/14.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "16:51",
                 "level": "Beginner",
                 "ratingCount": 223
-              },
-              {
+            },
+            {
                 "id": 15,
                 "title": "Ignite the Fire Within: Core Fusion",
                 "instructor": "Melissa Harper",
-                "thumbnail": "/assets/images/yoga/15.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "43:16",
                 "level": "Intermediate",
                 "ratingCount": 256
-              },
-              {
+            },
+            {
                 "id": 16,
                 "title": "Ignite the Fire Within: Breath in Motion",
                 "instructor": "Sarah Brown",
-                "thumbnail": "/assets/images/yoga/16.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "56:02",
                 "level": "Intermediate",
                 "ratingCount": 278
-              },
-              {
+            },
+            {
                 "id": 17,
                 "title": "Ignite the Fire Within: Core Stability Flow",
                 "instructor": "Melissa Harper",
-                "thumbnail": "/assets/images/yoga/17.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "28:11",
                 "level": "Intermediate",
                 "ratingCount": 245
-              },
-              {
+            },
+            {
                 "id": 18,
                 "title": "Partner Class with Julia Crouch and Melissa Krieger",
                 "instructor": "Julia Crouch",
-                "thumbnail": "/assets/images/yoga/18.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "32:06",
                 "level": "Beginner",
                 "ratingCount": 167
-              },
-              {
+            },
+            {
                 "id": 19,
                 "title": "Box Breathing",
                 "instructor": "Tia McKenzie",
-                "thumbnail": "/assets/images/yoga/19.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "04:44",
                 "level": "Beginner",
                 "ratingCount": 189
-              },
-              {
+            },
+            {
                 "id": 20,
                 "title": "Embodying Flow",
                 "instructor": "Sara Brown",
-                "thumbnail": "/assets/images/yoga/20.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "28:04",
                 "level": "Intermediate",
                 "ratingCount": 234
-              },
-              {
+            },
+            {
                 "id": 21,
                 "title": "Back to the Mat: Core Awake",
                 "instructor": "Sara Brown",
-                "thumbnail": "/assets/images/yoga/21.jpg",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "25:35",
                 "level": "Beginner",
                 "ratingCount": 156
-              }
-          ]
+            }
+        ]
     },
     "Community": {
         "Groups": {
@@ -609,6 +609,20 @@
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "3",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "4",
+                    "name": "Name4",
+                    "isPublic": true,
+                    "description": "Description4",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 4,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "4",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
                     "totalPosts": 0
