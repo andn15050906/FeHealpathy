@@ -1,0 +1,1 @@
+<h1>Invalid email validation request!</h1>

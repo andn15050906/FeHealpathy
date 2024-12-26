@@ -12,8 +12,10 @@ export const getUserById = async (id) => {
 
 export const getClientInfo = async () => {
   try {
-    const response = await api.get(`/Users/client`);
-    return response.data;
+    //const response = await api.get(`/Users/client`);
+    //return response.data;
+
+    return {}
   } catch (error) {
     console.error('Error fetching client info:', error.response ? error.response.data : error.message);
     throw error;
