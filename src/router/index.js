@@ -26,6 +26,11 @@ import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
+import Happy from '@/views/MoodRecording/MoodCart/Happy.vue'
+import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
+import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
+import Moved from '@/views/MoodRecording/MoodCart/Moved.vue'
+import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -127,6 +132,32 @@ const router = createRouter({
       name: 'moodOverview',
       component: MoodOverview
     },
+    {
+      path: '/mood-cart/happy',
+      name: 'happyCart',
+      component: Happy
+    },
+    {
+      path: '/mood-cart/sad',
+      name: 'sadCart',
+      component: Sad
+    },
+    {
+      path: '/mood-cart/angry',
+      name: 'angryCart',
+      component: Angry
+    },
+    {
+      path: '/mood-cart/moved',
+      name: 'movedCart',
+      component: Moved
+    },
+    {
+      path: '/mood-cart/anxiety',
+      name: 'anxietyCart',
+      component: Anxiety
+    },
+
 
 
 

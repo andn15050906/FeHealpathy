@@ -24,8 +24,8 @@
                         class="mood-icon" />
                 </div>
             </div>
-            <!-- Excited -->
-            <div class="mood-card excited">
+            <!-- moved -->
+            <div class="mood-card moved">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/e3ff816f600031f96b3bf75fa2c76bb2ac0a60cc572a49c3ab196222543d81c9?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
@@ -40,12 +40,12 @@
                         class="mood-icon" />
                 </div>
             </div>
-            <!-- Crying -->
-            <div class="mood-card crying">
+            <!-- anxiety -->
+            <div class="mood-card anxiety">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/ca79fb5af2e302375e06008c34767d0e50c971b995463146cc44f1d7af0af355?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        id="crying" class="mood-icon" />
+                        id="anxiety" class="mood-icon" />
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@
     background-color: rgba(1, 114, 234, 1);
 }
 
-.excited {
+.moved {
     background-color: rgba(249, 114, 67, 1);
 }
 
@@ -156,11 +156,11 @@
     background-color: rgba(222, 56, 94, 1);
 }
 
-.crying {
+.anxiety {
     background-color: rgba(114, 67, 249, 1);
 }
 
-#crying {
+#anxiety {
     margin-top: 20px;
 }
 
