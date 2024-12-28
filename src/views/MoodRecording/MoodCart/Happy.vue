@@ -2,6 +2,10 @@
     <div class="mood-tracker">
         <div class="mood-div">
             <div class="tracker-container">
+                <section class="emotion-container" role="region" aria-label="Emotional state display">
+                    <p class="emotion-pretext">I'm feeling</p>
+                    <h1 class="emotion-state">Happy</h1>
+                </section>
                 <div class="mood-display">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/e3ff816f600031f96b3bf75fa2c76bb2ac0a60cc572a49c3ab196222543d81c9?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
@@ -46,6 +50,33 @@ export default {
 </script>
 
 <style scoped>
+.emotion-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Poppins, sans-serif;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.emotion-pretext {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1;
+    margin: 0;
+}
+
+.emotion-state {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 41px;
+    margin: 8px 0 0;
+}
+
 .mood-tracker {
     background-color: rgba(249, 114, 67, 1);
     display: flex;
