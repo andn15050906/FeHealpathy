@@ -4,30 +4,26 @@
             <div class="tracker-container">
                 <div class="mood-display">
                     <img loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/e3ff816f600031f96b3bf75fa2c76bb2ac0a60cc572a49c3ab196222543d81c9?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/990d459e86807a6ad4ff81fbf586bb234d66989ae6f4e88c73f4c70c28f5267c?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
                         class="mood-icon" />
                 </div>
                 <div class="mood-selection">
                     <div class="mood-row">
-                        <button class="mood-button mood-happy" tabindex="0" role="button"
-                            aria-label="Select Happy mood">
+                        <button @click="navigateToMood('happy')" class="mood-button mood-happy">
                             Happy
                         </button>
-                        <button class="mood-button mood-moved" tabindex="0" role="button"
-                            aria-label="Select Moved mood">
-                            Moved
+                        <button @click="navigateToMood('eager')" class="mood-button mood-eager">
+                            Eager
                         </button>
                     </div>
                     <div class="mood-row">
-                        <button class="mood-button mood-anxiety" tabindex="0" role="button"
-                            aria-label="Select Anxiety mood">
+                        <button @click="navigateToMood('anxiety')" class="mood-button mood-anxiety">
                             Anxiety
                         </button>
-                        <button class="mood-button mood-angry" tabindex="0" role="button"
-                            aria-label="Select Angry mood">
+                        <button @click="navigateToMood('angry')" class="mood-button mood-angry">
                             Angry
                         </button>
-                        <button class="mood-button mood-sad" tabindex="0" role="button" aria-label="Select Sad mood">
+                        <button @click="navigateToMood('sad')" class="mood-button mood-sad">
                             Sad
                         </button>
                     </div>
@@ -39,7 +35,7 @@
 
 <style scoped>
 .mood-tracker {
-    background-color: rgba(249, 114, 67, 1);
+    background-color: rgba(1, 178, 110, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -109,7 +105,7 @@
     outline-offset: 2px;
 }
 
-.mood-moved {
+.mood-eager {
     background-color: rgba(255, 255, 255, 1);
     color: rgba(0, 0, 0, 1);
 }
@@ -143,6 +139,11 @@
 
 <script>
 export default {
-    name: 'MovedMoodTracker'
+    name: 'EagerMoodTracker',
+    methods: {
+        navigateToMood(mood) {
+            this.$router.push(`/mood-cart/${mood}`);
+        }
+    }
 }
 </script>

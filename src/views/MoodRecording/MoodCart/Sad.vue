@@ -9,25 +9,21 @@
                 </div>
                 <div class="mood-selection">
                     <div class="mood-row">
-                        <button class="mood-button mood-happy" tabindex="0" role="button"
-                            aria-label="Select Happy mood">
+                        <button @click="navigateToMood('happy')" class="mood-button mood-happy">
                             Happy
                         </button>
-                        <button class="mood-button mood-moved" tabindex="0" role="button"
-                            aria-label="Select Moved mood">
-                            Moved
+                        <button @click="navigateToMood('eager')" class="mood-button mood-eager">
+                            Eager
                         </button>
                     </div>
                     <div class="mood-row">
-                        <button class="mood-button mood-anxiety" tabindex="0" role="button"
-                            aria-label="Select Anxiety mood">
+                        <button @click="navigateToMood('anxiety')" class="mood-button mood-anxiety">
                             Anxiety
                         </button>
-                        <button class="mood-button mood-angry" tabindex="0" role="button"
-                            aria-label="Select Angry mood">
+                        <button @click="navigateToMood('angry')" class="mood-button mood-angry">
                             Angry
                         </button>
-                        <button class="mood-button mood-sad" tabindex="0" role="button" aria-label="Select Sad mood">
+                        <button @click="navigateToMood('sad')" class="mood-button mood-sad">
                             Sad
                         </button>
                     </div>
@@ -114,7 +110,7 @@
     color: rgba(0, 0, 0, 1);
 }
 
-.mood-moved,
+.mood-eager,
 .mood-anxiety,
 .mood-angry,
 .mood-happy {
@@ -143,6 +139,11 @@
 
 <script>
 export default {
-    name: 'SadMoodTracker'
+    name: 'SadMoodTracker',
+    methods: {
+        navigateToMood(mood) {
+            this.$router.push(`/mood-cart/${mood}`);
+        }
+    }
 }
 </script>

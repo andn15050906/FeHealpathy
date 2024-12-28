@@ -29,7 +29,7 @@ import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
 import Happy from '@/views/MoodRecording/MoodCart/Happy.vue'
 import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
 import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
-import Moved from '@/views/MoodRecording/MoodCart/Moved.vue'
+import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
 
 const router = createRouter({
@@ -148,9 +148,9 @@ const router = createRouter({
       component: Angry
     },
     {
-      path: '/mood-cart/moved',
-      name: 'movedCart',
-      component: Moved
+      path: '/mood-cart/eager',
+      name: 'eagerCart',
+      component: Eager
     },
     {
       path: '/mood-cart/anxiety',

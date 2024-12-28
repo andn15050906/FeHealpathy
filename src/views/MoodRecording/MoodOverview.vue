@@ -5,7 +5,9 @@
                 Elevate Your Emotional Well-being with our Healpathy Website
             </h1>
             <h2 class="mood-prompt">How do you feel today?</h2>
-            <button class="join-button" tabindex="0">Join with us</button>
+            <router-link to="/mood-cart/happy">
+                <button class="join-button" tabindex="0">Join with us</button>
+            </router-link>
         </div>
         <div class="mood-grid">
             <!-- Happy -->
@@ -24,8 +26,8 @@
                         class="mood-icon" />
                 </div>
             </div>
-            <!-- moved -->
-            <div class="mood-card moved">
+            <!-- eager -->
+            <div class="mood-card eager">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/e3ff816f600031f96b3bf75fa2c76bb2ac0a60cc572a49c3ab196222543d81c9?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
@@ -148,7 +150,7 @@
     background-color: rgba(1, 114, 234, 1);
 }
 
-.moved {
+.eager {
     background-color: rgba(249, 114, 67, 1);
 }
 
