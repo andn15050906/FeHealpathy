@@ -25,6 +25,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,11 @@ const router = createRouter({
       path: '/blogs',
       name: 'blogCatalog',
       component: BlogCatalog
+    },
+    {
+      path: '/blogs/blogdetail',
+      name: 'blogDetail',
+      component: BlogDetail
     },
     {
       path: '/search-blogs',
