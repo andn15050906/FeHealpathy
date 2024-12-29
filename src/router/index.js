@@ -25,7 +25,9 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
-import ProfileSettingUp from '@/components/ProfileComponents/ProfileSettingUp.vue'
+import SettingUp from '@/components/ProfileComponents/SettingUp.vue'
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -171,10 +173,10 @@ const router = createRouter({
       component: HabitTracking,
     },
     {
-      path: '/profile-setting-up',
-      name: 'profileSettingUp',
-      component: ProfileSettingUp,
-    },
+      path: '/setting-up',
+      name: 'SettingUp',
+      component: SettingUp
+    }
   ]
 })
 
