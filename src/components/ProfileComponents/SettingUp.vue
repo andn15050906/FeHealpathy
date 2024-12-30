@@ -15,29 +15,54 @@ export default {
         return {
             currentComponent: "InputOptions",
             inputOptions: [
-                { text: "🧘‍♀️ How would you rate your stress level (on a scale of 1-10)?", inputValue: "", type: "number" },
-                { text: "🏋️‍♂️ Do you regularly exercise or stay active (if yes, please describe briefly)?", inputValue: "", type: "text" },
-                { text: "💤 Do you regularly get 7-8 hours of sleep every day?", inputValue: "", type: "text" },
-                { text: "🍎 Do you feel that your current diet is healthy?", inputValue: "", type: "text" },
                 {
-                    text: "🌙 What is your ideal bedtime?",
+                    text: "🧘‍♀️ How would you rate your overall mental well-being?",
                     inputValue: "",
-                    type: "select",
-                    options: ["Before 10 PM", "10 PM - 12 AM", "After 12 AM"]
+                    options: ["Very Poor", "Poor", "Fair", "Good", "Very Good", "Excellent"]
                 },
                 {
-                    text: "💆 What method helps you reduce stress the most?",
+                    text: "🏋️‍♂️ How often do you engage in physical activities or exercise?",
                     inputValue: "",
-                    type: "select",
-                    options: ["Meditation", "Exercise", "Reading", "Music", "Other"]
+                    options: ["Daily", "A few times a week", "Once a week", "Rarely", "Never"]
+                },
+                {
+                    text: "💤 How would you describe the quality of your sleep?",
+                    inputValue: "",
+                    options: ["Very Poor", "Poor", "Average", "Good", "Very Good"]
+                },
+                {
+                    text: "🍎 How balanced and nutritious do you think your current diet is?",
+                    inputValue: "",
+                    options: ["Very Poor", "Poor", "Average", "Good", "Very Good"]
+                },
+                {
+                    text: "📆 How often do you take time to relax or practice self-care?",
+                    inputValue: "",
+                    options: ["Daily", "A few times a week", "Once a week", "Rarely", "Never"]
+                },
+                {
+                    text: "🌞 Do you spend time outdoors or get regular sunlight exposure?",
+                    inputValue: "",
+                    options: ["Yes", "No"]
+                },
+                {
+                    text: "📱 On average, how many hours a day do you spend on screens (e.g., phone, computer, TV)?",
+                    inputValue: "",
+                    options: ["Less than 2 hours", "2-4 hours", "4-6 hours", "6-8 hours", "More than 8 hours"]
+                },
+                {
+                    text: "🧘 What activity helps you relax and recharge the most?",
+                    inputValue: "",
+                    options: ["Meditation", "Exercise", "Spending time with loved ones", "Hobbies", "Other"]
                 }
             ],
             selectOptions: [
-                { text: "🌙 Improve sleep quality" },
-                { text: "💆 Reduce stress and anxiety" },
-                { text: "🏋️‍♂️ Boost physical health" },
-                { text: "🧠 Improve focus and mental clarity" },
-                { text: "🍎 Build a healthy diet" }
+                { "text": "🌙 Improve sleep quality and establish a healthy routine" },
+                { "text": "💆 Reduce stress, anxiety, and enhance emotional well-being" },
+                { "text": "🏋️‍♂️ Boost physical health and increase energy levels" },
+                { "text": "🧠 Improve focus, memory, and mental clarity" },
+                { "text": "🍎 Build and maintain a balanced, healthy diet" },
+                { "text": "🧘 Cultivate mindfulness and a positive mindset" }
             ],
             selectedOptions: []
         };

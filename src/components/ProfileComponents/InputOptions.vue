@@ -3,18 +3,12 @@
         <h2 class="mb-5 text-black">✨ Let us know about you more ✨</h2>
         <div class="d-flex flex-column gap-3">
             <div v-for="(option, index) in inputOptions" :key="'input-' + index">
-                <input v-if="option.type !== 'select'" :type="option.type || 'text'"
-                    class="form-control rounded-pill border-primary" :placeholder="option.text"
-                    v-model="option.inputValue" />
-
-                <div v-if="option.type === 'select'">
-                    <select v-model="option.inputValue" class="form-control rounded-pill border-primary">
-                        <option style="" value="" disabled selected>{{ option.text }}</option>
-                        <option v-for="(answer, index) in option.options" :key="'select-' + index" :value="answer">
-                            {{ answer }}
-                        </option>
-                    </select>
-                </div>
+                <select v-model="option.inputValue" class="form-control rounded-pill border-primary">
+                    <option value="" disabled selected>{{ option.text }}</option>
+                    <option v-for="(answer, index) in option.options" :key="'select-' + index" :value="answer">
+                        {{ answer }}
+                    </option>
+                </select>
             </div>
         </div>
         <div class="mt-4">
