@@ -9,13 +9,13 @@
         <h3>{{ petName }}</h3>
         <div class="status-bars">
           <div class="status-bar">
-            <span>Hạnh phúc</span>
+            <span>Happiness</span>
             <div class="progress-bar">
               <div :style="{ width: `${happiness}%` }" class="progress"></div>
             </div>
           </div>
           <div class="status-bar">
-            <span>Năng lượng</span>
+            <span>Energy</span>
             <div class="progress-bar">
               <div :style="{ width: `${energy}%` }" class="progress"></div>
             </div>
@@ -26,13 +26,13 @@
 
     <div class="pet-actions">
       <button @click="feedPet" :disabled="!canFeed">
-        <span>🍎</span> Cho ăn
+        <span>🍎</span> Feed
       </button>
       <button @click="playWithPet" :disabled="!canPlay">
-        <span>🎾</span> Chơi đùa
+        <span>🎾</span> Play
       </button>
       <button @click="restPet" :disabled="!canRest">
-        <span>😴</span> Nghỉ ngơi
+        <span>😴</span> Rest
       </button>
     </div>
 

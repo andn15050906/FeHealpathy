@@ -25,6 +25,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import StressAssessment from '@/views/Practice/HabitTracking/components/StressAssessment.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -121,19 +122,6 @@ const router = createRouter({
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
       path: '/assignments/create',
       name: 'CreateAssignment',
@@ -168,6 +156,11 @@ const router = createRouter({
       path: '/practice/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
+    },
+    {
+      path: '/stress-assessment',
+      name: 'StressAssessment',
+      component: StressAssessment
     }
   ]
 })

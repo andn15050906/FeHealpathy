@@ -7,7 +7,7 @@
         <div class="mood-icons">
           <span v-for="mood in moods" 
                 :key="mood.id" 
-                @click="selectMood(mood)"
+                @click="confirmAssessment(mood)"
                 :class="{ active: currentMood === mood.id }">
             {{ mood.icon }}
           </span>
@@ -18,6 +18,7 @@
     <div class="wellness-features">
       <MoodPet :userMood="currentMood" />
       <DailyQuest ref="dailyQuest" @reward-earned="onRewardEarned" />
+      <MoodAssessment v-if="showAssessment" />
     </div>
 
     <div class="tracking-grid">
@@ -60,12 +61,15 @@
 <script>
 import MoodPet from './components/MoodPet.vue'
 import DailyQuest from './components/DailyQuest.vue'
+import StressAssessment from './components/StressAssessment.vue'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'HabitTracking',
   components: {
     MoodPet,
-    DailyQuest
+    DailyQuest,
+    MoodAssessment
   },
   data() {
     return {
@@ -76,6 +80,7 @@ export default {
         { id: 'stressed', icon: '😫', label: 'Stressed' }
       ],
       currentMood: null,
+      showAssessment: false,
       sleepData: {
         hours: 0,
         quality: 0
@@ -117,10 +122,14 @@ export default {
     }
   },
   methods: {
-    selectMood(mood) {
-      this.currentMood = mood.id
-      this.$refs.moodPet.updateMood(mood.id)
-      this.$refs.dailyQuest.updateQuestProgress('mood', mood.id)
+    confirmAssessment(mood) {
+      this.currentMood = mood.id;
+      const confirm = window.confirm("Would you like to participate in the stress assessment?");
+      if (confirm) {
+        this.$router.push({ name: 'StressAssessment' }); // Navigate to the assessment page
+      } else {
+        this.showAssessment = false; // Reload the current page
+      }
     },
     generateRecommendation() {
       let recommendations = []
