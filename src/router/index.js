@@ -31,6 +31,7 @@ import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
 import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
 import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
+import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -157,6 +158,12 @@ const router = createRouter({
       name: 'anxietyCart',
       component: Anxiety
     },
+    {
+      path: '/diary/diary-writing',
+      name: 'diaryWriting',
+      component: DiaryWriting
+    },
+
 
 
 
