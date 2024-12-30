@@ -11,7 +11,7 @@
                         HomePage.AlreadyHaveAccount }}</GlowingButton>
                 </div>
             </section>
-
+            
             <section class="features-section">
                 <h2 class="section-title">{{ HomePage.Section1.Title }}</h2>
                 <div class="feature-cards">
