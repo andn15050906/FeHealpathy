@@ -13,20 +13,20 @@
         </ul>
       </div>
       <div class="user-actions">
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
-          <span>{{ user.name }}</span>
-          <i @click.stop="signOut" title="Logout"><font-awesome-icon icon="sign-out-alt" class="logout-icon" /></i>
-          <ul class="dropdown-menu" v-if="showProfileMenu">
-            <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin View</router-link></li>
-            <li v-if="user.role === 'Instructor'"><router-link to="/instructor">Instructor View</router-link></li>
-            <li><router-link to="/profile">Profile</router-link></li>
-            <li><router-link to="/enrolled-courses">Enrolled Courses</router-link></li>
-          </ul>
-        </div>
-        <router-link v-else to="/sign-in">
-          <div class="text-dark login-btn">Login</div>
-        </router-link>
-      </div>
+  <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+    <span>{{ user.name }}</span>
+    <ul v-if="showProfileMenu" class="dropdown-menu">
+      <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
+      <hr class="menu-divider" />
+      <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
+      <hr class="menu-divider" />
+      <li @click="signOut">Đăng xuất</li>
+    </ul>
+  </div>
+  <router-link v-else to="/sign-in">
+    <div class="text-dark login-btn">Login</div>
+  </router-link>
+</div>
     </div>
   </div>
 </template>
@@ -34,13 +34,7 @@
 <script>
 import { getClientInfo } from '@/services/userService';
 import { signOut } from '@/services/authService';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../Helper/Logo.vue';
-// import { getNotifications, updateNotification } from '@/services/notificationService';
-
-library.add(faSignOutAlt);
 
 export default {
   data() {
@@ -50,20 +44,17 @@ export default {
         name: '',
         role: ''
       },
-      // notifications: [],
-      // showNotifications: false,
       showProfileMenu: false
     };
   },
 
   async mounted() {
     await this.fetchUserProfile();
-    // await this.fetchNotifications();
+    document.addEventListener('click', this.handleClickOutside);
   },
 
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-    Logo
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   methods: {
@@ -84,52 +75,32 @@ export default {
       }
     },
 
-    // async fetchNotifications() {
-    //   try {
-    //     if (this.isLoggedIn) {
-    //       const notifications = await getNotifications(this.user.id);
-    //       this.notifications = notifications;
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching notifications:', error);
-    //   }
-    // },
-    // toggleNotifications() {
-    //   this.showNotifications = !this.showNotifications;
-    //   if (this.showNotifications) {
-    //     this.markNotificationsAsRead();
-    //   }
-    // },
     toggleProfileMenu() {
       this.showProfileMenu = !this.showProfileMenu;
     },
-    // async markNotificationsAsRead() {
-    //   try {
-    //     for (const notification of this.notifications) {
-    //       if (notification.status === 'unread') {
-    //         await updateNotification(notification.id, 'read');
-    //       }
-    //     }
-    //     await this.fetchNotifications();
-    //   } catch (error) {
-    //     console.error('Error marking notifications as read:', error);
-    //   }
-    // },
 
     async signOut() {
       try {
         await signOut();
-
         this.isLoggedIn = false;
         this.user = { name: '', role: '' };
-
-        await this.$router.push('/sign-in');
+        this.$router.push('/sign-in');
       } catch (error) {
         console.error('Error signing out:', error);
       }
     },
+
+    handleClickOutside(event) {
+      const dropdown = this.$el.querySelector('.dropdown-menu');
+      const profileMenu = this.$el.querySelector('.profile');
+      
+      if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
+        this.showProfileMenu = false;
+      }
+    }
   }
 };
+
 </script>
 
 <style scoped>
@@ -196,15 +167,36 @@ ul {
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
-  background: white;
-  list-style: none;
-  padding: 10px;
+  left: 20px;
+  background-color: white;
   border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: block;
 }
 
 .dropdown-menu li {
-  padding: 5px 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.menu-divider {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f3f3f3;
+}
+
+.dropdown-menu li a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .login-btn {
