@@ -35,17 +35,17 @@
             <label for="moodSelection">Mood Entry:</label>
             <div class="mood-options" role="radiogroup" aria-label="Select mood">
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/043686cbbf78022708fec22ca80a902f57abad9fc42b9f1e36b42603ed4d3765?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Very happy mood" class="mood-icon" :class="{ active: selectedMood === 'very-happy' }"
-                    @click="selectMood('very-happy')" />
+                    alt="Very sad mood" class="mood-icon" :class="{ active: selectedMood === 'very-sad' }"
+                    @click="selectMood('very-sad')" />
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/f3293582c94a47068c7d253c75b4dfc429b8270402ffc3b71a7b7a3b7c841e81?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Happy mood" class="mood-icon" :class="{ active: selectedMood === 'happy' }"
-                    @click="selectMood('happy')" />
+                    alt="Sad mood" class="mood-icon" :class="{ active: selectedMood === 'sad' }"
+                    @click="selectMood('sad')" />
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/2b08e9dcbcdfb2618f02b4a2293a914c1c92b9d58c21e5bf018dbe03cff35c2d?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
                     alt="Neutral mood" class="mood-icon" :class="{ active: selectedMood === 'neutral' }"
                     @click="selectMood('neutral')" />
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/9b68f23974a28e2ee613607ad4e8f9086a623c81fd8d04436f7b8862eb0bcd72?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Very sad mood" class="mood-icon" :class="{ active: selectedMood === 'very-sad' }"
-                    @click="selectMood('very-sad')" />
+                    alt="Very happy mood" class="mood-icon" :class="{ active: selectedMood === 'very-happy' }"
+                    @click="selectMood('very-happy')" />
             </div>
         </div>
 
@@ -56,6 +56,11 @@
 <script>
 export default {
     name: 'MemoryEntryForm',
+    created() {
+        if (this.$route.path === '/diary/diary-writing') {
+            this.memoryDate = new Date().toISOString().split('T')[0]
+        }
+    },
     data() {
         return {
             memoryTitle: '',
@@ -69,7 +74,7 @@ export default {
             // Form submission logic
         },
         handleBack() {
-            // Navigation logic
+            this.$router.push('/diary/diary-list')
         },
         selectMood(mood) {
             this.selectedMood = mood;

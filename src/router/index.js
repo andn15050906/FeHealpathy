@@ -32,6 +32,7 @@ import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
 import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
 import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
+import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -162,6 +163,11 @@ const router = createRouter({
       path: '/diary/diary-writing',
       name: 'diaryWriting',
       component: DiaryWriting
+    },
+    {
+      path: '/diary/diary-list',
+      name: 'diaryList',
+      component: DiaryList
     },
 
 
