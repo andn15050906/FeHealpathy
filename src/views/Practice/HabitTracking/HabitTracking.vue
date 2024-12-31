@@ -1,67 +1,78 @@
 <template>
-  <div class="habit-tracking">
-    <div class="mood-section">
+  <div class="container mt-5">
+    <div class="mood-section mb-4">
       <h2>Mood Check-in</h2>
       <div class="mood-selection">
         <h3>How are you feeling right now?</h3>
-        <div class="mood-icons">
-          <span v-for="mood in moods" 
-                :key="mood.id" 
-                @click="confirmAssessment(mood)"
-                :class="{ active: currentMood === mood.id }">
+        <div class="mood-icons d-flex gap-3 mt-3">
+          <span v-for="mood in moods" :key="mood.id" @click="confirmAssessment(mood)"
+            :class="{ active: currentMood === mood.id }">
             {{ mood.icon }}
           </span>
         </div>
       </div>
     </div>
 
-    <div class="wellness-features">
-      <MoodPet :userMood="currentMood" />
-      <DailyQuest ref="dailyQuest" @reward-earned="onRewardEarned" />
-      <MoodAssessment v-if="showAssessment" />
+    <div class="wellness-features row">
+      <div class="col-md-6 mb-4">
+        <MoodPet :userMood="currentMood" />
+      </div>
+      <div class="col-md-6 mb-4">
+        <DailyQuest ref="dailyQuest" @reward-earned="onRewardEarned" />
+      </div>
     </div>
-
-    <div class="tracking-grid">
-      <div class="tracking-card sleep-card">
-        <h3>Sleep Wellness</h3>
-        <div class="sleep-input">
-          <div class="input-group">
-            <label>Hours of sleep last night:</label>
-            <input type="number" v-model="sleepData.hours" @input="updateSleepData" min="0" max="24">
-          </div>
-          <div class="input-group">
-            <label>How well did you sleep?</label>
-            <div class="sleep-quality-rating">
-              <span v-for="i in 5" 
-                    :key="i" 
-                    @click="setSleepQuality(i)"
-                    :class="{ active: (sleepData.quality / 2) >= i }">
-                ⭐
-              </span>
+    <!-- TODO: Make this a separated component -->
+    <!-- <div class="tracking-grid row">
+      <div class="tracking-card sleep-card col-md-6 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Sleep Wellness</h3>
+            <div class="sleep-input">
+              <div class="mb-3 row">
+                <label class="col-sm-6 col-form-label">Hours of sleep last night:</label>
+                <div class="col-sm-6">
+                  <input type="number" class="form-control" v-model="sleepData.hours" @input="updateSleepData" min="0"
+                    max="24">
+                </div>
+              </div>
+              TODO: This currently doesn't align in horrizontal, make it look better
+              <div class="mb-3 row">
+                <label class="col-sm-6 col-form-label">How well did you sleep?</label>
+                <div class="col-sm-6">
+                  <div class="sleep-quality-rating d-flex gap-2">
+                    <span v-for="i in 5" :key="i" @click="setSleepQuality(i)"
+                      :class="{ active: (sleepData.quality / 2) >= i }">
+                      ⭐
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="tracking-card wellness-card">
-        <h3>Wellness Recommendations</h3>
-        <div class="wellness-recommendations">
-          <ul>
-            <li v-for="(rec, index) in currentRecommendations" 
-                :key="index">
-              {{ rec }}
-            </li>
-          </ul>
+      <div class="tracking-card wellness-card col-md-6 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Wellness Recommendations</h3>
+            <div class="wellness-recommendations">
+              <ul class="list-group">
+                <li v-for="(rec, index) in currentRecommendations" :key="index" class="list-group-item">
+                  {{ rec }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import MoodPet from './components/MoodPet.vue'
 import DailyQuest from './components/DailyQuest.vue'
-import StressAssessment from './components/StressAssessment.vue'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -69,7 +80,6 @@ export default {
   components: {
     MoodPet,
     DailyQuest,
-    MoodAssessment
   },
   data() {
     return {
@@ -116,30 +126,21 @@ export default {
   computed: {
     currentRecommendations() {
       if (!this.currentMood) return []
-      
-      // Return recommendations based on current mood
       return this.wellnessRecommendations[this.currentMood] || []
     }
   },
   methods: {
     confirmAssessment(mood) {
       this.currentMood = mood.id;
-      const confirm = window.confirm("Would you like to participate in the stress assessment?");
-      if (confirm) {
-        this.$router.push({ name: 'StressAssessment' }); // Navigate to the assessment page
-      } else {
-        this.showAssessment = false; // Reload the current page
-      }
+      this.showAssessment = false;
     },
     generateRecommendation() {
       let recommendations = []
 
-      // Add mood-based recommendations
       if (this.currentMood && this.wellnessRecommendations[this.currentMood]) {
         recommendations.push(...this.wellnessRecommendations[this.currentMood])
       }
 
-      // Add sleep-based recommendations
       if (this.sleepData.hours < 6) {
         recommendations.push(
           'Try to get more rest tonight',
@@ -148,13 +149,18 @@ export default {
         )
       }
 
-      // If no recommendations, provide default ones
       if (recommendations.length === 0) {
-        recommendations = [
-          'Take a moment to breathe deeply',
-          'Stay hydrated throughout the day',
-          'Take short breaks between tasks'
-        ]
+          recommendations = [
+            'Take a moment to breathe deeply 🌬️',
+            'Stay hydrated throughout the day 💧',
+            'Take short breaks between tasks 🛌',
+            'Go for a short walk 🚶‍♂️',
+            'Listen to your favorite music 🎵',
+            'Do some light stretching 🧘‍♂️',
+            'Eat a healthy snack 🍎',
+            'Spend time with loved ones ❤️',
+            'Read a book 📚',
+          ]
       }
 
       return recommendations
@@ -169,7 +175,6 @@ export default {
       this.$refs.dailyQuest.updateQuestProgress('sleep', this.sleepData)
     },
     onRewardEarned(reward) {
-      // Handle earned rewards
       this.showRewardNotification(reward)
     }
   }
@@ -185,12 +190,6 @@ export default {
   margin-bottom: 30px;
 }
 
-.mood-icons {
-  display: flex;
-  gap: 20px;
-  margin-top: 15px;
-}
-
 .mood-icons span {
   font-size: 30px;
   cursor: pointer;
@@ -203,83 +202,14 @@ export default {
   transform: scale(1.2);
 }
 
-.wellness-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.tracking-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.tracking-card {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.input-group {
-  margin-bottom: 15px;
-}
-
-.sleep-quality-rating {
-  display: flex;
-  gap: 8px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
 .sleep-quality-rating span {
+  cursor: pointer;
+  font-size: 1.5rem;
   opacity: 0.3;
   transition: all 0.2s ease;
 }
 
 .sleep-quality-rating span.active {
   opacity: 1;
-}
-
-.stat-box {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.stat-box .label {
-  font-size: 14px;
-  color: #666;
-}
-
-.stat-box .value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #75c9c8;
-}
-
-.wellness-recommendations {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.wellness-recommendations ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.wellness-recommendations li {
-  padding: 8px 0;
-  border-bottom: 1px dashed #ddd;
-  color: #666;
 }
 </style>
