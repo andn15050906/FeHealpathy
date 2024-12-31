@@ -33,6 +33,7 @@ import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
 import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
 import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
+import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -168,6 +169,11 @@ const router = createRouter({
       path: '/diary/diary-list',
       name: 'diaryList',
       component: DiaryList
+    },
+    {
+      path: '/emotion-tracking',
+      name: 'emotionTracking',
+      component: EmotionTracking
     },
 
 
