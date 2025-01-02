@@ -1,44 +1,54 @@
 <template>
-  <div class="habit-tracking">
-    <div class="mood-section">
-      <h2>What is Your Mood Today?</h2>
-      <div class="mood-layout">
-        <div class="mood-chart">
-          <PieChart :moodData="moodData" />
-        </div>
-        <div class="mood-selection">
+  <div class="container habit-tracking mt-5">
+    <div class="mood-section mb-4">
+      <div class="row mood-layout">
+        <h2>What is Your Mood Today?</h2>
+        <div class="col-md-4 mood-selection d-flex justify-content-around align-items-center">
           <span @click="selectMood('happy')" class="mood-icon" :class="{ active: currentMood === 'happy' }">😊</span>
-          <span @click="selectMood('relaxed')" class="mood-icon" :class="{ active: currentMood === 'relaxed' }">😌</span>
-          <span @click="selectMood('anxious')" class="mood-icon" :class="{ active: currentMood === 'anxious' }">😟</span>
-          <span @click="selectMood('stressed')" class="mood-icon" :class="{ active: currentMood === 'stressed' }">😣</span>
+          <span @click="selectMood('relaxed')" class="mood-icon"
+            :class="{ active: currentMood === 'relaxed' }">😌</span>
+          <span @click="selectMood('anxious')" class="mood-icon"
+            :class="{ active: currentMood === 'anxious' }">😟</span>
+          <span @click="selectMood('stressed')" class="mood-icon"
+            :class="{ active: currentMood === 'stressed' }">😣</span>
           <span @click="selectMood('sad')" class="mood-icon" :class="{ active: currentMood === 'sad' }">😢</span>
         </div>
-      </div>
-    </div>
-
-    <div class="sleep-input">
-      <h3>Sleep Quality</h3>
-      <input type="number" v-model="sleepHours" placeholder="Hours of Sleep" />
-      <div>
-        <label>Sleep Quality:</label>
-        <div class="star-rating">
-          <span v-for="star in 5" :key="star" @click="setSleepQuality(star)" class="star" :class="{ filled: sleepQuality >= star }">⭐</span>
+        <div class="col-md-8 sleep-input mb-4">
+          <h2>Sleep Quality</h2>
+          <div class="mb-3">
+            <input type="number" v-model="sleepHours" class="form-control" placeholder="Hours of Sleep" />
+          </div>
+          <div class="mb-3">
+            <label>Sleep Quality:</label>
+            <div class="star-rating d-flex">
+              <span v-for="star in 5" :key="star" @click="setSleepQuality(star)" class="star"
+                :class="{ filled: sleepQuality >= star }">⭐</span>
+            </div>
+          </div>
+          <button @click="submitSleepData" class="btn btn-primary">Submit Sleep Data</button>
         </div>
       </div>
-      <button @click="submitSleepData">Submit Sleep Data</button>
     </div>
 
+    <PieChart :moodData="moodData" />
+
     <div class="wellness-features">
-      <SleepChart :sleepData="sleepData" />
-      <Checklist :stressLevel="stressLevel" :checklistItems="checklistItems" />
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <SleepChart :sleepData="sleepData" />
+        </div>
+        <div class="col-md-6 mb-4">
+          <Checklist :stressLevel="stressLevel" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import SleepChart from './components/SleepChart.vue';
-import Checklist from './components/Checklist.vue';
 import PieChart from './components/PieChart.vue';
+import Checklist from './components/Checklist.vue';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -90,9 +100,27 @@ export default {
       this.updateChecklist();
 
       if (mood === 'stressed') {
-        if (confirm("Do you want to take the stress assessment?")) {
-          this.router.push('/stress-assessment');
-        }
+        this.router.push({ query: { stressLevel: this.moodData[mood] } });
+      }
+
+      switch (mood) {
+        case 'happy':
+          this.stressLevel = 2;
+          break;
+        case 'relaxed':
+          this.stressLevel = 4;
+          break;
+        case 'anxious':
+          this.stressLevel = 6;
+          break;
+        case 'stressed':
+          this.stressLevel = 8;
+          break;
+        case 'sad':
+          this.stressLevel = 10;
+          break;
+        default:
+          this.stressLevel = 0;
       }
     },
     setSleepQuality(rating) {
@@ -126,23 +154,15 @@ export default {
 <style scoped>
 .habit-tracking {
   padding: 20px;
-  position: relative;
 }
 
 .mood-section {
   margin-bottom: 30px;
-  text-align: right;
 }
 
 .mood-layout {
   display: flex;
   justify-content: space-between;
-}
-
-.mood-chart {
-  height: 505px;
-  width: 500px;
-  margin-right: 20px;
 }
 
 .mood-selection {
@@ -152,13 +172,13 @@ export default {
 }
 
 .mood-icon {
-  font-size: 20px;
+  font-size: 30px;
   cursor: pointer;
   transition: transform 0.2s;
 }
 
 .mood-icon.active {
-  transform: scale(1.2);
+  transform: scale(1.4);
 }
 
 .sleep-input {
