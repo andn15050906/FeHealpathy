@@ -13,16 +13,22 @@
         </ul>
       </div>
       <div class="user-actions">
-  <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
-    <span>{{ user.name }}</span>
-    <ul v-if="showProfileMenu" class="dropdown-menu">
-      <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
-      <hr class="menu-divider" />
-      <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
-      <hr class="menu-divider" />
-      <li @click="signOut">Đăng xuất</li>
-    </ul>
-  </div>
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+  <span>{{ user.name }}</span>
+  <ul v-if="showProfileMenu" class="dropdown-menu">
+    <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
+    <hr class="menu-divider" />
+    <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
+    <hr class="menu-divider" />
+
+    <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học đã mua</router-link></li>
+    <li v-if="user.role === 'Instructor'"><router-link to="/courses">Quản lý khóa học</router-link></li>
+    <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
+    <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
+
+    <li @click="signOut">Đăng xuất</li>
+  </ul>
+</div>
   <router-link v-else to="/sign-in">
     <div class="text-dark login-btn">Login</div>
   </router-link>
@@ -59,21 +65,21 @@ export default {
 
   methods: {
     async fetchUserProfile() {
-      try {
-        const clientData = await getClientInfo();
-        console.log('clientData:', clientData);
-
-        if (clientData) {
-          this.isLoggedIn = true;
-          this.user = { name: clientData.userName || 'User', role: clientData.role || 'Learner' };
-          console.log('User Info:', this.user);
-        } else {
-          console.log('User not logged in or invalid status');
-        }
-      } catch (error) {
-        console.error('Error fetching user status:', error);
+    try {
+      const clientData = await getClientInfo();
+      if (clientData) {
+        this.isLoggedIn = true;
+        this.user = {
+          name: clientData.userName || 'User',
+          role: clientData.role || 'Learner',
+        };
+      } else {
+        console.log('User not logged in or invalid status');
       }
-    },
+    } catch (error) {
+      console.error('Error fetching user status:', error);
+    }
+  },
 
     toggleProfileMenu() {
       this.showProfileMenu = !this.showProfileMenu;
