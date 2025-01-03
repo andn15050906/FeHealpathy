@@ -26,7 +26,9 @@
     <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
     <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
 
-    <li @click="signOut">Đăng xuất</li>
+    <li>
+      <button @click="signOut">Đăng xuất</button>
+    </li>
   </ul>
 </div>
   <router-link v-else to="/sign-in">
@@ -173,17 +175,18 @@ ul {
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 20px;
+  left: -50px;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   display: block;
+  width: max-content;
 }
 
 .dropdown-menu li {
-  padding: 10px 20px;
+  padding: 0;
   font-size: 14px;
   cursor: pointer;
   color: #333;
@@ -200,9 +203,23 @@ ul {
   background-color: #f3f3f3;
 }
 
-.dropdown-menu li a {
-  color: inherit;
+
+.dropdown-menu li a,
+.dropdown-menu li button {
+  display: block;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #333;
   text-decoration: none;
+  border: none; /* Xóa viền mặc định của button */
+  text-align: left; /* Canh trái nội dung */
+  cursor: pointer; /* Con trỏ chuột dạng click */
+  transition: background-color 0.2s;
+}
+
+.dropdown-menu li a:hover,
+.dropdown-menu li button:hover {
+  background-color: #f3f3f3;
 }
 
 .login-btn {
