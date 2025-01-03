@@ -29,9 +29,6 @@
                         <h2 class="entry-title">{{ entry.title }}</h2>
                         <p class="entry-date">{{ formatDate(entry.date) }}</p>
                     </div>
-                    <div class="mood-indicator">
-                        <img :src="getMoodIcon(entry.mood)" :alt="entry.mood" class="mood-icon" />
-                    </div>
                 </div>
             </div>
         </div>
@@ -49,84 +46,72 @@ export default {
                     id: 1,
                     title: 'My Memory #1',
                     date: '2024-01-15',
-                    mood: 'very-happy',
                     content: 'Today was amazing! I got promoted at work.'
                 },
                 {
                     id: 2,
                     title: 'Coffee with Friends',
                     date: '2024-01-16',
-                    mood: 'very-happy',
                     content: 'Had a wonderful coffee meetup with old friends.'
                 },
                 {
                     id: 3,
                     title: 'Rainy Day Thoughts',
                     date: '2024-01-17',
-                    mood: 'neutral',
                     content: 'Just a normal rainy day, staying indoors.'
                 },
                 {
                     id: 4,
                     title: 'Missing Home',
                     date: '2024-01-18',
-                    mood: 'sad',
                     content: 'Feeling homesick today...'
                 },
                 {
                     id: 5,
                     title: 'Weekend Adventure',
                     date: '2024-01-19',
-                    mood: 'very-happy',
                     content: 'Went hiking with my best friends!'
                 },
                 {
                     id: 6,
                     title: 'Movie Night',
                     date: '2024-01-20',
-                    mood: 'very-happy',
                     content: 'Watched my favorite movie again.'
                 },
                 {
                     id: 7,
                     title: 'Work Deadline',
                     date: '2024-01-21',
-                    mood: 'neutral',
                     content: 'Busy day at work, but managed to finish everything.'
                 },
                 {
                     id: 8,
                     title: 'Family Dinner',
                     date: '2024-01-22',
-                    mood: 'very-happy',
                     content: 'Had a wonderful dinner with family.'
                 },
                 {
                     id: 9,
                     title: 'Late Night Thoughts',
                     date: '2024-01-23',
-                    mood: 'sad',
                     content: 'Feeling a bit down tonight...'
                 },
                 {
                     id: 10,
                     title: 'Morning Walk',
                     date: '2024-01-24',
-                    mood: 'very-happy',
                     content: 'Beautiful sunrise during my morning walk.'
                 },
                 {
                     id: 11,
                     title: 'New Project',
                     date: '2024-01-25',
-                    mood: 'neutral',
                     content: 'Started a new project at work today.'
                 },
                 {
                     id: 12,
                     title: 'Birthday Celebration',
                     date: '2024-01-26',
-                    mood: 'very-happy',
                     content: 'Celebrated my birthday with loved ones!'
                 }
             ]
@@ -147,15 +132,6 @@ export default {
                 month: 'long',
                 day: 'numeric'
             })
-        },
-        getMoodIcon(mood) {
-            const moodIcons = {
-                'very-happy': 'https://cdn.builder.io/api/v1/image/assets/TEMP/9b68f23974a28e2ee613607ad4e8f9086a623c81fd8d04436f7b8862eb0bcd72?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657',
-                'sad': 'https://cdn.builder.io/api/v1/image/assets/TEMP/f3293582c94a47068c7d253c75b4dfc429b8270402ffc3b71a7b7a3b7c841e81?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657',
-                'neutral': 'https://cdn.builder.io/api/v1/image/assets/TEMP/2b08e9dcbcdfb2618f02b4a2293a914c1c92b9d58c21e5bf018dbe03cff35c2d?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657',
-                'very-sad': 'https://cdn.builder.io/api/v1/image/assets/TEMP/9b68f23974a28e2ee613607ad4e8f9086a623c81fd8d04436f7b8862eb0bcd72?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657'
-            }
-            return moodIcons[mood]
         },
         viewEntry(id) {
             this.$router.push(`/diary/${id}`)
@@ -233,6 +209,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: -10px;
 }
 
 .diary-info {
@@ -248,17 +225,6 @@ export default {
 .entry-date {
     font: 400 14px Manrope, sans-serif;
     color: #666;
-}
-
-.mood-indicator {
-    width: 40px;
-    height: 40px;
-}
-
-.mood-icon {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
 }
 
 @media (max-width: 991px) {
