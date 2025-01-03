@@ -32,6 +32,7 @@
                         </button>
                     </div>
                 </div>
+                <DiaryButton/>
             </div>
         </div>
     </div>
@@ -169,8 +170,13 @@
 </style>
 
 <script>
+import DiaryButton from '@/components/MoodComponents/DiaryButton.vue'
+
 export default {
     name: 'EagerMoodTracker',
+    components: {
+        DiaryButton
+    },
     methods: {
         navigateToMood(mood) {
             this.$router.push(`/mood-cart/${mood}`);
