@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5 stress-assessment">
     <h2 class="mb-4">Stress Assessment</h2>
-    <p>Please answer the following questions:</p>
+    <h5>Please answer the following questions:</h5>
     <div class="progress mb-4" style="height: 30px;">
       <div class="progress-bar progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"
         aria-valuemin="0" aria-valuemax="100"></div>
