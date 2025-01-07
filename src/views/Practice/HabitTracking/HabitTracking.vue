@@ -44,6 +44,11 @@
         </tbody>
       </table>
     </div>
+    
+    <span @click="showReport = !showReport" class="text-primary cursor-pointer small-report">Report</span>
+    <div v-if="showReport">
+      <PieChart :habits="habits" />
+    </div>
     <div class="controls mt-4 text-left">
       <span @click="showAddHabitForm = true" class="icon-clickable border p-2">
         <i class="fas fa-plus"></i> Add new habit
@@ -73,14 +78,24 @@
 
 <script>
 import { reactive, ref, computed } from 'vue';
+import PieChart from './components/PieChart.vue';
 
 export default {
   name: 'HabitTracker',
+  components: {
+    PieChart,
+  },
   setup() {
-    const habits = reactive([{ name: 'Example Habit', completedDates: [], goal: 1 }]);
+    const habits = reactive([
+      { name: 'Exercise', completedDates: ['1', '2', '3', '4', '5'], goal: 5 },
+      { name: 'Reading', completedDates: ['1', '2', '3'], goal: 5 },
+      { name: 'Meditation', completedDates: ['1', '2'], goal: 5 },
+      { name: 'Sleep', completedDates: ['1', '2', '3', '4'], goal: 5 },
+    ]);
     const today = new Date();
     const currentMonth = ref(today.getMonth());
     const currentYear = ref(today.getFullYear());
+    const showReport = ref(false);
 
     const daysOfMonth = computed(() => {
       const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
@@ -179,6 +194,7 @@ export default {
       nextMonth,
       isPastDate,
       isFutureDate,
+      showReport,
     };
   },
 };
@@ -269,5 +285,17 @@ export default {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+.text-primary {
+  color: #007bff;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.small-report {
+  font-size: 0.9rem;
 }
 </style>
