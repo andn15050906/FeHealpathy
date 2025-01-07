@@ -14,50 +14,58 @@
       </div>
       <div class="user-actions">
         <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
-  <span>{{ user.name }}</span>
-  <ul v-if="showProfileMenu" class="dropdown-menu">
-    <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
-    <hr class="menu-divider" />
-    <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
-    <hr class="menu-divider" />
+          <span>Hi, {{ user.userName }}</span>
+          <ul v-if="showProfileMenu" class="dropdown-menu">
+            <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
+            <hr class="menu-divider" />
+            <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
+            <hr class="menu-divider" />
 
-    <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học đã mua</router-link></li>
-    <li v-if="user.role === 'Instructor'"><router-link to="/courses">Quản lý khóa học</router-link></li>
-    <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
-    <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
+            <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học
+                đã mua</router-link></li>
+            <li v-if="user.role === 'Instructor'"><router-link to="/courses">Quản lý khóa học</router-link></li>
+            <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
+            <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
 
-    <li>
-      <button @click="signOut">Đăng xuất</button>
-    </li>
-  </ul>
-</div>
-  <router-link v-else to="/sign-in">
-    <div class="text-dark login-btn">Login</div>
-  </router-link>
-</div>
+            <li>
+              <button @click="signOut">Đăng xuất</button>
+            </li>
+          </ul>
+        </div>
+        <router-link v-else to="/sign-in">
+          <div class="text-dark login-btn">Login</div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getClientInfo } from '@/services/userService';
-import { signOut } from '@/services/authService';
+import { getUserAuthData, signOut } from '@/services/authService';
 import Logo from '../Helper/Logo.vue';
+// import { getNotifications, updateNotification } from '@/services/notificationService';
 
 export default {
   data() {
     return {
       isLoggedIn: false,
       user: {
-        name: '',
+        userName: '',
         role: ''
       },
+      // notifications: [],
+      // showNotifications: false,
       showProfileMenu: false
     };
   },
 
+  components: {
+    Logo
+  },
+
   async mounted() {
     await this.fetchUserProfile();
+    // await this.fetchNotifications();
     document.addEventListener('click', this.handleClickOutside);
   },
 
@@ -67,21 +75,22 @@ export default {
 
   methods: {
     async fetchUserProfile() {
-    try {
-      const clientData = await getClientInfo();
-      if (clientData) {
-        this.isLoggedIn = true;
-        this.user = {
-          name: clientData.userName || 'User',
-          role: clientData.role || 'Learner',
-        };
-      } else {
-        console.log('User not logged in or invalid status');
+      try {
+        const clientData = await getUserAuthData();
+        console.log(clientData);
+        if (clientData) {
+          this.isLoggedIn = true;
+          this.user = {
+            userName: clientData.userName || 'User',
+            role: clientData.role || 'Member',
+          };
+        } else {
+          console.log('User not logged in or invalid status');
+        }
+      } catch (error) {
+        console.error('Error fetching user status:', error);
       }
-    } catch (error) {
-      console.error('Error fetching user status:', error);
-    }
-  },
+    },
 
     toggleProfileMenu() {
       this.showProfileMenu = !this.showProfileMenu;
@@ -101,11 +110,41 @@ export default {
     handleClickOutside(event) {
       const dropdown = this.$el.querySelector('.dropdown-menu');
       const profileMenu = this.$el.querySelector('.profile');
-      
+
       if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
         this.showProfileMenu = false;
       }
     }
+
+    // async fetchNotifications() {
+    //   try {
+    //     if (this.isLoggedIn) {
+    //       const notifications = await getNotifications(this.user.id);
+    //       this.notifications = notifications;
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching notifications:', error);
+    //   }
+    // },
+    // toggleNotifications() {
+    //   this.showNotifications = !this.showNotifications;
+    //   if (this.showNotifications) {
+    //     this.markNotificationsAsRead();
+    //   }
+    // },
+
+    // async markNotificationsAsRead() {
+    //   try {
+    //     for (const notification of this.notifications) {
+    //       if (notification.status === 'unread') {
+    //         await updateNotification(notification.id, 'read');
+    //       }
+    //     }
+    //     await this.fetchNotifications();
+    //   } catch (error) {
+    //     console.error('Error marking notifications as read:', error);
+    //   }
+    // },
   }
 };
 
@@ -211,9 +250,12 @@ ul {
   font-size: 14px;
   color: #333;
   text-decoration: none;
-  border: none; /* Xóa viền mặc định của button */
-  text-align: left; /* Canh trái nội dung */
-  cursor: pointer; /* Con trỏ chuột dạng click */
+  border: none;
+  /* Xóa viền mặc định của button */
+  text-align: left;
+  /* Canh trái nội dung */
+  cursor: pointer;
+  /* Con trỏ chuột dạng click */
   transition: background-color 0.2s;
 }
 

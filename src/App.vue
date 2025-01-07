@@ -38,15 +38,20 @@ onMounted(() => {
   });
 });
 
+const headerRef = ref(null);
+const handleAuthenticated = (data) => {
+  headerRef.value.fetchUserProfile();
+}
+
 </script>
 <template>
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <Header />
+    <Header ref="headerRef" />
     <main>
       <div class="page-container">
-        <RouterView />
+        <RouterView @authenticated="handleAuthenticated" />
       </div>
     </main>
     <Footer />

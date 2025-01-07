@@ -11,7 +11,7 @@
                         HomePage.AlreadyHaveAccount }}</GlowingButton>
                 </div>
             </section>
-            
+
             <section class="features-section">
                 <h2 class="section-title">{{ HomePage.Section1.Title }}</h2>
                 <div class="feature-cards">
@@ -93,9 +93,24 @@
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import json from '../api/data.json'
+import router from '@/router';
+import { setUserAuthData } from '@/services/authService';
 
 export default {
     name: 'HomePage',
+    mounted() {
+        if (router.currentRoute.value.query) {
+            var externalUser = router.currentRoute.value.query['external_redirect'];
+            console.log(router.currentRoute.value.query['external_redirect']);
+            if (externalUser) {
+                setUserAuthData({
+                    User: externalUser
+                });
+            }
+
+            this.$router.replace({ path: '/', query: {} });
+        }
+    },
     data() {
         return {
             HomePage: json.HomePage
