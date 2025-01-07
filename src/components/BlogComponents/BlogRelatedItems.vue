@@ -1,63 +1,102 @@
 <template>
     <div class="container">
         <div class="content-wrapper">
+            <h3 class="section-title">Bài viết liên quan</h3>
+            <div class="articles-grid">
+                <div class="articles-row">
+                    <article v-for="(article, index) in relatedArticles" :key="index" class="article-card">
+                        <div class="card-content">
+                            <h4 class="article-title">{{ article.title }}</h4>
+                            <span class="author-name">{{ article.author }}</span>
+                            <span class="read-time">{{ article.readTime }}</span>
+                            <div class="engagement-stats">
+                                <div class="stat-item">
+                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/266277c58c37e13e9be72997ef7fa3fc4e5ea86973cb8c87c401c64e235f8ac8?apiKey=581cb509eedd462787009da53a17f69a&"
+                                        alt="" class="stat-icon" />
+                                    <span>{{ article.views }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0067e72d268af722a4b2e61f78916f3d246163026a619eb5c34382a9cb9470ae?apiKey=581cb509eedd462787009da53a17f69a&"
+                                        alt="" class="stat-icon" />
+                                    <span>{{ article.comments }}</span>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-item">
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/855f2c2cdc4327bf727cb4300c9d9a7ac50cb37d836043f89a106ad3b460b873?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                        <span>{{ article.likes }}</span>
+                                    </div>
+                                    <div class="stat-icons">
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/140b2b6620207c91290d4bed28d9445a84dae3d1d31b2a95ee834f02f82c6f9b?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/a06b59d3e1aa30b97d32443ca1852a963282113b8c36021fb6edb6f0478b02ed?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                    </div>
+                                    <span>{{ article.shares }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
             <div class="pagination">
                 <button class="page-dot active" aria-label="Page 1"></button>
                 <button class="page-dot" aria-label="Page 2"></button>
                 <button class="page-dot" aria-label="Page 3"></button>
             </div>
 
-            <section class="comments-section">
-                <h3 class="section-title">Bình luận</h3>
-                <form class="comment-form" @submit.prevent="submitComment">
-                    <label for="commentInput" class="visually-hidden">
-                        Hãy chia sẻ cảm nghĩ của bạn về bài viết
-                    </label>
-                    <textarea id="commentInput" class="comment-input"
-                        placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết"
-                        aria-label="Hãy chia sẻ cảm nghĩ của bạn về bài viết"></textarea>
-                    <button type="submit" class="submit-button">Gửi</button>
-                </form>
-
-                <div class="comment-filters">
-                    <button class="filter-button active">Hot nhất</button>
-                    <button class="filter-button">Mới nhất</button>
-                </div>
-
-                <div class="comments-list">
-                    <article v-for="(comment, index) in comments" :key="index" class="comment-item">
-                        <img :src="comment.avatar" :alt="`${comment.author}'s avatar`" class="avatar" />
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <div class="comment-author">{{ comment.author }}</div>
-                                <div class="comment-date">{{ comment.date }}</div>
-                            </div>
-                            <p class="comment-text">{{ comment.text }}</p>
-                            <div class="comment-actions">
-                                <button class="action-button">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/057be5174069cee3fb8d890121c15bd5d66134b62a2ef8be669c9feb57993a77?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="action-icon" />
-                                    <span>{{ comment.likes }}</span>
-                                </button>
-                                <button class="action-button">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/38ca355c5629335bed6368fdd17b30ced0048e325b22e960be2b58778feb36f6?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="action-icon" />
-                                    <span>Trả lời</span>
-                                </button>
+            <h3 class="section-title">Bài viết khác từ Kevinbkdev</h3>
+            <div class="articles-grid">
+                <div class="articles-row">
+                    <article v-for="(article, index) in authorArticles" :key="index" class="article-card">
+                        <div class="card-content">
+                            <h4 class="article-title">{{ article.title }}</h4>
+                            <span class="author-name">{{ article.author }}</span>
+                            <span class="read-time">{{ article.readTime }}</span>
+                            <div class="engagement-stats">
+                                <div class="stat-item">
+                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5fea4c65443495c6ef78f0148d755af0e7331037d59c22271be24da1aa3a72f?apiKey=581cb509eedd462787009da53a17f69a&"
+                                        alt="" class="stat-icon" />
+                                    <span>{{ article.views }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/eca4d7b81f4efb92c840395ed360348a96cd306b9f4092aa3823194de0416310?apiKey=581cb509eedd462787009da53a17f69a&"
+                                        alt="" class="stat-icon" />
+                                    <span>{{ article.comments }}</span>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-item">
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/37d8c63261302945c42488c0ecac0a17170e06f8e179ea4c4300dc50c1f049d8?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                        <span>{{ article.likes }}</span>
+                                    </div>
+                                    <div class="stat-icons">
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/c53aac672b5526ebd04e2d8647f9fa3170f71dfc3f2e018b7721eacf4d704b39?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/43a665e07267353445f833b64b87760c5668710054e9d86c129003f8a557df65?apiKey=581cb509eedd462787009da53a17f69a&"
+                                            alt="" class="stat-icon" />
+                                    </div>
+                                    <span>{{ article.shares }}</span>
+                                </div>
                             </div>
                         </div>
                     </article>
                 </div>
+            </div>
 
-                <button class="load-more">Tải thêm bình luận</button>
-            </section>
+            <div class="pagination">
+                <button class="page-dot active" aria-label="Page 1"></button>
+                <button class="page-dot" aria-label="Page 2"></button>
+                <button class="page-dot" aria-label="Page 3"></button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'RelatedArticles',
+    name: 'BlogRelatedItems',
     data() {
         return {
             relatedArticles: [

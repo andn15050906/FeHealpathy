@@ -42,7 +42,7 @@ const router = createRouter({
       component: BlogCatalog
     },
     {
-      path: '/blogs/blogdetail',
+      path: '/blogs/:id',
       name: 'blogDetail',
       component: BlogDetail
     },

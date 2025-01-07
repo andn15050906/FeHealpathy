@@ -1,4 +1,5 @@
 import api from '@/api/apiCall';
+import { backendApiBase } from '@/api/env';
 
 export const signIn = async (identifier, password) => {
   try {
@@ -15,6 +16,8 @@ export const signIn = async (identifier, password) => {
   }
 };
 
+export const getGoogleOAuthPath = () => backendApiBase + "/Auth/google-oauth/";
+
 export const register = async (username, email, password) => {
   try {
     const requestBody = {
@@ -30,12 +33,44 @@ export const register = async (username, email, password) => {
   }
 };
 
+export const verifyEmail = async (email, token) => {
+  try {
+    const requestBody = {
+      Email: email,
+      Token: token,
+    };
+    const response = await api.post('/users/verify', requestBody);
+    return response;
+  } catch (error) {
+    console.error('Verification failed:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
 export const signOut = async () => {
   try {
-    const response = await api.post('/Auth/SignOut');
-    return response.data;
+    clearUserAuthData();
   } catch (error) {
     console.error('Error signing out:', error);
     throw error;
   }
 };
+
+
+
+
+
+
+export const setUserAuthData = (data) => {
+  localStorage.setItem('token', data.accessToken);
+  localStorage.setItem('refresh', data.refreshToken);
+  localStorage.setItem('userProfile', JSON.stringify(data.user ?? data.User));
+}
+
+export const getUserAuthData = () => {
+  return JSON.parse(localStorage.getItem('userProfile'));
+}
+
+const clearUserAuthData = () => {
+  localStorage.clear();
+}

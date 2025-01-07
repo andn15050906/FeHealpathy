@@ -1,8 +1,9 @@
 <template>
   <div class="blog-detail">
     <button class="back-button" @click="goBack">← Quay lại</button>
-    <h1 class="title">Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing</h1>
-    <p class="category">Meditation & Mindfulness</p>
+    <!--<h1 class="title">Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your
+      wellbeing</h1>
+    <p class="category">Meditation & Mindfulness</p>-->
     <HeroImg />
 
     <div class="actions">
@@ -18,21 +19,22 @@
     <div class="divider"></div>
     <div class="blogdescription">
       <ul>
-        <BlogDescription />
+        <BlogContent />
       </ul>
     </div>
     <div class="divider"></div>
     <div class="blogcomment">
       <ul>
-        <BlogComment />
+        <BlogCommentSection />
       </ul>
     </div>
     <div class="divider"></div>
     <div class="blogrelated">
       <ul>
-        <BlogRelated />
+        <BlogRelatedItems />
       </ul>
     </div>
+    <ScrollToTop />
   </div>
 </template>
 
@@ -40,9 +42,9 @@
 import HeroImg from '../../components/Helper/HeroImg.vue'
 import BlogMeta from '../../components/BlogComponents/BlogMeta.vue'
 import ScrollToTop from '../../components/Misc/ScrollToTop.vue'
-import BlogRelated from '@/components/BlogComponents/BlogRelated.vue'
-import BlogComment from '@/components/BlogComponents/BlogComment.vue';
-import BlogDescription from '@/components/BlogComponents/BlogDescription.vue';
+import BlogRelatedItems from '@/components/BlogComponents/BlogRelatedItems.vue'
+import BlogCommentSection from '@/components/BlogComponents/BlogCommentSection.vue';
+import BlogContent from '@/components/BlogComponents/BlogContent.vue';
 
 export default {
   name: "BlogDetail",
@@ -54,9 +56,9 @@ export default {
   components: {
     HeroImg,
     BlogMeta,
-    BlogRelated,
-    BlogComment,
-    BlogDescription,
+    BlogRelatedItems,
+    BlogCommentSection,
+    BlogContent,
     ScrollToTop
   }
 };
@@ -153,51 +155,8 @@ export default {
 .exercise-item:hover {
   transform: scale(1.05);
 }
-
 </style>
 
-
-<!-- <template>
-  <div class="blog-layout">
-    <main class="main-content">
-      <HeroImg />
-      <BlogMeta />
-      <div style="display: flex;">
-        <BlogContent />
-      </div>
-    </main>
-    <ScrollToTop />
-  </div>
-</template>
-
-<script>
-import HeroImg from '../../components/Helper/HeroImg.vue'
-import BlogMeta from '../../components/BlogComponents/BlogMeta.vue'
+<!--
 import BlogContent from '../../components/BlogComponents/BlogContent.vue'
-import ScrollToTop from '../../components/Misc/ScrollToTop.vue'
-
-export default {
-  name: 'BlogLayout',
-  components: {
-    HeroImg,
-    BlogMeta,
-    BlogContent,
-    ScrollToTop
-  }
-}
-</script>
-
-<style scoped>
-.blog-layout {
-  background-color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-
-  width: 70%;
-}
-
-.main-content {
-  flex: 1;
-}
-</style> -->
+-->
