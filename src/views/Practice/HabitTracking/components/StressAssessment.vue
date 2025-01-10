@@ -1,34 +1,52 @@
 <template>
   <div class="container mt-5 stress-assessment">
-    <h2 class="mb-4">Stress Assessment</h2>
-    <h5>Please answer the following questions:</h5>
-    <div class="progress mb-4" style="height: 30px;">
-      <div class="progress-bar progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"
-        aria-valuemin="0" aria-valuemax="100"></div>
+    <h2 class="mb-4 text-title">Test</h2>
+    <div class="test-options">
+      <div 
+        v-for="(type, index) in assessmentTypes" 
+        :key="type.id" 
+        class="test-option" 
+        @click="openTest(type.id)"
+      >
+        <div class="icon-container">
+          <img :src="type.icon" alt="icon" class="icon" />
+        </div>
+        <span class="option-title">{{ type.title }}</span>
+      </div>
     </div>
-    <table class="table table-bordered assessment-table">
-      <thead class="thead-light text-center">
-        <tr>
-          <th></th>
-          <th>Not at all true for me</th>
-          <th>Somewhat true for me</th>
-          <th>Mostly true for me</th>
-          <th>Completely true for me</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(question, index) in questions" :key="index">
-          <td>{{ question.text }}</td>
-          <td v-for="(option, optionIndex) in question.options" :key="optionIndex" class="text-center">
-            <input type="radio" :name="'question' + index" :value="option" @change="selectAnswer(index, option)" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <button @click="submitAnswers" class="btn btn-primary mt-3">Submit Answers</button>
-    <div v-if="score !== null" class="mt-4">
-      <h5>Your Score: {{ score }}</h5>
-      <h5>Evaluation: {{ evaluation }}</h5>
+
+    <div v-if="showPopup" class="popup">
+      <div class="popup-content">
+        <span class="close" @click="closePopup">&times;</span>
+        <h3 class="text-center text-title">{{ currentTest.title }}</h3>
+        <h5 class="text-center">Please answer the following questions:</h5>
+        <div class="progress mb-4" style="height: 30px;">
+          <div class="progress-bar progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"
+            aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="questions-container">
+          <h5>Question {{ currentQuestionIndex + 1 }}:</h5>
+          <p>{{ currentTest.questions[currentQuestionIndex].text }}</p>
+          <div class="question-list">
+            <div v-for="(question, index) in currentTest.questions" :key="index" 
+                 class="question-item" 
+                 @click="currentQuestionIndex = index">
+              <span :class="{'answered': answers[index] !== undefined, 'current': currentQuestionIndex === index}">
+                {{ index + 1 }}
+              </span>
+            </div>
+          </div>
+          <div>
+            <div v-for="(option, optionIndex) in currentTest.questions[currentQuestionIndex].options" :key="optionIndex">
+              <input type="radio" :name="'question' + currentQuestionIndex" :value="option" 
+                     @change="selectAnswer(option)" 
+                     :class="{'selected': answers[currentQuestionIndex] === option, 'answered': answers[currentQuestionIndex] !== undefined}" />
+              {{ option }}
+            </div>
+          </div>
+          <button @click="nextQuestion" class="btn btn-primary mt-3 mx-auto d-block">Next</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -39,7 +57,10 @@ import data from '@/api/data';
 export default {
   data() {
     return {
-      questions: data.StressAssessment.questions,
+      assessmentTypes: data.Assessments.types,
+      currentTest: {},
+      showPopup: false,
+      currentQuestionIndex: 0,
       answers: [],
       progress: 0,
       score: null,
@@ -47,20 +68,40 @@ export default {
     };
   },
   methods: {
-    selectAnswer(questionIndex, answer) {
-      this.answers[questionIndex] = answer;
+    openTest(testId) {
+      this.currentTest = data.Assessments.types.find(type => type.id === testId);
+      this.currentQuestionIndex = 0; 
+      this.showPopup = true;
+    },
+    closePopup() {
+      this.showPopup = false;
+      this.resetTest();
+    },
+    resetTest() {
+      this.answers = [];
+      this.progress = 0;
+      this.score = null;
+      this.evaluation = '';
+      this.currentQuestionIndex = 0; 
+    },
+    selectAnswer(answer) {
+      this.answers[this.currentQuestionIndex] = answer;
+      this.updateProgress();
+    },
+    nextQuestion() {
+      this.currentQuestionIndex++;
       this.updateProgress();
     },
     updateProgress() {
       const answeredQuestions = this.answers.filter(answer => answer !== undefined).length;
-      this.progress = (answeredQuestions / this.questions.length) * 100;
+      this.progress = (answeredQuestions / this.currentTest.questions.length) * 100;
     },
     submitAnswers() {
       this.score = this.calculateScore(this.answers);
       this.evaluation = this.evaluateStressLevel(this.score);
     },
     calculateScore(answers) {
-      return answers.length; // Example: return the number of answers
+      return answers.length; 
     },
     evaluateStressLevel(score) {
       if (score < 5) return 'Low Stress';
@@ -72,26 +113,109 @@ export default {
 </script>
 
 <style scoped>
-.stress-assessment {
-  padding: 20px;
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  height: 100vh;
 }
-.table th {
-  vertical-align: middle;
-  text-align: center;
-}
-thead.thead-light th {
-  background-color: #f8f9fa;
-}
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-.progress-bar {
-  background-color: #28a745;
-  font-size: 1.2rem;
+.test-options {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.test-option {
+  background-color: #4CAF50;
+  padding: 60px;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: white;
+  flex: 1 1 calc(50% - 20px);
+  margin: 10px;
+}
+.test-option:nth-child(1),
+.test-option:nth-child(2),
+.test-option:nth-child(3) {
+  flex: 1 1 calc(33.33% - 20px);
+}
+.test-option:nth-child(4),
+.test-option:nth-child(5) {
+  flex: 1 1 calc(50% - 20px);
+}
+.test-option:hover {
+  background-color: #45a049;
+}
+.icon-container {
+  margin-bottom: 10px;
+}
+.icon {
+  width: 50px;
+  height: 50px;
+}
+.option-title {
+  font-size: 18px;
+}
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
   justify-content: center;
-  transition: width 0.6s ease;
+  align-items: center;
+}
+.popup-content {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 900px;
+  max-height: 80vh; 
+  overflow-y: auto; 
+}
+.close {
+  cursor: pointer;
+  float: right;
+  font-size: 20px;
+}
+.questions-container {
+  max-height: 400px; 
+  overflow-y: auto; 
+}
+.question-list {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.question-item {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #D3D3D3;
+}
+.question-item:hover {
+  background-color: #e7f1ff;
+}
+.question-item.current {
+  background-color: #4CAF50;
+}
+.question-item.answered {
+  background-color: #4CAF50;
+}
+input[type="radio"] {
+  margin-right: 10px;
+}
+.selected {
+  background-color: #4CAF50;
+}
+.text-title {
+  color: #007bff;
 }
 </style>
