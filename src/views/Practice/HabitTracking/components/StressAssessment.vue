@@ -10,11 +10,10 @@
       <thead class="thead-light text-center">
         <tr>
           <th></th>
-          <th>Never</th>
-          <th>Rarely</th>
-          <th>Sometimes</th>
-          <th>Often</th>
-          <th>Always</th>
+          <th>Not at all true for me</th>
+          <th>Somewhat true for me</th>
+          <th>Mostly true for me</th>
+          <th>Completely true for me</th>
         </tr>
       </thead>
       <tbody>
@@ -27,93 +26,66 @@
       </tbody>
     </table>
     <button @click="submitAnswers" class="btn btn-primary mt-3">Submit Answers</button>
+    <div v-if="score !== null" class="mt-4">
+      <h5>Your Score: {{ score }}</h5>
+      <h5>Evaluation: {{ evaluation }}</h5>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+<script>
+import data from '@/api/data';
 
-const router = useRouter();
-
-const questions = ref([
-  {
-    text: '🧠 How often do you feel overwhelmed by stress?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
+export default {
+  data() {
+    return {
+      questions: data.StressAssessment.questions,
+      answers: [],
+      progress: 0,
+      score: null,
+      evaluation: '',
+    };
   },
-  {
-    text: '😟 Do you find it hard to relax?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
+  methods: {
+    selectAnswer(questionIndex, answer) {
+      this.answers[questionIndex] = answer;
+      this.updateProgress();
+    },
+    updateProgress() {
+      const answeredQuestions = this.answers.filter(answer => answer !== undefined).length;
+      this.progress = (answeredQuestions / this.questions.length) * 100;
+    },
+    submitAnswers() {
+      this.score = this.calculateScore(this.answers);
+      this.evaluation = this.evaluateStressLevel(this.score);
+    },
+    calculateScore(answers) {
+      return answers.length; // Example: return the number of answers
+    },
+    evaluateStressLevel(score) {
+      if (score < 5) return 'Low Stress';
+      if (score < 10) return 'Moderate Stress';
+      return 'High Stress';
+    },
   },
-  {
-    text: '😰 How often do you feel anxious or worried?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  },
-  {
-    text: '💤 Do you have trouble sleeping due to stress?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  },
-  {
-    text: '😠 How often do you feel irritable or angry?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  },
-  {
-    text: '🏋️‍♂️ How often do you engage in physical activities or exercise?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  },
-  {
-    text: '🍎 How balanced and nutritious do you think your current diet is?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  },
-  {
-    text: '🌞 Do you spend time outdoors or get regular sunlight exposure?',
-    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-  }
-]);
-
-const answers = ref([]);
-const progress = ref(0);
-
-const selectAnswer = (questionIndex, answer) => {
-  answers.value[questionIndex] = answer;
-  updateProgress();
 };
-
-const updateProgress = () => {
-  const answeredQuestions = answers.value.filter(answer => answer !== undefined).length;
-  progress.value = (answeredQuestions / questions.value.length) * 100;
-};
-
-const submitAnswers = () => {
-  const stressLevel = evaluateStressLevel(answers.value);
-};
-
-const evaluateStressLevel = (answers) => {
-  return 'Normal';
-};
-
-watch(answers, updateProgress, { deep: true });
 </script>
 
 <style scoped>
 .stress-assessment {
   padding: 20px;
 }
-
 .table th {
   vertical-align: middle;
   text-align: center;
 }
-
 thead.thead-light th {
   background-color: #f8f9fa;
 }
-
 .btn-primary {
   background-color: #007bff;
   border-color: #007bff;
 }
-
 .progress-bar {
   background-color: #28a745;
   font-size: 1.2rem;

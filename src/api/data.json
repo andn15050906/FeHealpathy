@@ -693,5 +693,198 @@
                 "LikeCount": 10
             }
         ]
+    },
+    "StressAssessment": {
+        "questions": [
+            {
+                "text": "I find it hard to feel relaxed.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I have a dry mouth.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I don't feel any positive emotions.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I experience breathing irregularities (shortness of breath, difficulty breathing without exertion).",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I find it hard to start working.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I overreact to events.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I sweat (e.g., sweaty palms).",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel like I'm thinking too much.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I worry about situations that might embarrass me.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel like I have nothing to look forward to.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel easily irritated.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I find it hard to relax.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel depressed or disappointed.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I can't accept interruptions while I'm working.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel almost panicked.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I don't feel enthusiastic about anything anymore.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel like I'm not worth being a person.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel easily offended.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I hear my heartbeat clearly even when I'm not doing anything (e.g., increased heartbeat, irregular heartbeat).",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I often feel fear without reason.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            },
+            {
+                "text": "I feel life is meaningless.",
+                "options": [
+                    "Not at all true for me",
+                    "Somewhat true for me, or occasionally true",
+                    "Mostly true for me, or true most of the time",
+                    "Completely true for me, or true almost all the time"
+                ]
+            }
+        ]
     }
 }
