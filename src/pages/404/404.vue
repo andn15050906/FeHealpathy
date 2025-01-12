@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import VuesticLogo from './VuesticLogo.vue'
 import NotFoundImage from './NotFoundImage.vue'
 </script>
 
@@ -17,12 +16,6 @@ import NotFoundImage from './NotFoundImage.vue'
         The page you are looking for might have been removed had its name changed or is temporarily unavailable.
       </p>
 
-      <div class="flex flex-col sm:flex-row gap-4">
-        <VaButton to="/">Go to homepage</VaButton>
-        <VaButton href="https://github.com/epicmaxco/vuestic-admin/issues/new" preset="secondary" target="_blank"
-          >Create a GitHub issue
-        </VaButton>
-      </div>
     </div>
 
     <div/>
