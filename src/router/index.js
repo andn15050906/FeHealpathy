@@ -26,7 +26,7 @@ import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SettingUp from '@/components/ProfileComponents/SettingUp.vue'
-
+import MusicControl from '@/views/Music_Player/MusicControl.vue'
 
 
 const router = createRouter({
@@ -176,6 +176,11 @@ const router = createRouter({
       path: '/setting-up',
       name: 'SettingUp',
       component: SettingUp
+    },
+    {
+      path: '/musics',
+      name: 'MusicControl',
+      component: MusicControl
     }
   ]
 })
