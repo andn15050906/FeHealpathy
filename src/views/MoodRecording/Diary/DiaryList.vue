@@ -20,7 +20,7 @@
         </div>
 
         <div class="diary-entries">
-            <div v-for="entry in filteredEntries" 
+            <div v-for="(entry, index) in filteredEntries" 
                 :key="entry.id" 
                 class="diary-card"
                 @click="viewEntry(entry.id)">
@@ -29,18 +29,35 @@
                         <h2 class="entry-title">{{ entry.title }}</h2>
                         <p class="entry-date">{{ formatDate(entry.date) }}</p>
                     </div>
+                    <button class="delete-button" @click.stop="confirmDelete(entry.id)">Delete</button>
                 </div>
             </div>
         </div>
+
+        <DeleteConfirmPopup 
+            :message="'Are you sure you want to delete this diary entry?'" 
+            :isVisible="showDeletePopup" 
+            :url="entryToDeleteUrl" 
+            @confirmDelete="handleDelete" 
+            @update:isVisible="showDeletePopup = $event" 
+        />
     </div>
 </template>
 
 <script>
+import DeleteConfirmPopup from '@/components/Common/DeleteConfirmPopup.vue'
+
 export default {
     name: 'DiaryList',
+    components: {
+        DeleteConfirmPopup
+    },
     data() {
         return {
             searchQuery: '',
+            showDeletePopup: false,
+            entryToDelete: null,
+            entryToDeleteUrl: '',
             entries: [
                 {
                     id: 1,
@@ -135,6 +152,20 @@ export default {
         },
         viewEntry(id) {
             this.$router.push(`/diary/${id}`)
+        },
+        confirmDelete(entryId) {
+            this.entryToDelete = entryId;
+            this.entryToDeleteUrl = `api/diary/${entryId}`;
+            this.showDeletePopup = true;
+        },
+        handleDelete(confirm) {
+            if (confirm && this.entryToDelete !== null) {
+                this.entries = this.entries.filter(entry => entry.id !== this.entryToDelete);
+                console.log(`Deleted entry at: ${this.entryToDeleteUrl}`);
+            }
+            this.showDeletePopup = false;
+            this.entryToDelete = null;
+            this.entryToDeleteUrl = '';
         }
     }
 }
@@ -225,6 +256,18 @@ export default {
 .entry-date {
     font: 400 14px Manrope, sans-serif;
     color: #666;
+}
+
+.delete-button {
+    background-color: transparent;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.delete-button:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 991px) {
