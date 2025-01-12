@@ -34,7 +34,8 @@ const handleResetPassword = async () => {
     return;
   }
 
-  const { email, token } = route.query;
+  let email = route.params.email;
+  let token = route.params.resetToken;
 
   try {
     await resetPassword(email, token, newPassword.value);

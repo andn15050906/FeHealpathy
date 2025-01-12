@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HomePage from '@/views/HomePage.vue'
-import SignIn from '@/views/Profile/SignInAndRegister.vue'
+import SignIn from '@/views/Profile/SignIn.vue'
 import ChangePassword from '@/views/Profile/ChangePassword.vue'
 import ForgotPassword from '@/views/Profile/ForgotPassword.vue'
 import ResetPassword from '@/views/Profile/ResetPassword.vue'
@@ -35,6 +35,8 @@ import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
 import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
 import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 import DailyQuestion from '@/views/QuestionOfTheDay/DailyQuestion.vue'
+import BlogDetail from '@/views/Blogs/BlogDetail.vue'
+import Register from '@/views/Profile/Register.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +50,11 @@ const router = createRouter({
       path: '/blogs',
       name: 'blogCatalog',
       component: BlogCatalog
+    },
+    {
+      path: '/blogs/:id',
+      name: 'blogDetail',
+      component: BlogDetail
     },
     {
       path: '/search-blogs',
@@ -99,6 +106,11 @@ const router = createRouter({
       path: '/sign-in',
       name: 'signIn',
       component: SignIn
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
     },
     {
       path: '/change-password',

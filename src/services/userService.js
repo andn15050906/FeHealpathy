@@ -10,18 +10,6 @@ export const getUserById = async (id) => {
   }
 };
 
-export const getClientInfo = async () => {
-  try {
-    //const response = await api.get(`/Users/client`);
-    //return response.data;
-
-    return {}
-  } catch (error) {
-    console.error('Error fetching client info:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
 export const getUsers = async (query) => {
   try {
     const response = await api.get(`/Users`, { params: query });
@@ -114,7 +102,7 @@ export const resetPassword = async (email, token, newPassword) => {
       Token: token,
       NewPassword: newPassword,
     };
-    const response = await api.post('/Users/ResetPassword', requestBody);
+    const response = await api.post('/Auth/ResetPassword', requestBody);
     return response.data;
   } catch (error) {
     console.error('Reset password failed:', error.response ? error.response.data : error.message);
@@ -122,21 +110,9 @@ export const resetPassword = async (email, token, newPassword) => {
   }
 };
 
-export const checkValidity = async (email, token) => {
-  try {
-    const response = await api.get(`/Users/CheckValidity`, {
-      params: { email, token },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error checking token validity:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
 export const forgotPassword = async (email) => {
   try {
-    const response = await api.post('/Users/ForgotPassword', email);
+    const response = await api.post('/Auth/ForgotPassword', email);
     return response.data;
   } catch (error) {
     console.error('Forgot password failed:', error.response ? error.response.data : error.message);

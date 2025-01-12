@@ -14,13 +14,22 @@
       </div>
       <div class="user-actions">
         <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
-          <span>{{ user.name }}</span>
-          <i @click.stop="signOut" title="Logout"><font-awesome-icon icon="sign-out-alt" class="logout-icon" /></i>
-          <ul class="dropdown-menu" v-if="showProfileMenu">
-            <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin View</router-link></li>
-            <li v-if="user.role === 'Instructor'"><router-link to="/instructor">Instructor View</router-link></li>
-            <li><router-link to="/profile">Profile</router-link></li>
-            <li><router-link to="/enrolled-courses">Enrolled Courses</router-link></li>
+          <span>Hi, {{ user.userName }}</span>
+          <ul v-if="showProfileMenu" class="dropdown-menu">
+            <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
+            <hr class="menu-divider" />
+            <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
+            <hr class="menu-divider" />
+
+            <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học
+                đã mua</router-link></li>
+            <li v-if="user.role === 'Instructor'"><router-link to="/courses">Quản lý khóa học</router-link></li>
+            <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
+            <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
+
+            <li>
+              <button @click="signOut">Đăng xuất</button>
+            </li>
           </ul>
         </div>
         <router-link v-else to="/sign-in">
@@ -32,22 +41,16 @@
 </template>
 
 <script>
-import { getClientInfo } from '@/services/userService';
-import { signOut } from '@/services/authService';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { getUserAuthData, signOut } from '@/services/authService';
 import Logo from '../Helper/Logo.vue';
 // import { getNotifications, updateNotification } from '@/services/notificationService';
-
-library.add(faSignOutAlt);
 
 export default {
   data() {
     return {
       isLoggedIn: false,
       user: {
-        name: '',
+        userName: '',
         role: ''
       },
       // notifications: [],
@@ -56,26 +59,31 @@ export default {
     };
   },
 
+  components: {
+    Logo
+  },
+
   async mounted() {
     await this.fetchUserProfile();
     // await this.fetchNotifications();
+    document.addEventListener('click', this.handleClickOutside);
   },
 
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-    Logo
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   methods: {
     async fetchUserProfile() {
       try {
-        const clientData = await getClientInfo();
-        console.log('clientData:', clientData);
-
+        const clientData = await getUserAuthData();
+        console.log(clientData);
         if (clientData) {
           this.isLoggedIn = true;
-          this.user = { name: clientData.userName || 'User', role: clientData.role || 'Learner' };
-          console.log('User Info:', this.user);
+          this.user = {
+            userName: clientData.userName || 'User',
+            role: clientData.role || 'Member',
+          };
         } else {
           console.log('User not logged in or invalid status');
         }
@@ -83,6 +91,30 @@ export default {
         console.error('Error fetching user status:', error);
       }
     },
+
+    toggleProfileMenu() {
+      this.showProfileMenu = !this.showProfileMenu;
+    },
+
+    async signOut() {
+      try {
+        await signOut();
+        this.isLoggedIn = false;
+        this.user = { name: '', role: '' };
+        this.$router.push('/sign-in');
+      } catch (error) {
+        console.error('Error signing out:', error);
+      }
+    },
+
+    handleClickOutside(event) {
+      const dropdown = this.$el.querySelector('.dropdown-menu');
+      const profileMenu = this.$el.querySelector('.profile');
+
+      if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
+        this.showProfileMenu = false;
+      }
+    }
 
     // async fetchNotifications() {
     //   try {
@@ -100,9 +132,7 @@ export default {
     //     this.markNotificationsAsRead();
     //   }
     // },
-    toggleProfileMenu() {
-      this.showProfileMenu = !this.showProfileMenu;
-    },
+
     // async markNotificationsAsRead() {
     //   try {
     //     for (const notification of this.notifications) {
@@ -115,21 +145,9 @@ export default {
     //     console.error('Error marking notifications as read:', error);
     //   }
     // },
-
-    async signOut() {
-      try {
-        await signOut();
-
-        this.isLoggedIn = false;
-        this.user = { name: '', role: '' };
-
-        await this.$router.push('/sign-in');
-      } catch (error) {
-        console.error('Error signing out:', error);
-      }
-    },
   }
 };
+
 </script>
 
 <style scoped>
@@ -196,15 +214,54 @@ ul {
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
-  background: white;
-  list-style: none;
-  padding: 10px;
+  left: -50px;
+  background-color: white;
   border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: block;
+  width: max-content;
 }
 
 .dropdown-menu li {
-  padding: 5px 10px;
+  padding: 0;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.menu-divider {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f3f3f3;
+}
+
+
+.dropdown-menu li a,
+.dropdown-menu li button {
+  display: block;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  border: none;
+  /* Xóa viền mặc định của button */
+  text-align: left;
+  /* Canh trái nội dung */
+  cursor: pointer;
+  /* Con trỏ chuột dạng click */
+  transition: background-color 0.2s;
+}
+
+.dropdown-menu li a:hover,
+.dropdown-menu li button:hover {
+  background-color: #f3f3f3;
 }
 
 .login-btn {
