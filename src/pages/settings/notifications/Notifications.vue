@@ -18,19 +18,19 @@ import { ref } from 'vue'
 
 const notifications = ref([
   {
-    name: 'Thông báo bài viết mới',
+    name: 'New post notifications',
     isEnabled: true
   },
   {
-    name: 'Thông báo bình luận',
+    name: 'Comment notifications',
     isEnabled: true
   },
   {
-    name: 'Thông báo tin nhắn',
+    name: 'Message notifications',
     isEnabled: true
   },
   {
-    name: 'Thông báo cập nhật khóa học',
+    name: 'Course update notifications',
     isEnabled: false
   }
 ])

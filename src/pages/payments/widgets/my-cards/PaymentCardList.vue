@@ -1,52 +1,59 @@
 <template>
   <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
     <template v-if="loading">
-      <div
-        v-for="i in 4"
-        :key="i"
-        class="min-h-[114px] p-4 rounded-lg border border-dashed border-backgroundBorder flex flex-row items-center gap-6"
-      >
-        <div class="flex flex-col gap-2 flex-grow">
-          <VaSkeleton class height="1.5rem" variant="text" width="10rem" />
-          <div class="flex gap-4">
-            <VaSkeleton height="3rem" variant="rounded" width="5rem" />
-            <VaSkeleton :lines="2" variant="text" />
-          </div>
-        </div>
+      <div v-for="i in 4" :key="i" class="skeleton-card">
+        <VaSkeleton class="h-32 w-full rounded-lg" />
       </div>
     </template>
     <template v-else>
-      <CardListItem
-        v-for="paymentCard in list"
-        :key="paymentCard.id"
-        :card="paymentCard"
-        @edit="cardToEdit = paymentCard"
-        @remove="remove(paymentCard)"
-      />
-      <div
-        class="sm:h-[114px] p-4 rounded-lg border border-dashed border-primary flex flex-col sm:flex-row items-start sm:items-center gap-4"
-        :style="{ backgroundColor: colorToRgba(getColor('primary'), 0.07) }"
-      >
-        <div class="flex flex-col gap-2 flex-grow">
-          <div class="text-lg font-bold leading-relaxed">Important note</div>
-          <div class="text-secondary text-sm leading-tight">
-            Please carefully read Product Terms before adding your new payment card
+      <div v-for="paymentCard in list" :key="paymentCard.id" 
+           class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+        <CardListItem
+          :card="paymentCard"
+          @edit="cardToEdit = paymentCard"
+          @remove="remove(paymentCard)"
+        />
+      </div>
+
+      <div class="p-6 bg-primary bg-opacity-5 rounded-lg border-2 border-dashed border-primary">
+        <div class="flex flex-col gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">Add Payment Method</h3>
+            <p class="text-sm text-gray-600">
+              Please carefully read Product Terms before adding your new payment card
+            </p>
           </div>
+          <VaButton 
+            class="w-full sm:w-auto" 
+            color="primary"
+            @click="showCreate = true"
+          >
+            <VaIcon name="add" class="mr-2" />
+            Add New Card
+          </VaButton>
         </div>
-        <VaButton class="flex-none w-full sm:w-auto" @click="showCreate = true">Add card</VaButton>
       </div>
     </template>
   </div>
-  <PaymentCardCreateModal v-if="showCreate" @close="showCreate = false" />
-  <PaymentCardUpdateModal v-if="cardToEdit" :payment-card="cardToEdit" @close="cardToEdit = undefined" />
+
+  <PaymentCardCreateModal 
+    v-if="showCreate" 
+    :payment-card="defaultCard"
+    @close="showCreate = false" 
+  />
+  <PaymentCardUpdateModal 
+    v-if="cardToEdit" 
+    :payment-card="cardToEdit" 
+    @close="cardToEdit = undefined" 
+  />
 </template>
 
 <script lang="ts" setup>
 import CardListItem from './PaymentCardListItem.vue'
-import { usePaymentCardsStore } from '../../../../stores/payment-cards'
+import { usePaymentCardsStore } from '../../store/payment-cards'
 import { computed, ref } from 'vue'
 import { useColors } from 'vuestic-ui'
-import { PaymentCard } from '../../types'
+import { PaymentCard, PaymentSystemType } from '../../types'
 import { useModal, useToast } from 'vuestic-ui'
 import PaymentCardCreateModal from './PaymentCardCreateModal.vue'
 import PaymentCardUpdateModal from './PaymentCardUpdateModal.vue'
@@ -75,4 +82,19 @@ const remove = async (card: PaymentCard) => {
 }
 
 const { getColor, colorToRgba } = useColors()
+
+const defaultCard: PaymentCard = {
+  id: '',
+  name: '',
+  isPrimary: false,
+  paymentSystem: PaymentSystemType.Visa,
+  cardNumberMasked: '',
+  expirationDate: ''
+}
 </script>
+
+<style scoped>
+.skeleton-card {
+  @apply p-4 rounded-lg border border-gray-200;
+}
+</style>

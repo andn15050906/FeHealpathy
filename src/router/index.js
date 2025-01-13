@@ -27,6 +27,9 @@ import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import StressAssessment from '@/views/Practice/HabitTracking/components/StressAssessment.vue'
 import NotFound from '@/pages/404/404.vue'
+import Settings from '@/pages/settings/Settings.vue'
+import FaqPage from '@/pages/faq/FaqPage.vue'
+import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -171,6 +174,21 @@ const router = createRouter({
       path: '/stress-assessment',
       name: 'StressAssessment',
       component: StressAssessment
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings
+    },
+    {
+      path: '/faq',
+      name: 'FAQ',
+      component: FaqPage
+    },
+    {
+      path: '/payments',
+      name: 'Payments',
+      component: PaymentsPage
     }
   ]
 })
