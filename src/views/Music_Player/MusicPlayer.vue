@@ -3,9 +3,7 @@
         <div class="time-control">
             <p class="time-control__current">{{ getTime(songInfo.currentTime) }}</p>
             <div class="track">
-                <div class="track__bar" :style="{
-                    background: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`
-                }">
+                <div class="track__bar">
                     <input type="range" min="0" :max="songInfo.duration || 0" :value="songInfo.currentTime"
                         @input="dragHandler" class="track__input" />
                     <div class="track__animate" :style="trackAnim"></div>
@@ -94,11 +92,11 @@ export default {
 <style scoped>
 .music-player {
     width: 100%;
-    height: 28%;
+    height: 26%;
     background-color: #fff;
     border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.8rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -109,20 +107,20 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 1rem;
+    justify-content: space-between; 
 }
 
 .time-control__current,
 .time-control__total {
     font-size: 1rem;
     color: #666;
+    text-align: center; 
 }
 
 .track {
     width: 100%;
     height: 0.5rem;
-    background-color: #eee;
+    background-color: #b7b7b7;
     border-radius: 0.25rem;
     margin: 0 1rem;
     position: relative;
@@ -136,7 +134,6 @@ export default {
     width: 100%;
     position: relative;
     z-index: 1;
-    background: linear-gradient(to right, #2ab3bf, #205950);
     border-radius: 0.25rem;
 }
 
@@ -160,11 +157,9 @@ export default {
     appearance: none;
     height: 1.4rem;
     width: 1.4rem;
-    background-color: #fff;
-    /* Màu trắng */
+    background-color: #ffffff;
     border-radius: 50%;
-    border: 2px solid #2ab3bf;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     cursor: pointer;
     position: relative;
     z-index: 3;

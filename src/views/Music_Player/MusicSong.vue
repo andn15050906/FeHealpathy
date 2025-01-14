@@ -23,25 +23,25 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 10px;
 }
 
 .music-song__cover {
-    width: 240px;
-    height: 240px;
+    width: 180px;
+    height: 180px;
     object-fit: cover;
     border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .music-song__title {
-    margin-top: 1.5rem;
-    font-size: 2rem;
+    margin-top: 1rem;
+    font-size: 1.5rem;
     font-weight: 600;
 }
 
 .music-song__artist {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: #666;
 }
 </style>

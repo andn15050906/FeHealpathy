@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import InputOptions from "./InputOptions.vue";
-import SelectOptions from "./SelectOptions.vue";
+import InputOptions from "../../components/ProfileComponents/InputOptions.vue";
+import SelectOptions from "../../components/ProfileComponents/SelectOptions.vue";
 
 export default {
     components: { InputOptions, SelectOptions },

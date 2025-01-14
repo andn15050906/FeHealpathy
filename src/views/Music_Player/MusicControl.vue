@@ -3,10 +3,12 @@
         <div class="content d-flex">
             <div class="main-content" :class="{ 'main-content--shrinked': libraryStatus }">
                 <MusicSong :current-song="currentSong" />
+
                 <MusicPlayer :current-song="currentSong" :is-playing="isPlaying" :audio-ref="audioRef"
-                    :song-info="songInfo" :songs="songs" @set-current-song="selectSong"
-                    @update-song-info="updateSongInfo" @toggle-is-playing="toggleIsPlaying"
+                    :song-info="songInfo" @update-song-info="updateSongInfo" @toggle-is-playing="toggleIsPlaying"
                     @skip-track="skipTrackHandler" />
+
+                <MusicLibrary :songs="songs" :current-song-id="currentSong.id" @select-song="selectSong" />
             </div>
         </div>
 
@@ -19,31 +21,39 @@
 import { ref, reactive, onMounted } from "vue";
 import MusicPlayer from "./MusicPlayer.vue";
 import MusicSong from "./MusicSong.vue";
+import MusicLibrary from "./MusicLibrary.vue";
 
 export default {
     name: "MusicControl",
     components: {
         MusicPlayer,
         MusicSong,
+        MusicLibrary,
     },
     setup() {
         const songs = reactive([
             {
-                name: "Bản nhạc dở 1",
+                name: "Bản nhạc 1",
                 cover: "https://i.scdn.co/image/ab67616d0000b273331cabd7863a2d675633bca4",
                 artist: "Hoàng Minh",
                 audio: "https://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3",
-                color: ["#205950", "#2ab3bf"],
-                id: "0",
+                id: "1",
                 active: true,
             },
             {
-                name: "Bản nhạc dở 2",
-                cover: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/1b/67/4a/1b674adb-8249-641c-ab7e-81443642e6f2/cover.jpg/1200x1200bf-60.jpg",
+                name: "Bản nhạc 2",
+                cover: "https://i.scdn.co/image/ab67616d0000b273331cabd7863a2d675633bca4",
                 artist: "Hoàng Minh",
                 audio: "https://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3",
-                color: ["#a6c4ff", "#a2ffec"],
-                id: "1",
+                id: "2",
+                active: false,
+            },
+            {
+                name: "Bản nhạc 3",
+                cover: "https://i.scdn.co/image/ab67616d0000b273331cabd7863a2d675633bca4",
+                artist: "Hoàng Minh",
+                audio: "https://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3",
+                id: "3",
                 active: false,
             },
         ]);
@@ -92,7 +102,6 @@ export default {
 
         const selectSong = (song) => {
             setCurrentSong(song);
-            audioRef.value.src = song.audio;
             if (isPlaying.value) {
                 audioRef.value.play();
             }
@@ -116,6 +125,12 @@ export default {
         };
 
         onMounted(() => {
+            songs.forEach((song) => {
+                const audio = new Audio(song.audio);
+                audio.addEventListener("loadedmetadata", () => {
+                    song.duration = audio.duration;
+                });
+            });
             audioRef.value.src = currentSong.value.audio;
         });
 
@@ -155,9 +170,5 @@ export default {
 
 .main-content--shrinked {
     margin-left: 20%;
-}
-
-.btn {
-    transition: background-color 0.3s ease;
 }
 </style>

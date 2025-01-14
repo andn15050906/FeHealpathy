@@ -25,7 +25,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
-import SettingUp from '@/components/ProfileComponents/SettingUp.vue'
+import SettingUp from '@/views/Profile/SettingUp.vue'
 import MusicControl from '@/views/Music_Player/MusicControl.vue'
 
 
