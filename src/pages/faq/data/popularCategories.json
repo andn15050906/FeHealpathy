@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "icon": "diversity_1",
+    "name": "Getting Started",
+    "intro": "Learn how to start using HEALPATHY effectively."
+  },
+  {
+    "id": 2,
+    "icon": "monitor_heart",
+    "name": "Health Tracking",
+    "intro": "Track and monitor your health progress."
+  },
+  {
+    "id": 3,
+    "icon": "groups",
+    "name": "Community",
+    "intro": "Connect with others and share experiences."
+  },
+  {
+    "id": 4,
+    "icon": "fitness_center",
+    "name": "Exercise & Fitness",
+    "intro": "Access workout plans and fitness tips."
+  },
+  {
+    "id": 5,
+    "icon": "restaurant_menu",
+    "name": "Nutrition",
+    "intro": "Get nutrition advice and meal planning help."
+  },
+  {
+    "id": 6,
+    "icon": "psychology",
+    "name": "Mental Health",
+    "intro": "Resources for mental wellness support."
+  }
+]

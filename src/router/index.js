@@ -25,6 +25,11 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import StressAssessment from '@/views/Practice/HabitTracking/components/StressAssessment.vue'
+import NotFound from '@/pages/404/404.vue'
+import Settings from '@/pages/settings/Settings.vue'
+import FaqPage from '@/pages/faq/FaqPage.vue'
+import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
 import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
 import Happy from '@/views/MoodRecording/MoodCart/Happy.vue'
 import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
@@ -42,6 +47,15 @@ import CreateGroupVue from '@/components/GroupComponents/CreateGroup.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/404',
+      name: 'NotFound', 
+      component: NotFound
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    },
     {
       path: '/',
       name: 'Home',
@@ -248,6 +262,26 @@ const router = createRouter({
       path: '/practice/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
+    },
+    {
+      path: '/stress-assessment',
+      name: 'StressAssessment',
+      component: StressAssessment
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings
+    },
+    {
+      path: '/faq',
+      name: 'FAQ',
+      component: FaqPage
+    },
+    {
+      path: '/payments',
+      name: 'Payments',
+      component: PaymentsPage
     }
   ]
 })
