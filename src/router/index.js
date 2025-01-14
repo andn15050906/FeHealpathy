@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HomePage from '@/views/HomePage.vue'
-import SignIn from '@/views/Profile/SignInAndRegister.vue'
+import SignIn from '@/views/Profile/SignIn.vue'
 import ChangePassword from '@/views/Profile/ChangePassword.vue'
 import ForgotPassword from '@/views/Profile/ForgotPassword.vue'
 import ResetPassword from '@/views/Profile/ResetPassword.vue'
@@ -30,6 +30,19 @@ import NotFound from '@/pages/404/404.vue'
 import Settings from '@/pages/settings/Settings.vue'
 import FaqPage from '@/pages/faq/FaqPage.vue'
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
+import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
+import Happy from '@/views/MoodRecording/MoodCart/Happy.vue'
+import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
+import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
+import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
+import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
+import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
+import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
+import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
+import DailyQuestion from '@/views/QuestionOfTheDay/DailyQuestion.vue'
+import BlogDetail from '@/views/Blogs/BlogDetail.vue'
+import Register from '@/views/Profile/Register.vue'
+import CreateGroupVue from '@/components/GroupComponents/CreateGroup.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +65,11 @@ const router = createRouter({
       path: '/blogs',
       name: 'blogCatalog',
       component: BlogCatalog
+    },
+    {
+      path: '/blogs/:id',
+      name: 'blogDetail',
+      component: BlogDetail
     },
     {
       path: '/search-blogs',
@@ -105,6 +123,11 @@ const router = createRouter({
       component: SignIn
     },
     {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
+    {
       path: '/change-password',
       name: 'changePassword',
       component: ChangePassword
@@ -135,6 +158,76 @@ const router = createRouter({
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
     },
+    {
+      path: '/mood-overview',
+      name: 'moodOverview',
+      component: MoodOverview
+    },
+    {
+      path: '/mood-cart/happy',
+      name: 'happyCart',
+      component: Happy
+    },
+    {
+      path: '/mood-cart/sad',
+      name: 'sadCart',
+      component: Sad
+    },
+    {
+      path: '/mood-cart/angry',
+      name: 'angryCart',
+      component: Angry
+    },
+    {
+      path: '/mood-cart/eager',
+      name: 'eagerCart',
+      component: Eager
+    },
+    {
+      path: '/mood-cart/anxiety',
+      name: 'anxietyCart',
+      component: Anxiety
+    },
+    {
+      path: '/diary/diary-writing',
+      name: 'diaryWriting',
+      component: DiaryWriting
+    },
+    {
+      path: '/diary/diary-list',
+      name: 'diaryList',
+      component: DiaryList
+    },
+    {
+      path: '/emotion-tracking',
+      name: 'emotionTracking',
+      component: EmotionTracking
+    },
+    {
+      path: '/daily-question',
+      name: 'dailyQuestion',
+      component: DailyQuestion
+    },
+    {
+      path: '/create-group',
+      name: 'createGroup',
+      component: CreateGroupVue
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     {
       path: '/assignments/create',
       name: 'CreateAssignment',

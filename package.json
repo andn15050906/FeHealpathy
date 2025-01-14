@@ -22,6 +22,7 @@
     "chart.js": "^4.4.2",
     "emoji-mart-vue-fast": "^15.0.3",
     "firebase": "^10.8.1",
+    "quill": "^2.0.3",
     "sweetalert2": "^11.10.6",
     "vite-plugin-vuetify": "^2.0.4",
     "vue": "^3.4.15",
@@ -30,7 +31,8 @@
     "vue-i18n": "^11.0.1",
     "vue-router": "^4.3.0",
     "vuestic-ui": "^1.10.3",
-    "vuetify": "^3.7.5",
+    "vue3-quill": "^0.3.1",
+    "vuetify": "^3.7.6",
     "vuex": "^4.1.0",
     "webfontloader": "^1.6.28"
   },

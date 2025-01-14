@@ -6,6 +6,7 @@ import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
 import SweetAlert from './components/Common/SweetAlert.vue';
+import QuestionNotification from './views/QuestionOfTheDay/QuestionNotification.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -38,18 +39,24 @@ onMounted(() => {
   });
 });
 
+const headerRef = ref(null);
+const handleAuthenticated = (data) => {
+  headerRef.value.fetchUserProfile();
+}
+
 </script>
 <template>
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <Header />
+    <Header ref="headerRef" />
     <main>
       <div class="page-container">
-        <RouterView />
+        <RouterView @authenticated="handleAuthenticated" />
       </div>
     </main>
     <Footer />
+    <QuestionNotification />
   </div>
 </template>
 
