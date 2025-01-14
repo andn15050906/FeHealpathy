@@ -6,6 +6,7 @@ import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
 import SweetAlert from './components/Common/SweetAlert.vue';
+import QuestionNotification from './views/QuestionOfTheDay/QuestionNotification.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -55,6 +56,7 @@ const handleAuthenticated = (data) => {
       </div>
     </main>
     <Footer />
+    <QuestionNotification />
   </div>
 </template>
 
