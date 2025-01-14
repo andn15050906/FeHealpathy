@@ -49,7 +49,7 @@ const router = createRouter({
   routes: [
     {
       path: '/404',
-      name: 'NotFound', 
+      name: 'NotFound',
       component: NotFound
     },
     {
@@ -213,21 +213,6 @@ const router = createRouter({
       name: 'createGroup',
       component: CreateGroupVue
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
       path: '/assignments/create',
       name: 'CreateAssignment',
