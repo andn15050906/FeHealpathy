@@ -25,7 +25,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
-import StressAssessment from '@/views/Practice/HabitTracking/components/StressAssessment.vue'
+import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
 import NotFound from '@/pages/404/404.vue'
 import Settings from '@/pages/settings/Settings.vue'
 import FaqPage from '@/pages/faq/FaqPage.vue'
@@ -154,12 +154,17 @@ const router = createRouter({
       component: ViewUserProfile
     },
     {
+      path: '/practice/yoga',
+      name: 'yoga',
+      component: YogaView
+    },
+    {
       path: '/Practice/Yoga/:id',
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
     },
     {
-      path: '/mood-overview',
+      path: '/mood',
       name: 'moodOverview',
       component: MoodOverview
     },
@@ -199,14 +204,24 @@ const router = createRouter({
       component: DiaryList
     },
     {
+      path: '/daily-question',
+      name: 'dailyQuestion',
+      component: DailyQuestion
+    },
+    {
       path: '/emotion-tracking',
       name: 'emotionTracking',
       component: EmotionTracking
     },
     {
-      path: '/daily-question',
-      name: 'dailyQuestion',
-      component: DailyQuestion
+      path: '/self-assessment',
+      name: 'SelfAssessment',
+      component: SelfAssessment
+    },
+    {
+      path: '/habit-tracking',
+      name: 'habitTracking',
+      component: HabitTracking,
     },
     {
       path: '/create-group',
@@ -237,21 +252,6 @@ const router = createRouter({
       path: '/assignments/:id/attempt',
       name: 'AttemptAssignment',
       component: AttemptAssignment
-    },
-    {
-      path: '/practice/yoga',
-      name: 'yoga',
-      component: YogaView
-    },
-    {
-      path: '/practice/habit-tracking',
-      name: 'habitTracking',
-      component: HabitTracking,
-    },
-    {
-      path: '/stress-assessment',
-      name: 'StressAssessment',
-      component: StressAssessment
     },
     {
       path: '/settings',
