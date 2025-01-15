@@ -3,13 +3,11 @@
     <div>
       <div v-html="content"></div>
     </div>
-    <RelatedPosts />
   </article>
 </template>
 
 <script>
 import MockApi from '@/api/MockApi';
-import RelatedPosts from './RelatedPosts.vue';
 
 export default {
   name: 'BlogContent',
@@ -18,9 +16,6 @@ export default {
       content: MockApi.getBlogContent(1)
     }
   },
-  components: {
-    RelatedPosts
-  }
 }
 </script>
 

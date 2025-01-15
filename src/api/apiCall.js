@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { backendApiBase } from './env';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7277/api', 
+  baseURL: backendApiBase,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json', 
+    'Content-Type': 'application/json',
   },
 });
 
