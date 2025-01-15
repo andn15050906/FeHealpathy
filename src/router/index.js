@@ -26,6 +26,8 @@ import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
+import SettingUp from '@/views/Profile/SettingUp.vue'
+import MusicControl from '@/views/Music_Player/MusicControl.vue'
 import NotFound from '@/pages/404/404.vue'
 import Settings from '@/pages/settings/Settings.vue'
 import FaqPage from '@/pages/faq/FaqPage.vue'
@@ -252,6 +254,31 @@ const router = createRouter({
       path: '/assignments/:id/attempt',
       name: 'AttemptAssignment',
       component: AttemptAssignment
+    },
+    {
+      path: '/practice/yoga',
+      name: 'yoga',
+      component: YogaView
+    },
+    {
+      path: '/practice/habit-tracking',
+      name: 'habitTracking',
+      component: HabitTracking,
+    },
+    {
+      path: '/setting-up',
+      name: 'SettingUp',
+      component: SettingUp
+    },
+    {
+      path: '/musics',
+      name: 'MusicControl',
+      component: MusicControl
+    },
+    {
+      path: '/stress-assessment',
+      name: 'StressAssessment',
+      component: StressAssessment
     },
     {
       path: '/settings',
