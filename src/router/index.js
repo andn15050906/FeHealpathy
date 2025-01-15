@@ -271,14 +271,9 @@ const router = createRouter({
       component: SettingUp
     },
     {
-      path: '/musics',
+      path: '/media-library',
       name: 'MusicControl',
       component: MusicControl
-    },
-    {
-      path: '/stress-assessment',
-      name: 'StressAssessment',
-      component: StressAssessment
     },
     {
       path: '/settings',

@@ -11,9 +11,9 @@
       <RouterLink :to="'self-assessment'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
     <GlowingCard primaryColor="#12c2e9" secondaryColor="#c471ed">
-      <h2>LIBRARY</h2>
+      <h2>MEDIA LIBRARY</h2>
       <p>Tiếp cận nguồn tài nguyên đa phương tiện của bạn</p>
-      <RouterLink :to="'habit-tracking'" class="arrow-btn">→</RouterLink>
+      <RouterLink :to="'media-library'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
     <GlowingCard primaryColor="#5614B0" secondaryColor="#F29492">
       <h2>DIARY</h2>
