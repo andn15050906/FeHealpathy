@@ -16,13 +16,19 @@
 
     <div class="form-group">
       <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-      <input
-        type="text"
-        id="keywords"
-        v-model="blog.keywords"
-        placeholder="Cập nhập từ khóa, cách nhau bằng dấu phẩy"
-      />
-      <small class="hint">Ví dụ: yoga, helth, meditation, soothaway</small>
+        <multiselect
+          v-model="selectedKeywords"
+          :options="availableKeywords"
+          :multiple="true"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :preserve-search="true"
+          placeholder="Chọn từ khóa"
+          label="name"
+          track-by="name"
+          class="multiselect"
+        ></multiselect>
+      <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
     </div>
 
       <div class="form-group">
@@ -92,28 +98,42 @@
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
+
 export default {
   name: "BlogUpdate",
+  components: {
+    Multiselect,
+  },
   data() {
-  return {
-    blog: {
-      title: "Khám phá Yoga và Sức khỏe",
-      keywords: "yoga, sức khỏe, thể chất",
-      image: null,
-      previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png",
-      sections: [
-  {
-    title: "Lợi ích của Yoga",
-    image: null,
-    previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png", // Hình ảnh mẫu
-    content:
-      "Yoga không chỉ giúp tăng cường sức khỏe thể chất mà còn giúp cải thiện sức khỏe tinh thần, giảm căng thẳng và cải thiện giấc ngủ.",
-  }
-],
-    },
-    previewImage: null,
-  };
-},
+    return {
+      blog: {
+        title: "Khám phá Yoga và Sức khỏe",
+        keywords: "",
+        image: null,
+        previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png",
+        sections: [
+          {
+            title: "Lợi ích của Yoga",
+            image: null,
+            previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png",
+            content: "Yoga không chỉ giúp tăng cường sức khỏe thể chất mà còn giúp cải thiện sức khỏe tinh thần, giảm căng thẳng và cải thiện giấc ngủ.",
+          },
+        ],
+      },
+      previewImage: null,
+      selectedKeywords: [],
+      availableKeywords: [
+        { name: "Yoga" },
+        { name: "Sức khỏe" },
+        { name: "Thiền" },
+        { name: "Giảm căng thẳng" },
+        { name: "Thể chất" },
+        { name: "Meditation" },
+      ],
+    };
+  },
   methods: {
     handleImageUpload(event) {
       const file = event.target.files[0];
@@ -126,29 +146,6 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    mounted() {
-  this.blog = {
-    title: "Khám phá Yoga và Sức khỏe",
-    keywords: "yoga, sức khỏe, thể chất",
-    image: null,
-    sections: [
-      {
-        title: "Lợi ích của Yoga",
-        image: null,
-        previewImage: "https://via.placeholder.com/200x150",
-        content:
-          "Yoga không chỉ giúp tăng cường sức khỏe thể chất mà còn giúp cải thiện sức khỏe tinh thần, giảm căng thẳng và cải thiện giấc ngủ.",
-      },
-      {
-        title: "Các bài tập Yoga cơ bản",
-        image: null,
-        previewImage: "https://via.placeholder.com/200x150",
-        content:
-          "Dành cho người mới bắt đầu, các bài tập như Tư thế Núi, Tư thế Chó úp mặt, và Tư thế Chiến binh là những bài tập hiệu quả và dễ thực hiện.",
-      },
-    ],
-  };
-},
     addSection() {
       this.blog.sections.push({
         title: "",
@@ -176,7 +173,9 @@ export default {
         alert("Vui lòng nhập tiêu đề blog!");
         return;
       }
-      alert("Blog đã được tạo thành công!");
+      // Gắn từ khóa đã chọn vào blog.keywords
+      this.blog.keywords = this.selectedKeywords.map((keyword) => keyword.name).join(", ");
+      alert("Blog đã được tạo thành công với từ khóa: " + this.blog.keywords);
       this.resetForm();
     },
     resetForm() {
@@ -185,11 +184,11 @@ export default {
         image: null,
         sections: [],
       };
+      this.selectedKeywords = [];
       this.previewImage = null;
     },
   },
 };
-
 </script>
 
 <style scoped>
@@ -290,5 +289,54 @@ textarea {
 
 .btn:hover {
   opacity: 0.9;
+}
+.multiselect {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.multiselect__tags {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.multiselect__input {
+  font-size: 1rem;
+  margin-left: 5px;
+  padding: 5px;
+  border: none;
+  outline: none;
+}
+
+.multiselect--active {
+  border-color: #007bff;
+}
+
+.multiselect__tag {
+  background: #007bff;
+  color: #fff;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 2px 5px 2px 0;
+}
+
+.multiselect__tag:hover {
+  background: #0056b3;
+}
+
+.multiselect__clear {
+  color: #007bff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.multiselect__clear:hover {
+  color: #0056b3;
 }
 </style>
