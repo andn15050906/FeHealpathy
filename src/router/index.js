@@ -225,11 +225,6 @@ const router = createRouter({
       component: HabitTracking,
     },
     {
-      path: '/create-group',
-      name: 'createGroup',
-      component: CreateGroupVue
-    },
-    {
       path: '/assignments/create',
       name: 'CreateAssignment',
       component: CreateAssignment
