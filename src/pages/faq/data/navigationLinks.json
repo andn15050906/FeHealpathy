@@ -1,0 +1,55 @@
+{
+  "Getting Started": [
+    {
+      "name": "How to create an account"
+    },
+    {
+      "name": "Profile setup guide"
+    },
+    {
+      "name": "Security and privacy"
+    },
+    {
+      "name": "Basic navigation"
+    }
+  ],
+  "Health Tracking": [
+    {
+      "name": "Track your daily activities"
+    },
+    {
+      "name": "Monitor health metrics"
+    },
+    {
+      "name": "Set health goals"
+    },
+    {
+      "name": "View progress reports"
+    }
+  ],
+  "Community Features": [
+    {
+      "name": "Join health groups"
+    },
+    {
+      "name": "Participate in discussions"
+    },
+    {
+      "name": "Share experiences"
+    },
+    {
+      "name": "Connect with others"
+    }
+  ],
+  "Support & Help": [
+    {
+      "name": "Contact support team"
+    },
+    {
+      "name": "Report issues"
+    },
+    {
+      "name": "Feedback submission"
+    }
+  ]
+}

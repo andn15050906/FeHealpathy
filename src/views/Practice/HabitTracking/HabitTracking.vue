@@ -1,427 +1,301 @@
 <template>
-  <div class="habit-tracking">
-    <!-- Phần Mood Chart -->
-    <div class="mood-chart-section">
-      <h2>Biểu Đồ Tâm Trạng</h2>
-      <!--<line-chart :chart-data="moodChartData" :options="moodChartOptions" :width="400" :height="200" />-->
-      <div class="mood-selection">
-        <h3>Tâm trạng hôm nay của bạn?</h3>
-        <div class="mood-icons">
-          <span v-for="mood in moods" :key="mood.id" @click="selectMood(mood)"
-            :class="{ active: currentMood === mood.id }">
-            {{ mood.icon }}
-          </span>
-        </div>
-      </div>
+  <div id="app" class="container mt-5">
+    <h1 class="text-center mb-4">Habit Tracker</h1>
+    <div class="month-controls mb-4 text-center">
+      <span @click="previousMonth" class="icon-clickable">
+        <i class="fas fa-chevron-left"></i>
+      </span>
+      <span class="mx-3">{{ currentMonthYear }}</span>
+      <span @click="nextMonth" class="icon-clickable">
+        <i class="fas fa-chevron-right"></i>
+      </span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-bordered habit-table">
+        <thead class="thead-light">
+          <tr>
+            <th class="habit-column" rowspan="2">Habits</th>
+            <th v-for="day in firstHalfDays" :key="day" class="day-column">{{ day }}</th>
+            <th class="goal-column" rowspan="2">Goal</th>
+            <th class="achieved-column" rowspan="2">Achieved</th>
+          </tr>
+          <tr v-if="daysOfMonth.length > 16">
+            <th v-for="day in secondHalfDays" :key="day" class="day-column">{{ day }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(habit, habitIndex) in habits" :key="habitIndex">
+            <tr>
+              <td class="habit-column" rowspan="2">{{ habit.name }}</td>
+              <td v-for="(date, dateIndex) in firstHalfDays" :key="dateIndex"
+                :class="{ completed: habit.completedDates.includes(date), 'past-date': isPastDate(date), 'future-date': isFutureDate(date) }"
+                @click="toggleCompletion(habit, date)" class="day-column">
+              </td>
+              <td class="goal-column" rowspan="2">{{ habit.goal }}</td>
+              <td class="achieved-column" rowspan="2">{{ habit.completedDates.length }}</td>
+            </tr>
+            <tr>
+              <td v-for="(date, dateIndex) in secondHalfDays" :key="dateIndex"
+                :class="{ completed: habit.completedDates.includes(date), 'past-date': isPastDate(date), 'future-date': isFutureDate(date) }"
+                @click="toggleCompletion(habit, date)" class="day-column">
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    
+    <span @click="showReport = !showReport" class="text-primary cursor-pointer small-report">Report</span>
+    <div v-if="showReport">
+      <PieChart :habits="habits" />
+    </div>
+    <div class="controls mt-4 text-left">
+      <span @click="showAddHabitForm = true" class="icon-clickable border p-2">
+        <i class="fas fa-plus"></i> Add new habit
+      </span>
     </div>
 
-    <!-- Grid layout cho các cards -->
-    <div class="tracking-grid">
-      <!-- Sleep Quality Card -->
-      <div class="tracking-card sleep-card">
-        <h3>Chất Lượng Giấc Ngủ</h3>
-        <div class="sleep-input">
-          <div class="input-group">
-            <label>Hôm nay bạn ngủ mấy tiếng?</label>
-            <input type="number" v-model="sleepData.hours" min="0" max="24" @change="updateSleepData"
-              class="cute-input" />
-          </div>
-          <div class="input-group">
-            <label>Chất lượng giấc ngủ?</label>
-            <div class="sleep-quality-rating">
-              <span v-for="n in 5" :key="n" @click="setSleepQuality(n)"
-                :class="{ active: sleepData.quality >= n * 2 }">⭐</span>
-            </div>
-          </div>
+    <transition name="fade">
+      <div v-if="showAddHabitForm" class="add-habit-form mt-4 p-4 border rounded bg-light">
+        <h3 class="mb-3">Add New Habit</h3>
+        <div class="mb-3">
+          <label for="habitName" class="form-label">Habit Name</label>
+          <input type="text" class="form-control" id="habitName" v-model="newHabitName">
         </div>
-        <div class="sleep-stats">
-          <div class="stat-box">
-            <span class="label">Số giờ ngủ</span>
-            <span class="value">{{ totalSleepHours }}h</span>
-          </div>
-          <div class="stat-box">
-            <span class="label">Chất lượng</span>
-            <span class="value">{{ sleepQuality }}/10</span>
-          </div>
+        <div class="mb-3">
+          <label for="habitGoal" class="form-label">Goal</label>
+          <input type="number" class="form-control" id="habitGoal" v-model="newHabitGoal" :max="remainingDaysInMonth">
+          <small class="form-text text-muted">Max goal of this month: {{ remainingDaysInMonth }}</small>
         </div>
-        <!--<bar-chart :chart-data="sleepChartData" :options="sleepChartOptions" :width="400" :height="200" />-->
-      </div>
-
-      <!-- Nutrition Card -->
-      <div class="tracking-card nutrition-card">
-        <h3>Dinh Dưỡng Hôm Nay</h3>
-        <!--<pie-chart :chart-data="nutritionChartData" :options="nutritionChartOptions" :width="400" :height="200" />-->
-        <div class="nutrition-recommendations">
-          <h4>Gợi ý cho bạn:</h4>
-          <ul>
-            <li v-for="(rec, index) in currentNutritionRecommendation.split('\n')" :key="index">
-              {{ rec }}
-            </li>
-          </ul>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-secondary me-2" @click="showAddHabitForm = false">Cancel</button>
+          <button class="btn btn-primary" @click="addNewHabit">Add Habit</button>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
+<script>
+import { reactive, ref, computed } from 'vue';
+import PieChart from './components/PieChart.vue';
+
+export default {
+  name: 'HabitTracker',
+  components: {
+    PieChart,
+  },
+  setup() {
+    const habits = reactive([
+      { name: 'Exercise', completedDates: ['1', '2', '3', '4', '5'], goal: 5 },
+      { name: 'Reading', completedDates: ['1', '2', '3'], goal: 5 },
+      { name: 'Meditation', completedDates: ['1', '2'], goal: 5 },
+      { name: 'Sleep', completedDates: ['1', '2', '3', '4'], goal: 5 },
+    ]);
+    const today = new Date();
+    const currentMonth = ref(today.getMonth());
+    const currentYear = ref(today.getFullYear());
+    const showReport = ref(false);
+
+    const daysOfMonth = computed(() => {
+      const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
+      return Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    });
+
+    const firstHalfDays = computed(() => daysOfMonth.value.slice(0, 16));
+    const secondHalfDays = computed(() => daysOfMonth.value.slice(16));
+
+    const currentMonthYear = computed(() => {
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      return `${monthNames[currentMonth.value]} ${currentYear.value}`;
+    });
+
+    const remainingDaysInMonth = computed(() => {
+      const todayDate = today.getDate();
+      return daysOfMonth.value.length - todayDate + 1;
+    });
+
+    const showAddHabitForm = ref(false);
+    const newHabitName = ref('');
+    const newHabitGoal = ref(1);
+
+    const addNewHabit = () => {
+      if (newHabitName.value && !isNaN(newHabitGoal.value) && newHabitGoal.value <= remainingDaysInMonth.value) {
+        habits.push({ name: newHabitName.value, completedDates: [], goal: newHabitGoal.value });
+        newHabitName.value = '';
+        newHabitGoal.value = 1;
+        showAddHabitForm.value = false;
+      }
+    };
+
+    const toggleCompletion = (habit, date) => {
+      if (!isPastDate(date) && !isFutureDate(date)) {
+        const index = habit.completedDates.indexOf(date);
+        if (index > -1) {
+          habit.completedDates.splice(index, 1);
+        } else {
+          habit.completedDates.push(date);
+        }
+      }
+    };
+
+    const previousMonth = () => {
+      if (currentMonth.value === 0) {
+        currentMonth.value = 11;
+        currentYear.value -= 1;
+      } else {
+        currentMonth.value -= 1;
+      }
+      renewHabitsForNewMonth();
+    };
+
+    const nextMonth = () => {
+      if (currentMonth.value === 11) {
+        currentMonth.value = 0;
+        currentYear.value += 1;
+      } else {
+        currentMonth.value += 1;
+      }
+      renewHabitsForNewMonth();
+    };
+
+    const renewHabitsForNewMonth = () => {
+      habits.forEach(habit => {
+        habit.completedDates = habit.completedDates.filter(date => date <= daysOfMonth.value.length);
+      });
+    };
+
+    const isPastDate = date => {
+      const currentDate = new Date(currentYear.value, currentMonth.value, date);
+      return currentDate < today.setHours(0, 0, 0, 0);
+    };
+
+    const isFutureDate = date => {
+      const currentDate = new Date(currentYear.value, currentMonth.value, date);
+      return currentDate > today.setHours(0, 0, 0, 0);
+    };
+
+    return {
+      habits,
+      daysOfMonth,
+      firstHalfDays,
+      secondHalfDays,
+      currentMonthYear,
+      remainingDaysInMonth,
+      showAddHabitForm,
+      newHabitName,
+      newHabitGoal,
+      addNewHabit,
+      toggleCompletion,
+      previousMonth,
+      nextMonth,
+      isPastDate,
+      isFutureDate,
+      showReport,
+    };
+  },
+};
+</script>
+
 <style scoped>
-.habit-tracking {
-  padding: 20px;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+.controls {
+  margin-top: 20px;
+  text-align: left;
 }
 
-.tracking-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.tracking-card {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.mood-icons {
-  display: flex;
-  gap: 15px;
-  font-size: 24px;
+.icon-clickable {
   cursor: pointer;
-}
-
-.mood-icons span.active {
-  transform: scale(1.2);
-}
-
-.mood-chart-section {
-  margin-bottom: 30px;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.sleep-stats {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.total-sleep,
-.sleep-quality {
-  font-size: 24px;
-  font-weight: bold;
-  color: #5488c7;
-}
-
-.sleep-input {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.cute-input {
-  border: 2px solid #e1e1e1;
-  border-radius: 10px;
-  padding: 8px 15px;
-  font-size: 16px;
-  width: 80px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.cute-input:focus {
-  border-color: #75c9c8;
-  box-shadow: 0 0 0 3px rgba(117, 201, 200, 0.2);
-}
-
-.sleep-quality-rating {
-  display: flex;
-  gap: 8px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.sleep-quality-rating span {
-  opacity: 0.3;
-  transition: all 0.2s ease;
-}
-
-.sleep-quality-rating span.active {
-  opacity: 1;
-}
-
-.stat-box {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
 }
 
-.stat-box .label {
-  font-size: 14px;
-  color: #666;
+.month-controls {
+  margin-bottom: 20px;
 }
 
-.stat-box .value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #75c9c8;
+.table-container {
+  overflow-x: auto;
+  width: 100%;
 }
 
-.nutrition-recommendations {
+.habit-table {
+  width: 100%;
+  border-collapse: collapse;
   margin-top: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  table-layout: fixed;
 }
 
-.nutrition-recommendations ul {
-  list-style-type: none;
-  padding: 0;
+.habit-table th,
+.habit-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.nutrition-recommendations li {
-  padding: 8px 0;
-  border-bottom: 1px dashed #ddd;
-  color: #666;
+.habit-table th {
+  background-color: #f4f4f4;
+}
+
+.habit-table .day-column {
+  width: 45px;
+}
+
+.habit-table .habit-column {
+  width: 150px;
+  height: 60px;
+}
+
+.habit-table .goal-column,
+.habit-table .achieved-column {
+  width: 90px;
+}
+
+.habit-table td.completed {
+  background-color: #d1ffd6;
+  cursor: pointer;
+}
+
+.habit-table td.past-date {
+  background-color: #ffcccc;
+  cursor: not-allowed;
+}
+
+.habit-table td.future-date {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.add-habit-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.text-primary {
+  color: #007bff;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.small-report {
+  font-size: 0.9rem;
 }
 </style>
-
-<script>
-import { Line as LineChart, Bar as BarChart, Pie as PieChart } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js'
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-)
-
-export default {
-  name: 'HabitTracking',
-  components: {
-    LineChart,
-    BarChart,
-    PieChart
-  },
-  data() {
-    return {
-      moods: [
-        { id: 'happy', icon: '😊', label: 'Vui vẻ' },
-        { id: 'neutral', icon: '😐', label: 'Bình thường' },
-        { id: 'sad', icon: '😔', label: 'Buồn' },
-        { id: 'stressed', icon: '😫', label: 'Căng thẳng' }
-      ],
-      currentMood: null,
-      sleepData: {
-        hours: 0,
-        quality: 0
-      },
-      nutritionRecommendations: {
-        lowSleep: [
-          'Thực phẩm giàu tryptophan',
-          'Thực phẩm giàu magie',
-          'Hạn chế caffeine'
-        ],
-        highSleep: [
-          'Thực phẩm giàu năng lượng',
-          'Vitamin B'
-        ]
-        // Thêm các recommendations khác
-      },
-      moodChartData: {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-        datasets: [{
-          label: 'Tâm trạng',
-          data: [4, 3, 5, 2, 4, 5, 4],
-          borderColor: '#75c9c8',
-          tension: 0.4,
-          fill: true,
-          backgroundColor: 'rgba(117, 201, 200, 0.1)'
-        }]
-      },
-      sleepChartData: {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-        datasets: [{
-          label: 'Giờ ngủ',
-          data: [7, 6.5, 8, 7.5, 6, 9, 7.5],
-          backgroundColor: 'rgba(165, 214, 167, 0.8)'
-        }]
-      },
-      nutritionChartData: {
-        labels: ['Protein', 'Carbs', 'Chất béo'],
-        datasets: [{
-          label: 'Phân bố dinh dưỡng',
-          data: [30, 50, 20],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(255, 205, 86, 0.8)'
-          ]
-        }]
-      },
-      moodChartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 5
-          }
-        }
-      },
-      sleepChartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      },
-      nutritionChartOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      },
-      totalSleepHours: 7,
-      sleepQuality: 8
-    }
-  },
-  computed: {
-    currentNutritionRecommendation() {
-      // Logic để trả về recommendation dựa trên sleep và mood
-      return this.generateRecommendation()
-    }
-  },
-  methods: {
-    selectMood(mood) {
-      this.currentMood = mood.id
-      this.updateMoodChart()
-    },
-    generateRecommendation() {
-      let recommendations = [];
-
-      // Kiểm tra giấc ngủ
-      if (this.sleepData.hours < 6) {
-        recommendations.push(...this.nutritionRecommendations.lowSleep);
-      } else if (this.sleepData.hours > 9) {
-        recommendations.push(...this.nutritionRecommendations.highSleep);
-      }
-
-      // Kiểm tra tâm trạng
-      if (this.currentMood) {
-        switch (this.currentMood) {
-          case 'stressed':
-            recommendations.push('Thực phẩm giàu omega-3', 'Vitamin C');
-            break;
-          case 'sad':
-            recommendations.push('Thực phẩm giàu vitamin D', 'Thực phẩm giàu serotonin');
-            break;
-        }
-      }
-
-      return recommendations.join('\n');
-    },
-    updateMoodChart() {
-      const moodValues = {
-        'happy': 5,
-        'neutral': 3,
-        'sad': 2,
-        'stressed': 1
-      };
-
-      const newData = [...this.moodChartData.datasets[0].data];
-      newData.shift();
-      newData.push(moodValues[this.currentMood]);
-      this.moodChartData.datasets[0].data = newData;
-    },
-    setSleepQuality(stars) {
-      this.sleepData.quality = stars * 2
-      this.updateSleepData()
-    },
-    updateSleepData() {
-      this.totalSleepHours = this.sleepData.hours;
-      this.sleepQuality = this.sleepData.quality;
-
-      // Cập nhật biểu đồ
-      const newData = [...this.sleepChartData.datasets[0].data];
-      newData.shift();
-      newData.push(this.sleepData.hours);
-      this.sleepChartData.datasets[0].data = newData;
-    },
-    initializeChartData() {
-      // Mood chart
-      this.moodChartData = {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-        datasets: [{
-          label: 'Tâm trạng',
-          data: [4, 3, 5, 2, 4, 5, 4],
-          borderColor: '#75c9c8',
-          tension: 0.4,
-          fill: true,
-          backgroundColor: 'rgba(117, 201, 200, 0.1)'
-        }]
-      };
-
-      // Sleep chart  
-      this.sleepChartData = {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-        datasets: [{
-          label: 'Giờ ngủ',
-          data: [7, 6.5, 8, 7.5, 6, 9, 7.5],
-          backgroundColor: 'rgba(165, 214, 167, 0.8)'
-        }]
-      };
-
-      // Nutrition chart
-      this.nutritionChartData = {
-        labels: ['Protein', 'Carbs', 'Chất béo'],
-        datasets: [{
-          label: 'Phân bố dinh dư���ng',
-          data: [30, 50, 20],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(255, 205, 86, 0.8)'
-          ]
-        }]
-      };
-    }
-  },
-  mounted() {
-    // Khởi tạo dữ liệu ban đầu cho charts
-    this.initializeChartData();
-  },
-  watch: {
-    'moodChartData.labels'(newLabels) {
-      this.sleepChartData.labels = [...newLabels];
-    }
-  }
-}
-</script>

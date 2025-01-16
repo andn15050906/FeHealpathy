@@ -25,6 +25,23 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
+import SettingUp from '@/views/Profile/SettingUp.vue'
+import MusicControl from '@/views/Music_Player/MusicControl.vue'
+import NotFound from '@/pages/404/404.vue'
+import Settings from '@/pages/settings/Settings.vue'
+import FaqPage from '@/pages/faq/FaqPage.vue'
+import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
+import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
+import Happy from '@/views/MoodRecording/MoodCart/Happy.vue'
+import Sad from '@/views/MoodRecording/MoodCart/Sad.vue'
+import Angry from '@/views/MoodRecording/MoodCart/Angry.vue'
+import Eager from '@/views/MoodRecording/MoodCart/Eager.vue'
+import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
+import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
+import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
+import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
+import DailyQuestion from '@/views/QuestionOfTheDay/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
 import CreateBlog from '@/views/Blogs/CreateBlog.vue'
@@ -34,6 +51,15 @@ import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/404',
+      name: 'NotFound',
+      component: NotFound
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    },
     {
       path: '/',
       name: 'Home',
@@ -147,23 +173,80 @@ const router = createRouter({
       component: ViewUserProfile
     },
     {
+      path: '/practice/yoga',
+      name: 'yoga',
+      component: YogaView
+    },
+    {
       path: '/Practice/Yoga/:id',
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
+    {
+      path: '/mood',
+      name: 'moodOverview',
+      component: MoodOverview
+    },
+    {
+      path: '/mood-cart/happy',
+      name: 'happyCart',
+      component: Happy
+    },
+    {
+      path: '/mood-cart/sad',
+      name: 'sadCart',
+      component: Sad
+    },
+    {
+      path: '/mood-cart/angry',
+      name: 'angryCart',
+      component: Angry
+    },
+    {
+      path: '/mood-cart/eager',
+      name: 'eagerCart',
+      component: Eager
+    },
+    {
+      path: '/mood-cart/anxiety',
+      name: 'anxietyCart',
+      component: Anxiety
+    },
+    {
+      path: '/diary/diary-writing',
+      name: 'diaryWriting',
+      component: DiaryWriting
+    },
+    {
+      path: '/diary/diary-list',
+      name: 'diaryList',
+      component: DiaryList
+    },
+    {
+      path: '/daily-question',
+      name: 'dailyQuestion',
+      component: DailyQuestion
+    },
+    {
+      path: '/emotion-tracking',
+      name: 'emotionTracking',
+      component: EmotionTracking
+    },
+    {
+      path: '/self-assessment',
+      name: 'SelfAssessment',
+      component: SelfAssessment
+    },
+    {
+      path: '/habit-tracking',
+      name: 'habitTracking',
+      component: HabitTracking,
+    },
+    {
+      path: '/create-group',
+      name: 'createGroup',
+      component: CreateGroupVue
+    },
     {
       path: '/assignments/create',
       name: 'CreateAssignment',
@@ -198,6 +281,31 @@ const router = createRouter({
       path: '/practice/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
+    },
+    {
+      path: '/setting-up',
+      name: 'SettingUp',
+      component: SettingUp
+    },
+    {
+      path: '/media-library',
+      name: 'MusicControl',
+      component: MusicControl
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings
+    },
+    {
+      path: '/faq',
+      name: 'FAQ',
+      component: FaqPage
+    },
+    {
+      path: '/payments',
+      name: 'Payments',
+      component: PaymentsPage
     }
   ]
 })

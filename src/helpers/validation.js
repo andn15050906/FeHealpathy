@@ -1,7 +1,7 @@
 const handleFormSubmit = async (callback, sweetAlert) => {
     const result = await sweetAlert.showAlert({
-        title: text.Confirm,
-        text: text.ConfirmQuestion,
+        title: 'Confirmation',
+        text: 'Are you sure you want to update this item?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes, update it!',

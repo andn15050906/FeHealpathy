@@ -5,17 +5,30 @@
       <p>Khám phá sự cân bằng và thư giãn qua các bài tập Yoga chuyên nghiệp, cải thiện cả thể chất và tinh thần.</p>
       <RouterLink :to="'practice/yoga'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
-    <GlowingCard primaryColor="#ff4b5c" secondaryColor="#F29492">
-      <h2>GYM</h2>
-      <p>
-        Nâng cao thể lực, sức khỏe và hình thể qua các bài tập Gym hiệu quả cùng chương trình tập luyện thông minh.
-      </p>
-      <RouterLink :to="'GymExerciseDetail'" class="arrow-btn">→</RouterLink>
+    <GlowingCard primaryColor="#ff4b5c" secondaryColor="#DBD65C">
+      <h2>SELF ASSESSMENT</h2>
+      <p>Đánh giá bản thân bằng những bài test đã được kiểm nghiệm</p>
+      <RouterLink :to="'self-assessment'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
-    <GlowingCard primaryColor="#5614B0" secondaryColor="#DBD65C">
+    <GlowingCard primaryColor="#12c2e9" secondaryColor="#c471ed">
+      <h2>MEDIA LIBRARY</h2>
+      <p>Tiếp cận nguồn tài nguyên đa phương tiện của bạn</p>
+      <RouterLink :to="'media-library'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
+    <GlowingCard primaryColor="#5614B0" secondaryColor="#F29492">
+      <h2>DIARY</h2>
+      <p>Ghi lại suy nghĩ, cảm xúc và nhận diện các tác nhân ảnh hưởng tới cảm xúc</p>
+      <RouterLink :to="'diary/diary-list'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
+    <GlowingCard primaryColor="#1CD8D2" secondaryColor="#93EDC7">
+      <h2>MOOD PATTERN</h2>
+      <p>Nhận diện xu hướng tâm lý dựa vào trạng thái cảm xúc hàng ngày</p>
+      <RouterLink :to="'mood'" class="arrow-btn">→</RouterLink>
+    </GlowingCard>
+    <GlowingCard primaryColor="#4776E6" secondaryColor="#8E54E9">
       <h2>HABIT TRACKER</h2>
       <p>Hình thành lối sống lành mạnh thông qua sự rèn luyện và thích nghi.</p>
-      <RouterLink :to="'practice/habit-tracking'" class="arrow-btn">→</RouterLink>
+      <RouterLink :to="'habit-tracking'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
   </div>
 </template>
@@ -38,6 +51,8 @@ export default {
   align-items: center;
   gap: 40px;
   height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 h2 {
