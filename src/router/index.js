@@ -22,8 +22,6 @@ import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
-import CreateGroup from '@/views/Community/CreateGroup.vue'
-import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
 import SettingUp from '@/views/Profile/SettingUp.vue'
@@ -44,7 +42,8 @@ import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 import DailyQuestion from '@/views/QuestionOfTheDay/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
-import CreateGroupVue from '@/components/GroupComponents/CreateGroup.vue'
+import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
+import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
