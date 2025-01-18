@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "agree": "Tôi đồng ý.",
+    "createAccount": "Tạo tài khoản",
+    "email": "Email",
+    "login": "Đăng nhập",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "resetPassword": "Đặt lại mật khẩu",
+    "submit": "Gửi",
+    "cancel": "Hủy"
+  },
+  "home": {
+    "welcome": "Chào mừng đến với HEALPATHY",
+    "description": "Nơi bạn tìm thấy sự bình yên và sức khỏe."
+  },
+  "error": {
+    "notFound": "Không tìm thấy trang.",
+    "serverError": "Đã xảy ra lỗi trên máy chủ."
+  },
+  "language": {
+    "brazilian_portuguese": "Tiếng Bồ Đào Nha",
+    "english": "Tiếng Anh",
+    "spanish": "Tiếng Tây Ban Nha",
+    "simplified_chinese": "Tiếng Trung giản thể",
+    "persian": "Tiếng Ba Tư"
+  }
+}
