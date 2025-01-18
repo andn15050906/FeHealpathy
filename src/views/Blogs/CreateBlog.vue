@@ -14,16 +14,22 @@
           />
         </div>
   
-      <div class="form-group">
-        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-        <input
-          type="text"
-          id="keywords"
-          v-model="blog.keywords"
-          placeholder="Nhập từ khóa, cách nhau bằng dấu phẩy"
-        />
-        <small class="hint">Ví dụ: yoga, helth, meditation, soothaway</small>
-      </div>
+        <div class="form-group">
+      <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
+        <multiselect
+          v-model="selectedKeywords"
+          :options="availableKeywords"
+          :multiple="true"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :preserve-search="true"
+          placeholder="Chọn từ khóa"
+          label="name"
+          track-by="name"
+          class="multiselect"
+        ></multiselect>
+      <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
+    </div>
 
         <div class="form-group">
           <label for="image">🖼️ Hình ảnh Blog</label>
@@ -92,16 +98,31 @@
   </template>
   
   <script>
+  import Multiselect from 'vue-multiselect';
+  import 'vue-multiselect/dist/vue-multiselect.min.css';
   export default {
     name: "BlogCreation",
+    components: {
+    Multiselect,
+  },
     data() {
       return {
         blog: {
           title: "",
+          keywords: "",
           image: null,
           sections: [],
         },
         previewImage: null,
+        selectedKeywords: [],
+      availableKeywords: [
+        { name: "Yoga" },
+        { name: "Sức khỏe" },
+        { name: "Thiền" },
+        { name: "Giảm căng thẳng" },
+        { name: "Thể chất" },
+        { name: "Meditation" },
+      ],
       };
     },
     methods: {
@@ -143,8 +164,9 @@
           alert("Vui lòng nhập tiêu đề blog!");
           return;
         }
-        alert("Blog đã được tạo thành công!");
-        this.resetForm();
+        this.blog.keywords = this.selectedKeywords.map((keyword) => keyword.name).join(", ");
+      alert("Blog đã được tạo thành công với từ khóa: " + this.blog.keywords);
+      this.resetForm();
       },
       resetForm() {
         this.blog = {
@@ -152,6 +174,7 @@
           image: null,
           sections: [],
         };
+        this.selectedKeywords = [];
         this.previewImage = null;
       },
     },
@@ -257,5 +280,54 @@
   .btn:hover {
     opacity: 0.9;
   }
+  .multiselect {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.multiselect__tags {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.multiselect__input {
+  font-size: 1rem;
+  margin-left: 5px;
+  padding: 5px;
+  border: none;
+  outline: none;
+}
+
+.multiselect--active {
+  border-color: #007bff;
+}
+
+.multiselect__tag {
+  background: #007bff;
+  color: #fff;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 2px 5px 2px 0;
+}
+
+.multiselect__tag:hover {
+  background: #0056b3;
+}
+
+.multiselect__clear {
+  color: #007bff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.multiselect__clear:hover {
+  color: #0056b3;
+}
   </style>
   

@@ -173,9 +173,8 @@ export default {
         alert("Vui lòng nhập tiêu đề blog!");
         return;
       }
-      // Gắn từ khóa đã chọn vào blog.keywords
       this.blog.keywords = this.selectedKeywords.map((keyword) => keyword.name).join(", ");
-      alert("Blog đã được tạo thành công với từ khóa: " + this.blog.keywords);
+      alert("Blog đã được cập nhật thành công với từ khóa: " + this.blog.keywords);
       this.resetForm();
     },
     resetForm() {

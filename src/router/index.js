@@ -47,6 +47,10 @@ import Register from '@/views/Profile/Register.vue'
 import CreateBlog from '@/views/Blogs/CreateBlog.vue'
 import ManageBlog from '@/views/Blogs/ManageBlog.vue'
 import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
+import ManageCourse from '@/views/Courses/ManageCourse.vue'
+import CreateCourse from '@/views/Courses/CreateCourse.vue'
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -104,6 +108,16 @@ const router = createRouter({
       path: '/courses',
       name: 'courseList',
       component: CourseList
+    },
+    {
+      path: '/courses/create',
+      name: 'createCourse',
+      component: CreateCourse
+    },
+    {
+      path: '/courses/manage',
+      name: 'manageCourse',
+      component: ManageCourse
     },
     {
       path: '/community',
@@ -245,7 +259,7 @@ const router = createRouter({
     {
       path: '/create-group',
       name: 'createGroup',
-      component: CreateGroupVue
+      component: CreateGroup,
     },
     {
       path: '/assignments/create',
