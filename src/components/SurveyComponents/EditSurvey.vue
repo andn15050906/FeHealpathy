@@ -1,6 +1,16 @@
 <template>
     <div class="survey-container">
         <h1 class="title">Survey Editor</h1>
+        <div class="survey-details">
+            <div class="form-input">
+                <label class="form-label">Survey Name *</label>
+                <input v-model="survey.name" class="input-field" />
+            </div>
+            <div class="form-input">
+                <label class="form-label">Description *</label>
+                <textarea v-model="survey.description" class="input-field"></textarea>
+            </div>
+        </div>
         <div class="question-list">
             <div v-for="(question, questionIndex) in questions" :key="questionIndex" class="question-card">
                 <button class="btn-icon delete-question-btn" @click="removeQuestion(questionIndex)">
@@ -61,27 +71,30 @@
 import { ref, onMounted } from 'vue';
 
 // Fake data
+
+const survey = ref({ name: 'Demo Survey', description: 'This is a demo survey for testing purposes.' });
+
 const fakeQuestions = [
-  {
-    content: 'What is Vue.js?',
-    explanation: 'Explain what Vue.js is in brief.',
-    answers: [
-      { content: 'A JavaScript framework', isCorrect: true },
-      { content: 'An HTML preprocessor', isCorrect: false },
-      { content: 'A CSS library', isCorrect: false },
-      { content: 'A database', isCorrect: false },
-    ],
-  },
-  {
-    content: 'Which company developed Vue.js?',
-    explanation: 'Identify the company which developed Vue.js.',
-    answers: [
-      { content: 'Google', isCorrect: false },
-      { content: 'Microsoft', isCorrect: false },
-      { content: 'Facebook', isCorrect: false },
-      { content: 'Evan You (individual developer)', isCorrect: true },
-    ],
-  },
+    {
+        content: 'What is Vue.js?',
+        explanation: 'Explain what Vue.js is in brief.',
+        answers: [
+            { content: 'A JavaScript framework', isCorrect: true },
+            { content: 'An HTML preprocessor', isCorrect: false },
+            { content: 'A CSS library', isCorrect: false },
+            { content: 'A database', isCorrect: false },
+        ],
+    },
+    {
+        content: 'Which company developed Vue.js?',
+        explanation: 'Identify the company which developed Vue.js.',
+        answers: [
+            { content: 'Google', isCorrect: false },
+            { content: 'Microsoft', isCorrect: false },
+            { content: 'Facebook', isCorrect: false },
+            { content: 'Evan You (individual developer)', isCorrect: true },
+        ],
+    },
 ];
 
 // Initialize questions with fake data
@@ -89,42 +102,42 @@ const questions = ref([]);
 const isLoading = ref(false);
 
 onMounted(() => {
-  questions.value = fakeQuestions;
+    questions.value = fakeQuestions;
 });
 
 function addQuestion() {
-  questions.value.push({
-    content: '',
-    explanation: '',
-    answers: [{ content: '', isCorrect: false }],
-  });
+    questions.value.push({
+        content: '',
+        explanation: '',
+        answers: [{ content: '', isCorrect: false }],
+    });
 }
 
 function removeQuestion(index) {
-  questions.value.splice(index, 1);
+    questions.value.splice(index, 1);
 }
 
 function addAnswer(questionIndex) {
-  questions.value[questionIndex].answers.push({ content: '', isCorrect: false });
+    questions.value[questionIndex].answers.push({ content: '', isCorrect: false });
 }
 
 function removeAnswer(questionIndex, answerIndex) {
-  questions.value[questionIndex].answers.splice(answerIndex, 1);
+    questions.value[questionIndex].answers.splice(answerIndex, 1);
 }
 
 async function saveAllQuestions() {
-  isLoading.value = true;
-  try {
-    const payload = questions.value.map((q) => ({
-      content: q.content,
-      explanation: q.explanation,
-      answers: q.answers,
-    }));
-  } catch (error) {
-    console.error('Error saving survey:', error);
-  } finally {
-    isLoading.value = false;
-  }
+    isLoading.value = true;
+    try {
+        questions.value.map((q) => ({
+            content: q.content,
+            explanation: q.explanation,
+            answers: q.answers,
+        }));
+    } catch (error) {
+        console.error('Error saving survey:', error);
+    } finally {
+        isLoading.value = false;
+    }
 }
 
 </script>
@@ -247,7 +260,7 @@ async function saveAllQuestions() {
 }
 
 .btn-primary {
-    background-color: #3f51b5;
+    background-color: #863fb5;
     color: #fff;
     padding: 10px 20px;
     border: none;
@@ -257,7 +270,7 @@ async function saveAllQuestions() {
 }
 
 .btn-primary:hover {
-    background-color: #303f9f;
+    background-color: #863fb5;
 }
 
 .form-footer {
@@ -266,18 +279,30 @@ async function saveAllQuestions() {
     margin-top: 30px;
 }
 
+.survey-details {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    margin-bottom: 30px;
+}
+
+.form-input {
+    margin-bottom: 20px;
+}
+
 .form-button {
     padding: 10px 20px;
     font-size: 16px;
     font-weight: 600;
     color: #fff;
-    background-color: #3f51b5;
+    background-color: #863fb5;
     border-radius: 6px;
     transition: background-color 0.3s ease;
 }
 
 .form-button:hover {
-    background-color: #303f9f;
+    background-color: #863fb5;
 }
 
 .form-button:disabled {
@@ -295,10 +320,6 @@ async function saveAllQuestions() {
 }
 
 .input-field:focus {
-    border-bottom-color: #3f51b5;
-}
-
-.form-input {
-    margin-bottom: 20px;
+    border-bottom-color: #863fb5;
 }
 </style>

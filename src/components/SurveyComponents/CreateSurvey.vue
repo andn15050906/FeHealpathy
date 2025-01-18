@@ -263,7 +263,7 @@ async function saveSurvey() {
 }
 
 .btn-primary {
-    background-color: #3f51b5;
+    background-color: #863fb5;
     color: #fff;
     padding: 10px 20px;
     border: none;
@@ -273,7 +273,7 @@ async function saveSurvey() {
 }
 
 .btn-primary:hover {
-    background-color: #303f9f;
+    background-color: #863fb5;
 }
 
 .add-question-btn {
@@ -293,13 +293,13 @@ async function saveSurvey() {
     font-size: 16px;
     font-weight: 600;
     color: #fff;
-    background-color: #3f51b5;
+    background-color: #863fb5;
     border-radius: 6px;
     transition: background-color 0.3s ease;
 }
 
 .form-button:hover {
-    background-color: #303f9f;
+    background-color: #863fb5;
 }
 
 .form-button:disabled {
@@ -317,6 +317,6 @@ async function saveSurvey() {
 }
 
 .input-field:focus {
-    border-bottom-color: #3f51b5;
+    border-bottom-color: #863fb5;
 }
 </style>
