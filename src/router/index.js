@@ -49,6 +49,7 @@ import ManageBlog from '@/views/Blogs/ManageBlog.vue'
 import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
 import ManageCourse from '@/views/Courses/ManageCourse.vue'
 import CreateCourse from '@/views/Courses/CreateCourse.vue'
+import UpdateCourse from '@/views/Courses/UpdateCourse.vue'
 
 
 
@@ -118,6 +119,11 @@ const router = createRouter({
       path: '/courses/manage',
       name: 'manageCourse',
       component: ManageCourse
+    },
+    {
+      path: '/courses/update',
+      name: 'updateCourse',
+      component: UpdateCourse
     },
     {
       path: '/community',
