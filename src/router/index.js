@@ -45,6 +45,7 @@ import Register from '@/views/Profile/Register.vue'
 import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
+import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -289,6 +290,11 @@ const router = createRouter({
       path: '/create-survey',
       name: 'CreateSurvey',
       component: CreateSurvey
+    },
+    {
+      path: '/edit-survey',
+      name: 'EditSurvey',
+      component: EditSurvey
     }
   ]
 })

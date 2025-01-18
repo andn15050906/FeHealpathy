@@ -1,19 +1,9 @@
 <template>
     <div class="survey-container">
-        <h1 class="title">Create Survey</h1>
-        <div class="survey-details">
-            <div class="form-input">
-                <label class="form-label">Survey Name *</label>
-                <input v-model="survey.name" class="input-field" />
-            </div>
-            <div class="form-input">
-                <label class="form-label">Description *</label>
-                <textarea v-model="survey.description" class="input-field"></textarea>
-            </div>
-        </div>
+        <h1 class="title">Survey Editor</h1>
         <div class="question-list">
             <div v-for="(question, questionIndex) in questions" :key="questionIndex" class="question-card">
-                <button class="btn-icon" id="btn-deleteQuestion" @click="removeQuestion(questionIndex)">
+                <button class="btn-icon delete-question-btn" @click="removeQuestion(questionIndex)">
                     <i class="fas fa-trash-alt"></i>
                 </button>
                 <h2 class="section-title">Question {{ questionIndex + 1 }}</h2>
@@ -37,12 +27,11 @@
                         <div v-for="(answer, answerIndex) in question.answers" :key="answerIndex" class="answer-row">
                             <v-text-field v-model="answer.content" label="Answer Content" outlined
                                 :placeholder="'Answer ' + (answerIndex + 1)" class="answer-input" />
-                            <label class="checkbox-label"> 
-                                <input type="checkbox" v-model="answer.isCorrect" class="checkbox-input"> 
-                                Correct Answer 
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="answer.isCorrect" class="checkbox-input">
+                                Correct Answer
                             </label>
-                            <button class="btn-icon" id="btn-deleteAnswer"
-                                @click="removeAnswer(questionIndex, answerIndex)">
+                            <button class="btn-icon" @click="removeAnswer(questionIndex, answerIndex)">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -55,13 +44,13 @@
         </div>
 
         <!-- Add New Question -->
-        <button class="btn-gray" id="btn-add-question" @click="addQuestion">
+        <button class="btn-gray add-question-btn" @click="addQuestion">
             Add New Question
         </button>
 
         <!-- Save All Questions -->
         <div class="form-footer">
-            <button type="submit" class="btn-primary" :loading="isLoading" @click="saveSurvey">
+            <button type="submit" class="btn-primary form-button" :loading="isLoading" @click="saveAllQuestions">
                 Save Survey
             </button>
         </div>
@@ -69,65 +58,75 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-// Initialize survey details and questions data
-const survey = ref({
-    name: '',
-    description: ''
-});
+// Fake data
+const fakeQuestions = [
+  {
+    content: 'What is Vue.js?',
+    explanation: 'Explain what Vue.js is in brief.',
+    answers: [
+      { content: 'A JavaScript framework', isCorrect: true },
+      { content: 'An HTML preprocessor', isCorrect: false },
+      { content: 'A CSS library', isCorrect: false },
+      { content: 'A database', isCorrect: false },
+    ],
+  },
+  {
+    content: 'Which company developed Vue.js?',
+    explanation: 'Identify the company which developed Vue.js.',
+    answers: [
+      { content: 'Google', isCorrect: false },
+      { content: 'Microsoft', isCorrect: false },
+      { content: 'Facebook', isCorrect: false },
+      { content: 'Evan You (individual developer)', isCorrect: true },
+    ],
+  },
+];
 
-const questions = ref([
-    {
-        content: '',
-        explanation: '',
-        answers: [
-            { content: '', isCorrect: false },
-        ],
-    },
-]);
-
+// Initialize questions with fake data
+const questions = ref([]);
 const isLoading = ref(false);
 
+onMounted(() => {
+  questions.value = fakeQuestions;
+});
+
 function addQuestion() {
-    questions.value.push({
-        content: '',
-        explanation: '',
-        answers: [{ content: '', isCorrect: false }],
-    });
+  questions.value.push({
+    content: '',
+    explanation: '',
+    answers: [{ content: '', isCorrect: false }],
+  });
 }
 
 function removeQuestion(index) {
-    questions.value.splice(index, 1);
+  questions.value.splice(index, 1);
 }
 
 function addAnswer(questionIndex) {
-    questions.value[questionIndex].answers.push({ content: '', isCorrect: false });
+  questions.value[questionIndex].answers.push({ content: '', isCorrect: false });
 }
 
 function removeAnswer(questionIndex, answerIndex) {
-    questions.value[questionIndex].answers.splice(answerIndex, 1);
+  questions.value[questionIndex].answers.splice(answerIndex, 1);
 }
 
-async function saveSurvey() {
-    isLoading.value = true;
-    try {
-        const payload = {
-            name: survey.value.name,
-            description: survey.value.description,
-            questions: questions.value
-        };
-
-        console.log('Saving survey:', payload);
-
-        // Simulate API call
-        // await api.saveSurvey(payload);
-    } catch (error) {
-        console.error('Error saving survey:', error);
-    } finally {
-        isLoading.value = false;
-    }
+async function saveAllQuestions() {
+  isLoading.value = true;
+  try {
+    const payload = questions.value.map((q) => ({
+      content: q.content,
+      explanation: q.explanation,
+      answers: q.answers,
+    }));
+  } catch (error) {
+    console.error('Error saving survey:', error);
+  } finally {
+    isLoading.value = false;
+  }
 }
+
 </script>
 
 <style scoped>
@@ -149,18 +148,6 @@ async function saveSurvey() {
     color: #333;
 }
 
-.survey-details {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    margin-bottom: 30px;
-}
-
-.form-input {
-    margin-bottom: 20px;
-}
-
 .question-list {
     display: flex;
     flex-direction: column;
@@ -178,7 +165,6 @@ async function saveSurvey() {
 }
 
 .checkbox-label {
-    margin-top: -20px;
     display: flex;
     align-items: center;
     margin-left: auto;
@@ -194,7 +180,7 @@ async function saveSurvey() {
     background-color: #bbb;
 }
 
-#btn-add-question {
+.add-question-btn {
     margin-top: 20px;
     display: block;
     margin-left: auto;
@@ -238,11 +224,13 @@ async function saveSurvey() {
     margin-left: auto;
 }
 
-#btn-deleteQuestion {
+.delete-question-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    z-index: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-icon {
@@ -252,10 +240,6 @@ async function saveSurvey() {
     cursor: pointer;
     color: #666;
     font-size: 18px;
-}
-
-#btn-deleteAnswer {
-    margin-top: -20px;
 }
 
 .btn-icon:hover {
@@ -274,12 +258,6 @@ async function saveSurvey() {
 
 .btn-primary:hover {
     background-color: #303f9f;
-}
-
-.add-question-btn {
-    margin-top: 20px;
-    display: block;
-    margin-left: auto;
 }
 
 .form-footer {
@@ -318,5 +296,9 @@ async function saveSurvey() {
 
 .input-field:focus {
     border-bottom-color: #3f51b5;
+}
+
+.form-input {
+    margin-bottom: 20px;
 }
 </style>
