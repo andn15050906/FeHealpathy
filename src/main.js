@@ -4,6 +4,7 @@ import { createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { createPinia } from 'pinia'
 
 // Styles
 import 'vuestic-ui/css'
@@ -51,12 +52,14 @@ const vuetify = createVuetify({
 })
 
 const app = createApp(App)
+const pinia = createPinia()
 
 // Register plugins
 app.use(router)
 app.use(i18n)
 app.use(vuetify)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
+app.use(pinia)
 
 // Mount app
 app.mount('#app')

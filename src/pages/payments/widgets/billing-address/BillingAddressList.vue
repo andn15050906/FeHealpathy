@@ -43,34 +43,81 @@
 </template>
 
 <script lang="ts" setup>
+import CardListItem from './BillingAddressListItem.vue'
 import { computed, ref } from 'vue'
-import { useModal, useToast, useColors } from 'vuestic-ui'
+import { useModal, useToast } from 'vuestic-ui'
 import AddressCreateModal from './BillingAddressCreateModal.vue'
 import AddressUpdateModal from './BillingAddressUpdateModal.vue'
-import CardListItem from './BillingAddressListItem.vue'
+import { useBillingAddressesStore } from '../../../payments/store/billingAddressStore'
 import { BillingAddress } from '../../types'
-import { billingAddressStore } from '../../store/billingAddressStore'
+import { useColors } from 'vuestic-ui'
 
-const list = computed(() => billingAddressStore.allBillingAddresses)
-const loading = computed(() => billingAddressStore.loading)
+const store = useBillingAddressesStore()
+
+const list = computed(() => store.allBillingAddresses)
+const loading = computed(() => store.loading)
 const { confirm } = useModal()
 
 const showCreate = ref<boolean>(false)
 const addressToEdit = ref<BillingAddress>()
 const { init } = useToast()
 
-billingAddressStore.load()
-const remove = async (card: BillingAddress) => {
+store.load()
+const remove = async (address: BillingAddress) => {
   confirm({
     message: 'Are you really sure you want to delete this address?',
     size: 'small',
     maxWidth: '380px',
   }).then((ok) => {
     if (!ok) return
-    billingAddressStore.remove(card.id)
+    store.remove(address.id)
     init({ message: 'Billing Address has been deleted', color: 'success' })
   })
 }
 
 const { getColor, colorToRgba } = useColors()
 </script>
+
+<style scoped>
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.address-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.address-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.primary-label {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.address-info {
+  font-weight: normal;
+}
+
+.important-note {
+  background-color: #e0f7fa;
+  border: 1px solid #b2ebf2;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.add-address-button {
+  margin-top: 10px;
+}
+</style>

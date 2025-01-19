@@ -19,7 +19,13 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 
-const notifications = ref([
+interface Notification {
+  key: string
+  isEnabled: boolean
+  name: string
+}
+
+const notifications = ref<Notification[]>([
   {
     name: 'New post notifications',
     isEnabled: true,
@@ -42,8 +48,8 @@ const notifications = ref([
   }
 ])
 
-const saveNotificationSettings = (notification) => {
-  localStorage.setItem(`notification_${notification.key}`, notification.isEnabled)
+const saveNotificationSettings = (notification: Notification) => {
+  localStorage.setItem(`notification_${notification.key}`, notification.isEnabled.toString());
 }
 
 // Load saved settings
