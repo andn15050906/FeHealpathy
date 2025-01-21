@@ -17,9 +17,10 @@ export const Default = () => ({
         isPrimary: false,
         street: 'Ap #285-7193 Ullamcorper Avenue',
         city: 'Amesbury',
-        state: 'HI',
-        postalCode: '93373',
+        ward: 'Ward 1',
+        district: 'District 1',
         country: 'US',
+        phone: '123-456-7890'
       } satisfies BillingAddress,
       lastEvent: '___',
     }

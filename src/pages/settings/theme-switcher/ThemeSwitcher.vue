@@ -1,27 +1,40 @@
 <template>
-  <VaButtonToggle v-model="theme" color="background-element" border-color="background-element" :options="options" />
+  <div class="theme-switcher">
+    <va-button-toggle
+      v-model="currentTheme"
+      :options="options"
+      color="primary"
+      @change="toggleTheme"
+    />
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useColors } from 'vuestic-ui'
+import { ref, onMounted } from 'vue'
+import { useTheme } from 'vuetify'
 
-const { applyPreset, currentPresetName } = useColors()
-
-const theme = computed({
-  get() {
-    return currentPresetName.value
-  },
-  set(value) {
-    applyPreset(value)
-  },
-})
-
-const { t } = useI18n()
+const theme = useTheme()
+const currentTheme = ref('light')
 
 const options = [
-  { label: t('buttonSelect.dark'), value: 'dark' },
-  { label: t('buttonSelect.light'), value: 'light' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' }
 ]
+
+const toggleTheme = () => {
+  theme.global.name.value = currentTheme.value
+  document.body.setAttribute('data-theme', currentTheme.value)
+}
+
+onMounted(() => {
+  currentTheme.value = theme.global.name.value
+})
 </script>
+
+<style scoped>
+.theme-switcher {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+}
+</style>
