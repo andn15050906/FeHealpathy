@@ -16,15 +16,9 @@
         <div class="content-section">
             <div class="content-header">
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Upload image" 
-                    class="upload-icon" 
-                    tabindex="0" 
-                    @click="handleImageUpload" />
+                    alt="Upload image" class="upload-icon" tabindex="0" @click="handleImageUpload" />
             </div>
-            <textarea 
-                class="memory-content" 
-                placeholder="Type any things.." 
-                v-model="memoryContent"
+            <textarea class="memory-content" placeholder="Type any things.." v-model="memoryContent"
                 aria-label="Memory content">
             </textarea>
         </div>
@@ -34,6 +28,8 @@
 </template>
 
 <script>
+import { createDiaryNote } from "@/services/diaryNoteService";
+
 export default {
     name: 'MemoryEntryForm',
     created() {
@@ -46,11 +42,38 @@ export default {
             memoryTitle: '',
             memoryDate: '',
             memoryContent: '',
+            mediaFiles: []
         }
     },
     methods: {
-        handleSubmit() {
-            // Form submission logic
+        async handleSubmit() {
+            if (!this.memoryTitle || !this.memoryDate || !this.memoryContent) {
+                alert("Please fill in all fields before saving."); // Simple validation
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("Title", this.memoryTitle);
+            formData.append("Date", this.memoryDate);
+            formData.append("Content", this.memoryContent);
+
+            console.log([...formData.entries()]);
+
+            // Nếu có file upload, thêm vào formData
+            if (this.mediaFiles && this.mediaFiles.length > 0) {
+                this.mediaFiles.forEach((file, index) => {
+                    formData.append(`Medias[${index}]`, file);
+                });
+            }
+
+            try {
+                const response = await createDiaryNote(formData); // Gọi API từ service
+                alert("Memory saved successfully!");
+                this.$router.push('/diary/diary-list'); // Quay lại danh sách
+            } catch (error) {
+                console.error("Error saving memory:", error);
+                alert("Failed to save memory. Please try again.");
+            }
         },
         handleBack() {
             this.$router.push('/diary/diary-list')

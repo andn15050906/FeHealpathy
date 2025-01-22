@@ -23,7 +23,7 @@
                 <div class="diary-card-content">
                     <div class="diary-info">
                         <h2 class="entry-title">{{ entry.title }}</h2>
-                        <p class="entry-date">{{ formatDate(entry.date) }}</p>
+                        <p class="entry-date">{{ formatDate(entry.creationTime) }}</p>
                     </div>
                     <button class="delete-button" @click.stop="confirmDelete(entry.id)">Delete</button>
                 </div>
@@ -58,8 +58,8 @@ export default {
     computed: {
         filteredEntries() {
             return this.entries.filter(entry =>
-                entry.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                entry.date.includes(this.searchQuery)
+                (entry.title && entry.title.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
+                (entry.creationTime && entry.creationTime.includes(this.searchQuery)) // Đảm bảo không gọi `toLowerCase()` nếu title là undefined
             );
         }
     },
@@ -76,11 +76,12 @@ export default {
             this.errorMessage = "";
             try {
                 const data = await getPagedDiaryNotes();
+                console.log('data', data)
                 if (data.length === 0) {
-                    this.diaryNotes = [];
+                    this.entries = [];
                     this.errorMessage = "No diary notes found.";
                 } else {
-                    this.diaryNotes = data;
+                    this.entries = data.items;
                 }
             } catch (error) {
                 this.errorMessage = "Failed to fetch diary notes. Please try again.";
