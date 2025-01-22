@@ -84,12 +84,6 @@
                     <a href="#terms" class="terms-link">{{ HomePage.Pricing.Terms.Title }}</a> |
                     <a href="#cancel" class="terms-link">{{ HomePage.Pricing.Terms.CancelText }}</a>
                 </p>
-                <!--
-                <div style="display: flex; justify-content: center;">
-                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">
-                        {{ HomePage.Pricing.Terms.Continue }}
-                    </GlowingButton>
-                </div>-->
             </section>
         </main>
     </div>
@@ -100,14 +94,34 @@ import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import json from '../api/data.json'
 import router from '@/router';
-import { setUserAuthData } from '@/services/authService';
+import { getUserAuthData, setUserAuthData } from '@/services/authService';
+import { Noti } from '@/api/Models';
 
 export default {
     name: 'HomePage',
+    methods: {
+        setActivePricing: function () {
+
+        },
+        navigateToSettings: function (notiId) {
+            this.$router.push({ path: 'settings' });
+            this.$emit('removeNotification', notiId);
+        }
+    },
+    data() {
+        return {
+            user: null,
+            HomePage: json.HomePage
+        }
+    },
+    components: {
+        GlowingButton,
+        GlowingCard
+    },
     mounted() {
+        // handle auth
         if (router.currentRoute.value.query) {
             var externalUser = router.currentRoute.value.query['external_redirect'];
-            console.log(router.currentRoute.value.query['external_redirect']);
             if (externalUser) {
                 setUserAuthData({
                     User: externalUser
@@ -116,18 +130,18 @@ export default {
 
             this.$router.replace({ path: '/', query: {} });
         }
-    },
-    setActivePricing() {
+        this.user = getUserAuthData();
 
-    },
-    data() {
-        return {
-            HomePage: json.HomePage
+        // handle setting up
+        if (this.user.preferences && this.user.preferences.length == 0) {
+            this.$router.push({ path: 'setting-up' });
         }
-    },
-    components: {
-        GlowingButton,
-        GlowingCard
+
+        if (this.user.settings && this.user.settings.length == 0) {
+            let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
+            noti.callback = () => this.navigateToSettings(noti.id);
+            this.$emit('addNotification', noti);
+        }
     }
 }
 </script>

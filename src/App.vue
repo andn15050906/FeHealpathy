@@ -1,17 +1,34 @@
+<template>
+  <div id="app">
+    <LoadingSpinner ref="loadingSpinner" />
+    <SweetAlert ref="sweetAlert" />
+    <Header ref="headerRef" />
+    <NotificationContainer v-if="isAuthenticated" ref="notificationRef" />
+    <main>
+      <div class="page-container">
+        <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
+          @removeNotification="removeNotification" />
+      </div>
+    </main>
+    <Footer />
+  </div>
+</template>
+
 <script setup>
 import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router';
 import { ref, provide, onMounted } from 'vue';
+import { getUserAuthData } from '@/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
 import SweetAlert from './components/Common/SweetAlert.vue';
-import QuestionNotification from './views/QuestionOfTheDay/QuestionNotification.vue';
+import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
-
 const router = useRouter();
+const isAuthenticated = ref(false);
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -26,7 +43,7 @@ provide('sweetAlert', {
   showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
 });
 
-onMounted(() => {
+onMounted(async () => {
   router.beforeEach((to, from, next) => {
     loadingSpinner.value.showSpinner();
     next();
@@ -37,28 +54,25 @@ onMounted(() => {
       loadingSpinner.value.hideSpinner();
     }, 300);
   });
+
+  if (await getUserAuthData())
+    isAuthenticated.value = true;
 });
 
 const headerRef = ref(null);
 const handleAuthenticated = (data) => {
+  isAuthenticated.value = true;
   headerRef.value.fetchUserProfile();
 }
 
+const notificationRef = ref(null);
+const addNotification = (data) => {
+  notificationRef.value.addNotification(data);
+}
+const removeNotification = (data) => {
+  notificationRef.value.removeNotification(data);
+}
 </script>
-<template>
-  <div id="app">
-    <LoadingSpinner ref="loadingSpinner" />
-    <SweetAlert ref="sweetAlert" />
-    <Header ref="headerRef" />
-    <main>
-      <div class="page-container">
-        <RouterView @authenticated="handleAuthenticated" />
-      </div>
-    </main>
-    <Footer />
-    <QuestionNotification />
-  </div>
-</template>
 
 <style scoped>
 main {

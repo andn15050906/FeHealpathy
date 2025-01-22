@@ -1,22 +1,21 @@
 // src/stores/cards.ts
 
 import { defineStore } from 'pinia'
-import { sleep } from '../store/utilis'
+//import { sleep } from '../store/utilis'
 import { PaymentSystemType, PaymentCard } from '../types' // adjust the import path accordingly
 
 // Simulated fetch function
 const fetchPaymentCards = async () => {
-  await sleep(1000)
   return [
     {
       id: '1',
-      name: 'Main card',
+      name: 'VNPay',
       isPrimary: true,
-      paymentSystem: PaymentSystemType.Visa,
+      paymentSystem: PaymentSystemType.VNPay,
       cardNumberMasked: '****1679',
       expirationDate: '0924',
     },
-    {
+    /*{
       id: '2',
       name: 'Online shopping',
       isPrimary: false,
@@ -31,7 +30,7 @@ const fetchPaymentCards = async () => {
       paymentSystem: PaymentSystemType.MasterCard,
       cardNumberMasked: '****4523',
       expirationDate: '1222',
-    },
+    }*/
   ]
 }
 

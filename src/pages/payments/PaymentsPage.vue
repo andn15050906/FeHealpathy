@@ -14,14 +14,6 @@
       <div class="text-2xl font-bold leading-5 mb-6">Billing address</div>
 
       <BillingAddressList />
-
-      <div class="space-y-2 mt-6">
-        <div class="text-lg font-bold mb-2">Tax location</div>
-        <div class="space-y-1">
-          <div class="text-sm text-gray-500">United States - 10% VAT</div>
-          <div class="text-sm text-primary underline">More info</div>
-        </div>
-      </div>
     </VaCardContent>
   </VaCard>
 </template>
@@ -63,16 +55,20 @@ import BillingAddressList from './widgets/billing-address/BillingAddressList.vue
 }
 
 .text-secondary {
-  color: #6b7280; /* Màu xám */
+  color: #6b7280;
+  /* Màu xám */
 }
 
 .text-primary {
-  color: #3b82f6; /* Màu xanh */
+  color: #3b82f6;
+  /* Màu xanh */
 }
 
 .important-note {
-  background-color: #e0f7fa; /* Màu nền nhạt */
-  border: 1px solid #b2ebf2; /* Viền màu xanh nhạt */
+  background-color: #e0f7fa;
+  /* Màu nền nhạt */
+  border: 1px solid #b2ebf2;
+  /* Viền màu xanh nhạt */
   padding: 10px;
   border-radius: 4px;
 }
