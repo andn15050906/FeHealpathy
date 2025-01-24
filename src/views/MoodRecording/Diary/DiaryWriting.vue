@@ -37,10 +37,11 @@
 </template>
 
 <script>
-import { createDiaryNote } from "@/services/diaryNoteService";
+import { createDiaryNote, getPagedDiaryNotes } from "@/services/diaryNoteService";
 
 export default {
-    name: 'MemoryEntryForm',
+    name: 'DiaryWriting',
+    props: ['title'],
     created() {
         if (this.$route.path === '/diary/diary-writing') {
             this.memoryDate = new Date().toISOString().split('T')[0]
@@ -51,10 +52,39 @@ export default {
             memoryTitle: '',
             memoryDate: '',
             memoryContent: '',
-            mediaFiles: []
+            mediaFiles: [],
+            isEdit: false
+        }
+    },
+    async mounted() {
+        const title = this.$route.params.title;
+        if (title) {
+            this.isEdit = true;
+            await this.fetchDiaryNote(title);
         }
     },
     methods: {
+        async fetchDiaryNote(title) {
+            try {
+                const filter = { Title: title };
+                const response = await getPagedDiaryNotes(filter);
+
+                if (response.Items && response.Items.length > 0) {
+                    const diary = response.Items[0];
+                    this.memoryTitle = diary.Title;
+                    this.memoryDate = diary.CreationTime || new Date().toISOString().split("T")[0];
+                    this.memoryContent = diary.Content || "";
+                    this.mediaFiles = (diary.Medias || []).map((media) => ({
+                        file: null,
+                        preview: media.Url,
+                    }));
+                } else {
+                    alert("Diary note not found.");
+                }
+            } catch (error) {
+                alert("Failed to load diary. Please try again.");
+            }
+        },
         async handleSubmit() {
             if (!this.memoryTitle || !this.memoryDate || !this.memoryContent) {
                 alert("Please fill in all fields before saving.");
