@@ -1,38 +1,38 @@
 [
   {
     "id": 1,
-    "icon": "diversity_1",
-    "name": "Getting Started",
-    "intro": "Learn how to start using HEALPATHY effectively."
+    "icon": "🧘‍♀️",
+    "name": "Healing the Soul",
+    "intro": "Explore methods to find peace within your soul."
   },
   {
     "id": 2,
-    "icon": "monitor_heart",
-    "name": "Health Tracking",
-    "intro": "Track and monitor your health progress."
+    "icon": "🌱",
+    "name": "Personal Development",
+    "intro": "Learn how to grow personally and enhance your quality of life."
   },
   {
     "id": 3,
-    "icon": "groups",
-    "name": "Community",
-    "intro": "Connect with others and share experiences."
+    "icon": "💖",
+    "name": "Self-Love",
+    "intro": "Discover ways to love and care for yourself every day."
   },
   {
     "id": 4,
-    "icon": "fitness_center",
-    "name": "Exercise & Fitness",
-    "intro": "Access workout plans and fitness tips."
+    "icon": "🌈",
+    "name": "Meditation",
+    "intro": "Explore meditation techniques to relax and focus."
   },
   {
     "id": 5,
-    "icon": "restaurant_menu",
-    "name": "Nutrition",
-    "intro": "Get nutrition advice and meal planning help."
+    "icon": "🌼",
+    "name": "Positive Living",
+    "intro": "Learn how to live positively and view life optimistically."
   },
   {
     "id": 6,
-    "icon": "psychology",
-    "name": "Mental Health",
-    "intro": "Resources for mental wellness support."
+    "icon": "🌊",
+    "name": "Connecting with Nature",
+    "intro": "Discover how to connect with nature to find peace."
   }
 ]

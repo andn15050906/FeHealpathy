@@ -62,7 +62,6 @@ export default {
 			let verifiedEmail = router.currentRoute.value.query['email'];
 			let token = router.currentRoute.value.query['token'];
 			router.replace({ 'query': null });
-			console.log(verifiedEmail);
 			if (verifiedEmail && token) {
 				try {
 					await verifyEmail(verifiedEmail, token);
