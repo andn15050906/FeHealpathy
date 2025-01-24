@@ -1,4 +1,4 @@
-import { Image } from "./Clazz"
+import { Image } from "./Models"
 
 const MockApi = {
     getHeroImg: () => { },

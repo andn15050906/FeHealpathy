@@ -6,12 +6,8 @@
         <p class="text-regularLarge">
           {{ notification.name }}
         </p>
-        <va-switch 
-          v-model="notification.isEnabled"
-          @change="saveNotificationSettings(notification)"
-        />
+        <v-switch v-model="notification.isEnabled" @change="saveNotificationSettings(notification)" color="info" />
       </div>
-      <va-divider class="py-4 group-last:hidden" />
     </div>
   </div>
 </template>

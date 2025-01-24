@@ -1,11 +1,6 @@
 <template>
   <div class="theme-switcher">
-    <va-button-toggle
-      v-model="currentTheme"
-      :options="options"
-      color="primary"
-      @change="toggleTheme"
-    />
+    <va-button-toggle v-model="currentTheme" :options="options" color="primary" @change="toggleTheme" />
   </div>
 </template>
 

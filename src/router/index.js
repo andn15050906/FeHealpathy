@@ -15,7 +15,6 @@ import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
 import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
 import SearchBlogResult from '@/views/Blogs/SearchBlogResult.vue'
-import AboutUs from '@/views/AboutUs/AboutUs.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
 import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
@@ -26,10 +25,10 @@ import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
-import SettingUp from '@/views/Profile/SettingUp.vue'
 import MusicControl from '@/views/Music_Player/MusicControl.vue'
-import NotFound from '@/pages/404/404.vue'
-import Settings from '@/pages/settings/Settings.vue'
+import NotFound from '@/components/Layouts/404.vue'
+import Settings from '@/views/Profile/Settings/Settings.vue'
+import SettingUp from '@/views/Profile/Preferences/SettingUp.vue'
 import FaqPage from '@/pages/faq/FaqPage.vue'
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
 import MoodOverview from '@/views/MoodRecording/MoodOverview.vue'
@@ -41,22 +40,23 @@ import Anxiety from '@/views/MoodRecording/MoodCart/Anxiety.vue'
 import DiaryWriting from '@/views/MoodRecording/Diary/DiaryWriting.vue'
 import DiaryList from '@/views/MoodRecording/Diary/DiaryList.vue'
 import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
-import DailyQuestion from '@/views/QuestionOfTheDay/DailyQuestion.vue'
+import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
 import CreateGroupVue from '@/components/GroupComponents/CreateGroup.vue'
+import MediaControl from '@/views/MediaResource/MediaControl.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/404',
+      path: '/NotFound',
       name: 'NotFound',
       component: NotFound
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/404'
+      redirect: '/NotFound'
     },
     {
       path: '/',
@@ -115,9 +115,9 @@ const router = createRouter({
       component: EditGroup
     },
     {
-      path: '/about-us',
-      name: 'aboutUs',
-      component: AboutUs
+      path: '/faq',
+      name: 'FAQ',
+      component: FaqPage
     },
     {
       path: '/sign-in',
@@ -266,11 +266,6 @@ const router = createRouter({
       component: HabitTracking,
     },
     {
-      path: '/setting-up',
-      name: 'SettingUp',
-      component: SettingUp
-    },
-    {
       path: '/media-library',
       name: 'MusicControl',
       component: MusicControl
@@ -281,14 +276,19 @@ const router = createRouter({
       component: Settings
     },
     {
-      path: '/faq',
-      name: 'FAQ',
-      component: FaqPage
+      path: '/setting-up',
+      name: 'SettingUp',
+      component: SettingUp
     },
     {
       path: '/payments',
       name: 'Payments',
       component: PaymentsPage
+    },
+    {
+      path: '/media-resource',
+      name: 'MediaControl',
+      component: MediaControl
     }
   ]
 })

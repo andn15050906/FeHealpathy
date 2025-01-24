@@ -1,1 +1,0 @@
-<template>Guideline list page</template>
