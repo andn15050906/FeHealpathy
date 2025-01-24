@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-overlay" @click.self="$emit('close')">
+    <v-overlay v-model="overlay" @click.self="$emit('close')">
         <div class="question-container">
             <header class="header-section">
                 <button class="back-button" @click="$emit('close')">
@@ -18,12 +18,8 @@
                 </div>
 
                 <div class="answer-section">
-                    <textarea 
-                        v-model="answer"
-                        class="answer-input"
-                        placeholder="Share your thoughts..."
-                        :rows="5"
-                    ></textarea>
+                    <textarea v-model="answer" class="answer-input" placeholder="Share your thoughts..."
+                        :rows="5"></textarea>
                     <div class="character-count">{{ answer.length }}/500 characters</div>
                 </div>
 
@@ -39,7 +35,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </v-overlay>
 </template>
 
 <script>
@@ -53,7 +49,8 @@ export default {
     },
     data() {
         return {
-            answer: ''
+            answer: '',
+            overlay: true
         }
     },
     methods: {
@@ -200,7 +197,8 @@ export default {
     margin-top: 40px;
 }
 
-.cancel-button, .save-button {
+.cancel-button,
+.save-button {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -239,8 +237,13 @@ export default {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideIn {
@@ -248,6 +251,7 @@ export default {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -274,7 +278,8 @@ export default {
         flex-direction: column;
     }
 
-    .cancel-button, .save-button {
+    .cancel-button,
+    .save-button {
         width: 100%;
         justify-content: center;
     }

@@ -2,6 +2,7 @@
   <div class="header">
     <div class="navbar">
       <Logo :height="40" />
+      <button class="menu-toggle" @click="toggleMenu">☰</button>
       <div class="menu">
         <ul>
           <li><router-link class="hovered-link" to="/">Home</router-link></li>
@@ -9,7 +10,7 @@
           <li><router-link class="hovered-link" to="/blogs">Blogs</router-link></li>
           <li><router-link class="hovered-link" to="/courses">Courses</router-link></li>
           <li><router-link class="hovered-link" to="/community">Community</router-link></li>
-          <li><router-link class="hovered-link" to="/about-us">About us</router-link></li>
+          <li><router-link class="hovered-link" to="/faq">FAQ</router-link></li>
         </ul>
       </div>
       <div class="user-actions">
@@ -77,18 +78,26 @@ export default {
     async fetchUserProfile() {
       try {
         const clientData = await getUserAuthData();
-        console.log(clientData);
         if (clientData) {
           this.isLoggedIn = true;
           this.user = {
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
           };
-        } else {
-          console.log('User not logged in or invalid status');
         }
+        // else {
+        //   console.log('User not logged in or invalid status');
+        // }
       } catch (error) {
         console.error('Error fetching user status:', error);
+      }
+    },
+
+    toggleMenu() {
+      this.menuVisible = !this.menuVisible;
+      const menu = this.$el.querySelector('.menu');
+      if (menu) {
+        menu.classList.toggle('show', this.menuVisible);
       }
     },
 
@@ -251,11 +260,8 @@ ul {
   color: #333;
   text-decoration: none;
   border: none;
-  /* Xóa viền mặc định của button */
   text-align: left;
-  /* Canh trái nội dung */
   cursor: pointer;
-  /* Con trỏ chuột dạng click */
   transition: background-color 0.2s;
 }
 
@@ -298,5 +304,54 @@ ul {
 .hovered-link:hover {
   opacity: 1;
   color: #3db83b;
+}
+
+@media (max-width: 768px) {
+  .menu {
+    display: none;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu ul {
+    flex-direction: column;
+    padding: 10px 0;
+  }
+
+  .menu ul li {
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+  }
+
+  .menu-toggle {
+    display: block !important;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .menu.show {
+    display: flex;
+  }
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.menu-toggle:focus {
+  outline: none;
 }
 </style>

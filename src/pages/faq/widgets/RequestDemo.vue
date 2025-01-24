@@ -35,3 +35,19 @@ const submit = async () => {
   showModal.value = false
 }
 </script>
+
+<style scoped>
+.va-h5 {
+  font-size: 1.5rem;
+  color: #154EC1; 
+}
+
+.text-base {
+  margin-bottom: 0.5rem;
+}
+
+img {
+  max-width: 100px; 
+  height: auto; 
+}
+</style>
