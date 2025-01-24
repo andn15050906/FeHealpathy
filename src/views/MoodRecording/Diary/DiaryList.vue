@@ -59,7 +59,7 @@ export default {
         filteredEntries() {
             return this.entries.filter(entry =>
                 (entry.title && entry.title.toLowerCase().includes(this.searchQuery.toLowerCase())) ||
-                (entry.creationTime && entry.creationTime.includes(this.searchQuery)) // Đảm bảo không gọi `toLowerCase()` nếu title là undefined
+                (entry.creationTime && entry.creationTime.includes(this.searchQuery))
             );
         }
     },

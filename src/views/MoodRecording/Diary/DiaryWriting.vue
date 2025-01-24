@@ -16,11 +16,20 @@
         <div class="content-section">
             <div class="content-header">
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Upload image" class="upload-icon" tabindex="0" @click="handleImageUpload" />
+                    alt="Upload image" class="upload-icon" tabindex="0" @click="triggerFileInput" />
+                <input type="file" ref="fileInput" class="visually-hidden" @change="handleFileChange" multiple
+                    accept="image/*" />
             </div>
             <textarea class="memory-content" placeholder="Type any things.." v-model="memoryContent"
                 aria-label="Memory content">
             </textarea>
+        </div>
+
+        <div class="preview-section">
+            <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
+                <img :src="file.preview" alt="Preview" class="preview-image" />
+                <button type="button" @click="removeFile(index)" class="remove-button">Remove</button>
+            </div>
         </div>
 
         <button type="submit" class="save-button">Save</button>
@@ -48,28 +57,27 @@ export default {
     methods: {
         async handleSubmit() {
             if (!this.memoryTitle || !this.memoryDate || !this.memoryContent) {
-                alert("Please fill in all fields before saving."); // Simple validation
+                alert("Please fill in all fields before saving.");
                 return;
             }
 
             const formData = new FormData();
             formData.append("Title", this.memoryTitle);
-            formData.append("Date", this.memoryDate);
             formData.append("Content", this.memoryContent);
 
-            console.log([...formData.entries()]);
-
-            // Nếu có file upload, thêm vào formData
             if (this.mediaFiles && this.mediaFiles.length > 0) {
                 this.mediaFiles.forEach((file, index) => {
-                    formData.append(`Medias[${index}]`, file);
+                    formData.append(`Medias[${index}].File`, file); // File tải lên
+                    formData.append(`Medias[${index}].Title`, file.name || "Untitled Media"); // Tiêu đề là tên file
                 });
             }
 
+            console.log([...formData.entries()]);
+
             try {
-                const response = await createDiaryNote(formData); // Gọi API từ service
+                const response = await createDiaryNote(formData);
                 alert("Memory saved successfully!");
-                this.$router.push('/diary/diary-list'); // Quay lại danh sách
+                this.$router.push('/diary/diary-list');
             } catch (error) {
                 console.error("Error saving memory:", error);
                 alert("Failed to save memory. Please try again.");
@@ -78,8 +86,24 @@ export default {
         handleBack() {
             this.$router.push('/diary/diary-list')
         },
-        handleImageUpload() {
-            // Image upload logic
+        triggerFileInput() {
+            this.$refs.fileInput.click();
+        },
+        handleFileChange(event) {
+            const files = event.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.mediaFiles.push({
+                        file,
+                        preview: e.target.result
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+        removeFile(index) {
+            this.mediaFiles.splice(index, 1);
         }
     }
 }
