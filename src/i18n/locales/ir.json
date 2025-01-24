@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "agree": "من موافقم.",
+    "createAccount": "ایجاد حساب",
+    "email": "ایمیل",
+    "login": "ورود",
+    "password": "رمز عبور",
+    "forgotPassword": "رمز عبور را فراموش کرده‌اید؟",
+    "resetPassword": "تنظیم مجدد رمز عبور",
+    "submit": "ارسال",
+    "cancel": "لغو"
+  },
+  "home": {
+    "welcome": "به HEALPATHY خوش آمدید",
+    "description": "جایی که شما آرامش و سلامتی را پیدا می‌کنید."
+  },
+  "error": {
+    "notFound": "صفحه پیدا نشد.",
+    "serverError": "خطایی در سرور رخ داده است."
+  },
+  "language": {
+    "brazilian_portuguese": "پرتغالی",
+    "english": "انگلیسی",
+    "spanish": "اسپانیایی",
+    "simplified_chinese": "چینی ساده‌شده",
+    "persian": "فارسی"
+  }
+}

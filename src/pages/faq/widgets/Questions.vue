@@ -51,3 +51,27 @@ import { reactive } from 'vue'
 
 const accordionState = reactive([false, true, false, false])
 </script>
+
+<style scoped>
+.va-h5 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #154EC1; 
+}
+
+article {
+  margin-bottom: 1rem;
+}
+
+.max-w-3xl {
+  max-width: 800px; 
+}
+
+.list-disc {
+  margin-left: 1.5rem; 
+}
+
+.mb-4 {
+  margin-bottom: 1rem; 
+}
+</style>

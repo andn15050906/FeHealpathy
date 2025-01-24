@@ -23,6 +23,7 @@
     "emoji-mart-vue-fast": "^15.0.3",
     "firebase": "^10.8.1",
     "moment": "^2.30.1",
+    "pinia": "^2.3.0",
     "quill": "^2.0.3",
     "sweetalert2": "^11.10.6",
     "vite-plugin-vuetify": "^2.0.4",
@@ -39,6 +40,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "@types/node": "^22.10.7",
     "@vitejs/plugin-vue": "^5.0.3",
     "vite": "^5.0.11",
     "webpack": "^5.90.3",

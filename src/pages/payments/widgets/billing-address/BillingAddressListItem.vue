@@ -9,7 +9,7 @@
       </div>
       <div class="text-secondary leading-5">
         <div>{{ billingAddress.street }}</div>
-        <div>{{ billingAddress.city }}, {{ billingAddress.state }} {{ billingAddress.postalCode }}</div>
+        <div>{{ billingAddress.ward }}, {{ billingAddress.district }}, {{ billingAddress.city }}</div>
         <div>{{ billingAddress.country }}</div>
       </div>
     </div>

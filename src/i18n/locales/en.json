@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "agree": "I agree.",
+    "createAccount": "Create account",
+    "email": "Email",
+    "login": "Login",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "home": {
+    "welcome": "Welcome to HEALPATHY",
+    "description": "Where you find peace and health."
+  },
+  "error": {
+    "notFound": "Page not found.",
+    "serverError": "An error occurred on the server."
+  },
+  "language": {
+    "brazilian_portuguese": "Portuguese",
+    "english": "English",
+    "spanish": "Spanish",
+    "simplified_chinese": "Simplified Chinese",
+    "persian": "Persian"
+  }
+}
