@@ -59,9 +59,23 @@ export default {
             this.showEditMusic = !this.showEditMusic;
         },
         addMusic(newMusic) {
-            this.mood.files.push(newMusic);
+            this.mood.files.push({
+                id: newMusic.id,
+                title: newMusic.media.title,
+                artistName: newMusic.artist,
+                description: newMusic.description,
+                url: newMusic.media.url,
+                file: newMusic.media.file,
+            });
             this.showAddMusic = false;
         },
+        updateMusic(updatedMusic) {
+            if (this.selectedMusicIndex !== null) {
+                this.$set(this.mood.files, this.selectedMusicIndex, updatedMusic);
+            }
+            this.showEditMusic = false;
+        },
+
         editMusic(music, index) {
             this.selectedMusic = { ...music };
             this.selectedMusicIndex = index;
