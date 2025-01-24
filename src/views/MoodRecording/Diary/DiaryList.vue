@@ -37,7 +37,7 @@
 
 <script>
 import DeleteConfirmPopup from '@/components/Common/DeleteConfirmPopup.vue';
-import { getPagedDiaryNotes } from '@/services/diaryNoteService';
+import { getPagedDiaryNotes, deleteDiaryNote } from '@/services/diaryNoteService';
 
 export default {
     name: 'DiaryList',
@@ -98,14 +98,25 @@ export default {
             this.entryToDeleteUrl = `api/diary/${entryId}`;
             this.showDeletePopup = true;
         },
-        handleDelete(confirm) {
+        async handleDelete(confirm) {
             if (confirm && this.entryToDelete !== null) {
-                this.entries = this.entries.filter(entry => entry.id !== this.entryToDelete);
-                console.log(`Deleted entry at: ${this.entryToDeleteUrl}`);
+                try {
+                    await deleteDiaryNote(this.entryToDelete);
+
+                    this.entries = this.entries.filter(entry => entry.id !== this.entryToDelete);
+                    alert("Diary entry deleted successfully.");
+                } catch (error) {
+                    alert("Failed to delete diary entry. Please try again.");
+                } finally {
+                    this.showDeletePopup = false;
+                    this.entryToDelete = null;
+                    this.entryToDeleteUrl = '';
+                }
+            } else {
+                this.showDeletePopup = false;
+                this.entryToDelete = null;
+                this.entryToDeleteUrl = '';
             }
-            this.showDeletePopup = false;
-            this.entryToDelete = null;
-            this.entryToDeleteUrl = '';
         }
     },
     mounted() {

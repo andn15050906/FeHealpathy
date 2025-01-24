@@ -67,8 +67,8 @@ export default {
 
             if (this.mediaFiles && this.mediaFiles.length > 0) {
                 this.mediaFiles.forEach((file, index) => {
-                    formData.append(`Medias[${index}].File`, file); // File tải lên
-                    formData.append(`Medias[${index}].Title`, file.name || "Untitled Media"); // Tiêu đề là tên file
+                    formData.append(`Medias[${index}].File`, file);
+                    formData.append(`Medias[${index}].Title`, file.name || "Untitled Media");
                 });
             }
 
