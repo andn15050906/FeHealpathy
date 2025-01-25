@@ -1,8 +1,8 @@
-import api from '@/api/apiCall'; 
+import apiClient from '@/api/apiCall';
 
 export const getAssignment = async (id) => {
   try {
-    const response = await api.get(`/assignments/${id}`);
+    const response = await apiClient.get(`/assignments/${id}`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch assignment:', error);
@@ -12,7 +12,7 @@ export const getAssignment = async (id) => {
 
 export const getAssignments = async () => {
   try {
-    const response = await api.get(`/assignments`);
+    const response = await apiClient.get(`/assignments`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch assignment:', error);
@@ -22,7 +22,7 @@ export const getAssignments = async () => {
 
 export const getMin = async (id) => {
   try {
-    const response = await api.get(`/${id}/min`);
+    const response = await apiClient.get(`/${id}/min`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch assignment:', error);
@@ -32,7 +32,7 @@ export const getMin = async (id) => {
 
 export const getByAssignmentId = async (assignmentId) => {
   try {
-    const response = await api.get(`/submissions/ByAssignment`, {
+    const response = await apiClient.get(`/submissions/ByAssignment`, {
       params: { assignmentId }
     });
     return response.data;
@@ -44,7 +44,7 @@ export const getByAssignmentId = async (assignmentId) => {
 
 export const getByCourse = async (courseId) => {
   try {
-    const response = await api.get(`/assignments/ByCourse`, {
+    const response = await apiClient.get(`/assignments/ByCourse`, {
       params: { courseId }
     });
     return response.data;
