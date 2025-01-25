@@ -21,8 +21,6 @@ import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
-import CreateGroup from '@/views/Community/CreateGroup.vue'
-import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
 import MusicControl from '@/views/Music_Player/MusicControl.vue'
@@ -43,7 +41,10 @@ import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
-import CreateGroupVue from '@/components/GroupComponents/CreateGroup.vue'
+import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
+import EditGroup from '@/components/GroupComponents/EditGroup.vue'
+import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
+import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
 
@@ -197,9 +198,10 @@ const router = createRouter({
       component: Anxiety
     },
     {
-      path: '/diary/diary-writing',
-      name: 'diaryWriting',
-      component: DiaryWriting
+      path: '/diary/diary-writing/:id?/:title?',
+      name: 'DiaryWriting',
+      component: DiaryWriting,
+      props: true
     },
     {
       path: '/diary/diary-list',
@@ -225,11 +227,6 @@ const router = createRouter({
       path: '/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
-    },
-    {
-      path: '/create-group',
-      name: 'createGroup',
-      component: CreateGroupVue
     },
     {
       path: '/assignments/create',
@@ -295,7 +292,7 @@ const router = createRouter({
       path: '/survey',
       name: 'Survey',
       component: ManageSurvey
-    },
+    }
   ]
 })
 
