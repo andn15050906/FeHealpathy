@@ -23,12 +23,14 @@
             <textarea class="memory-content" placeholder="Type any things.." v-model="memoryContent"
                 aria-label="Memory content">
             </textarea>
-        </div>
 
-        <div class="preview-section">
-            <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
-                <img :src="file.preview" alt="Preview" class="preview-image" />
-                <button type="button" @click="removeFile(index)" class="remove-button">Remove</button>
+            <div class="preview-section">
+                <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
+                    <img :src="file.preview" alt="Preview" class="preview-image" />
+                    <button type="button" @click="removeFile(index)" class="remove-button">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -72,11 +74,12 @@ export default {
                 if (response.items && response.items.length > 0) {
                     const diary = response.items[0];
                     this.memoryTitle = diary.title;
-                    this.memoryDate = diary.creationTime || new Date().toISOString().split("T")[0];
+                    this.memoryDate = diary.creationTime ? diary.creationTime.split("T")[0] : new Date().toISOString().split("T")[0];
                     this.memoryContent = diary.content || "";
                     this.mediaFiles = (diary.medias || []).map((media) => ({
                         file: null,
-                        preview: media.Url,
+                        preview: media.url,
+                        url: media.url,
                     }));
                 } else {
                     alert("Diary note not found.");
@@ -98,8 +101,14 @@ export default {
 
             if (this.mediaFiles && this.mediaFiles.length > 0) {
                 this.mediaFiles.forEach((file, index) => {
-                    formData.append(`Medias[${index}].File`, file);
-                    formData.append(`Medias[${index}].Title`, file.name || "Untitled Media");
+                    if (file.url) {
+                        // If the file has URL (existing media), append the URL
+                        formData.append(`Medias[${index}].Url`, file.url);
+                    } else if (file.file) {
+                        // If the file is new (uploaded), append the actual file
+                        formData.append(`Medias[${index}].File`, file.file);
+                    }
+                    formData.append(`Medias[${index}].Title`, file.file ? file.file.name : `Existing Media ${index}`);
                 });
             }
 
@@ -132,7 +141,8 @@ export default {
                 reader.onload = (e) => {
                     this.mediaFiles.push({
                         file,
-                        preview: e.target.result
+                        preview: e.target.result,
+                        url: null
                     });
                 };
                 reader.readAsDataURL(file);
@@ -280,6 +290,62 @@ export default {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+}
+
+
+.preview-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    /* Increased gap between items */
+    justify-content: flex-start;
+}
+
+.preview-item {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.preview-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: #ff0000;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.remove-button:hover {
+    transform: scale(1.2);
+}
+
+.remove-button i {
+    margin: 0;
+}
+
+.preview-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 991px) {
