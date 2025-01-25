@@ -1,7 +1,6 @@
 <template>
   <div class="settings-container">
     <h1 class="page-title">Settings</h1>
-    
     <div class="settings-section">
       <h3>Theme</h3>
       <ThemeSwitcher />
@@ -20,9 +19,9 @@
 </template>
 
 <script lang="ts" setup>
-import ThemeSwitcher from './theme-switcher/ThemeSwitcher.vue'
-import LanguageSwitcher from './language-switcher/LanguageSwitcher.vue'
-import Notifications from './notifications/Notifications.vue'
+import ThemeSwitcher from './ThemeSwitcher.vue'
+import LanguageSwitcher from './LanguageSwitcher.vue'
+import Notifications from './NotificationSettings.vue'
 </script>
 
 <style scoped>
@@ -37,6 +36,6 @@ import Notifications from './notifications/Notifications.vue'
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
