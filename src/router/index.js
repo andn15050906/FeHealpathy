@@ -46,6 +46,7 @@ import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
+import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -258,7 +259,7 @@ const router = createRouter({
       component: YogaView
     },
     {
-      path: '/practice/habit-tracking',
+      path: '/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
     },
@@ -281,6 +282,16 @@ const router = createRouter({
       path: '/payments',
       name: 'Payments',
       component: PaymentsPage
+    },
+    {
+      path: '/media-resource',
+      name: 'MediaControl',
+      component: MediaControl
+    },
+    {
+      path: '/survey',
+      name: 'Survey',
+      component: ManageSurvey
     }
   ]
 })

@@ -28,6 +28,9 @@ export default {
     methods: {
         addNotification(data) {
             if (data instanceof Noti) {
+                //safeguard
+                if ([...this.notiMap.values()].find(item => item.title == data.title))
+                    return;
                 this.notiMap.set(data.id, data);
             }
         },
@@ -42,7 +45,7 @@ export default {
 .noti-container {
     position: fixed;
     top: 20px;
-    right: 20px;
+    left: 40px;
     margin-top: 50px;
     z-index: 1000;
 }

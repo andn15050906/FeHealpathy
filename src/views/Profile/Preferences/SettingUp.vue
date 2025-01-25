@@ -1,42 +1,64 @@
 <template>
     <div class="container text-center">
-        <component :is="currentComponent" :input-options="inputOptions" :original-options="selectOptions"
-            @update-original-options="updateOriginalOptions" @change-component="changeComponent" />
+        <single-select-survey v-if="childIndex == 0" :options="wellnessSurveyOptions"></single-select-survey>
+        <multiple-select-survey v-if="childIndex == 1" :options="whatYouWantSurveyOptions"></multiple-select-survey>
     </div>
 </template>
 
 <script>
-import data from '@/api/data.json';
-import InputOptions from "./InputOptions.vue";
-import SelectOptions from "./SelectOptions.vue";
+import { inject } from 'vue';
+import { getPagedSurveys } from '@/services/surveysService';
+import { createSubmission } from '@/services/submissionsService';
+import { getAllPreferenceSurveys, updateUserPreference } from '@/services/preferencesService'
+import SingleSelectSurvey from "./SingleSelectSurvey.vue";
+import MultipleSelectSurvey from "./MultipleSelectSurvey.vue";
+import { SurveyOptions } from "./SurveyOptions";
+import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/api/dtos';
 
 export default {
-    components: { InputOptions, SelectOptions },
-    data() {
-        return {
-            currentComponent: "InputOptions",
-            inputOptions: data["SettingUp"]["survey"]["questions"].map(item => ({
-                ...item, inputValue: ''
-            })),
-            selectOptions: [
-                { "text": "🌙 Reduce stress, anxiety, and enhance emotional well-being" },
-                { "text": "💆 Access self-help tools, guided meditations, and mindfulness exercises" },
-                { "text": "🏋️‍♂️ Connect with like-minded individuals, share progress and seek advice" },
-                { "text": "🧘 Boost physical health and increase energy levels" },
-                { "text": "💆 Receive personalized recommendations, enhance skills and achieve personal goals" },
-                { "text": "🍎 Establish a healthy routine and develop positive habits" },
-                { "text": "🧠 Improve focus, memory, and mental clarity" }
-            ],
-            selectedOptions: []
-        };
-    },
+    components: { SingleSelectSurvey, MultipleSelectSurvey },
     methods: {
-        updateOriginalOptions(updatedOptions) {
-            this.selectedOptions = updatedOptions;
+        submitWellnessSurvey() {
+            let survey = this.wellnessSurveyOptions.survey;
+            let data = new CreateSubmissionDto(
+                survey.id,
+                survey.questions.filter(ele => ele.inputValue).map(ele => {
+                    return new CreateMcqChoiceDto(ele.id, ele.inputValue)
+                })
+            );
+            createSubmission(data);
+            this.switchChild(1);
         },
-        changeComponent(newComponent) {
-            this.currentComponent = newComponent;
+        async submitWhatYouWantSurvey(selectedOptions) {
+            await updateUserPreference({
+                sourceId: this.whatYouWantSurvey.id,
+                preferenceValueIds: selectedOptions
+            });
+
+            await this.sweetAlert
+                .showSuccess("Setting up successfully!")
+                .then(() => { this.$router.push({ path: '/' }); });
+        },
+        switchChild(childComponentIndex) {
+            this.childIndex = childComponentIndex;
         }
+    },
+    async mounted() {
+        this.wellnessSurvey = (await getPagedSurveys()).items.find(survey => survey.name.includes("Wellness Assessment"));
+        this.wellnessSurveyOptions = new SurveyOptions(this.wellnessSurvey, '✨ Let us know about you more ✨', () => { this.switchChild(1) }, this.submitWellnessSurvey);
+        this.whatYouWantSurvey = (await getAllPreferenceSurveys()).find(survey => survey.title.includes("What you want us to help you"));
+        this.whatYouWantSurveyOptions = new SurveyOptions(this.whatYouWantSurvey, this.whatYouWantSurvey.title, () => { }, this.submitWhatYouWantSurvey);
+    },
+    data() {
+        const sweetAlert = inject('sweetAlert');
+        return {
+            childIndex: 0,
+            wellnessSurvey: {},
+            whatYouWantSurvey: {},
+            wellnessSurveyOptions: new SurveyOptions({}, '', () => { }, () => { }),
+            whatYouWantSurveyOptions: new SurveyOptions({}, '', () => { }, () => { }),
+            sweetAlert
+        };
     }
 };
 </script>

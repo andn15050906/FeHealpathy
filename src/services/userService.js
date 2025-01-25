@@ -1,8 +1,8 @@
-import api from '@/api/apiCall';
+import apiClient from '@/api/apiCall';
 
 export const getUserById = async (id) => {
   try {
-    const response = await api.get(`/Users/${id}`);
+    const response = await apiClient.get(`/Users/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching user by ID:', error.response ? error.response.data : error.message);
@@ -12,7 +12,7 @@ export const getUserById = async (id) => {
 
 export const getUsers = async (query) => {
   try {
-    const response = await api.get(`/Users`, { params: query });
+    const response = await apiClient.get(`/Users`, { params: query });
     return response.data;
   } catch (error) {
     console.error('Error fetching users:', error.response ? error.response.data : error.message);
@@ -22,7 +22,7 @@ export const getUsers = async (query) => {
 
 export const getMultipleUsers = async (ids) => {
   try {
-    const response = await api.get(`/Users/multiple`, { params: { ids } });
+    const response = await apiClient.get(`/Users/multiple`, { params: { ids } });
     return response.data;
   } catch (error) {
     console.error('Error fetching multiple users:', error.response ? error.response.data : error.message);
@@ -32,7 +32,7 @@ export const getMultipleUsers = async (ids) => {
 
 export const getMinUsers = async (ids) => {
   try {
-    const response = await api.get(`/Users/min`, { params: { ids } });
+    const response = await apiClient.get(`/Users/min`, { params: { ids } });
     return response.data;
   } catch (error) {
     console.error('Error fetching minimal users:', error.response ? error.response.data : error.message);
@@ -42,7 +42,7 @@ export const getMinUsers = async (ids) => {
 
 export const getAllMinUsers = async () => {
   try {
-    const response = await api.get(`/Users/all`);
+    const response = await apiClient.get(`/Users/all`);
     return response.data;
   } catch (error) {
     console.error('Error fetching all minimal users:', error.response ? error.response.data : error.message);
@@ -52,7 +52,7 @@ export const getAllMinUsers = async () => {
 
 export const getUserAvatar = async (resourceId) => {
   try {
-    const response = await api.get(`/Users/avatar/${resourceId}`, {
+    const response = await apiClient.get(`/Users/avatar/${resourceId}`, {
       responseType: "blob",
     });
     return response.data;
@@ -65,7 +65,7 @@ export const getUserAvatar = async (resourceId) => {
 // Update user profile
 export const updateUserProfile = async (formData) => {
   try {
-    const response = await api.patch(`/Users`, formData, {
+    const response = await apiClient.patch(`/Users`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -82,7 +82,7 @@ export const updateUserProfile = async (formData) => {
 
 // export const changePassword = async (formData) => {
 //   try {
-//     const response = await api.patch('/Users', formData, {
+//     const response = await apiClient.patch('/Users', formData, {
 //       headers: {
 //         'Content-Type': 'multipart/form-data',
 //       },
@@ -102,7 +102,7 @@ export const resetPassword = async (email, token, newPassword) => {
       Token: token,
       NewPassword: newPassword,
     };
-    const response = await api.post('/Auth/ResetPassword', requestBody);
+    const response = await apiClient.post('/Auth/ResetPassword', requestBody);
     return response.data;
   } catch (error) {
     console.error('Reset password failed:', error.response ? error.response.data : error.message);
@@ -112,7 +112,7 @@ export const resetPassword = async (email, token, newPassword) => {
 
 export const forgotPassword = async (email) => {
   try {
-    const response = await api.post('/Auth/ForgotPassword', email);
+    const response = await apiClient.post('/Auth/ForgotPassword', email);
     return response.data;
   } catch (error) {
     console.error('Forgot password failed:', error.response ? error.response.data : error.message);
