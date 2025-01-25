@@ -197,7 +197,7 @@ const router = createRouter({
       component: Anxiety
     },
     {
-      path: '/diary/diary-writing/:title?',
+      path: '/diary/diary-writing/:id?/:title?',
       name: 'DiaryWriting',
       component: DiaryWriting,
       props: true

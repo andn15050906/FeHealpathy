@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { createDiaryNote, getPagedDiaryNotes } from "@/services/diaryNoteService";
+import { createDiaryNote, getPagedDiaryNotes, updateDiaryNote } from "@/services/diaryNoteService";
 
 export default {
     name: 'DiaryWriting',
@@ -69,12 +69,12 @@ export default {
                 const filter = { Title: title };
                 const response = await getPagedDiaryNotes(filter);
 
-                if (response.Items && response.Items.length > 0) {
-                    const diary = response.Items[0];
-                    this.memoryTitle = diary.Title;
-                    this.memoryDate = diary.CreationTime || new Date().toISOString().split("T")[0];
-                    this.memoryContent = diary.Content || "";
-                    this.mediaFiles = (diary.Medias || []).map((media) => ({
+                if (response.items && response.items.length > 0) {
+                    const diary = response.items[0];
+                    this.memoryTitle = diary.title;
+                    this.memoryDate = diary.creationTime || new Date().toISOString().split("T")[0];
+                    this.memoryContent = diary.content || "";
+                    this.mediaFiles = (diary.medias || []).map((media) => ({
                         file: null,
                         preview: media.Url,
                     }));
@@ -92,6 +92,7 @@ export default {
             }
 
             const formData = new FormData();
+            formData.append("Id", this.isEdit ? this.$route.params.id : "");
             formData.append("Title", this.memoryTitle);
             formData.append("Content", this.memoryContent);
 
@@ -105,8 +106,13 @@ export default {
             console.log([...formData.entries()]);
 
             try {
-                const response = await createDiaryNote(formData);
-                alert("Memory saved successfully!");
+                if (this.isEdit) {
+                    await updateDiaryNote(formData);
+                    alert("Memory updated successfully!");
+                } else {
+                    await createDiaryNote(formData);
+                    alert("Memory saved successfully!");
+                }
                 this.$router.push('/diary/diary-list');
             } catch (error) {
                 console.error("Error saving memory:", error);

@@ -19,7 +19,7 @@
         <div v-else-if="error" class="error-message">{{ error }}</div>
         <div v-else class="diary-entries">
             <div v-for="(entry, index) in filteredEntries" :key="entry.id" class="diary-card"
-                @click="viewEntry(entry.title)">
+                @click="viewEntry(entry.id, entry.title)">
                 <div class="diary-card-content">
                     <div class="diary-info">
                         <h2 class="entry-title">{{ entry.title }}</h2>
@@ -90,8 +90,13 @@ export default {
                 this.loading = false;
             }
         },
-        viewEntry(title) {
-            this.$router.push({ name: 'DiaryWriting', params: { title } });
+        viewEntry(diaryId, diaryTitle) {
+            this.$router.push({
+                name: 'DiaryWriting', params: {
+                    id: diaryId,
+                    title: diaryTitle
+                }
+            });
         },
         confirmDelete(entryId) {
             this.entryToDelete = entryId;
