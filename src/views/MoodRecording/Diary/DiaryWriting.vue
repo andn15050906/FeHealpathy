@@ -27,7 +27,7 @@
             <div class="preview-section">
                 <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
                     <img :src="file.preview" alt="Preview" class="preview-image" />
-                    <button type="button" @click="removeFile(index)" class="remove-button">
+                    <button type="button" @click="removeFile(file.id)" class="remove-button">
                         <i class="fa fa-trash"></i>
                     </button>
                 </div>
@@ -55,6 +55,7 @@ export default {
             memoryDate: '',
             memoryContent: '',
             mediaFiles: [],
+            removedFileIds: [],
             isEdit: false
         }
     },
@@ -77,6 +78,8 @@ export default {
                     this.memoryDate = diary.creationTime ? diary.creationTime.split("T")[0] : new Date().toISOString().split("T")[0];
                     this.memoryContent = diary.content || "";
                     this.mediaFiles = (diary.medias || []).map((media) => ({
+                        id: media.id,
+                        isOld: true,
                         file: null,
                         preview: media.url,
                         url: media.url,
@@ -100,15 +103,28 @@ export default {
             formData.append("Content", this.memoryContent);
 
             if (this.mediaFiles && this.mediaFiles.length > 0) {
-                this.mediaFiles.forEach((file, index) => {
+                this.mediaFiles.filter(file => !file.isOld).forEach((file, index) => {
                     if (file.url) {
                         // If the file has URL (existing media), append the URL
-                        formData.append(`Medias[${index}].Url`, file.url);
+                        formData.append(
+                            !this.isEdit ? `Medias[${index}].Url` : `AddedMedias[${index}].Url`,
+                            file.url
+                        );
                     } else if (file.file) {
                         // If the file is new (uploaded), append the actual file
-                        formData.append(`Medias[${index}].File`, file.file);
+                        formData.append(
+                            !this.isEdit ? `Medias[${index}].File` : `AddedMedias[${index}].File`,
+                            file.file
+                        );
                     }
-                    formData.append(`Medias[${index}].Title`, file.file ? file.file.name : `Existing Media ${index}`);
+                    formData.append(
+                        !this.isEdit ? `Medias[${index}].Title` : `AddedMedias[${index}].Title`,
+                        file.file ? file.file.name : `Existing Media ${index}`);
+                });
+            }
+            if (this.removedFileIds && this.removedFileIds.length > 0) {
+                this.removedFileIds.forEach(id => {
+                    formData.append(`RemovedMedias[]`, id)
                 });
             }
 
@@ -140,6 +156,7 @@ export default {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     this.mediaFiles.push({
+                        id: crypto.randomUUID(),    // Local id, not saved to DB
                         file,
                         preview: e.target.result,
                         url: null
@@ -148,8 +165,9 @@ export default {
                 reader.readAsDataURL(file);
             });
         },
-        removeFile(index) {
-            this.mediaFiles.splice(index, 1);
+        removeFile(fileId) {
+            this.removedFileIds.push(fileId);
+            this.mediaFiles = this.mediaFiles.filter(file => file.id != fileId);
         }
     }
 }

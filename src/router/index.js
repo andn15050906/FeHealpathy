@@ -54,6 +54,7 @@ import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
+import Conversation from '@/views/Community/Conversation.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -152,6 +153,11 @@ const router = createRouter({
       path: '/edit-group',
       name: 'editGroup',
       component: EditGroup
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: Conversation
     },
     {
       path: '/faq',
