@@ -21,8 +21,6 @@ import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
-import CreateGroup from '@/views/Community/CreateGroup.vue'
-import EditGroup from '@/views/Community/EditGroup.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment.vue'
 import MusicControl from '@/views/Music_Player/MusicControl.vue'
@@ -49,9 +47,13 @@ import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
 import ManageCourse from '@/views/Courses/ManageCourse.vue'
 import CreateCourse from '@/views/Courses/CreateCourse.vue'
 import UpdateCourse from '@/views/Courses/UpdateCourse.vue'
-
-
+import Calendar from '@/components/Calendar/Calendar.vue'
+import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
+import EditGroup from '@/components/GroupComponents/EditGroup.vue'
+import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
+import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
+import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -233,9 +235,10 @@ const router = createRouter({
       component: Anxiety
     },
     {
-      path: '/diary/diary-writing',
-      name: 'diaryWriting',
-      component: DiaryWriting
+      path: '/diary/diary-writing/:id?/:title?',
+      name: 'DiaryWriting',
+      component: DiaryWriting,
+      props: true
     },
     {
       path: '/diary/diary-list',
@@ -298,7 +301,7 @@ const router = createRouter({
       component: YogaView
     },
     {
-      path: '/practice/habit-tracking',
+      path: '/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
     },
@@ -323,9 +326,19 @@ const router = createRouter({
       component: PaymentsPage
     },
     {
+      path: '/calendar',
+      name: 'Calendar',
+      component: Calendar
+    },
+    {
       path: '/media-resource',
       name: 'MediaControl',
       component: MediaControl
+    },
+    {
+      path: '/survey',
+      name: 'Survey',
+      component: ManageSurvey
     }
   ]
 })

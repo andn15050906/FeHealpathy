@@ -1,8 +1,8 @@
-import api from '@/api/apiCall';
+import apiClient from '@/api/apiCall';
 
 export const getNotifications = async (receiverId) => {
   try {
-    const response = await api.get(`/notifications`, {
+    const response = await apiClient.get(`/notifications`, {
       params: { ReceiverId: receiverId }
     });
     return response.data;
@@ -14,7 +14,7 @@ export const getNotifications = async (receiverId) => {
 
 export const updateNotification = async (notificationId, status) => {
   try {
-    const response = await api.patch(`/notifications`, {
+    const response = await apiClient.patch(`/notifications`, {
       Id: notificationId,
       Status: status
     });

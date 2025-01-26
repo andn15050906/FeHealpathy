@@ -16,17 +16,22 @@
         <div class="content-section">
             <div class="content-header">
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                    alt="Upload image" 
-                    class="upload-icon" 
-                    tabindex="0" 
-                    @click="handleImageUpload" />
+                    alt="Upload image" class="upload-icon" tabindex="0" @click="triggerFileInput" />
+                <input type="file" ref="fileInput" class="visually-hidden" @change="handleFileChange" multiple
+                    accept="image/*" />
             </div>
-            <textarea 
-                class="memory-content" 
-                placeholder="Type any things.." 
-                v-model="memoryContent"
+            <textarea class="memory-content" placeholder="Type any things.." v-model="memoryContent"
                 aria-label="Memory content">
             </textarea>
+
+            <div class="preview-section">
+                <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
+                    <img :src="file.preview" alt="Preview" class="preview-image" />
+                    <button type="button" @click="removeFile(index)" class="remove-button">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="save-button">Save</button>
@@ -34,8 +39,11 @@
 </template>
 
 <script>
+import { createDiaryNote, getPagedDiaryNotes, updateDiaryNote } from "@/services/diaryNoteService";
+
 export default {
-    name: 'MemoryEntryForm',
+    name: 'DiaryWriting',
+    props: ['title'],
     created() {
         if (this.$route.path === '/diary/diary-writing') {
             this.memoryDate = new Date().toISOString().split('T')[0]
@@ -46,17 +54,102 @@ export default {
             memoryTitle: '',
             memoryDate: '',
             memoryContent: '',
+            mediaFiles: [],
+            isEdit: false
+        }
+    },
+    async mounted() {
+        const title = this.$route.params.title;
+        if (title) {
+            this.isEdit = true;
+            await this.fetchDiaryNote(title);
         }
     },
     methods: {
-        handleSubmit() {
-            // Form submission logic
+        async fetchDiaryNote(title) {
+            try {
+                const filter = { Title: title };
+                const response = await getPagedDiaryNotes(filter);
+
+                if (response.items && response.items.length > 0) {
+                    const diary = response.items[0];
+                    this.memoryTitle = diary.title;
+                    this.memoryDate = diary.creationTime ? diary.creationTime.split("T")[0] : new Date().toISOString().split("T")[0];
+                    this.memoryContent = diary.content || "";
+                    this.mediaFiles = (diary.medias || []).map((media) => ({
+                        file: null,
+                        preview: media.url,
+                        url: media.url,
+                    }));
+                } else {
+                    alert("Diary note not found.");
+                }
+            } catch (error) {
+                alert("Failed to load diary. Please try again.");
+            }
+        },
+        async handleSubmit() {
+            if (!this.memoryTitle || !this.memoryDate || !this.memoryContent) {
+                alert("Please fill in all fields before saving.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("Id", this.isEdit ? this.$route.params.id : "");
+            formData.append("Title", this.memoryTitle);
+            formData.append("Content", this.memoryContent);
+
+            if (this.mediaFiles && this.mediaFiles.length > 0) {
+                this.mediaFiles.forEach((file, index) => {
+                    if (file.url) {
+                        // If the file has URL (existing media), append the URL
+                        formData.append(`Medias[${index}].Url`, file.url);
+                    } else if (file.file) {
+                        // If the file is new (uploaded), append the actual file
+                        formData.append(`Medias[${index}].File`, file.file);
+                    }
+                    formData.append(`Medias[${index}].Title`, file.file ? file.file.name : `Existing Media ${index}`);
+                });
+            }
+
+            console.log([...formData.entries()]);
+
+            try {
+                if (this.isEdit) {
+                    await updateDiaryNote(formData);
+                    alert("Memory updated successfully!");
+                } else {
+                    await createDiaryNote(formData);
+                    alert("Memory saved successfully!");
+                }
+                this.$router.push('/diary/diary-list');
+            } catch (error) {
+                console.error("Error saving memory:", error);
+                alert("Failed to save memory. Please try again.");
+            }
         },
         handleBack() {
             this.$router.push('/diary/diary-list')
         },
-        handleImageUpload() {
-            // Image upload logic
+        triggerFileInput() {
+            this.$refs.fileInput.click();
+        },
+        handleFileChange(event) {
+            const files = event.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.mediaFiles.push({
+                        file,
+                        preview: e.target.result,
+                        url: null
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+        removeFile(index) {
+            this.mediaFiles.splice(index, 1);
         }
     }
 }
@@ -197,6 +290,62 @@ export default {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+}
+
+
+.preview-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    /* Increased gap between items */
+    justify-content: flex-start;
+}
+
+.preview-item {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.preview-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: #ff0000;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.remove-button:hover {
+    transform: scale(1.2);
+}
+
+.remove-button i {
+    margin: 0;
+}
+
+.preview-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 991px) {

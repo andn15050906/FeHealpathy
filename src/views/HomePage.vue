@@ -103,8 +103,8 @@ export default {
         setActivePricing: function () {
 
         },
-        navigateToSettings: function (notiId) {
-            this.$router.push({ path: 'settings' });
+        navigateToSettingUp: function (notiId) {
+            this.$router.push({ path: 'setting-up' });
             this.$emit('removeNotification', notiId);
         }
     },
@@ -133,13 +133,14 @@ export default {
         this.user = getUserAuthData();
 
         // handle setting up
-        if (this.user.preferences && this.user.preferences.length == 0) {
+        if (!this.user)
+            return;
+        /*if (this.user.preferences && this.user.preferences.length == 0) {
             this.$router.push({ path: 'setting-up' });
-        }
-
+        }*/
         if (this.user.settings && this.user.settings.length == 0) {
             let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
-            noti.callback = () => this.navigateToSettings(noti.id);
+            noti.callback = () => this.navigateToSettingUp(noti.id);
             this.$emit('addNotification', noti);
         }
     }

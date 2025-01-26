@@ -1,4 +1,4 @@
-import api from '@/api/apiCall';
+import apiClient from '@/api/apiCall';
 import { backendApiBase } from '@/api/env';
 
 export const signIn = async (identifier, password) => {
@@ -8,7 +8,7 @@ export const signIn = async (identifier, password) => {
       Password: password,
     };
 
-    const response = await api.post('/Auth/SignIn', requestBody);
+    const response = await apiClient.post('/Auth/SignIn', requestBody);
     return response.data;
   } catch (error) {
     console.error('Login failed:', error.response ? error.response.data : error.message);
@@ -25,7 +25,7 @@ export const register = async (username, email, password) => {
       Email: email,
       Password: password,
     };
-    const response = await api.post('/Users', requestBody);
+    const response = await apiClient.post('/Users', requestBody);
     return response.data;
   } catch (error) {
     console.error('Registration failed:', error.response ? error.response.data : error.message);
@@ -39,7 +39,7 @@ export const verifyEmail = async (email, token) => {
       Email: email,
       Token: token,
     };
-    const response = await api.post('/users/verify', requestBody);
+    const response = await apiClient.post('/users/verify', requestBody);
     return response;
   } catch (error) {
     console.error('Verification failed:', error.response ? error.response.data : error.message);
