@@ -21,6 +21,8 @@
             <hr class="menu-divider" />
             <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
             <hr class="menu-divider" />
+            <li><router-link to="/blogs/manage">Quản lý blog</router-link></li>
+            <hr class="menu-divider" />
 
             <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học
                 đã mua</router-link></li>

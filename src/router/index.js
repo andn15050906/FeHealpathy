@@ -41,6 +41,12 @@ import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
+import CreateBlog from '@/views/Blogs/CreateBlog.vue'
+import ManageBlog from '@/views/Blogs/ManageBlog.vue'
+import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
+import ManageCourse from '@/views/Courses/ManageCourse.vue'
+import CreateCourse from '@/views/Courses/CreateCourse.vue'
+import UpdateCourse from '@/views/Courses/UpdateCourse.vue'
 import Calendar from '@/components/Calendar/Calendar.vue'
 import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
@@ -72,6 +78,21 @@ const router = createRouter({
       component: BlogCatalog
     },
     {
+      path: '/blogs/create',
+      name: 'createBlog',
+      component: CreateBlog
+    },
+    {
+      path: '/blogs/manage',
+      name: 'manageBlog',
+      component: ManageBlog
+    },
+    {
+      path: '/blogs/update',
+      name: 'updateBlog',
+      component: UpdateBlog
+    },
+    {
       path: '/blogs/:id',
       name: 'blogDetail',
       component: BlogDetail
@@ -90,6 +111,21 @@ const router = createRouter({
       path: '/courses',
       name: 'courseList',
       component: CourseList
+    },
+    {
+      path: '/courses/create',
+      name: 'createCourse',
+      component: CreateCourse
+    },
+    {
+      path: '/courses/manage',
+      name: 'manageCourse',
+      component: ManageCourse
+    },
+    {
+      path: '/courses/update',
+      name: 'updateCourse',
+      component: UpdateCourse
     },
     {
       path: '/community',
@@ -228,6 +264,11 @@ const router = createRouter({
       path: '/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
+    },
+    {
+      path: '/create-group',
+      name: 'createGroup',
+      component: CreateGroup,
     },
     {
       path: '/assignments/create',
