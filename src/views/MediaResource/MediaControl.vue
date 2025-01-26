@@ -1,8 +1,10 @@
 <template>
     <div class="container mt-4">
-        <h3 class="p-2">Media Control</h3>
         <div v-if="showAddMusic">
             <AddMusic @cancel="toggleAddMusic" @add-music="createMedia" />
+        </div>
+        <div v-else-if="showEditMusic">
+            <EditMusic :music="selectedMusic" @cancel="toggleEditMusic" @edit-music="updateMedia" />
         </div>
         <div v-else>
             <MediaList :mediaFiles="mediaFiles" @edit-media="editMedia" @delete-media="deleteMedia" />
@@ -67,7 +69,8 @@ export default {
             this.showAddMusic = !this.showAddMusic;
         },
         toggleEditMusic() {
-            this.showEditMusic = !this.showEditMusic;
+            this.showEditMusic = false;
+            this.selectedMusic = null;
         },
         async createMedia(newMusic) {
             try {
@@ -80,15 +83,21 @@ export default {
                 toast.error("Failed to add media.");
             }
         },
-        async updateMedia(updatedMusic) {
+        async updateMedia(updatedMusicFormData) {
             try {
-                await updateMediaResource(updatedMusic.id, updatedMusic);
-                if (this.selectedMusicIndex !== null) {
-                    this.$set(this.mediaFiles, this.selectedMusicIndex, updatedMusic);
-                }
+                const response = await updateMediaResource(updatedMusicFormData);
+                // const updatedMedia = response.data;
+                // if (this.selectedMusicIndex !== null) {
+                //     this.$set(this.mediaFiles, this.selectedMusicIndex, updatedMedia);
+                // }
                 this.showEditMusic = false;
+                this.selectedMusic = null;
+
+                await this.fetchMediaResources(this.currentPage);
+
                 toast.success("Media updated successfully!");
             } catch (error) {
+                console.log(error);
                 toast.error("Failed to update media.");
             }
         },

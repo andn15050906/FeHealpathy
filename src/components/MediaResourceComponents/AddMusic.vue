@@ -51,7 +51,6 @@
 
 <script>
 import { createMediaResource } from "../../services/mediaResourcesService";
-import { toast } from "vue3-toastify";
 
 export default {
     data() {
@@ -95,7 +94,6 @@ export default {
                 this.error = null;
             } else {
                 this.error = "Only MP3 files are allowed.";
-                toast.error(this.error);
             }
         },
         handleUrlInput() {
@@ -106,13 +104,11 @@ export default {
         async handleAddMusic() {
             if (!this.newMusic.title || !this.newMusic.artistName || !this.newMusic.description) {
                 this.error = "Please fill all required fields.";
-                toast.error(this.error);
                 return;
             }
 
             if (!this.newMusic.file && !this.newMusic.url) {
                 this.error = "Please upload an MP3 file or provide a valid URL.";
-                toast.error(this.error);
                 return;
             }
 
@@ -133,13 +129,10 @@ export default {
                     formData.append("Media.Url", this.newMusic.url);
                 }
 
-                const response = await createMediaResource(formData);
-                toast.success("Music added successfully.");
-                this.$emit("add-music", response.data);
+                this.$emit("add-music", formData);
                 this.newMusic = { title: "", artistName: "", description: "", url: "", file: null };
             } catch (err) {
                 this.error = "Failed to add music. Please try again.";
-                toast.error(this.error);
             } finally {
                 this.loading = false;
             }
