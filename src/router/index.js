@@ -51,7 +51,7 @@ import Calendar from '@/components/Calendar/Calendar.vue'
 import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
-import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue
+import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
 
