@@ -22,6 +22,6 @@ export const updateMediaResource = async (id, formData) => {
   });
 };
 
-export const deleteMediaResource = async (resourceId) => {
-  return await del(`${API_BASE_URL}/${resourceId}`);
+export const deleteMediaResource = async (id) => {
+  return await del(`${API_BASE_URL}/${id}`);
 };

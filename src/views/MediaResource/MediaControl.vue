@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
 import MediaList from "../../components/MediaResourceComponents/MediaList.vue";
 import Pagination from "../../components/Common/Pagination.vue";
 import AddMusic from "../../components/MediaResourceComponents/AddMusic.vue";
@@ -50,7 +51,7 @@ export default {
                     Artist: "",
                     Title: "",
                     Type: null,
-                    PageIndex: page -1,
+                    PageIndex: page - 1,
                     PageSize: 10,
                 };
                 const response = await getPagedMediaResources(params);
@@ -59,7 +60,7 @@ export default {
                     this.totalPages = response.pageCount || 1;
                 }
             } catch (error) {
-                console.error(error);
+                toast.error("Failed to fetch media resources.");
             }
         },
         toggleAddMusic() {
@@ -74,8 +75,9 @@ export default {
                 this.mediaFiles.push(response.data);
                 this.showAddMusic = false;
                 await this.fetchMediaResources(this.currentPage);
+                toast.success("Media added successfully!");
             } catch (error) {
-                console.error(error);
+                toast.error("Failed to add media.");
             }
         },
         async updateMedia(updatedMusic) {
@@ -85,8 +87,9 @@ export default {
                     this.$set(this.mediaFiles, this.selectedMusicIndex, updatedMusic);
                 }
                 this.showEditMusic = false;
+                toast.success("Media updated successfully!");
             } catch (error) {
-                console.error(error);
+                toast.error("Failed to update media.");
             }
         },
         editMedia(media, index) {
@@ -99,8 +102,10 @@ export default {
                 try {
                     await deleteMediaResource(mediaId);
                     this.mediaFiles.splice(index, 1);
+                    await this.fetchMediaResources(this.currentPage);
+                    toast.success("Media deleted successfully!");
                 } catch (error) {
-                    console.error(error);
+                    toast.error("Failed to delete media.");
                 }
             }
         },
