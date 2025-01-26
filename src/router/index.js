@@ -41,6 +41,7 @@ import EmotionTracking from '@/views/MoodRecording/EmotionTracking.vue'
 import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
 import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import Register from '@/views/Profile/Register.vue'
+import Calendar from '@/components/Calendar/Calendar.vue'
 import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
@@ -282,6 +283,11 @@ const router = createRouter({
       path: '/payments',
       name: 'Payments',
       component: PaymentsPage
+    },
+    {
+      path: '/calendar',
+      name: 'Calendar',
+      component: Calendar
     },
     {
       path: '/media-resource',
