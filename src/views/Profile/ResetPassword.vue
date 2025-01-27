@@ -17,7 +17,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { resetPassword } from '@/services/userService.js';
+import { resetPassword } from '@/scripts/api/services/userService.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,7 +41,7 @@ const handleResetPassword = async () => {
     await resetPassword(email, token, newPassword.value);
     message.value = 'Password reset successful!';
     isSuccess.value = true;
-    setTimeout(() => router.push('/sign-in'), 2000); // Redirect after 2 seconds
+    setTimeout(() => router.push({ name: 'signIn' }), 2000);
   } catch (error) {
     message.value = 'Password reset failed. Please try again.';
     isSuccess.value = false;

@@ -15,14 +15,13 @@
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
-import { useRouter } from 'vue-router';
 import { ref, provide, onMounted } from 'vue';
-import { getUserAuthData } from '@/services/authService';
+import { RouterView, useRouter } from 'vue-router';
+import { getUserAuthData } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
-import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
-import SweetAlert from './components/Common/SweetAlert.vue';
+import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
+import SweetAlert from './components/Common/Popup/SweetAlert.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 
 const loadingSpinner = ref(null);

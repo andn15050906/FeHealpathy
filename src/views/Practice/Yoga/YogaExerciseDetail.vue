@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import data from '@/api/data';
+import data from '@/scripts/data/data';
 import YogaExerciseCard from '@/components/PracticeComponents/YogaExerciseCard.vue';
 
 export default {

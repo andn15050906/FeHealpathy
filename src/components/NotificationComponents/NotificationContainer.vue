@@ -12,7 +12,7 @@
 <script>
 import HighlightedNotification from '@/components/NotificationComponents/HighlightedNotification.vue';
 import QuestionNotification from './QuestionNotification.vue';
-import { Noti } from '@/api/Models';
+import { Noti } from '@/scripts/types/models';
 
 export default {
     name: 'NotificationContainer',

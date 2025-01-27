@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import HeroImg from '../../components/Helper/HeroImg.vue'
+import HeroImg from '../../components/Common/Misc/HeroImg.vue'
 import BlogMeta from '../../components/BlogComponents/BlogMeta.vue'
-import ScrollToTop from '../../components/Misc/ScrollToTop.vue'
+import ScrollToTop from '../../components/Common/Misc/ScrollToTop.vue'
 import BlogRelatedItems from '@/components/BlogComponents/BlogRelatedItems.vue'
 import BlogCommentSection from '@/components/BlogComponents/BlogCommentSection.vue';
 import BlogContent from '@/components/BlogComponents/BlogContent.vue';

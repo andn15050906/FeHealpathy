@@ -87,9 +87,9 @@ import PostCreateSection from '@/components/CommunityComponents/CreatePostSectio
 import JoinRequest from '@/components/CommunityComponents/JoinRequest.vue';
 import GroupMemberSection from '@/components/CommunityComponents/GroupMemberSection.vue';
 import GroupPost from '@/components/CommunityComponents/GroupPost.vue';
-import GlobalState from '@/helpers/globalState';
-import dict from '@/api/dictionary';
-import data from '@/api/data';
+import GlobalState from '@/scripts/logic/globalState';
+import dict from '@/scripts/data/dictionary';
+import data from '@/scripts/data/data';
 
 const route = useRoute();
 const groupInfo = ref({});

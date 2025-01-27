@@ -44,9 +44,9 @@
 
 <script>
 import { inject } from 'vue';
-import router from '@/router';
-import { readErr } from '@/helpers/common';
-import { getGoogleOAuthPath, setUserAuthData, signIn } from '@/services/authService';
+import router from '@/scripts/router';
+import { readErr } from '@/scripts/logic/common';
+import { getGoogleOAuthPath, setUserAuthData, signIn } from '@/scripts/api/services/authService';
 
 export default {
 	data() {

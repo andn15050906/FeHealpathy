@@ -2,7 +2,7 @@
     <GlowingCard class="excercise-card" justify="unset" padding="10px">
         <div style="flex-grow: 1;">
             <div class="excercise-thumbnail">
-                <RouterLink :to="`/practice/yoga/${excercise.id}`">
+                <RouterLink :to="`/yoga/${excercise.id}`">
                     <img :src="excercise.thumbnail" :alt="excercise.title">
                 </RouterLink>
                 <span class="duration">{{ excercise.duration }}</span>

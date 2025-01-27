@@ -81,12 +81,12 @@
 
 <script>
 import { inject, ref, onMounted } from 'vue';
-import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
-import { updateUserProfile } from '../../services/userService.js';
-import { getUserAuthData } from '@/services/authService';
-import { handleFormSubmit } from '@/helpers/validation';
-import GlobalState from '@/helpers/globalState';
-import dict from '@/api/dictionary.json';
+import { ConvertTo_yyyy_mm_dd } from '../../scripts/logic/common';
+import { updateUserProfile } from '../../scripts/api/services/userService.js';
+import { getUserAuthData } from '@/scripts/api/services/authService';
+import { handleFormSubmit } from '@/scripts/logic/validation';
+import GlobalState from '@/scripts/logic/globalState';
+import dict from '@/scripts/data/dictionary.json';
 
 export default {
   data() {
@@ -117,7 +117,7 @@ export default {
     const text = dict['en'];
 
     const roleMapping = {
-      1: 'Instructor',
+      1: 'Advisor',
       2: 'Learner',
       3: 'Admin'
     };
