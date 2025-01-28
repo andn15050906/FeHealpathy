@@ -19,14 +19,23 @@
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
             <hr class="menu-divider" />
+            <li><router-link to="/settings">Cài đặt</router-link></li>
+            <hr class="menu-divider" />
             <li><router-link to="/change-password">Đổi mật khẩu</router-link></li>
             <hr class="menu-divider" />
 
-            <li v-if="user.role === 'Learner' || user.role === 'Instructor'"><router-link to="/enrolled-course">Khóa học
-                đã mua</router-link></li>
-            <li v-if="user.role === 'Instructor'"><router-link to="/courses">Quản lý khóa học</router-link></li>
-            <li v-if="user.role === 'Admin'"><router-link to="/admin">Admin</router-link></li>
-            <hr v-if="['Learner', 'Instructor', 'Admin'].includes(user.role)" class="menu-divider" />
+            <li v-if="user.role === 'Learner' || user.role === 'Advisor'">
+              <router-link to="/enrolled-course">Khóa học đã mua</router-link>
+            </li>
+            <li v-if="user.role === 'Advisor'">
+              <router-link to="/courses">Quản lý khóa học</router-link>
+              <router-link to="/blogs/manage">Quản lý blog</router-link>
+            </li>
+            <li v-if="user.role === 'Admin'">
+              <router-link to="/admin">Admin</router-link>
+              <router-link to="/blogs/manage">Quản lý blog</router-link>
+            </li>
+            <hr v-if="['Learner', 'Advisor', 'Admin'].includes(user.role)" class="menu-divider" />
 
             <li>
               <button @click="signOut">Đăng xuất</button>
@@ -42,9 +51,9 @@
 </template>
 
 <script>
-import { getUserAuthData, signOut } from '@/services/authService';
-import Logo from '../Helper/Logo.vue';
-// import { getNotifications, updateNotification } from '@/services/notificationService';
+import { getUserAuthData, signOut } from '@/scripts/api/services/authService';
+import Logo from '@/components/Common/Misc/Logo.vue';
+// import { getNotifications, updateNotification } from '@/scripts/api/services/notificationService';
 
 export default {
   data() {
@@ -110,7 +119,7 @@ export default {
         await signOut();
         this.isLoggedIn = false;
         this.user = { name: '', role: '' };
-        this.$router.push('/sign-in');
+        this.$router.push({ name: 'signIn' });
       } catch (error) {
         console.error('Error signing out:', error);
       }

@@ -17,9 +17,7 @@ export default {
   },
   methods: {
     navigateToDiary() {
-      this.$router.push({
-        path: '/diary/diary-writing'
-      })
+      this.$router.push({ name: 'diaryList' })
     }
   }
 }
@@ -60,4 +58,4 @@ export default {
 .diary-button:active {
   transform: translateY(0);
 }
-</style> 
+</style>

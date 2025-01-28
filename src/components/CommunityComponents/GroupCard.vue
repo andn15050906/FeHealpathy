@@ -16,7 +16,7 @@
 
 <script setup>
 import { onMounted, ref, defineProps } from 'vue';
-import dict from '@/api/dictionary.json';
+import dict from '@/scripts/data/dictionary.json';
 
 const text = ref({
     members: '',

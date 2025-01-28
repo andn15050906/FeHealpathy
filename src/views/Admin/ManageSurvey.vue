@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { get, post, patch, del } from "@/api/apiCall";
+import { get, post, patch, del } from "@/scripts/api/apiClients";
 
 export default {
     data() {

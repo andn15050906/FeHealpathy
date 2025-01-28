@@ -1,10 +1,12 @@
 <template>
     <div class="glowing" padding="10px">
-        <a :href="article.Link" class="article-link">
-            <img :src="article.Thumb" :alt="article.Title" class="article-image" />
-        </a>
+        <RouterLink :to="`/blogs/${article.Link ? article.Link : 1}`" class="article-link">
+            <img :src="article.Thumb" alt="Featured" class="article-image" loading="lazy" />
+        </RouterLink>
         <div class="article-content">
-            <a :href="article.Link" class="article-title">{{ article.Title }}</a>
+            <RouterLink :to="`/blogs/${article.Link ? article.Link : 1}`" class="article-link">
+                {{ article.Title }}
+            </RouterLink>
             <time class="article-date">{{ article.Date }}</time>
             <div class="article-tags">
                 <span v-for="tag in article.Tags" :key="tag" class="article-tag" @click="handleTagClick(tag)">
@@ -17,6 +19,9 @@
 
 
 <script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 const props = defineProps({
     article: {
         type: Object
@@ -26,9 +31,9 @@ const props = defineProps({
 // keep in both BlogCardWithTags and SearchBlogResult
 const handleTagClick = (tagOrCategory) => {
     if (tagOrCategory.Title) {
-        this.$router.push({ path: '/search-blogs', query: { category: tagOrCategory.Id, page: 1 } });
+        router.push({ name: 'searchBlogs', query: { category: tagOrCategory.Id, page: 1 } });
     } else {
-        this.$router.push({ path: '/search-blogs', query: { tag: tagOrCategory, page: 1 } });
+        router.push({ name: 'searchBlogs', query: { tag: tagOrCategory, page: 1 } });
     }
 }
 </script>
@@ -62,6 +67,11 @@ const handleTagClick = (tagOrCategory) => {
 .article-title {
     margin-top: 16px;
     font-size: 24px;
+    color: #000;
+}
+
+.article-link {
+    text-decoration: none;
     color: #000;
 }
 

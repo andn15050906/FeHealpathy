@@ -12,7 +12,7 @@
 
 
 <script>
-import { Noti } from '@/api/Models';
+import { Noti } from '@/scripts/types/models';
 
 export default {
     name: 'HighlightedNotification',

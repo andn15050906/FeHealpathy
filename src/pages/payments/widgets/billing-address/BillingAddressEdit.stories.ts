@@ -18,9 +18,10 @@ export const Default = () => ({
         isPrimary: false,
         street: 'Ap #285-7193 Ullamcorper Avenue',
         city: 'Amesbury',
-        state: 'HI',
-        postalCode: '93373',
-        country: 'US',
+        ward: '',
+        district: '',
+        country: '',
+        phone: ''
       } satisfies BillingAddress,
     }
   },
@@ -45,9 +46,10 @@ export const Empty = () => ({
         isPrimary: false,
         street: '',
         city: '',
-        state: '',
-        postalCode: '',
+        ward: '',
+        district: '',
         country: '',
+        phone: ''
       } satisfies BillingAddress,
     }
   },

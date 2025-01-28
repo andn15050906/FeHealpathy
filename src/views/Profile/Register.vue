@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { register } from '@/services/authService';
+import { register } from '@/scripts/api/services/authService';
 
 export default {
   data() {
@@ -94,7 +94,7 @@ export default {
         try {
           await register(form.value.username, form.value.email, form.value.password);
           this.generalError = 'Registration successful! Please check your email to verify your account.';
-          setTimeout(() => router.push('/sign-in'), 2000);
+          setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
           console.error('Registration error:', error);
           this.generalError = 'Registration failed. Please try again.';

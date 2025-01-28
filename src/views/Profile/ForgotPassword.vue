@@ -24,7 +24,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { forgotPassword } from '@/services/userService.js';
+import { forgotPassword } from '@/scripts/api/services/userService.js';
 
 const email = ref('');
 const message = ref('');
@@ -36,7 +36,7 @@ const handleForgotPassword = async () => {
     await forgotPassword(email.value);
     message.value = 'Password reset email sent!';
     isSuccess.value = true;
-    setTimeout(() => router.push('/sign-in'), 2000);
+    setTimeout(() => router.push({ name: 'signIn' }), 2000);
   } catch (error) {
     message.value = 'Failed to send password reset email. Please try again.';
     isSuccess.value = false;

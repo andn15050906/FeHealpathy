@@ -75,8 +75,8 @@
 </template>
 
 <script>
-import data from '../../api/data.json';
-import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
+import data from '../../scripts/data/data.json';
+import { ConvertTo_yyyy_mm_dd } from '../../scripts/logic/common';
 
 export default {
     data() {

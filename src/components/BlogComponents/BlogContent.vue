@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import MockApi from '@/api/MockApi';
+import MockApi from '@/scripts/data/MockApi';
 
 export default {
   name: 'BlogContent',

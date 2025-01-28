@@ -7,13 +7,13 @@
 
 <script>
 import { inject } from 'vue';
-import { getPagedSurveys } from '@/services/surveysService';
-import { createSubmission } from '@/services/submissionsService';
-import { getAllPreferenceSurveys, updateUserPreference } from '@/services/preferencesService'
+import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import { createSubmission } from '@/scripts/api/services/submissionsService';
+import { getAllPreferenceSurveys, updateUserPreference } from '@/scripts/api/services/preferencesService'
 import SingleSelectSurvey from "./SingleSelectSurvey.vue";
 import MultipleSelectSurvey from "./MultipleSelectSurvey.vue";
 import { SurveyOptions } from "./SurveyOptions";
-import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/api/dtos';
+import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/scripts/types/dtos';
 
 export default {
     components: { SingleSelectSurvey, MultipleSelectSurvey },
