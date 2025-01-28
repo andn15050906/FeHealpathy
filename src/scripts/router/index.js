@@ -64,7 +64,7 @@ import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
-import Conversation from '@/components/CommunityComponents/ConversationWindow.vue'
+import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -344,7 +344,7 @@ const router = createRouter({
     {
       path: '/chat',
       name: 'chat',
-      component: Conversation,
+      component: ConversationWindow,
       meta: { requiresAuth: true }
     },
 

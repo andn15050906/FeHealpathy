@@ -1,6 +1,6 @@
 <template>
     <router-link to="/" class="logo-link" :style="{ height: height + 'px' }">
-        <img loading="lazy" src="../../../../public/assets/images/logo.png" alt="Logo" class="logo" />
+        <img loading="lazy" src="/assets/images/logo.png" alt="Logo" class="logo" />
     </router-link>
 </template>
 

@@ -1,33 +1,35 @@
 <template>
     <div class="window-container">
-        <form v-if="addNewRoom" @submit.prevent="createRoom">
-            <input v-model="addRoomUsername" type="text" placeholder="Add username" />
-            <button type="submit" :disabled="disableForm || !addRoomUsername">
-                Create Room
-            </button>
-            <button class="button-cancel" @click="addNewRoom = false">Cancel</button>
-        </form>
+        <div v-if="boxWindow">
+            <form v-if="addNewRoom" @submit.prevent="createRoom">
+                <input v-model="addRoomUsername" type="text" placeholder="Add username" />
+                <button type="submit" :disabled="disableForm || !addRoomUsername">
+                    Create Room
+                </button>
+                <button class="button-cancel" @click="addNewRoom = false">Cancel</button>
+            </form>
 
-        <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
-            <input v-model="invitedUsername" type="text" placeholder="Add username" />
-            <button type="submit" :disabled="disableForm || !invitedUsername">
-                Add User
-            </button>
-            <button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
-        </form>
+            <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
+                <input v-model="invitedUsername" type="text" placeholder="Add username" />
+                <button type="submit" :disabled="disableForm || !invitedUsername">
+                    Add User
+                </button>
+                <button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
+            </form>
 
-        <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
-            <select v-model="removeUserId">
-                <option default value="">Select User</option>
-                <option v-for="user in removeUsers" :key="user._id" :value="user._id">
-                    {{ user.username }}
-                </option>
-            </select>
-            <button type="submit" :disabled="disableForm || !removeUserId">
-                Remove User
-            </button>
-            <button class="button-cancel" @click="removeRoomId = null">Cancel</button>
-        </form>
+            <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
+                <select v-model="removeUserId">
+                    <option default value="">Select User</option>
+                    <option v-for="user in removeUsers" :key="user._id" :value="user._id">
+                        {{ user.username }}
+                    </option>
+                </select>
+                <button type="submit" :disabled="disableForm || !removeUserId">
+                    Remove User
+                </button>
+                <button class="button-cancel" @click="removeRoomId = null">Cancel</button>
+            </form>
+        </div>
 
         <vue-advanced-chat ref="chatWindow" :height="screenHeight" :theme="'light'" :styles="JSON.stringify(styles)"
             :current-user-id="currentUserId" :room-id="roomId" :rooms="JSON.stringify(loadedRooms)"
@@ -134,14 +136,39 @@ const messageStore = [
 ];
 
 export default {
+    props: {
+        boxWindow: {
+            type: Boolean
+        }
+    },
     async mounted() {
         //const styles = await import('../../assets/conversation.css')
-        const style = document.createElement('style')
-        style.innerHTML =
+        this.addStyle(
             `.vac-icon-textarea-left {
                 display: none !important;
-            }`;
-        this.$refs.chatWindow.shadowRoot.appendChild(style);
+            }`
+        );
+
+        if (!this.fullWindow) {
+            this.addStyle(
+                `.vac-rooms-container {
+                    display: none !important;
+                }
+                .vac-toggle-button {
+                    display: none !important;
+                }`
+            );
+            this.menuActions = [
+                { name: 'toggleChat', title: 'Toggle Chat' }
+            ];
+        }
+        else {
+            this.menuActions = [
+                { name: 'inviteUser', title: 'Invite User' },
+                { name: 'removeUser', title: 'Remove User' },
+                { name: 'deleteRoom', title: 'Delete Room' }
+            ];
+        }
 
         this.currentUserId = (await getUserAuthData()).id;
         //...
@@ -185,11 +212,7 @@ export default {
                 { name: 'removeUser', title: 'Remove User' },
                 { name: 'deleteRoom', title: 'Delete Room' }
             ],
-            menuActions: [
-                { name: 'inviteUser', title: 'Invite User' },
-                { name: 'removeUser', title: 'Remove User' },
-                { name: 'deleteRoom', title: 'Delete Room' }
-            ],
+            menuActions: [],
             messageSelectionActions: [{ name: 'deleteMessages', title: 'Delete' }],
             styles: { container: { borderRadius: '4px' } },
             templatesText: [
@@ -213,10 +236,21 @@ export default {
             return this.rooms.slice(0, this.roomsLoadedCount)
         },
         screenHeight() {
-            return window.innerHeight + 'px'
+            return !this.boxWindow ? '750px' : '460px';
         }
     },
     methods: {
+        addStyle(style, id) {
+            let element = document.createElement('style');
+            element.innerHTML = style;
+            Object.assign(element, { id: id })
+            this.$refs.chatWindow.shadowRoot.appendChild(element);
+        },
+        removeStyle(id) {
+            let element = this.$refs.chatWindow.shadowRoot.getElementById(id);
+            element.parentNode.removeChild(element);
+        },
+
         resetRooms() {
             this.loadingRooms = true
             this.loadingLastMessageByRoom = 0
@@ -355,7 +389,6 @@ export default {
                 })
             })
 
-            console.log(roomList);
             const formattedRooms = []
 
             Object.keys(roomList).forEach(key => {
@@ -365,8 +398,7 @@ export default {
                     user => user._id !== this.currentUserId
                 )
 
-                room.roomName =
-                    roomContacts.map(user => user.username).join(', ') || 'Myself'
+                room.roomName = roomContacts.map(user => user.username).join(', ') || 'Myself'
 
                 const roomAvatar =
                     roomContacts.length === 1 && roomContacts[0].avatar
@@ -489,7 +521,6 @@ export default {
                 return
             }
 
-            console.log(4);
             this.selectedRoom = room.roomId;
 
             (() => {
@@ -582,8 +613,6 @@ export default {
         },
 
         formatMessage(room, message) {
-            console.log(message);
-
             // const senderUser = room.users.find(user => user._id === message.sender_id)
             const formattedMessage = {
                 ...message,
@@ -599,8 +628,6 @@ export default {
                     distributed: true
                 }
             }
-
-            console.log(formattedMessage);
 
             if (message.replyMessage) {
                 formattedMessage.replyMessage = {
@@ -819,6 +846,8 @@ export default {
 
         menuActionHandler({ action, roomId }) {
             switch (action.name) {
+                case 'toggleChat':
+                    return this.toggleChat();
                 case 'inviteUser':
                     return this.inviteUser(roomId)
                 case 'removeUser':
@@ -880,12 +909,10 @@ export default {
                     }
                 })
             })*/
-            console.log(6);
             //this.roomsListeners.push(listener)
         },
 
         listenUsersOnlineStatus(rooms) {
-            console.log(7);
             /*rooms.forEach(room => {
                 room.users.forEach(user => {
                     const listener = firebaseService.firebaseListener(
@@ -934,6 +961,10 @@ export default {
             this.addNewRoom = false
             this.addRoomUsername = ''
             this.fetchRooms()
+        },
+
+        toggleChat() {
+            this.$emit("toggleChat");
         },
 
         inviteUser(roomId) {
