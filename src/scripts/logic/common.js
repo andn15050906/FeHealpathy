@@ -77,10 +77,23 @@ export const parseTimestamp = (timestamp, format = '') => {
     return date
 }
 
-export const formatTimestamp = (date, timestamp) => {
-    const timestampFormat = isSameDay(date, new Date()) ? 'HH:mm' : 'DD/MM/YY'
-    const result = parseTimestamp(timestamp, timestampFormat)
-    return timestampFormat === 'HH:mm' ? `Today, ${result}` : result
+export const formatISODate = (isoDate) => {
+    const date = new Date(isoDate);
+    const timestampFormat = isSameDay(date, new Date()) ? 'HH:mm' : 'DD/MM/YY';
+    
+    let result;
+    if (timestampFormat === 'HH:mm') {
+        result = date.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+        return `Today, ${result}`;
+    } else {
+        result = date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        return result;
+    }
+};
+
+export const reactionMap = {
+    'U+1F601': '😁',
+    'U+1F970': '🥰'
 }
 
 export { ConvertTo_yyyy_mm_dd, readErr }

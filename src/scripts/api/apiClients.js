@@ -40,7 +40,8 @@ const apiCall = async (method, url, data = null, params = null) => {
     });
     return response.data;
   } catch (error) {
-    handleError(error);
+    throw error;
+    //handleError(error);
   }
 };
 
@@ -54,7 +55,8 @@ const formApiCall = async (method, url, data = null, params = null) => {
     });
     return response.data;
   } catch (error) {
-    handleError(error);
+    throw error;
+    //handleError(error);
   }
 };
 

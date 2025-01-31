@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getUserBearerToken } from '@/scripts/api/services/authService'
 
 import HomePage from '@/views/HomePage.vue'
 import SignIn from '@/views/Profile/SignIn.vue'
@@ -396,7 +397,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = localStorage.getItem('token');
+    const token = getUserBearerToken();
     if (!token) {
       next('/sign-in');
     } else {
