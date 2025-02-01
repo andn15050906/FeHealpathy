@@ -28,7 +28,7 @@
             <!-- Add Members -->
             <div class="form-input">
                 <label class="form-label">Add Members</label>
-                <v-autocomplete v-model="newMemberName" :items="userSearchResults" item-text="fullName" item-value="id"
+                <v-autocomplete v-model="newMemberName" :items="userSearchResults" item-title="fullName" item-value="id"
                     label="Search for users" @input="onUserSearch" return-object outlined />
                 <v-btn @click="addMember" color="secondary" :disabled="!newMemberName">
                     Add Member
@@ -76,12 +76,15 @@ async function onSubmit() {
     formData.append('IsPrivate', conversationInfo.value.isPrivate);
 
     if (conversationInfo.value.avatarUrl) {
-        formData.append('Thumb', conversationInfo.value.avatarUrl);
+        const file = conversationInfo.value.avatarUrl;
+
+        formData.append('Thumb.File', file);
+        formData.append('Thumb.Title', file.name);
     }
 
     members.value.forEach((member, index) => {
-        formData.append(`Members[${index}].UserId`, member.UserId);
-        formData.append(`Members[${index}].IsAdmin`, member.IsAdmin);
+        formData.append(`Members[${index}].UserId`, member.id);
+        formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
     });
 
     try {
@@ -112,9 +115,6 @@ async function onUserSearch(event) {
         if (query && typeof query === 'string') {
             const response = await getUsers({ name: query });
             userSearchResults.value = [...response.items];
-            nextTick(() => {
-                console.log("Updated User Search Results:", userSearchResults.value);
-            });
         } else {
             userSearchResults.value = [];
         }
