@@ -1,4 +1,4 @@
-import { get, post, patch, del } from '../apiClients';
+import { get, postForm, patchForm, del } from '../apiClients';
 
 const API_BASE_URL = '/Conversations';
 
@@ -7,11 +7,11 @@ export const getPagedConversations = async (queryParams = {}) => {
 };
 
 export const createConversation = async (conversationData) => {
-    return await post(`${API_BASE_URL}`, conversationData);
+    return await postForm(`${API_BASE_URL}`, conversationData);
 };
 
 export const updateConversation = async (conversationData) => {
-    return await patch(`${API_BASE_URL}`, conversationData);
+    return await patchForm(`${API_BASE_URL}`, conversationData);
 };
 
 export const deleteConversation = async (conversationId) => {
