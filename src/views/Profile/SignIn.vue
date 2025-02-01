@@ -43,13 +43,15 @@
 </template>
 
 <script>
-import router from '@/router';
-import { readErr } from '@/helpers/common';
-import { getGoogleOAuthPath, setUserAuthData, signIn } from '@/services/authService';
+import { inject } from 'vue';
+import router from '@/scripts/router';
+import { readErr } from '@/scripts/logic/common';
+import { getGoogleOAuthPath, setUserAuthData, signIn } from '@/scripts/api/services/authService';
 
 export default {
 	data() {
 		return {
+			loadingSpinner: inject('loadingSpinner'),
 			identifier: "",
 			password: "",
 			rememberMe: false,
@@ -78,6 +80,7 @@ export default {
 			//...
 			// remember me
 			try {
+				this.loadingSpinner.showSpinner();
 				const data = await signIn(this.identifier, this.password);
 				setUserAuthData(data);
 				this.generalError = '';
@@ -85,6 +88,8 @@ export default {
 				router.push('/');
 			} catch (error) {
 				this.generalError = readErr(error);
+			} finally {
+				this.loadingSpinner.hideSpinner();
 			}
 		},
 		handleGoogleOAuthRedirect() {

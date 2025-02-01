@@ -25,7 +25,7 @@
 
 <script>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
-import data from '../../../api/data.json';
+import data from '../../../scripts/data/data.json';
 import YogaExerciseCard from '@/components/PracticeComponents/YogaExerciseCard.vue';
 
 export default {

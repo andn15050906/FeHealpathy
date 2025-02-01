@@ -31,7 +31,7 @@
 
 <script>
 import BlogCardWithTags from '@/components/BlogComponents/BlogCardWithTags.vue';
-import data from '../../api/data.json';
+import data from '../../scripts/data/data.json';
 import BlogFilters from '../../components/BlogComponents/BlogFilters.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 
@@ -102,34 +102,34 @@ export default {
 
     methods: {
         handleSearch(query) {
-            this.$router.push({ path: '/search-blogs', query: { title: query, page: 1 } });
+            this.$router.push({ name: 'searchBlogs', query: { title: query, page: 1 } });
         },
 
         // keep in both BlogCardWithTags and SearchBlogResult
         handleTagClick(tagOrCategory) {
             if (tagOrCategory.Title) {
-                this.$router.push({ path: '/search-blogs', query: { category: tagOrCategory.Id, page: 1 } });
+                this.$router.push({ name: 'searchBlogs', query: { category: tagOrCategory.Id, page: 1 } });
             } else {
-                this.$router.push({ path: '/search-blogs', query: { tag: tagOrCategory, page: 1 } });
+                this.$router.push({ name: 'searchBlogs', query: { tag: tagOrCategory, page: 1 } });
             }
         },
 
         goToPage(page) {
             if (page > 0 && page <= this.totalPages) {
                 this.currentPage = page;
-                this.$router.push({ path: '/search-blogs', query: { ...this.$route.query, page: this.currentPage } });
+                this.$router.push({ name: 'searchBlogs', query: { ...this.$route.query, page: this.currentPage } });
             }
         },
 
         handleSortChange(sort) {
             this.currentSort = sort;
-            this.$router.push({ path: '/search-blogs', query: { ...this.$route.query, page: 1, sort: this.currentSort } });
+            this.$router.push({ name: 'searchBlogs', query: { ...this.$route.query, page: 1, sort: this.currentSort } });
         }
     }
 };
 </script>
 
-<style scoped>
+<style>
 .search-results-container {
     margin-top: 60px;
     padding: 0 20px;
@@ -156,6 +156,7 @@ export default {
     padding: 10px;
     display: flex;
     flex-direction: column;
+    justify-content: start !important;
 }
 
 .article-title {

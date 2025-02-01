@@ -17,9 +17,9 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "vue3-toastify/dist/index.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 
-import App from "./App.vue";
-import router from "./router";
-import vuesticGlobalConfig from "./services/vuestic-ui/global-config";
+import App from './App.vue'
+import router from './scripts/router'
+import vuesticGlobalConfig from './scripts/plugins/vuestic-ui/global-config'
 
 // Cấu hình i18n
 const i18n = createI18n({

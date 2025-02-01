@@ -3,11 +3,14 @@
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
     <Header ref="headerRef" />
-    <NotificationContainer v-if="isAuthenticated" ref="notificationRef" />
     <main>
+      <NotificationContainer v-if="isAuthenticated" ref="notificationRef" />
       <div class="page-container">
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
+        <div class="partner-chat">
+          <ConversationWindow :boxWindow="true" @toggleChat="toggleChat" />
+        </div>
       </div>
     </main>
     <Footer />
@@ -15,15 +18,15 @@
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
-import { useRouter } from 'vue-router';
 import { ref, provide, onMounted } from 'vue';
-import { getUserAuthData } from '@/services/authService';
+import { RouterView, useRouter } from 'vue-router';
+import { getUserAuthData } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
-import LoadingSpinner from './components/Helper/LoadingSpinner.vue';
-import SweetAlert from './components/Common/SweetAlert.vue';
+import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
+import SweetAlert from './components/Common/Popup/SweetAlert.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
+import ConversationWindow from './components/CommunityComponents/ConversationWindow.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -72,6 +75,11 @@ const addNotification = (data) => {
 const removeNotification = (data) => {
   notificationRef.value.removeNotification(data);
 }
+
+const toggleChat = () => {
+  let style = document.getElementsByClassName('partner-chat')[0].style;
+  style.marginBottom = (style.marginBottom == '0px' || style.marginBottom == '') ? '-400px' : '0px';
+}
 </script>
 
 <style scoped>
@@ -94,6 +102,15 @@ main {
   background-color: #fff;
   margin-top: 60px;
   padding: 40px;
+}
+
+.partner-chat {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  z-index: 1000;
+  height: 460px;
+  width: 360px;
 }
 
 footer {

@@ -3,7 +3,7 @@
     <GlowingCard primaryColor="#4facfe" secondaryColor="#00f2fe">
       <h2>YOGA</h2>
       <p>Khám phá sự cân bằng và thư giãn qua các bài tập Yoga chuyên nghiệp, cải thiện cả thể chất và tinh thần.</p>
-      <RouterLink :to="'practice/yoga'" class="arrow-btn">→</RouterLink>
+      <RouterLink :to="'yoga'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
     <GlowingCard primaryColor="#ff4b5c" secondaryColor="#DBD65C">
       <h2>SELF ASSESSMENT</h2>
@@ -23,7 +23,7 @@
     <GlowingCard primaryColor="#1CD8D2" secondaryColor="#93EDC7">
       <h2>MOOD PATTERN</h2>
       <p>Nhận diện xu hướng tâm lý dựa vào trạng thái cảm xúc hàng ngày</p>
-      <RouterLink :to="'mood'" class="arrow-btn">→</RouterLink>
+      <RouterLink :to="'mood-cart'" class="arrow-btn">→</RouterLink>
     </GlowingCard>
     <GlowingCard primaryColor="#4776E6" secondaryColor="#8E54E9">
       <h2>HABIT TRACKER</h2>
