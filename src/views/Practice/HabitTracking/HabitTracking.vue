@@ -9,6 +9,7 @@
 import { ref, computed, onMounted } from "vue";
 import Calendar from "../../../components/Common/Misc/Calendar.vue";
 import { getPagedRoutines, createRoutine, deleteRoutine } from "../../../scripts/api/services/routinesService";
+import { getUserAuthData } from "../../../scripts/api/services/authService";
 
 const frequencyEnum = {
   Daily: 0,
@@ -27,23 +28,20 @@ export default {
   setup() {
     const habits = ref([]);
     const today = new Date();
-    const remainingDaysInMonth = computed(() => {
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      return daysInMonth - today.getDate() + 1;
-    });
-    const loadRoutines = async () => {
+
+    const refreshEvents = async () => {
       try {
-        const response = await getPagedRoutines({ pageIndex: 0, pageSize: 100 });
-        console.log("Routines:", response);
+        const response = await getPagedRoutines({ pageIndex: 0, pageSize: 100, creatorId: getUserAuthData().id }); // Pagination is not fully implemented yet
         habits.value = Array.isArray(response.items) ? response.items : [];
       } catch (error) {
-        console.error("Error loading routines:", error);
         habits.value = [];
       }
     };
+
     onMounted(() => {
-      loadRoutines();
+      refreshEvents();
     });
+
     const handleSaveEvent = async (newEvent) => {
       try {
         const formattedEvent = {
@@ -52,25 +50,23 @@ export default {
           objective: newEvent.objective || "",
           frequency: frequencyEnum[newEvent.frequency] ?? 0,
         };
-        const response = await createRoutine(formattedEvent);
-        if (response.item) {
-          habits.value.push(response.item);
-        } else {
-          habits.value.push(response.data);
-        }
+        await createRoutine(formattedEvent);
+        await refreshEvents();
       } catch (error) {
         console.error("Error creating routine:", error);
       }
     };
+
     const handleDeleteEvent = async (eventToDelete) => {
       try {
         await deleteRoutine(eventToDelete.id);
-        habits.value = habits.value.filter((e) => e.id !== eventToDelete.id);
+        await refreshEvents();
       } catch (error) {
-        console.error("Error deleting routine:", error);
+        console.error(" Error deleting routine:", error);
       }
     };
-    return { habits, today, remainingDaysInMonth, handleSaveEvent, handleDeleteEvent };
+
+    return { habits, today, handleSaveEvent, handleDeleteEvent, refreshEvents };
   },
 };
 </script>

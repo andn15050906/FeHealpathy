@@ -143,7 +143,13 @@ export default {
     },
     currentEvents() {
       return this.events.filter((event) => {
-        const eventDate = event.creationTime ? new Date(event.creationTime) : new Date(event.date);
+        if (!event) return false;
+        const eventDate = event.creationTime
+          ? new Date(event.creationTime)
+          : event.date
+            ? new Date(event.date)
+            : null;
+        if (!eventDate) return false;
         return isSameDay(eventDate, this.selectedDate);
       });
     },
@@ -159,7 +165,13 @@ export default {
     },
     hasEvents(day) {
       return this.events.some((event) => {
-        const eventDate = event.creationTime ? new Date(event.creationTime) : new Date(event.date);
+        if (!event) return false;
+        const eventDate = event.creationTime
+          ? new Date(event.creationTime)
+          : event.date
+            ? new Date(event.date)
+            : null;
+        if (!eventDate) return false;
         return isSameDay(eventDate, day.date);
       });
     },
