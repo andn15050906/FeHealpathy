@@ -1,68 +1,126 @@
 <template>
     <div class="container mt-4">
-        <MediaCategory v-if="selectedMood === null" :moods="moods" @select-mood="selectMood" />
-
-        <MediaList v-else :mood="moods[selectedMood]" @back="selectedMood = null" />
+        <div v-if="showAddMusic">
+            <AddMusic @cancel="toggleAddMusic" @add-music="createMedia" />
+        </div>
+        <div v-else-if="showEditMusic">
+            <EditMusic :music="selectedMusic" @cancel="toggleEditMusic" @edit-music="updateMedia" />
+        </div>
+        <div v-else>
+            <MediaList :mediaFiles="mediaFiles" @edit-media="editMedia" @delete-media="deleteMedia" />
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn btn-primary" @click="toggleAddMusic">
+                    <i class="fas fa-plus me-1"></i> Add Media
+                </button>
+                <Pagination :currentPage="currentPage" :totalPages="totalPages" @go-to-page="fetchMediaResources" />
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-import MediaCategory from "../../../components/MediaResourceComponents/MediaCategory.vue";
+import { toast } from "vue3-toastify";
 import MediaList from "../../../components/MediaResourceComponents/MediaList.vue";
+import Pagination from "../../../components/Common/Pagination.vue";
+import AddMusic from "../../../components/MediaResourceComponents/AddMusic.vue";
+import EditMusic from "../../../components/MediaResourceComponents/EditMusic.vue";
+import {
+    getPagedMediaResources,
+    createMediaResource,
+    updateMediaResource,
+    deleteMediaResource,
+} from "../../../scripts/api/services/mediaResourcesService";
 
 export default {
-    components: {
-        MediaCategory,
-        MediaList,
-    },
+    components: { MediaList, Pagination, AddMusic, EditMusic },
     data() {
         return {
-            moods: [
-                {
-                    name: "Happy",
-                    icon: "fas fa-smile text-success",
-                    files: [
-                        { name: "Happy Song 1", url: "/happy-song-1", fileUrl: "https://example.com/happy-song-1.mp3" },
-                        { name: "Happy Song 2", url: "/happy-song-2", fileUrl: "https://example.com/happy-song-2.mp3" },
-                    ],
-                },
-                {
-                    name: "Sad",
-                    icon: "fas fa-frown text-primary",
-                    files: [
-                        { name: "Sad Song 1", url: "/sad-song-1", fileUrl: "https://example.com/sad-song-1.mp3" },
-                    ],
-                },
-                {
-                    name: "Angry",
-                    icon: "fas fa-angry text-danger",
-                    files: [
-                        { name: "Angry Song 1", url: "/angry-song-1", fileUrl: "https://example.com/angry-song-1.mp3" },
-                        { name: "Angry Song 2", url: "/angry-song-2", fileUrl: "https://example.com/angry-song-2.mp3" },
-                    ],
-                },
-                {
-                    name: "Excited",
-                    icon: "fas fa-grin-stars text-warning",
-                    files: [
-                        { name: "Excited Song 1", url: "/excited-song-1", fileUrl: "https://example.com/excited-song-1.mp3" },
-                    ],
-                },
-                {
-                    name: "Calm",
-                    icon: "fas fa-meh text-muted",
-                    files: [
-                        { name: "Calm Song 1", url: "/calm-song-1", fileUrl: "https://example.com/calm-song-1.mp3" },
-                    ],
-                },
-            ],
-            selectedMood: null,
+            mediaFiles: [],
+            currentPage: 1,
+            totalPages: 1,
+            showAddMusic: false,
+            showEditMusic: false,
+            selectedMusic: null,
+            selectedMusicIndex: null,
         };
     },
     methods: {
-        selectMood(index) {
-            this.selectedMood = index;
+        async fetchMediaResources(page = 1) {
+            this.currentPage = page;
+            try {
+                const params = {
+                    Description: "",
+                    Artist: "",
+                    Title: "",
+                    Type: null,
+                    PageIndex: page - 1,
+                    PageSize: 10,
+                };
+                const response = await getPagedMediaResources(params);
+                if (response && response.items) {
+                    this.mediaFiles = response.items;
+                    this.totalPages = response.pageCount || 1;
+                }
+            } catch (error) {
+                toast.error("Failed to fetch media resources.");
+            }
         },
+        toggleAddMusic() {
+            this.showAddMusic = !this.showAddMusic;
+        },
+        toggleEditMusic() {
+            this.showEditMusic = false;
+            this.selectedMusic = null;
+        },
+        async createMedia(newMusic) {
+            try {
+                const response = await createMediaResource(newMusic);
+                this.mediaFiles.push(response.data);
+                this.showAddMusic = false;
+                await this.fetchMediaResources(this.currentPage);
+                toast.success("Media added successfully!");
+            } catch (error) {
+                toast.error("Failed to add media.");
+            }
+        },
+        async updateMedia(updatedMusicFormData) {
+            try {
+                const response = await updateMediaResource(updatedMusicFormData);
+                // const updatedMedia = response.data;
+                // if (this.selectedMusicIndex !== null) {
+                //     this.$set(this.mediaFiles, this.selectedMusicIndex, updatedMedia);
+                // }
+                this.showEditMusic = false;
+                this.selectedMusic = null;
+
+                await this.fetchMediaResources(this.currentPage);
+
+                toast.success("Media updated successfully!");
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to update media.");
+            }
+        },
+        editMedia(media, index) {
+            this.selectedMusic = { ...media };
+            this.selectedMusicIndex = index;
+            this.showEditMusic = true;
+        },
+        async deleteMedia(mediaId, index) {
+            if (confirm("Are you sure you want to delete this media?")) {
+                try {
+                    await deleteMediaResource(mediaId);
+                    this.mediaFiles.splice(index, 1);
+                    await this.fetchMediaResources(this.currentPage);
+                    toast.success("Media deleted successfully!");
+                } catch (error) {
+                    toast.error("Failed to delete media.");
+                }
+            }
+        },
+    },
+    mounted() {
+        this.fetchMediaResources();
     },
 };
 </script>
