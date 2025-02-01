@@ -50,8 +50,6 @@
 </template>
 
 <script>
-import { createMediaResource } from "../../services/mediaResourcesService";
-
 export default {
     data() {
         return {

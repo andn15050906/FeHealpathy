@@ -1,5 +1,4 @@
-import { get, del } from "@/api/apiCall";
-import api from "@/api/apiCall";
+import { get, postForm, patchForm, del } from "@/scripts/api/apiClients";
 
 const API_BASE_URL = "/MediaResources";
 
@@ -8,15 +7,11 @@ export const getPagedMediaResources = async (queryParams) => {
 };
 
 export const createMediaResource = async (formData) => {
-  return await api.post(`${API_BASE_URL}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return await postForm(`${API_BASE_URL}`, formData);
 };
 
 export const updateMediaResource = async (formData) => {
-  return await api.patch(`${API_BASE_URL}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return await patchForm(`${API_BASE_URL}`, formData);
 };
 
 export const deleteMediaResource = async (id) => {
