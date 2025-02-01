@@ -27,13 +27,23 @@ export default {
 .notification {
     background: white;
     border-radius: 17px;
-    padding: 15px 20px;
+    padding: 12px 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 1000;
     max-width: 380px;
     animation: slideIn 0.5s ease-out;
     margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        padding: 12px 16px;
+    }
 }
 
 .notification-content {
@@ -74,16 +84,6 @@ export default {
     to {
         transform: translateX(0);
         opacity: 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .notification {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        padding: 15px 20px;
     }
 }
 </style>

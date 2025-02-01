@@ -1,36 +1,38 @@
 <template>
     <div class="window-container">
-        <form v-if="addNewRoom" @submit.prevent="createRoom">
-            <input v-model="addRoomUsername" type="text" placeholder="Add username" />
-            <button type="submit" :disabled="disableForm || !addRoomUsername">
-                Create Room
-            </button>
-            <button class="button-cancel" @click="addNewRoom = false">Cancel</button>
-        </form>
+        <div v-if="singleRoom">
+            <form v-if="addNewRoom" @submit.prevent="createRoom">
+                <input v-model="addRoomUsername" type="text" placeholder="Add username" />
+                <button type="submit" :disabled="disableForm || !addRoomUsername">
+                    Create Room
+                </button>
+                <button class="button-cancel" @click="addNewRoom = false">Cancel</button>
+            </form>
 
-        <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
-            <input v-model="invitedUsername" type="text" placeholder="Add username" />
-            <button type="submit" :disabled="disableForm || !invitedUsername">
-                Add User
-            </button>
-            <button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
-        </form>
+            <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
+                <input v-model="invitedUsername" type="text" placeholder="Add username" />
+                <button type="submit" :disabled="disableForm || !invitedUsername">
+                    Add User
+                </button>
+                <button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
+            </form>
 
-        <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
-            <select v-model="removeUserId">
-                <option default value="">Select User</option>
-                <option v-for="user in removeUsers" :key="user._id" :value="user._id">
-                    {{ user.username }}
-                </option>
-            </select>
-            <button type="submit" :disabled="disableForm || !removeUserId">
-                Remove User
-            </button>
-            <button class="button-cancel" @click="removeRoomId = null">Cancel</button>
-        </form>
+            <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
+                <select v-model="removeUserId">
+                    <option default value="">Select User</option>
+                    <option v-for="user in removeUsers" :key="user._id" :value="user._id">
+                        {{ user.username }}
+                    </option>
+                </select>
+                <button type="submit" :disabled="disableForm || !removeUserId">
+                    Remove User
+                </button>
+                <button class="button-cancel" @click="removeRoomId = null">Cancel</button>
+            </form>
+        </div>
 
         <vue-advanced-chat ref="chatWindow" :height="screenHeight" :theme="'light'" :styles="JSON.stringify(styles)"
-            :current-user-id="currentUserId" :room-id="roomId" :rooms="JSON.stringify(loadedRooms)"
+            :current-user-id="currentUser.id" :room-id="roomId" :rooms="JSON.stringify(loadedRooms)"
             :loading-rooms="loadingRooms" :rooms-loaded="roomsLoaded" :messages="JSON.stringify(messages)"
             :messages-loaded="messagesLoaded" :room-message="roomMessage" :room-actions="JSON.stringify(roomActions)"
             :menu-actions="JSON.stringify(menuActions)"
@@ -44,7 +46,9 @@
             @message-selection-action-handler="messageSelectionActionHandler($event.detail[0])"
             @send-message-reaction="sendMessageReaction($event.detail[0])"
             @typing-message="typingMessage($event.detail[0])"
-            @toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)">
+            :show-new-messages-divider="false"
+            :single-room="singleRoom">
+            <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
             <!--@show-audio="false"-->
         </vue-advanced-chat>
     </div>
@@ -53,105 +57,54 @@
 <script>
 import { register } from 'vue-advanced-chat'
 import { getUserAuthData } from '@/scripts/api/services/authService';
-import { formatTimestamp, parseTimestamp } from '@/scripts/logic/common';
+import { formatISODate, reactionMap } from '@/scripts/logic/common';
+import { getUsers } from '@/scripts/api/services/userService';
+import { getPagedConversations } from '@/scripts/api/services/conversationService';
+import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
+import { HubConnection, MessagingHandler } from '@/scripts/api/hubClient';
+import { ChatMessage } from '@/scripts/logic/store/chat';
 
 register();
 
-const messageStore = [
-    {
-        _id: '7891',
-        indexId: 12091,
-        content: 'Message 2',
-        senderId: '1234',
-        username: 'John Doe',
-        avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-        date: '14 November',
-        timestamp: { seconds: 1552543554644, nanoseconds: 88000000 },
-        system: false,
-        saved: true,
-        distributed: true,
-        seen: true,
-        deleted: false,
-        failure: false,
-        disableActions: true,
-        disableReactions: true, //disable if is currentuser
-    },
-    {
-        _id: '7890',
-        indexId: 12092,
-        content: 'Message 1',
-        senderId: '1234',
-        username: 'John Doe',
-        avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-        date: '13 November',
-        //timestamp: '10:20',
-        timestamp: { seconds: 1552543554634, nanoseconds: 88000000 },
-        system: false,
-        saved: true,
-        distributed: true,
-        seen: true,
-        deleted: false,
-        failure: true,
-        disableActions: true,//false,
-        disableReactions: false,
-        files: [
-            {
-                name: 'My File',
-                size: 67351,
-                type: 'png',
-                audio: true,
-                duration: 14.4,
-                url: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                preview: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                //progress: 88
-            }
-        ],
-        reactions: {
-            '😁': [
-                '1234', // USER_ID
-                '4321'
-            ],
-            '🥰': [
-                '1234'
-            ]
-        },
-        /*replyMessage: {
-            content: 'Reply Message',
-            senderId: '4321',
-            files: [
-                {
-                    name: 'My Replied File',
-                    size: 67351,
-                    type: 'png',
-                    audio: true,
-                    duration: 14.4,
-                    url: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                    preview: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU'
-                }
-            ]
-        }*/
-    }
-];
-
 export default {
+    props: {
+        singleRoom: {
+            type: Boolean
+        }
+    },
     async mounted() {
         //const styles = await import('../../assets/conversation.css')
-        const style = document.createElement('style')
-        style.innerHTML =
-            `.vac-icon-textarea-left {
+        this.addStyle(
+            `.vac-icon-textarea-left, .vac-toggle-button, .vac-text-started {
                 display: none !important;
-            }`;
-        this.$refs.chatWindow.shadowRoot.appendChild(style);
+            }`
+        );
 
-        this.currentUserId = (await getUserAuthData()).id;
-        //...
-        messageStore[0].senderId = this.currentUserId;
+        this.currentUser = await getUserAuthData();
+        this.isPartnerChat = this.singleRoom;
 
-        this.fetchRooms();
+        if (this.isPartnerChat) {
+            this.menuActions = [
+                { name: 'toggleChat', title: 'Toggle Chat' }
+            ];
+            this.fetchPartnerRoom();
+        }
+        else {
+            this.menuActions = [
+                { name: 'inviteUser', title: 'Invite User' },
+                { name: 'removeUser', title: 'Remove User' }
+            ];
+            this.fetchRooms();
+        }
+
+        this.listenMessages();
     },
     data() {
         return {
-            currentUserId: '',
+            messagingHandler: {},
+            allUsers: [],
+            currentUser: {},
+            isPartnerChat: false,
             roomsPerPage: 15,
             rooms: [],
             roomId: '',
@@ -159,7 +112,6 @@ export default {
             endRooms: null,
             roomsLoaded: false,
             loadingRooms: true,
-            allUsers: [],
             loadingLastMessageByRoom: 0,
             roomsLoadedCount: 0,
             selectedRoom: null,
@@ -180,32 +132,11 @@ export default {
             removeRoomId: null,
             removeUserId: '',
             removeUsers: [],
-            roomActions: [
-                { name: 'inviteUser', title: 'Invite User' },
-                { name: 'removeUser', title: 'Remove User' },
-                { name: 'deleteRoom', title: 'Delete Room' }
-            ],
-            menuActions: [
-                { name: 'inviteUser', title: 'Invite User' },
-                { name: 'removeUser', title: 'Remove User' },
-                { name: 'deleteRoom', title: 'Delete Room' }
-            ],
+            roomActions: [],
+            menuActions: [],
             messageSelectionActions: [{ name: 'deleteMessages', title: 'Delete' }],
             styles: { container: { borderRadius: '4px' } },
-            templatesText: [
-                {
-                    tag: 'help',
-                    text: 'This is the help'
-                },
-                {
-                    tag: 'action',
-                    text: 'This is the action'
-                },
-                {
-                    tag: 'action 2',
-                    text: 'This is the second action'
-                }
-            ]
+            templatesText: [{ tag: 'help', text: 'This is the help' }]
         }
     },
     computed: {
@@ -213,10 +144,21 @@ export default {
             return this.rooms.slice(0, this.roomsLoadedCount)
         },
         screenHeight() {
-            return window.innerHeight + 'px'
+            return !this.singleRoom ? '750px' : '460px';
         }
     },
     methods: {
+        addStyle(style, id) {
+            let element = document.createElement('style');
+            element.innerHTML = style;
+            Object.assign(element, { id: id })
+            this.$refs.chatWindow.shadowRoot.appendChild(element);
+        },
+        removeStyle(id) {
+            let element = this.$refs.chatWindow.shadowRoot.getElementById(id);
+            element.parentNode.removeChild(element);
+        },
+
         resetRooms() {
             this.loadingRooms = true
             this.loadingLastMessageByRoom = 0
@@ -244,146 +186,90 @@ export default {
             this.fetchMoreRooms()
         },
 
-        async fetchMoreRooms() {
-            if (this.endRooms && !this.startRooms) {
-                this.roomsLoaded = true
-                return
+        async fetchPartnerRoom() {
+            let fetchedRoom = {
+                id: this.currentUser.id,
+                roomId: this.currentUser.id,
+                roomName: 'Your AI partner',
+                avatar: 'https://img.freepik.com/free-vector/cartoon-style-robot-vectorart_78370-4103.jpg?t=st=1738321862~exp=1738325462~hmac=b560fdb38b0ed4d909df8515962e618b4608320fd6b2997b8773c39d498f10d4&w=826',
+                unreadCount: 0,
+                lastMessage: {},
+                users: [
+                    {
+                        _id: this.currentUser.id,
+                        username: this.currentUser.fullName,
+                        avatar: this.currentUser.avatarUrl
+                    }
+                ],
+                lastMessage: {
+                    content: '',
+                    timestamp: formatISODate(new Date())
+                }
             }
 
-            /*const query = firestoreService.roomsQuery(
-                this.currentUserId,
-                this.roomsPerPage,
-                this.startRooms
-            )
+            this.rooms = this.rooms.concat([fetchedRoom])
+            this.listenLastMessage(fetchedRoom);
+        },
 
-            const { data, docs } = await firestoreService.getRooms(query)*/
-            // this.incrementDbCounter('Fetch Rooms', data.length)
+        async fetchMoreRooms() {
+            if (this.endRooms && !this.startRooms) {
+                this.roomsLoaded = true;
+                return;
+            }
+            
+            let userPromise = getUsers().then(pagedUsers => {
+                this.allUsers = Array.from(pagedUsers.items.map(item => {
+                    return {
+                        _id: item.id,
+                        username: item.fullName,
+                        avatar: item.avatarUrl
+                        //status: { state: 'online', lastChanged: 'today, 14:30' }
+                    }
+                }));
+            });
 
-            const users = [
-                {
-                    _id: '_id1',
-                    id: 'id1',
-                    username: 'username1',
-                    avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                    status: 'online'
-                },
-                {
-                    _id: '_id2',
-                    id: 'id2',
-                    username: 'username2',
-                    avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                    status: 'offline'
-                }
-            ]
+            let fetchedRooms = [];
+            let conversationPromise = getPagedConversations().then(pagedConversations => {
+                fetchedRooms = Array.from((pagedConversations.items).map(item => {          //... filter user conversation only?
+                    return {
+                        id: item.id,
+                        roomId: item.id,
+                        roomName: item.title,
+                        avatar: item.avatarUrl,
+                        unreadCount: 0,                                                     //...
+                        lastMessage: {},                                                    //...
+                        users: Array.from(item.members.map(item => item.creatorId)),
+                        lastUpdated: item.creationTime
+                    }
+                }));
+            })
 
-            const data = [
-                {
-                    id: 1,  //...
-                    roomId: '1',
-                    roomName: 'Room 1',
-                    avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                    unreadCount: 4,
-                    index: 3,
-                    lastMessage: {
-                        _id: 'xyz',
-                        content: 'Last message received',
-                        senderId: '1234',
-                        username: 'John Doe',
-                        timestamp: '10:20',
-                        saved: true,
-                        distributed: false,
-                        seen: false,
-                        new: true
-                    },
-                    users: [
-                        {
-                            _id: '1234',
-                            username: 'John Doe',
-                            avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                            status: {
-                                state: 'online',
-                                lastChanged: 'today, 14:30'
-                            }
-                        },
-                        {
-                            _id: '4321',
-                            username: 'John Snow',
-                            avatar: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
-                            status: {
-                                state: 'offline',
-                                lastChanged: '14 July, 20:00'
-                            }
-                        }
-                    ],
-                    typingUsers: [4321],
-                    lastUpdated: { seconds: 1552543554634, nanoseconds: 88000000 }
-                }
-            ]
+            await Promise.all([userPromise, conversationPromise]);
 
-            this.roomsLoaded = data.length === 0 || data.length < this.roomsPerPage;
+            this.roomsLoaded = fetchedRooms.length === 0 || fetchedRooms.length < this.roomsPerPage;
 
             /*if (this.startRooms) this.endRooms = this.startRooms
             this.startRooms = docs[docs.length - 1]*/
 
-            const roomUserIds = []
-            data.forEach(room => {
-                room.users.forEach(userId => {
-                    const foundUser = this.allUsers.find(user => user?._id === userId)
-                    if (!foundUser && roomUserIds.indexOf(userId) === -1) {
-                        roomUserIds.push(userId)
-                    }
-                })
-            })
-
-            // this.incrementDbCounter('Fetch Room Users', roomUserIds.length)
-            const rawUsers = []
-            roomUserIds.forEach(userId => {
-                //const promise = firestoreService.getUser(userId)
-                //rawUsers.push(promise)
-                rawUsers.push(users[0])
-            })
-
-            this.allUsers = [...this.allUsers, ...(await Promise.all(rawUsers))]
-
-            const roomList = {}
-            data.forEach(room => {
-                roomList[room.id] = { ...room, users: [] }
-
-                room.users.forEach(userId => {
-                    const foundUser = this.allUsers.find(user => user?._id === userId)
-                    if (foundUser) roomList[room.id].users.push(foundUser)
-                })
-            })
-
-            console.log(roomList);
             const formattedRooms = []
+            fetchedRooms.forEach(room => {
+                // re-assign room users (convert from userId to user)
+                for (let i = 0; i < room.users.length; i++) {
+                    room.users[i] = this.allUsers.find(user => user?._id === room.users[i]);
+                }
 
-            Object.keys(roomList).forEach(key => {
-                const room = roomList[key]
-
-                const roomContacts = room.users.filter(
-                    user => user._id !== this.currentUserId
-                )
-
-                room.roomName =
-                    roomContacts.map(user => user.username).join(', ') || 'Myself'
-
-                const roomAvatar =
-                    roomContacts.length === 1 && roomContacts[0].avatar
-                        ? roomContacts[0].avatar
-                        : ''
+                // re-assign room name
+                const otherRoomUsers = room.users.filter(user => user._id != this.currentUser.id);
+                room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
 
                 formattedRooms.push({
                     ...room,
-                    roomId: key,
-                    avatar: roomAvatar,
+                    roomId: room.id,
+                    avatar: otherRoomUsers.length === 1 && otherRoomUsers[0].avatar ? otherRoomUsers[0].avatar : '',
                     index: room.lastUpdated.seconds,
                     lastMessage: {
-                        content: 'Room created',
-                        timestamp: formatTimestamp(
-                            new Date(room.lastUpdated.seconds),
-                            room.lastUpdated
-                        )
+                        content: '',
+                        timestamp: formatISODate(room.lastUpdated)
                     }
                 })
             })
@@ -396,19 +282,18 @@ export default {
                 this.roomsLoadedCount = 0
             }
 
-            this.listenUsersOnlineStatus(formattedRooms)
-            this.listenRooms(/*query*/)
+            //this.listenUsersOnlineStatus(formattedRooms);
         },
 
         listenLastMessage(room) {
-            messageStore.forEach(message => {
+            /*messageStore.forEach(message => {
                 const lastMessage = this.formatLastMessage(message, room)
                 const roomIndex = this.rooms.findIndex(
                     r => room.roomId === r.roomId
                 )
                 this.rooms[roomIndex].lastMessage = lastMessage
                 this.rooms = [...this.rooms]
-            })
+            })*/
             if (this.loadingLastMessageByRoom < this.rooms.length) {
                 this.loadingLastMessageByRoom++
 
@@ -417,7 +302,9 @@ export default {
                     this.roomsLoadedCount = this.rooms.length
                 }
             }
-            /*const listener = firestoreService.listenLastMessage(
+
+            /*
+            const listener = firestoreService.listenLastMessage(
                 room.roomId,
                 messages => {
                     // this.incrementDbCounter('Listen Last Room Message', messages.length)
@@ -443,108 +330,124 @@ export default {
             this.roomsListeners.push(listener)*/
         },
 
-        formatLastMessage(message, room) {
-            if (!message.timestamp) return
 
-            let content = message.content
-            if (message.files?.length) {
-                const file = message.files[0]
-                content = `${file.name}.${file.extension || file.type}`
-            }
-
-            const username =
-                message.sender_id !== this.currentUserId
-                    ? room.users.find(user => message.sender_id === user._id)?.username
-                    : ''
-
-            return {
-                ...message,
-                ...{
-                    _id: message.id,
-                    content,
-                    senderId: message.sender_id,
-                    timestamp: formatTimestamp(
-                        new Date(message.timestamp.seconds * 1000),
-                        message.timestamp
-                    ),
-                    username: username,
-                    distributed: true,
-                    seen: message.sender_id === this.currentUserId ? message.seen : null,
-                    new:
-                        message.sender_id !== this.currentUserId &&
-                        (!message.seen || !message.seen[this.currentUserId])
-                }
-            }
-        },
 
         fetchMessages({ room, options = {} }) {
-            this.$emit('show-demo-options', false)
+            //this.$emit('show-demo-options', false)
 
-            if (options.reset) {
-                this.resetMessages()
-            }
+            if (options.reset)
+                this.resetMessages();
 
             if (this.previousLastLoadedMessage && !this.lastLoadedMessage) {
-                this.messagesLoaded = true
+                this.messagesLoaded = true;
                 return
             }
 
-            console.log(4);
             this.selectedRoom = room.roomId;
+            this.roomId = room.roomId;
+            getPagedChatMessages({conversationId : room.roomId}).then(response => {
+                if (this.selectedRoom !== room.roomId || !response.items)
+                    return;
 
-            (() => {
-                if (this.selectedRoom !== room.roomId) return
+                if (response.items.length === 0 || response.items.length < this.messagesPerPage)
+                    this.messagesLoaded = true;
 
-                if (messageStore.length === 0 || messageStore.length < this.messagesPerPage) {
-                    setTimeout(() => {
-                        this.messagesLoaded = true
-                    }, 0)
-                }
+                if (options.reset)
+                    this.messages = [];
 
-                if (options.reset) this.messages = []
-
-                messageStore.forEach(message => {
-                    const formattedMessage = this.formatMessage(room, message)
-                    this.messages.unshift(formattedMessage)
+                response.items.forEach(newMessage => {
+                    let sender = this.allUsers.find(user => user?._id === newMessage.creatorId)
+                    this.addMessage(
+                        this.messages,
+                        newMessage,
+                        sender,
+                        this.currentUser.id == sender.id,
+                        this.addReaction(newMessage),
+                    )
                 })
 
-                if (this.lastLoadedMessage) {
+                if (this.lastLoadedMessage)
                     this.previousLastLoadedMessage = this.lastLoadedMessage
-                }
-                //this.lastLoadedMessage = docs[docs.length - 1]
-                this.lastLoadedMessage = messageStore[messageStore.length - 1]
 
-                this.listenMessages(room)
-            })();
-            /*firestoreService
-                .getMessages(room.roomId, this.messagesPerPage, this.lastLoadedMessage)
-                .then(({ data, docs }) => {
-                    // this.incrementDbCounter('Fetch Room Messages', messages.length)
-                    if (this.selectedRoom !== room.roomId) return
-        
-                    if (data.length === 0 || data.length < this.messagesPerPage) {
-                        setTimeout(() => {
-                            this.messagesLoaded = true
-                        }, 0)
-                    }
-        
-                    if (options.reset) this.messages = []
-        
-                    data.forEach(message => {
-                        const formattedMessage = this.formatMessage(room, message)
-                        this.messages.unshift(formattedMessage)
-                    })
-        
-                    if (this.lastLoadedMessage) {
-                        this.previousLastLoadedMessage = this.lastLoadedMessage
-                    }
-                    this.lastLoadedMessage = docs[docs.length - 1]
-        
-                    this.listenMessages(room)
-                })*/
+                //this.lastLoadedMessage = docs[docs.length - 1]
+                this.lastLoadedMessage = response.items[response.items.length - 1]
+            }).catch(err => {
+                if (err.status == 404)
+                    this.messagesLoaded = true;
+            });
         },
 
-        listenMessages(room) {
+        addMessage(messages, message, sender, isCurrentUser, reactions) {
+            messages.push(
+            {
+                _id: message.id,
+                content: message.content,
+                senderId: sender?._id,
+                username: sender?.username,
+                avatar: sender?.avatar,
+                date: formatISODate(message.lastModificationTime),
+                disableActions: true,
+                disableReactions: isCurrentUser,
+                // files: [
+                //     {
+                //         name: 'My File',
+                //         size: 67351,
+                //         type: 'png',
+                //         audio: true,
+                //         duration: 14.4,
+                //         url: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
+                //         preview: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
+                //         //progress: 88
+                //     }
+                // ],
+                reactions: reactions,
+                // replyMessage: {
+                //     content: 'Reply Message',
+                //     senderId: '4321',
+                //     files: [
+                //         {
+                //             name: 'My Replied File',
+                //             size: 67351,
+                //             type: 'png',
+                //             audio: true,
+                //             duration: 14.4,
+                //             url: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU',
+                //             preview: 'https://fastly.picsum.photos/id/716/200/300.jpg?hmac=qbNS_afUKsp_nyvuAAcK8T7OxOtMoqJvLIeaK-jirsU'
+                //         }
+                //     ]
+                // }
+            });
+        },
+
+        addReaction(message) {
+            let reactions = {};
+            message.reactions.forEach(item => {
+                const emoji = reactionMap[item.content];
+                if (emoji) {
+                    if (!reactions[emoji]) {
+                        reactions[emoji] = [];
+                    }
+                    reactions[emoji].push(item.creatorId);
+                }
+            });
+            return reactions;
+        },
+
+        listenMessages() {
+            this.messagingHandler = new MessagingHandler(new HubConnection());
+            this.messagingHandler.onChatMessageCreated = (conversationId, newMessage) => {
+                if (conversationId == this.roomId) {
+                    let sender = this.allUsers.find(user => user?._id === newMessage.creatorId);
+                    this.addMessage(
+                        this.messages,
+                        newMessage,
+                        sender,
+                        this.currentUser.id == sender.id,
+                        this.addReaction(newMessage)
+                    );
+                }
+            }
+
             /*const listener = firestoreService.listenMessages(
                 room.roomId,
                 this.lastLoadedMessage,
@@ -567,65 +470,26 @@ export default {
                     })
                 }
             )
-            this.listeners.push(listener)*/
+            this.listeners.push(listener);*/
         },
 
         markMessagesSeen(room, message) {
-            if (
-                message.sender_id !== this.currentUserId &&
-                (!message.seen || !message.seen[this.currentUserId])
-            ) {
+            if (message.sender_id !== this.currentUser.id && (!message.seen || !message.seen[this.currentUser.id]))
+            {
                 /*firestoreService.updateMessage(room.roomId, message.id, {
-                    [`seen.${this.currentUserId}`]: new Date()
+                    [`seen.${this.currentUser.id}`]: new Date()
                 })*/
             }
         },
 
-        formatMessage(room, message) {
-            console.log(message);
-
-            // const senderUser = room.users.find(user => user._id === message.sender_id)
-            const formattedMessage = {
-                ...message,
-                ...{
-                    senderId: message.senderId, //message.sender_id,
-                    _id: message._id,//message.id,
-                    seconds: message.timestamp.seconds,
-                    timestamp: parseTimestamp(message.timestamp, 'HH:mm'),
-                    date: parseTimestamp(message.timestamp, 'DD MMMM YYYY'),
-                    username: room.users.find(user => /*message.sender_id*/message.senderId === user._id)
-                        ?.username,
-                    // avatar: senderUser ? senderUser.avatar : null,
-                    distributed: true
-                }
-            }
-
-            console.log(formattedMessage);
-
-            if (message.replyMessage) {
-                formattedMessage.replyMessage = {
-                    ...message.replyMessage,
-                    ...{
-                        senderId: message.replyMessage.sender_id
-                    }
-                }
-            }
-
-            return formattedMessage
-        },
-
         async sendMessage({ content, roomId, files, replyMessage }) {
-            const message = {
-                sender_id: this.currentUserId,
+            let message = new ChatMessage(
                 content,
-                timestamp: new Date()
-            }
+                files ? this.formattedFiles(files) : null
+            );
+            message.setCreationData(this.currentUser.id);
 
-            if (files) {
-                message.files = this.formattedFiles(files)
-            }
-
-            if (replyMessage) {
+            /*if (replyMessage) {
                 message.replyMessage = {
                     _id: replyMessage._id,
                     content: replyMessage.content,
@@ -635,15 +499,15 @@ export default {
                 if (replyMessage.files) {
                     message.replyMessage.files = replyMessage.files
                 }
-            }
+            }*/
 
-            //const { id } = await firestoreService.addMessage(roomId, message)
+            this.messagingHandler.createChatMessage(this.selectedRoom, content, files);
 
-            if (files) {
+            /*if (files) {
                 for (let index = 0; index < files.length; index++) {
                     await this.uploadFile({ file: files[index], messageId: id, roomId })
                 }
-            }
+            }*/
 
             //firestoreService.updateRoom(roomId, { lastUpdated: new Date() })
         },
@@ -678,7 +542,7 @@ export default {
 
             if (files) {
                 files.forEach(file => {
-                    //storageService.deleteFile(this.currentUserId, message._id, file)
+                    //storageService.deleteFile(this.currentUser.id, message._id, file)
                 })
             }
         },
@@ -691,7 +555,7 @@ export default {
                 }
 
                 /*storageService.listenUploadImageProgress(
-                    this.currentUserId,
+                    this.currentUser.id,
                     messageId,
                     file,
                     type,
@@ -763,8 +627,8 @@ export default {
                     const userId1 = room.users[0]._id
                     const userId2 = room.users[1]._id
                     if (
-                        (userId1 === user._id || userId1 === this.currentUserId) &&
-                        (userId2 === user._id || userId2 === this.currentUserId)
+                        (userId1 === user._id || userId1 === this.currentUser.id) &&
+                        (userId2 === user._id || userId2 === this.currentUser.id)
                     ) {
                         roomId = room.roomId
                     }
@@ -777,7 +641,7 @@ export default {
             }
 
             /*const query1 = await firestoreService.getUserRooms(
-                this.currentUserId,
+                this.currentUser.id,
                 user._id
             )
         
@@ -787,7 +651,7 @@ export default {
         
             const query2 = await firestoreService.getUserRooms(
                 user._id,
-                this.currentUserId
+                this.currentUser.id
             )
         
             if (query2.data.length) {
@@ -795,9 +659,9 @@ export default {
             }*/
 
             const users =
-                user._id === this.currentUserId
-                    ? [this.currentUserId]
-                    : [user._id, this.currentUserId]
+                user._id === this.currentUser.id
+                    ? [this.currentUser.id]
+                    : [user._id, this.currentUser.id]
 
             /*const room = await firestoreService.addRoom({
                 users: users,
@@ -819,12 +683,12 @@ export default {
 
         menuActionHandler({ action, roomId }) {
             switch (action.name) {
+                case 'toggleChat':
+                    return this.toggleChat();
                 case 'inviteUser':
                     return this.inviteUser(roomId)
                 case 'removeUser':
                     return this.removeUser(roomId)
-                case 'deleteRoom':
-                    return this.deleteRoom(roomId)
             }
         },
 
@@ -841,7 +705,7 @@ export default {
             /*firestoreService.updateMessageReactions(
                 roomId,
                 messageId,
-                this.currentUserId,
+                this.currentUser.id,
                 reaction.unicode,
                 remove ? 'remove' : 'add'
             )*/
@@ -863,30 +727,14 @@ export default {
 
                 /*firestoreService.updateRoomTypingUsers(
                     roomId,
-                    this.currentUserId,
+                    this.currentUser.id,
                     message ? 'add' : 'remove'
                 )*/
             }
         },
 
-        async listenRooms(query) {
-            /*const listener = firestoreService.listenRooms(query, rooms => {
-                // this.incrementDbCounter('Listen Rooms Typing Users', rooms.length)
-                rooms.forEach(room => {
-                    const foundRoom = this.rooms.find(r => r.roomId === room.id)
-                    if (foundRoom) {
-                        foundRoom.typingUsers = room.typingUsers
-                        foundRoom.index = room.lastUpdated.seconds
-                    }
-                })
-            })*/
-            console.log(6);
-            //this.roomsListeners.push(listener)
-        },
-
-        listenUsersOnlineStatus(rooms) {
-            console.log(7);
-            /*rooms.forEach(room => {
+        /*listenUsersOnlineStatus(rooms) {
+            rooms.forEach(room => {
                 room.users.forEach(user => {
                     const listener = firebaseService.firebaseListener(
                         firebaseService.userStatusRef(user._id),
@@ -910,8 +758,8 @@ export default {
                     )
                     this.roomsListeners.push(listener)
                 })
-            })*/
-        },
+            })
+        },*/
 
         addRoom() {
             this.resetForms()
@@ -927,13 +775,17 @@ export default {
             await firestoreService.updateUser(id, { _id: id })
         
             await firestoreService.addRoom({
-                users: [id, this.currentUserId],
+                users: [id, this.currentUser.id],
                 lastUpdated: new Date()
             })*/
 
             this.addNewRoom = false
             this.addRoomUsername = ''
             this.fetchRooms()
+        },
+
+        toggleChat() {
+            this.$emit("toggleChat");
         },
 
         inviteUser(roomId) {
@@ -975,31 +827,6 @@ export default {
             this.fetchRooms()
         },
 
-        async deleteRoom(roomId) {
-            const room = this.rooms.find(r => r.roomId === roomId)
-            /*if (
-                room.users.find(user => user._id === 'SGmFnBZB4xxMv9V4CVlW') ||
-                room.users.find(user => user._id === '6jMsIXUrBHBj7o2cRlau')
-            ) {
-                return alert('Nope, for demo purposes you cannot delete this room')
-            }
-        
-            firestoreService.getMessages(roomId).then(({ data }) => {
-                data.forEach(message => {
-                    firestoreService.deleteMessage(roomId, message.id)
-                    if (message.files) {
-                        message.files.forEach(file => {
-                            storageService.deleteFile(this.currentUserId, message.id, file)
-                        })
-                    }
-                })
-            })
-        
-            await firestoreService.deleteRoom(roomId)*/
-
-            this.fetchRooms()
-        },
-
         resetForms() {
             this.disableForm = false
             this.addNewRoom = null
@@ -1009,6 +836,49 @@ export default {
             this.removeRoomId = null
             this.removeUserId = ''
         }
+
+        /*formatLastMessage(message, room) {
+            if (!message.timestamp) return
+
+            let content = message.content
+            if (message.files?.length) {
+                const file = message.files[0]
+                content = `${file.name}.${file.extension || file.type}`
+            }
+
+            const username = message.sender_id !== this.currentUser.id
+                ? room.users.find(user => message.sender_id === user._id)?.username
+                : ''
+
+            return {
+                ...message,
+                ...{
+                    _id: message.id,
+                    content,
+                    senderId: message.sender_id,
+                    timestamp: formatTimestamp(
+                        new Date(message.timestamp.seconds * 1000),
+                        message.timestamp
+                    ),
+                    username: username,
+                    distributed: true,
+                    seen: message.sender_id === this.currentUser.id ? message.seen : null,
+                    new:
+                        message.sender_id !== this.currentUser.id &&
+                        (!message.seen || !message.seen[this.currentUser.id])
+                }
+            }
+        },*/
+
+        /* message
+        //timestamp: 
+        //system: false,
+        //saved: false,
+        //distributed: false,
+        //seen: false,
+        //deleted: false,
+        //failure: false,
+        */
     }
 }
 </script>

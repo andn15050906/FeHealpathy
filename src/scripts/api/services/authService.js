@@ -67,6 +67,10 @@ export const setUserAuthData = (data) => {
   localStorage.setItem('userProfile', JSON.stringify(data.user ?? data.User));
 }
 
+export const getUserBearerToken = () => {
+  return localStorage.getItem('token');
+}
+
 export const getUserAuthData = () => {
   return JSON.parse(localStorage.getItem('userProfile'));
 }

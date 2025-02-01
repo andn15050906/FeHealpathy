@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getUserBearerToken } from '@/scripts/api/services/authService'
 
 import HomePage from '@/views/HomePage.vue'
 import SignIn from '@/views/Profile/SignIn.vue'
@@ -64,7 +65,7 @@ import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
 import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
-import Conversation from '@/components/CommunityComponents/ConversationWindow.vue'
+import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -344,7 +345,7 @@ const router = createRouter({
     {
       path: '/chat',
       name: 'chat',
-      component: Conversation,
+      component: ConversationWindow,
       meta: { requiresAuth: true }
     },
 
@@ -396,7 +397,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = localStorage.getItem('token');
+    const token = getUserBearerToken();
     if (!token) {
       next('/sign-in');
     } else {

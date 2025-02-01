@@ -21,6 +21,7 @@
     "@fullcalendar/vue3": "^6.1.15",
     "@kyvg/vue3-notification": "^3.2.0",
     "@mdi/font": "^7.4.47",
+    "@microsoft/signalr": "^8.0.7",
     "apexcharts": "^3.46.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
