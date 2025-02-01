@@ -25,7 +25,7 @@
     </div>
   </template>
   
-  <script>
+<script>
 import moment from 'moment';
 import { getPagedArticles, deleteArticle } from '@/services/blogService';
   export default {
@@ -77,6 +77,7 @@ import { getPagedArticles, deleteArticle } from '@/services/blogService';
         }
       }
     },
+
     },
     mounted() {
       this.fetchBlogs();
@@ -201,4 +202,6 @@ import { getPagedArticles, deleteArticle } from '@/services/blogService';
     font-size: 1rem;
   }
   </style>
+
+  
   

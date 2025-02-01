@@ -1,21 +1,21 @@
 <template>
-    <div class="blog-creation">
-      <h1 class="title">✨ Tạo Blog Mới ✨</h1>
-  
-      <form @submit.prevent="submitBlog" class="blog-form">
-        <div class="form-group">
-          <label for="title">🖋️ Tiêu đề Blog</label>
-          <input
-            type="text"
-            id="title"
-            v-model="blog.title"
-            placeholder="Nhập tiêu đề blog"
-            required
-          />
-        </div>
-  
-        <div class="form-group">
-      <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
+  <div class="blog-creation">
+    <h1 class="title">✨ Tạo Blog Mới ✨</h1>
+
+    <form @submit.prevent="submitBlog" class="blog-form">
+      <div class="form-group">
+        <label for="title">🖋️ Tiêu đề Blog</label>
+        <input
+          type="text"
+          id="title"
+          v-model="blog.title"
+          placeholder="Nhập tiêu đề blog"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
         <multiselect
           v-model="selectedKeywords"
           :options="availableKeywords"
@@ -25,161 +25,201 @@
           :preserve-search="true"
           placeholder="Chọn từ khóa"
           label="name"
-          track-by="name"
+          track-by="id"
           class="multiselect"
-        ></multiselect>
-      <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
-    </div>
+        />
+        <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
+      </div>
 
-        <div class="form-group">
-          <label for="image">🖼️ Hình ảnh Blog</label>
-          <input
-            type="file"
-            id="image"
-            @change="handleImageUpload"
-            accept="image/*"
-          />
-          <div v-if="previewImage" class="image-preview">
-            <img :src="previewImage" alt="Hình ảnh blog" />
-          </div>
+      <div class="form-group">
+        <label for="thumb">🖼️ Hình ảnh Blog</label>
+        <input
+          type="file"
+          id="thumb"
+          @change="handleThumbUpload"
+          accept="thumb/*"
+        />
+        <div v-if="previewImage" class="image-preview">
+          <img :src="previewImage" alt="Hình ảnh blog" />
         </div>
-  
-        <div class="sections">
-          <h2>📚 Thêm Các Phần Tùy Chọn</h2>
-          <div
-            class="section"
-            v-for="(section, index) in blog.sections"
-            :key="index"
+      </div>
+
+      <div class="sections">
+        <h2>📚 Thêm Các Phần Tùy Chọn</h2>
+        <div
+          class="section"
+          v-for="(section, index) in blog.sections"
+          :key="index"
+        >
+          <div class="form-group">
+            <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
+            <input
+              type="text"
+              v-model="section.title"
+              placeholder="Nhập tiêu đề phần"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
+            <input
+              type="file"
+              @change="(e) => handleSectionThumbUpload(e, index)"
+              accept="thumb/*"
+            />
+            <div v-if="section.previewImage" class="image-preview">
+              <img :src="section.previewImage" alt="Hình ảnh phần" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>✏️ Nội dung Phần {{ index + 1 }}</label>
+            <textarea
+              v-model="section.content"
+              placeholder="Nhập nội dung chi tiết"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+          <button
+            type="button"
+            class="btn remove"
+            @click="removeSection(index)"
           >
-            <div class="form-group">
-              <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
-              <input
-                type="text"
-                v-model="section.title"
-                placeholder="Nhập tiêu đề phần"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
-              <input
-                type="file"
-                @change="(e) => handleSectionImageUpload(e, index)"
-                accept="image/*"
-              />
-              <div v-if="section.previewImage" class="image-preview">
-                <img :src="section.previewImage" alt="Hình ảnh phần" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>✏️ Nội dung Phần {{ index + 1 }}</label>
-              <textarea
-                v-model="section.content"
-                placeholder="Nhập nội dung chi tiết"
-                rows="4"
-                required
-              ></textarea>
-            </div>
-            <button type="button" class="btn remove" @click="removeSection(index)">
-              ❌ Xóa Phần
-            </button>
-            <div class="divider"></div>
-          </div>
-          <button type="button" class="btn add" @click="addSection">
-            ➕ Thêm Phần
+            ❌ Xóa Phần
           </button>
+          <div class="divider"></div>
         </div>
-  
-        <div class="form-actions">
-          <button type="submit" class="btn submit">✅ Tạo Blog</button>
-        </div>
-      </form>
-    </div>
-  </template>
-  
-  <script>
-  import Multiselect from 'vue-multiselect';
-  import 'vue-multiselect/dist/vue-multiselect.min.css';
-  export default {
-    name: "BlogCreation",
-    components: {
-    Multiselect,
+        <button type="button" class="btn add" @click="addSection">
+          ➕ Thêm Phần
+        </button>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn submit">✅ Tạo Blog</button>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script>
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import { getPagedTags } from "@/services/tagService";
+import { createArticle } from '@/services/blogService';
+
+export default {
+  name: "BlogCreation",
+  components: { Multiselect },
+  data() {
+    return {
+      blog: {
+        title: "",
+        thumbFile: null,
+        sections: [],
+      },
+      previewImage: null,
+      selectedKeywords: [],
+      availableKeywords: [],
+    };
   },
-    data() {
-      return {
-        blog: {
-          title: "",
-          keywords: "",
-          image: null,
-          sections: [],
-        },
-        previewImage: null,
-        selectedKeywords: [],
-      availableKeywords: [
-        { name: "Yoga" },
-        { name: "Sức khỏe" },
-        { name: "Thiền" },
-        { name: "Giảm căng thẳng" },
-        { name: "Thể chất" },
-        { name: "Meditation" },
-      ],
-      };
-    },
-    methods: {
-      handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-          this.blog.image = file;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.previewImage = e.target.result;
-          };
-          reader.readAsDataURL(file);
+  mounted() {
+    this.fetchAvailableKeywords();
+  },
+  methods: {
+    async fetchAvailableKeywords() {
+      try {
+        const response = await getPagedTags();
+        if (response && Array.isArray(response) && response.length > 0) {
+          this.availableKeywords = response.map((tag) => ({
+            name: tag.title,
+            id: tag.id, 
+          }));
+        }else {
+          this.availableKeywords = [];
+        }
+          console.log("Available Keywords:", this.availableKeywords);
+        } catch (error) {
+          alert("Không thể tải danh sách từ khóa. Vui lòng thử lại sau!");
         }
       },
-      addSection() {
-        this.blog.sections.push({
-          title: "",
-          image: null,
-          previewImage: null,
-          content: "",
-        });
-      },
-      handleSectionImageUpload(event, index) {
-        const file = event.target.files[0];
-        if (file) {
-          this.blog.sections[index].image = file;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.$set(this.blog.sections[index], "previewImage", e.target.result);
-          };
-          reader.readAsDataURL(file);
-        }
-      },
-      removeSection(index) {
-        this.blog.sections.splice(index, 1);
-      },
-      submitBlog() {
-        if (!this.blog.title) {
-          alert("Vui lòng nhập tiêu đề blog!");
-          return;
-        }
-        this.blog.keywords = this.selectedKeywords.map((keyword) => keyword.name).join(", ");
-      alert("Blog đã được tạo thành công với từ khóa: " + this.blog.keywords);
-      this.resetForm();
-      },
-      resetForm() {
-        this.blog = {
-          title: "",
-          image: null,
-          sections: [],
+    handleThumbUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.blog.thumb = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.previewImage = e.target.result;
         };
-        this.selectedKeywords = [];
-        this.previewImage = null;
-      },
+        reader.readAsDataURL(file);
+      }
     },
-  };
-  </script>
+    addSection() {
+      this.blog.sections.push({
+        title: "",
+        thumb: null,
+        previewImage: null,
+        content: "",
+      });
+    },
+    handleSectionThumbUpload(event, index) {
+      const file = event.target.files[0];
+      if (file) {
+        this.blog.sections[index].thumb = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.$set(this.blog.sections[index], "previewImage", e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    removeSection(index) {
+      this.blog.sections.splice(index, 1);
+    },
+    async submitBlog() {
+        const formData = new FormData();
+        formData.append("Title", this.blog.title);
+  
+        formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.name)));
+
+        if (this.blog.thumb) {
+          formData.append("Thumb.File", this.blog.thumb);
+       }
+
+        const sectionsData = this.blog.sections.map(section => {
+        const sectionData = {
+        title: section.title,
+        content: section.content,
+      };
+
+      if (section.thumb) {
+        sectionData["thumb"] = section.thumb;
+      }
+
+      return sectionData;
+    });
+      formData.append("Sections", JSON.stringify(sectionsData));
+
+      try {
+        const response = await createArticle(formData);
+        alert("Blog đã được tạo thành công!");
+      } catch (error) {
+        console.error("Lỗi khi tạo blog:", error);
+        alert("Lỗi!");
+    }
+  },
+  
+    resetForm() {
+      this.blog = {
+        title: "",
+        thumb: null,
+        sections: [],
+      };
+      this.selectedKeywords = [];
+      this.previewImage = null;
+    },
+  }
+};
+</script>
   
   <style scoped>
   body {

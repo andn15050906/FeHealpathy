@@ -48,7 +48,7 @@
   "devDependencies": {
     "@types/node": "^22.10.7",
     "@vitejs/plugin-vue": "^5.0.3",
-    "vite": "^5.0.11",
+    "vite": "^5.4.14",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4"
   }
