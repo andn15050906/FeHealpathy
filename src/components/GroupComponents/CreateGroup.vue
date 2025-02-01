@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 import { createConversation } from '@/scripts/api/services/conversationService';
 import { getUsers } from '@/scripts/api/services/userService';
 
