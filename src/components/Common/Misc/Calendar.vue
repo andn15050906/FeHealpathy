@@ -7,30 +7,26 @@
           <div class="month-year">{{ currentMonth }} {{ currentYear }}</div>
           <button class="nav-btn" @click="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-
         <div class="weekdays">
           <div v-for="day in daysOfWeek" :key="day" class="weekday">{{ day }}</div>
         </div>
-
         <div class="days-grid">
           <div v-for="(day, index) in calendarDays" :key="index" :class="dayClasses(day)" @click="selectDay(day)">
             {{ formatDate(day.date) }}
           </div>
         </div>
       </div>
-
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
           <div class="full-date">{{ formattedSelectedDate }}</div>
         </div>
-
         <div class="events-list">
           <div v-if="currentEvents.length === 0" class="no-events">No events for this day</div>
           <div v-else v-for="(event, idx) in currentEvents" :key="idx" class="event-item">
             <div class="event-info">
-              <div class="event-time">{{ event.time }}</div>
               <div class="event-title">{{ event.title }}</div>
+              <div class="event-description">{{ event.description }}</div>
             </div>
             <div class="event-actions">
               <button class="delete-event-btn" @click="deleteEvent(event)">
@@ -39,33 +35,33 @@
             </div>
           </div>
         </div>
-
         <button class="add-event-btn" @click="showEventForm = true">
           <i class="fa-solid fa-plus"></i> Add Event
         </button>
       </div>
     </div>
-
     <div v-if="showEventForm" class="event-form-modal">
       <div class="modal-content">
         <h3>New Event</h3>
         <input v-model="newEvent.title" placeholder="Event title" class="form-input" />
-
-        <div class="time-inputs">
-          <label class="form-label">Start Time:</label>
-          <input type="time" v-model="startTime" class="time-input" @input="handleStartTimeChange" />
-
-          <label class="form-label">End Time:</label>
-          <input type="time" v-model="endTime" class="time-input" @input="handleEndTimeChange" />
-        </div>
-
+        <textarea v-model="newEvent.description" placeholder="Description" class="form-input"></textarea>
+        <input v-model="newEvent.objective" placeholder="Objective" class="form-input" />
+        <select v-model="newEvent.frequency" class="form-input">
+          <option value="Daily">Daily</option>
+          <option value="EveryMonday">Every Monday</option>
+          <option value="EveryTuesday">Every Tuesday</option>
+          <option value="EveryWednesday">Every Wednesday</option>
+          <option value="EveryThursday">Every Thursday</option>
+          <option value="EveryFriday">Every Friday</option>
+          <option value="EverySaturday">Every Saturday</option>
+          <option value="EverySunday">Every Sunday</option>
+        </select>
         <div class="modal-actions">
           <button @click="cancelEvent">Cancel</button>
-          <button @click="saveEvent">Save</button>
+          <button class="btn btn-success" @click="saveEvent">Save</button>
         </div>
       </div>
     </div>
-
     <div v-if="showDeleteForm" class="delete-modal">
       <div class="modal-content">
         <h3>Delete Event</h3>
@@ -80,17 +76,39 @@
 </template>
 
 <script>
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subMonths, addMonths, isSameDay, isSameMonth, format } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  subMonths,
+  addMonths,
+  isSameDay,
+  isSameMonth,
+  format,
+} from "date-fns";
 
 export default {
+  props: {
+    events: {
+      type: Array,
+      default: () => [],
+    },
+    initialDate: {
+      type: Date,
+      default: () => new Date(),
+    },
+    eventDotColor: {
+      type: String,
+      default: "#e74c3c",
+    },
+  },
   data() {
     return {
-      currentDate: new Date(),
-      selectedDate: new Date(),
-      events: [],
-      newEvent: { title: "" },
-      startTime: "00:00",
-      endTime: "00:00",
+      currentDate: this.initialDate,
+      selectedDate: this.initialDate,
+      newEvent: { title: "", description: "", objective: "", frequency: "Daily" },
       eventToDelete: null,
       showEventForm: false,
       showDeleteForm: false,
@@ -124,20 +142,26 @@ export default {
       return format(this.selectedDate, "EEEE");
     },
     currentEvents() {
-      return this.events.filter((event) => isSameDay(new Date(event.date), this.selectedDate));
+      return this.events.filter((event) => {
+        const eventDate = event.creationTime ? new Date(event.creationTime) : new Date(event.date);
+        return isSameDay(eventDate, this.selectedDate);
+      });
     },
   },
   methods: {
     dayClasses(day) {
       return {
-        'calendar-day': true,
-        'current-month': day.isCurrentMonth,
-        'selected': isSameDay(day.date, this.selectedDate),
-        'has-event': this.hasEvents(day),
+        "calendar-day": true,
+        "current-month": day.isCurrentMonth,
+        "selected": isSameDay(day.date, this.selectedDate),
+        "has-event": this.hasEvents(day),
       };
     },
     hasEvents(day) {
-      return this.events.some((event) => isSameDay(new Date(event.date), day.date));
+      return this.events.some((event) => {
+        const eventDate = event.creationTime ? new Date(event.creationTime) : new Date(event.date);
+        return isSameDay(eventDate, day.date);
+      });
     },
     formatDate(date) {
       return format(date, "dd");
@@ -153,37 +177,32 @@ export default {
     },
     saveEvent() {
       if (!this.newEvent.title) return;
-      this.events.push({
+      const eventPayload = {
         title: this.newEvent.title,
-        time: `${this.startTime} - ${this.endTime}`,
+        description: this.newEvent.description,
+        objective: this.newEvent.objective,
+        frequency: this.newEvent.frequency,
         date: this.selectedDate,
-      });
+      };
+      this.$emit("save-event", eventPayload);
       this.cancelEvent();
     },
     cancelEvent() {
       this.showEventForm = false;
-      this.newEvent.title = "";
-      this.startTime = "00:00";
-      this.endTime = "00:00";
+      this.newEvent = { title: "", description: "", objective: "", frequency: "Daily" };
     },
     deleteEvent(event) {
       this.eventToDelete = event;
       this.showDeleteForm = true;
     },
     confirmDelete() {
-      this.events = this.events.filter((e) => e !== this.eventToDelete);
-      this.eventToDelete = null;
+      this.$emit("delete-event", this.eventToDelete);
       this.showDeleteForm = false;
+      this.eventToDelete = null;
     },
     cancelDelete() {
       this.eventToDelete = null;
       this.showDeleteForm = false;
-    },
-    handleStartTimeChange(value) {
-      if (this.endTime < value) this.endTime = value;
-    },
-    handleEndTimeChange(value) {
-      if (value < this.startTime) this.endTime = this.startTime;
     },
   },
 };
@@ -242,6 +261,7 @@ export default {
 }
 
 .calendar-day {
+  position: relative;
   padding: 12px;
   text-align: center;
   border-radius: 6px;
@@ -264,7 +284,7 @@ export default {
 }
 
 .has-event::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 5px;
   left: 50%;
@@ -385,18 +405,6 @@ export default {
   border-radius: 5px;
 }
 
-.time-inputs {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin: 15px 0;
-}
-
-.time-input {
-  flex: 1;
-  padding: 5px;
-}
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -409,26 +417,5 @@ export default {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-}
-
-.modal-actions button:last-child {
-  background: #3498db;
-  color: white;
-}
-
-.has-event {
-  position: relative;
-}
-
-.has-event::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
-  background: #e74c3c;
-  border-radius: 50%;
 }
 </style>
