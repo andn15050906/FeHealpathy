@@ -67,3 +67,4 @@ export const postForm = (url, data) => formApiCall("post", url, data);
 export const patchForm = (url, data) => formApiCall("patch", url, data);
 
 export default apiClient;
+

@@ -5,40 +5,20 @@
     <form @submit.prevent="submitBlog" class="blog-form">
       <div class="form-group">
         <label for="title">🖋️ Tiêu đề Blog</label>
-        <input
-          type="text"
-          id="title"
-          v-model="blog.title"
-          placeholder="Nhập tiêu đề blog"
-          required
-        />
+        <input type="text" id="title" v-model="blog.title" placeholder="Nhập tiêu đề blog" required />
       </div>
 
       <div class="form-group">
         <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-        <multiselect
-          v-model="selectedKeywords"
-          :options="availableKeywords"
-          :multiple="true"
-          :close-on-select="false"
-          :clear-on-select="false"
-          :preserve-search="true"
-          placeholder="Chọn từ khóa"
-          label="name"
-          track-by="id"
-          class="multiselect"
-        />
+        <multiselect v-model="selectedKeywords" :options="availableKeywords" :multiple="true"
+          :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+          placeholder="Chọn từ khóa" label="name" track-by="id" class="multiselect" />
         <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
       </div>
 
       <div class="form-group">
         <label for="thumb">🖼️ Hình ảnh Blog</label>
-        <input
-          type="file"
-          id="thumb"
-          @change="handleThumbUpload"
-          accept="thumb/*"
-        />
+        <input type="file" id="thumb" @change="handleThumbUpload" accept="image/*" />
         <div v-if="previewImage" class="image-preview">
           <img :src="previewImage" alt="Hình ảnh blog" />
         </div>
@@ -46,52 +26,26 @@
 
       <div class="sections">
         <h2>📚 Thêm Các Phần Tùy Chọn</h2>
-        <div
-          class="section"
-          v-for="(section, index) in blog.sections"
-          :key="index"
-        >
+        <div class="section" v-for="(section, index) in blog.sections" :key="index">
           <div class="form-group">
             <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
-            <input
-              type="text"
-              v-model="section.title"
-              placeholder="Nhập tiêu đề phần"
-              required
-            />
+            <input type="text" v-model="section.title" placeholder="Nhập tiêu đề phần" required />
           </div>
           <div class="form-group">
             <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
-            <input
-              type="file"
-              @change="(e) => handleSectionThumbUpload(e, index)"
-              accept="thumb/*"
-            />
+            <input type="file" @change="(e) => handleSectionThumbUpload(e, index)" accept="image/*" />
             <div v-if="section.previewImage" class="image-preview">
               <img :src="section.previewImage" alt="Hình ảnh phần" />
             </div>
           </div>
           <div class="form-group">
             <label>✏️ Nội dung Phần {{ index + 1 }}</label>
-            <textarea
-              v-model="section.content"
-              placeholder="Nhập nội dung chi tiết"
-              rows="4"
-              required
-            ></textarea>
+            <textarea v-model="section.content" placeholder="Nhập nội dung chi tiết" rows="4" required></textarea>
           </div>
-          <button
-            type="button"
-            class="btn remove"
-            @click="removeSection(index)"
-          >
-            ❌ Xóa Phần
-          </button>
+          <button type="button" class="btn remove" @click="removeSection(index)">❌ Xóa Phần</button>
           <div class="divider"></div>
         </div>
-        <button type="button" class="btn add" @click="addSection">
-          ➕ Thêm Phần
-        </button>
+        <button type="button" class="btn add" @click="addSection">➕ Thêm Phần</button>
       </div>
 
       <div class="form-actions">
@@ -105,7 +59,7 @@
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/services/tagService";
-import { createArticle } from '@/services/blogService';
+import { createArticle } from "@/services/blogService";
 
 export default {
   name: "BlogCreation",
@@ -114,7 +68,7 @@ export default {
     return {
       blog: {
         title: "",
-        thumbFile: null,
+        thumb: null,
         sections: [],
       },
       previewImage: null,
@@ -129,19 +83,20 @@ export default {
     async fetchAvailableKeywords() {
       try {
         const response = await getPagedTags();
-        if (response && Array.isArray(response) && response.length > 0) {
+        if (Array.isArray(response) && response.length > 0) {
           this.availableKeywords = response.map((tag) => ({
             name: tag.title,
-            id: tag.id, 
+            id: tag.id,
           }));
-        }else {
+        } else {
           this.availableKeywords = [];
         }
-          console.log("Available Keywords:", this.availableKeywords);
-        } catch (error) {
-          alert("Không thể tải danh sách từ khóa. Vui lòng thử lại sau!");
-        }
-      },
+      } catch (error) {
+        console.error("Lỗi tải từ khóa:", error);
+        alert("Không thể tải danh sách từ khóa.");
+      }
+    },
+
     handleThumbUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -153,6 +108,19 @@ export default {
         reader.readAsDataURL(file);
       }
     },
+
+    handleSectionThumbUpload(event, index) {
+      const file = event.target.files[0];
+      if (file) {
+        this.blog.sections[index].thumb = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.blog.sections[index].previewImage = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+
     addSection() {
       this.blog.sections.push({
         title: "",
@@ -161,65 +129,48 @@ export default {
         content: "",
       });
     },
-    handleSectionThumbUpload(event, index) {
-      const file = event.target.files[0];
-      if (file) {
-        this.blog.sections[index].thumb = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.$set(this.blog.sections[index], "previewImage", e.target.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    },
+
     removeSection(index) {
       this.blog.sections.splice(index, 1);
     },
+
     async submitBlog() {
-        const formData = new FormData();
-        formData.append("Title", this.blog.title);
-  
-        formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.name)));
+      const formData = new FormData();
+      formData.append("Title", this.blog.title);
 
-        if (this.blog.thumb) {
-          formData.append("Thumb.File", this.blog.thumb);
-       }
+      formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.name)));
 
-        const sectionsData = this.blog.sections.map(section => {
-        const sectionData = {
-        title: section.title,
-        content: section.content,
-      };
-
-      if (section.thumb) {
-        sectionData["thumb"] = section.thumb;
+      if (this.blog.thumb instanceof File) {
+        formData.append("Thumb", this.blog.thumb);
       }
 
-      return sectionData;
-    });
-      formData.append("Sections", JSON.stringify(sectionsData));
+      this.blog.sections.forEach((section, index) => {
+        formData.append(`Sections[${index}].Title`, section.title);
+        formData.append(`Sections[${index}].Content`, section.content);
+
+        if (section.thumb instanceof File) {
+          formData.append(`Sections[${index}].Thumb`, section.thumb);
+        }
+      });
 
       try {
         const response = await createArticle(formData);
         alert("Blog đã được tạo thành công!");
       } catch (error) {
         console.error("Lỗi khi tạo blog:", error);
-        alert("Lỗi!");
-    }
-  },
-  
-    resetForm() {
-      this.blog = {
-        title: "",
-        thumb: null,
-        sections: [],
-      };
-      this.selectedKeywords = [];
-      this.previewImage = null;
+
+        if (error.response && error.response.data) {
+          console.error("Chi tiết lỗi:", error.response.data);
+          alert(`Lỗi: ${error.response.data.title}`);
+        } else {
+          alert("Có lỗi xảy ra. Vui lòng thử lại.");
+        }
+      }
     },
-  }
+  },
 };
 </script>
+
   
   <style scoped>
   body {
