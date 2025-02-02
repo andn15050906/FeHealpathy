@@ -1,6 +1,7 @@
 ﻿import { hubUrl } from '@/scripts/env.js';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { getUserBearerToken } from '@/scripts/api/services/authService';
+import { CreateChatMessageDto, CreateReactionDto, UpdateChatMessageDto } from '../types/dtos';
 export {
     HubConnection, MessagingHandler, RTCHandler,
     MESSAGE_TYPES, STREAM_EVENTS, ParticipantExtraInfo
@@ -13,9 +14,8 @@ class HubConnection {
         var bearer = getUserBearerToken();
         //console.log(bearer);
 
-        this.#connection = new HubConnectionBuilder().withUrl(hubUrl, /*
-            { headers: { "ngrok-skip-browser-warning": "69420" } }
-        */
+        this.#connection = new HubConnectionBuilder().withUrl(hubUrl,
+            //{ headers: { "ngrok-skip-browser-warning": "69420" } }
             { accessTokenFactory: () => bearer }
         ).build();
     }
@@ -39,36 +39,30 @@ class HubConnection {
 
 
     // Messaging
-    sendToConversation(message) {
-        this.#connection.invoke("SendToConversation", message);
-    }
-
-
-
-
-
+    createChatMessage = (message) =>
+        this.#connection.invoke(MESSAGE_TYPES.CreateChatMessage.label, message);
+    updateChatMessage = (message) =>
+        this.#connection.invoke(MESSAGE_TYPES.UpdateChatMessage.label, message);
+    deleteChatMessage = (message) =>
+        this.#connection.invoke(MESSAGE_TYPES.DeleteChatMessage.label, message);
+    createMessageReaction = (message) =>
+        this.#connection.invoke(MESSAGE_TYPES.CreateMessageReaction.label, message);
+    deleteMessageReaction = (message) =>
+        this.#connection.invoke(MESSAGE_TYPES.DeleteMessageReaction.label, message);
 
     // Stream
-
-    sendOffers(offerMessages, isRenegotiation) {
+    sendOffers = (offerMessages, isRenegotiation) =>
         this.#connection.invoke("SendOffers", offerMessages, isRenegotiation);
-    }
-    sendAnswer(offerer, answer) {
+    sendAnswer = (offerer, answer) =>
         this.#connection.invoke("SendAnswer", offerer, JSON.stringify(answer));
-    }
-    sendICECandidate(receiver, candidate) {
+    sendICECandidate = (receiver, candidate) =>
         this.#connection.invoke("SendICECandidate", receiver, JSON.stringify(candidate));
-    }
-
-    joinRoom(roomId, info) {
+    joinRoom = (roomId, info) =>
         this.#connection.invoke("JoinRoom", roomId, info);
-    }
-    sendRoom(roomId, message) {
+    sendRoom = (roomId, message) =>
         this.#connection.invoke("SendRoom", roomId, message);
-    }
-    leaveRoom(roomId) {
+    leaveRoom = (roomId) =>
         this.#connection.invoke("LeaveRoom", roomId);
-    }
 }
 
 
@@ -81,39 +75,69 @@ class MessagingHandler {
 
     constructor(hubConnection) {
         this.#hubConnection = hubConnection;
-        console.log(MESSAGE_TYPES.ChatMessageCreated.Name);
-        this.#hubConnection.subscribe(MESSAGE_TYPES.ChatMessageCreated.Name, (conversationId, messageModel) => {
-            this.onChatMessageCreated(conversationId, messageModel);
-        })
-        this.#hubConnection.start();
+
+        // bind the method with #hubConnection to call it from outside
+        this.addListener = this.addListener.bind(this);
+        this.startListening = this.startListening.bind(this);
 
         this.createChatMessage = this.createChatMessage.bind(this);
+        this.updateChatMessage = this.updateChatMessage.bind(this);
+        this.deleteChatMessage = this.deleteChatMessage.bind(this);
+        this.createMessageReaction = this.createMessageReaction.bind(this);
+        this.deleteMessageReaction =this.deleteMessageReaction.bind(this);
     }
 
-
-    // these methods (events) should be overriden
-    onChatMessageCreated = (conversationId, messageModel) => {
-        return {
-            conversationId: conversationId,
-            messageModel: messageModel
-        }
+    addListener(event, handler) {
+        let isValidEvent = Object.values(MESSAGE_TYPES).some(type => type.callback.toLowerCase() === event.toLowerCase());
+        if (!isValidEvent)
+            return;
+        this.#hubConnection.subscribe(event, response => handler(response));
+    }
+    
+    startListening() {
+        this.#hubConnection.start();
     }
 
+    createChatMessage(conversationMembers, conversationId, content/*, attachments*/) {
+        this.#hubConnection.createChatMessage({
+            conversationMembers: conversationMembers,
+            callback: MESSAGE_TYPES.CreateChatMessage.callback,
+            dto: JSON.stringify(new CreateChatMessageDto(conversationId, content, null))
+        });
+    }
 
+    updateChatMessage(conversationMembers, messageId, content/*, attachments*/) {
+        this.#hubConnection.updateChatMessage({
+            conversationMembers: conversationMembers,
+            callback: MESSAGE_TYPES.UpdateChatMessage.callback,
+            dto: JSON.stringify(new UpdateChatMessageDto(messageId, content, 0, null, null))
+        });
+    }
 
-    createChatMessage(conversationId, content, attachments) {
-        var message = {
-            receiverId: conversationId,
-            type: attachments == null
-                ? MESSAGE_TYPES.CreateTextChatMessage.Enum
-                : MESSAGE_TYPES.CreateFileChatMessage.Enum,
-            callback: MESSAGE_TYPES.ChatMessageCreated.Name,
-            data: attachments == null
-                ? content
-                : JSON.stringify(attachments),
-            time: new Date()
-        }
-        this.#hubConnection.sendToConversation(message);
+    deleteChatMessage(conversationMembers, messageId) {
+        this.#hubConnection.deleteChatMessage({
+            conversationMembers: conversationMembers,
+            callback: MESSAGE_TYPES.DeleteChatMessage.callback,
+            dto: messageId
+        });
+    }
+
+    createMessageReaction(conversationMembers, messageId, reactionUnicode) {
+        console.log(new CreateReactionDto(messageId, reactionUnicode));
+        this.#hubConnection.createMessageReaction({
+            conversationMembers: conversationMembers,
+            callback: MESSAGE_TYPES.CreateMessageReaction.callback,
+            dto: JSON.stringify(new CreateReactionDto(messageId, reactionUnicode))
+        });
+    }
+
+    deleteMessageReaction(conversationMembers, reactionId) {
+        console.log(reactionId);
+        this.#hubConnection.deleteMessageReaction({
+            conversationMembers: conversationMembers,
+            callback: MESSAGE_TYPES.DeleteMessageReaction.callback,
+            dto: reactionId
+        });
     }
 }
 
@@ -264,8 +288,8 @@ class RTCHandler {
 
 
 
+    // message: chatHandler.ChatMessage
     sendRoomChatMessage = (roomId, message) => {
-        // message: chatHandler.ChatMessage
         this.#hubConnection.sendRoom(roomId, new StreamMessage(STREAM_EVENTS.RoomMessageReceived, message));
     }
     sendRoomVideoOff = (roomId) => {
@@ -287,15 +311,18 @@ class RTCHandler {
 
 
 
-const MESSAGE_TYPES = {
-    CreateConversation: { Name: "CreateConversation", Enum: 0 },
-    UpdateConversation: { Name: "UpdateConversation", Enum: 1 },
+// Enums for message types
+const MESSAGE_TYPES = Object.freeze({
+    CreateConversation: { value: 0, label: 'CreateConversation', callback: '' },
+    UpdateConversation: { value: 1, label: 'UpdateConversation', callback: '' },
 
-    CreateTextChatMessage: { Name: "CreateTextChatMessage", Enum: 2 },
-    CreateFileChatMessage: { Name: "CreateFileChatMessage", Enum: 3 },
-
-    ChatMessageCreated: { Name: "ChatMessageCreated", Enum: 4 },
-}
+    CreateChatMessage: { value: 2, label: 'CreateChatMessage', callback: 'ChatMessageCreated' },
+    UpdateChatMessage: { value: 3, label: 'UpdateChatMessage', callback: 'ChatMessageUpdated' },
+    DeleteChatMessage: { value: 4, label: 'DeleteChatMessage', callback: 'ChatMessageDeleted' },
+    
+    CreateMessageReaction: { value: 5, label: 'CreateMessageReaction', callback: 'MessageReactionCreated' },
+    DeleteMessageReaction: { value: 6, label: 'DeleteMessageReaction', callback: 'MessageReactionDeleted' }
+});
 
 const STREAM_EVENTS = {
     RoomCreated: "RoomCreated",

@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, defineProps, watch, defineEmits } from 'vue';
+import { ref, onBeforeMount, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import MemberCard from './MemberCard.vue';
 

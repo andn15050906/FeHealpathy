@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps({
     message: {

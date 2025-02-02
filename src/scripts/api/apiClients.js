@@ -1,71 +1,75 @@
 import axios from "axios";
 import { backendApiBase } from '../env';
+import { clearUserAuthData } from '@/scripts/api/services/authService';
 
-const apiClient = axios.create({
-  baseURL: backendApiBase,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  }
-});
-
-const formApiClient = axios.create({
-  baseURL: backendApiBase,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "multipart/form-data",
-  }
-});
-
-apiClient.interceptors.request.use(config => {
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
-
-apiClient.interceptors.response.use(response => {
-  return response;
-}, error => {
-  console.error('API response error:', error.response || error);
-  return Promise.reject(error);
-});
-
-const apiCall = async (method, url, data = null, params = null) => {
-  try {
-    const response = await apiClient({
-      method,
-      url,
-      data,
-      params,
+const createApiClient = (contentType) => {
+    const client = axios.create({
+        baseURL: backendApiBase,
+        withCredentials: true,
+        headers: {
+            "Content-Type": contentType,
+        }
     });
-    return response.data;
-  } catch (error) {
-    throw error;
-    //handleError(error);
-  }
+
+    client.interceptors.request.use(config => {
+        return config;
+    }, error => {
+        return Promise.reject(error);
+    });
+
+    client.interceptors.response.use(response => {
+        return response;
+    }, error => {
+        console.error('API response error:', error.response || error);
+        return Promise.reject(error);
+    });
+
+    return client;
 };
 
-const formApiCall = async (method, url, data = null, params = null) => {
-  try {
-    const response = await formApiClient({
-      method,
-      url,
-      data,
-      params,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-    //handleError(error);
-  }
+const apiClient = createApiClient("application/json");
+const formApiClient = createApiClient("application/json");
+
+const apiCall = async (client, method, url, data = null, params = null) => {
+try {
+	const response = await client({
+		method,
+		url,
+		data,
+		params,
+	});
+	return response.data;
+} catch (error) {
+	logError(error);
+	//handleError(error);
+	throw error;
+}
 };
 
-export const get = (url, params) => apiCall("get", url, null, params);
-export const post = (url, data) => apiCall("post", url, data);
-export const patch = (url, data) => apiCall("patch", url, data);
-export const del = (url) => apiCall("delete", url);
+const logError = error =>
+{
+	if (error.response) {
+		if (error.response.status === 401
+			&& error.response.headers['www-authenticate']?.includes('The token expired')
+			&& !window.location.href.includes("/sign-in")) {
+			clearUserAuthData();
+			window.location.href = "/sign-in";
+		}
+		/*else {
+			console.log('An error occurred:', error.message);
+		}*/
+	}
+	/*else {
+		console.log('Error without response:', error.message);
+	}*/
+}
 
-export const postForm = (url, data) => formApiCall("post", url, data);
-export const patchForm = (url, data) => formApiCall("patch", url, data);
+export const get = (url, params) => apiCall(apiClient, "get", url, null, params);
+export const post = (url, data) => apiCall(apiClient, "post", url, data);
+export const patch = (url, data) => apiCall(apiClient, "patch", url, data);
+export const del = (url) => apiCall(apiClient, "delete", url);
+
+export const postForm = (url, data) => formApiCall(formApiClient, "post", url, data);
+export const patchForm = (url, data) => formApiCall(formApiClient, "patch", url, data);
 
 export default apiClient;

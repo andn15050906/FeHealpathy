@@ -75,6 +75,6 @@ export const getUserAuthData = () => {
   return JSON.parse(localStorage.getItem('userProfile'));
 }
 
-const clearUserAuthData = () => {
+export const clearUserAuthData = () => {
   localStorage.clear();
 }

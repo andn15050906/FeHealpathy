@@ -9,7 +9,7 @@
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
         <div class="partner-chat">
-          <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
+          <ConversationWindow v-if="isAuthenticated" :single-room="true" @toggleChat="toggleChat" />
         </div>
       </div>
     </main>
