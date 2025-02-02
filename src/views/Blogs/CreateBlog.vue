@@ -135,38 +135,92 @@ export default {
     },
 
     async submitBlog() {
-      const formData = new FormData();
-      formData.append("Title", this.blog.title);
+  const formData = new FormData();
 
-      formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.name)));
+  // Gửi tiêu đề Blog
+  formData.append("Title", this.blog.title);
 
-      if (this.blog.thumb instanceof File) {
-        formData.append("Thumb", this.blog.thumb);
-      }
+  // Gửi trạng thái Blog (Ví dụ: "Draft", "Published", ...)
+  const status = "Draft";  // Ví dụ
+  formData.append("Status", status);
 
-      this.blog.sections.forEach((section, index) => {
-        formData.append(`Sections[${index}].Title`, section.title);
-        formData.append(`Sections[${index}].Content`, section.content);
+  // Gửi trạng thái IsCommentDisabled (boolean, có thể lấy từ checkbox hoặc toggle)
+  const isCommentDisabled = false; // Ví dụ
+  formData.append("IsCommentDisabled", isCommentDisabled);
 
-        if (section.thumb instanceof File) {
-          formData.append(`Sections[${index}].Thumb`, section.thumb);
-        }
-      });
+  // Gửi Tags
+  formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.id)));
 
-      try {
-        const response = await createArticle(formData);
-        alert("Blog đã được tạo thành công!");
-      } catch (error) {
-        console.error("Lỗi khi tạo blog:", error);
+  // Gửi Thumb (Hình ảnh đại diện của blog)
+  if (this.blog.thumb instanceof File) {
+    formData.append("Thumb.File", this.blog.thumb); // Gửi file ảnh
+  }
 
-        if (error.response && error.response.data) {
-          console.error("Chi tiết lỗi:", error.response.data);
-          alert(`Lỗi: ${error.response.data.title}`);
+  if (this.previewImage) {
+    formData.append("Thumb.Url", this.previewImage); // Gửi URL của ảnh thumb
+  }
+
+  formData.append("Thumb.Title", "Thumbnail for the blog"); // Tiêu đề của ảnh thumb
+
+  // Gửi các phần của Blog
+  this.blog.sections.forEach((section, index) => {
+    // Gửi ID cho phần nếu có
+    const sectionId = section.id || this.generateUUID();  // Nếu chưa có id, tạo một UUID ngẫu nhiên
+    formData.append(`Sections[${index}].id`, sectionId);
+
+    // Gửi tiêu đề (header) và nội dung (content) của phần
+    formData.append(`Sections[${index}].header`, section.title);
+    formData.append(`Sections[${index}].content`, section.content);
+
+    // Gửi media cho mỗi section (file hoặc url)
+    if (section.thumb instanceof File) {
+      formData.append(`Sections[${index}].media.file`, section.thumb);  // Gửi file hình ảnh nếu có
+    }
+
+    if (section.previewImage) {
+      formData.append(`Sections[${index}].media.url`, section.previewImage);  // Gửi URL của hình ảnh nếu có
+    }
+
+    // Gửi title cho media (nếu cần thiết)
+    formData.append(`Sections[${index}].media.title`, `Image for section ${index + 1}`);
+  });
+
+  this.logFormData(formData);  // Để log dữ liệu gửi lên API (sử dụng khi cần debug)
+
+  try {
+    const response = await createArticle(formData);  // API tạo bài viết
+    alert("Blog đã được tạo thành công!");
+  } catch (error) {
+    console.error("Lỗi khi tạo blog:", error);
+    if (error.response && error.response.data) {
+      console.error("Chi tiết lỗi:", error.response.data);
+      alert(`Lỗi: ${error.response.data.title}`);
+    } else {
+      alert("Có lỗi xảy ra. Vui lòng thử lại.");
+    }
+  }
+},
+
+// Hàm tạo UUID ngẫu nhiên (nếu không có sẵn)
+generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0,
+          v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+,
+    logFormData(formData) {
+    console.log("🚀 Dữ liệu gửi đi:");
+    for (const pair of formData.entries()) {
+        if (pair[1] instanceof File) {
+            console.log(`${pair[0]}: [File] ${pair[1].name}`);
         } else {
-          alert("Có lỗi xảy ra. Vui lòng thử lại.");
+            console.log(`${pair[0]}:`, pair[1]);
         }
-      }
-    },
+    }
+}
   },
 };
 </script>
