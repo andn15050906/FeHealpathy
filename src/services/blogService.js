@@ -1,4 +1,4 @@
-import { get, post, patch, del } from '../api/apiCall';
+import { get, postForm, patchForm, del } from '../api/apiCall';
 
 const API_BASE_URL = '/Articles';
 
@@ -7,11 +7,11 @@ export const getPagedArticles = async (queryParams = {}) => {
 };
 
 export const createArticle = async (articleData) => {
-    return await post(`${API_BASE_URL}`, articleData);
+    return await postForm(`${API_BASE_URL}`, articleData);
 };
 
 export const updateArticle = async (articleData) => {
-    return await patch(`${API_BASE_URL}`, articleData);
+    return await patchForm(`${API_BASE_URL}`, articleData);
 };
 
 export const deleteArticle = async (articleId) => {

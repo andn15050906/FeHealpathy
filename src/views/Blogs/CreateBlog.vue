@@ -149,15 +149,17 @@ export default {
   formData.append("IsCommentDisabled", isCommentDisabled);
 
   // Gửi Tags
-  formData.append("Tags", JSON.stringify(this.selectedKeywords.map(tag => tag.id)));
-
+  this.selectedKeywords.forEach(tag => {
+    formData.append("Tags[]", tag.id);
+  });
+  
   // Gửi Thumb (Hình ảnh đại diện của blog)
   if (this.blog.thumb instanceof File) {
     formData.append("Thumb.File", this.blog.thumb); // Gửi file ảnh
   }
 
   if (this.previewImage) {
-    formData.append("Thumb.Url", this.previewImage); // Gửi URL của ảnh thumb
+    formData.append("Thumb.Url", "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs"); // Gửi URL của ảnh thumb
   }
 
   formData.append("Thumb.Title", "Thumbnail for the blog"); // Tiêu đề của ảnh thumb
@@ -178,7 +180,7 @@ export default {
     }
 
     if (section.previewImage) {
-      formData.append(`Sections[${index}].media.url`, section.previewImage);  // Gửi URL của hình ảnh nếu có
+      formData.append(`Sections[${index}].media.url`, "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs");  // Gửi URL của hình ảnh nếu có
     }
 
     // Gửi title cho media (nếu cần thiết)
