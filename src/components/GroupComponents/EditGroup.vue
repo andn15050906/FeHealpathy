@@ -25,6 +25,16 @@
                 </div>
             </div>
 
+            <!-- Add Members -->
+            <div class="form-input">
+                <label class="form-label">Add Members</label>
+                <v-autocomplete v-model="newMemberName" :items="userSearchResults" item-title="fullName" item-value="id"
+                    label="Search for users" @input="onUserSearch" return-object outlined />
+                <v-btn @click="addMember" color="secondary" :disabled="!newMemberName">
+                    Add Member
+                </v-btn>
+            </div>
+
             <!-- Members List -->
             <div v-if="members.length > 0" class="members-list">
                 <p><strong>Members:</strong></p>
@@ -45,6 +55,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { updateConversation, getPagedConversations } from '@/scripts/api/services/conversationService';
+import { getUsers } from '@/scripts/api/services/userService';
 
 const route = useRoute();
 const router = useRouter();
@@ -55,6 +66,8 @@ const conversationInfo = ref({
     isPrivate: false,
 });
 
+const newMemberName = ref(null);
+const userSearchResults = ref([]);
 const members = ref([]);
 const isLoading = ref(false);
 
@@ -63,7 +76,6 @@ const conversationId = route.params.id;
 onMounted(async () => {
     if (!conversationId) return;
     try {
-        // Fetch conversation details, including members
         const response = await getPagedConversations({ ConversationIds: conversationId });
         if (response.items && response.items.length > 0) {
             const conversation = response.items[0];
@@ -73,8 +85,13 @@ onMounted(async () => {
                 isPrivate: conversation.isPrivate || false
             };
 
-            // Directly use the members returned from the API
-            members.value = conversation.members || [];
+            const updatedMembers = await Promise.all(conversation.members.map(async (member) => {
+                const userResponse = await getUsers({ id: member.creatorId });
+                const userName = userResponse.items.length > 0 ? userResponse.items[0].fullName : 'Unknown';
+                return { ...member, name: userName };
+            }));
+
+            members.value = updatedMembers;
         } else {
             console.warn("No conversation found with the given ID");
         }
@@ -101,6 +118,34 @@ async function onSubmit() {
         console.error('Error updating conversation:', error);
     } finally {
         isLoading.value = false;
+    }
+}
+
+async function onUserSearch(event) {
+    const query = event.target.value;
+    if (!query) return;
+    try {
+        if (query && typeof query === 'string') {
+            const response = await getUsers({ name: query });
+            userSearchResults.value = [...response.items];
+        } else {
+            userSearchResults.value = [];
+        }
+    } catch (error) {
+        console.error("Failed to fetch users", error);
+    }
+}
+
+function addMember() {
+    if (newMemberName.value) {
+        console.log("Selected User:", newMemberName.value);
+        members.value.push({
+            id: newMemberName.value.id,
+            name: newMemberName.value.fullName,
+            isAdmin: false,
+        });
+
+        newMemberName.value = null;
     }
 }
 
