@@ -16,4 +16,19 @@ class Noti {
     }
 }
 
-export { Image, Noti }
+class ConversationHubMessage {
+    //id;
+    //creatorId;
+    dto;
+    //createdAt;
+    //updatedAt;
+    //status;
+    //attachments;
+    //reactions;
+
+    constructor(dto) {
+        this.dto = dto;
+    }
+}
+
+export { Image, Noti, ConversationHubMessage }
