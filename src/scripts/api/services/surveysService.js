@@ -1,4 +1,4 @@
-import { get, post, del } from "@/scripts/api/apiClients";
+import { get, post, patch, del } from "@/scripts/api/apiClients";
 
 const API_BASE_URL = "/Surveys";
 
@@ -8,6 +8,10 @@ export const getPagedSurveys = async (queryParams) => {
 
 export const createSurvey = async (surveyData) => {
     return await post(`${API_BASE_URL}`, surveyData);
+};
+
+export const updateSurvey = async (surveyData) => {
+    return await patch(`${API_BASE_URL}`, surveyData);
 };
 
 export const deleteSurvey = async (surveyId) => {
