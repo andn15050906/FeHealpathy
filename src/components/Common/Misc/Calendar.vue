@@ -29,7 +29,7 @@
               <div class="event-description">{{ event.description }}</div>
             </div>
             <div class="event-actions">
-              <button class="delete-event-btn" @click="deleteEvent(event)">
+              <button class="delete-event-btn" @click="confirmDeleteEvent(event)">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -40,6 +40,7 @@
         </button>
       </div>
     </div>
+
     <div v-if="showEventForm" class="event-form-modal">
       <div class="modal-content">
         <h3>New Event</h3>
@@ -47,7 +48,7 @@
         <textarea v-model="newEvent.description" placeholder="Description" class="form-input"></textarea>
         <input v-model="newEvent.objective" placeholder="Objective" class="form-input" />
         <select v-model="newEvent.frequency" class="form-input">
-          <option value="Daily">Daily</option>
+          <option selected value="Daily">Daily</option>
           <option value="EveryMonday">Every Monday</option>
           <option value="EveryTuesday">Every Tuesday</option>
           <option value="EveryWednesday">Every Wednesday</option>
@@ -62,16 +63,9 @@
         </div>
       </div>
     </div>
-    <div v-if="showDeleteForm" class="delete-modal">
-      <div class="modal-content">
-        <h3>Delete Event</h3>
-        <p>Are you sure you want to delete the event "{{ eventToDelete.title }}"?</p>
-        <div class="modal-actions">
-          <button @click="cancelDelete">Cancel</button>
-          <button class="btn btn-danger" @click="confirmDelete">Delete</button>
-        </div>
-      </div>
-    </div>
+
+    <DeleteConfirmPopup :message="`Are you sure you want to delete the event '${eventToDelete?.title}'?`"
+      :isVisible="showDeletePopup" @confirmDelete="handleDeleteConfirm" @update:isVisible="showDeletePopup = false" />
   </div>
 </template>
 
@@ -88,21 +82,14 @@ import {
   isSameMonth,
   format,
 } from "date-fns";
+import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 
 export default {
+  components: { DeleteConfirmPopup },
   props: {
-    events: {
-      type: Array,
-      default: () => [],
-    },
-    initialDate: {
-      type: Date,
-      default: () => new Date(),
-    },
-    eventDotColor: {
-      type: String,
-      default: "#e74c3c",
-    },
+    events: { type: Array, default: () => [] },
+    initialDate: { type: Date, default: () => new Date() },
+    eventDotColor: { type: String, default: "#e74c3c" },
   },
   data() {
     return {
@@ -111,7 +98,7 @@ export default {
       newEvent: { title: "", description: "", objective: "", frequency: "Daily" },
       eventToDelete: null,
       showEventForm: false,
-      showDeleteForm: false,
+      showDeletePopup: false,
     };
   },
   computed: {
@@ -189,32 +176,23 @@ export default {
     },
     saveEvent() {
       if (!this.newEvent.title) return;
-      const eventPayload = {
-        title: this.newEvent.title,
-        description: this.newEvent.description,
-        objective: this.newEvent.objective,
-        frequency: this.newEvent.frequency,
-        date: this.selectedDate,
-      };
-      this.$emit("save-event", eventPayload);
+      this.$emit("save-event", { ...this.newEvent, date: this.selectedDate });
       this.cancelEvent();
     },
     cancelEvent() {
       this.showEventForm = false;
-      this.newEvent = { title: "", description: "", objective: "", frequency: "Daily" };
+      this.newEvent = { title: "", description: "" };
     },
-    deleteEvent(event) {
+    confirmDeleteEvent(event) {
       this.eventToDelete = event;
-      this.showDeleteForm = true;
+      this.showDeletePopup = true;
     },
-    confirmDelete() {
-      this.$emit("delete-event", this.eventToDelete);
-      this.showDeleteForm = false;
+    handleDeleteConfirm(confirm) {
+      if (confirm) {
+        this.$emit("delete-event", this.eventToDelete);
+      }
+      this.showDeletePopup = false;
       this.eventToDelete = null;
-    },
-    cancelDelete() {
-      this.eventToDelete = null;
-      this.showDeleteForm = false;
     },
   },
 };

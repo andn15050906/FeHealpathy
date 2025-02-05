@@ -70,14 +70,14 @@
             </button>
         </div>
 
-        <div class="text-end">
-            <button class="btn btn-primary" :disabled="isLoading" @click="updateSurveyData">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-danger" @click="$emit('cancel')">
+                Cancel
+            </button>
+            <button class="btn btn-success" :disabled="isLoading" @click="updateSurveyData">
                 <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
                     aria-hidden="true"></span>
                 Save Survey
-            </button>
-            <button class="btn btn-secondary ms-2" @click="$emit('cancel')">
-                Cancel
             </button>
         </div>
     </div>
