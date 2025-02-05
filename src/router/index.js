@@ -88,9 +88,10 @@ const router = createRouter({
       component: ManageBlog
     },
     {
-      path: '/blogs/update',
+      path: "/blogs/edit-blog/:id",
       name: 'updateBlog',
-      component: UpdateBlog
+      component: UpdateBlog,
+      props: true
     },
     {
       path: '/blogs/:id',

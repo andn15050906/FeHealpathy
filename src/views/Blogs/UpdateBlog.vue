@@ -1,93 +1,51 @@
 <template>
-  <div class="blog-update">
+  <div class="blog-creation">
     <h1 class="title">✨ Cập Nhật Blog ✨</h1>
 
     <form @submit.prevent="submitBlog" class="blog-form">
       <div class="form-group">
         <label for="title">🖋️ Tiêu đề Blog</label>
-        <input
-          type="text"
-          id="title"
-          v-model="blog.title"
-          placeholder="Cập nhập tiêu đề blog"
-          required
-        />
+        <input type="text" id="title" v-model="blog.title" placeholder="Nhập tiêu đề blog" required />
       </div>
 
-    <div class="form-group">
-      <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-        <multiselect
-          v-model="selectedKeywords"
-          :options="availableKeywords"
-          :multiple="true"
-          :close-on-select="false"
-          :clear-on-select="false"
-          :preserve-search="true"
-          placeholder="Chọn từ khóa"
-          label="name"
-          track-by="name"
-          class="multiselect"
-        ></multiselect>
-      <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
-    </div>
+      <div class="form-group">
+        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
+        <multiselect v-model="selectedKeywords" :options="availableKeywords" :multiple="true"
+          :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+          placeholder="Chọn từ khóa" label="name" track-by="id" class="multiselect" />
+        <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
+      </div>
 
       <div class="form-group">
-        <label for="image">🖼️ Hình ảnh Blog</label>
-        <input
-          type="file"
-          id="image"
-          @change="handleImageUpload"
-          accept="image/*"
-        />
+        <label for="thumb">🖼️ Hình ảnh Blog</label>
+        <input type="file" id="thumb" @change="handleThumbUpload" accept="image/*" />
         <div v-if="previewImage" class="image-preview">
           <img :src="previewImage" alt="Hình ảnh blog" />
         </div>
       </div>
 
       <div class="sections">
-        <h2>📚 Quản Lý Các Phần</h2>
-        <div
-          class="section"
-          v-for="(section, index) in blog.sections"
-          :key="index"
-        >
+        <h2>📚 Thêm Các Phần Tùy Chọn</h2>
+        <div class="section" v-for="(section, index) in blog.sections" :key="index">
           <div class="form-group">
             <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
-            <input
-              type="text"
-              v-model="section.title"
-              placeholder="Nhập tiêu đề phần"
-              required
-            />
+            <input type="text" v-model="section.title" placeholder="Nhập tiêu đề phần" required />
           </div>
           <div class="form-group">
             <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
-            <input
-              type="file"
-              @change="(e) => handleSectionImageUpload(e, index)"
-              accept="image/*"
-            />
+            <input type="file" @change="(e) => handleSectionThumbUpload(e, index)" accept="image/*" />
             <div v-if="section.previewImage" class="image-preview">
               <img :src="section.previewImage" alt="Hình ảnh phần" />
             </div>
           </div>
           <div class="form-group">
             <label>✏️ Nội dung Phần {{ index + 1 }}</label>
-            <textarea
-              v-model="section.content"
-              placeholder="Nhập nội dung chi tiết"
-              rows="4"
-              required
-            ></textarea>
+            <textarea v-model="section.content" placeholder="Nhập nội dung chi tiết" rows="4" required></textarea>
           </div>
-          <button type="button" class="btn remove" @click="removeSection(index)">
-            ❌ Xóa Phần
-          </button>
+          <button type="button" class="btn remove" @click="removeSection(index)">❌ Xóa Phần</button>
           <div class="divider"></div>
         </div>
-        <button type="button" class="btn add" @click="addSection">
-          ➕ Thêm Phần
-        </button>
+        <button type="button" class="btn add" @click="addSection">➕ Thêm Phần</button>
       </div>
 
       <div class="form-actions">
@@ -98,47 +56,75 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect';
-import 'vue-multiselect/dist/vue-multiselect.min.css';
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import { getPagedTags } from "@/services/tagService";
+import { updateArticle, getBlogById} from "@/services/blogService";
 
 export default {
-  name: "BlogUpdate",
-  components: {
-    Multiselect,
-  },
+  name: "UpdateBlog",
+  components: { Multiselect },
   data() {
     return {
       blog: {
-        title: "Khám phá Yoga và Sức khỏe",
-        keywords: "",
-        image: null,
-        previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png",
-        sections: [
-          {
-            title: "Lợi ích của Yoga",
-            image: null,
-            previewImage: "https://api-healthcontent.dai-ichi-life.com.vn/api/api/v1/app/downloadFile?fileName=news//thumnailtacdungcuayoga_1729496086755.png",
-            content: "Yoga không chỉ giúp tăng cường sức khỏe thể chất mà còn giúp cải thiện sức khỏe tinh thần, giảm căng thẳng và cải thiện giấc ngủ.",
-          },
-        ],
+        title: "",
+        thumb: null,
+        sections: [],
       },
       previewImage: null,
       selectedKeywords: [],
-      availableKeywords: [
-        { name: "Yoga" },
-        { name: "Sức khỏe" },
-        { name: "Thiền" },
-        { name: "Giảm căng thẳng" },
-        { name: "Thể chất" },
-        { name: "Meditation" },
-      ],
+      availableKeywords: [],
     };
   },
+  mounted() {
+    this.fetchAvailableKeywords();
+    this.fetchBlogData();
+  },
   methods: {
-    handleImageUpload(event) {
+    async fetchAvailableKeywords() {
+      try {
+        const response = await getPagedTags();
+        if (Array.isArray(response) && response.length > 0) {
+          this.availableKeywords = response.map((tag) => ({
+            name: tag.title,
+            id: tag.id,
+          }));
+        } else {
+          this.availableKeywords = [];
+        }
+      } catch (error) {
+        console.error("Lỗi tải từ khóa:", error);
+        alert("Không thể tải danh sách từ khóa.");
+      }
+    },
+
+async fetchBlogData() {
+  const blogId = this.$route.params.id;
+  if (!blogId) {
+    console.error("Không có blogId trong URL");
+    return;
+  }
+  try {
+    const blogData = await getBlogById(blogId); 
+    if (blogData) {
+      this.blog = {
+        title: blogData.title,
+        content: blogData.content,
+        thumb: blogData.thumb,
+        sections: blogData.sections || [],
+      };
+      this.previewImage = blogData.thumb;
+      this.selectedKeywords = blogData.tags || [];
+    }
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu blog:", error);
+  }
+}
+,
+    handleThumbUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.blog.image = file;
+        this.blog.thumb = file;
         const reader = new FileReader();
         reader.onload = (e) => {
           this.previewImage = e.target.result;
@@ -146,150 +132,148 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-    addSection() {
-      this.blog.sections.push({
-        title: "",
-        image: null,
-        previewImage: null,
-        content: "",
-      });
-    },
-    handleSectionImageUpload(event, index) {
+
+    handleSectionThumbUpload(event, index) {
       const file = event.target.files[0];
       if (file) {
-        this.blog.sections[index].image = file;
+        this.blog.sections[index].thumb = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.$set(this.blog.sections[index], "previewImage", e.target.result);
+          this.blog.sections[index].previewImage = e.target.result;
         };
         reader.readAsDataURL(file);
       }
     },
+
+    addSection() {
+      this.blog.sections.push({
+        title: "",
+        thumb: null,
+        previewImage: null,
+        content: "",
+      });
+    },
+
     removeSection(index) {
       this.blog.sections.splice(index, 1);
     },
-    submitBlog() {
-      if (!this.blog.title) {
-        alert("Vui lòng nhập tiêu đề blog!");
-        return;
+
+    async submitBlog() {
+      try {
+        const response = await updateArticle(this.blog);
+        alert("Blog đã được cập nhật thành công!");
+        this.$router.push(`/blog/${response.id}`);
+      } catch (error) {
+        console.error("Lỗi khi cập nhật blog:", error);
+        alert("Có lỗi xảy ra. Vui lòng thử lại.");
       }
-      this.blog.keywords = this.selectedKeywords.map((keyword) => keyword.name).join(", ");
-      alert("Blog đã được cập nhật thành công với từ khóa: " + this.blog.keywords);
-      this.resetForm();
-    },
-    resetForm() {
-      this.blog = {
-        title: "",
-        image: null,
-        sections: [],
-      };
-      this.selectedKeywords = [];
-      this.previewImage = null;
     },
   },
 };
 </script>
 
-<style scoped>
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f4f9;
-  margin: 0;
-  padding: 0;
-}
 
-.blog-update {
-  max-width: 800px;
-  margin: 20px auto;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px 30px;
-}
-
-.title {
-  text-align: center;
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  font-weight: bold;
-  color: #555;
-}
-
-.form-group input,
-textarea {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-textarea {
-  resize: none;
-}
-
-.image-preview img {
-  width: 100%;
-  max-width: 200px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.sections {
-  margin-top: 20px;
-}
-
-.section {
-  background: #fafafa;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-.divider {
-  border-top: 1px dashed #ddd;
-  margin: 15px 0;
-}
-
-.btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.btn.add {
-  background: #007bff;
-  color: white;
-  display: block;
-  margin: 0 auto;
-}
-
-.btn.remove {
-  background: #ff6868;
-  color: white;
-}
-
-.btn.submit {
-  margin-top: 20px;
-  background: #28a745;
-  color: white;
-  width: 100%;
-  text-align: center;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-.multiselect {
+  
+  <style scoped>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .blog-creation {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .form-group input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  textarea {
+    resize: none;
+  }
+  
+  .image-preview img {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  
+  .sections {
+    margin-top: 20px;
+  }
+  
+  .section {
+    background: #fafafa;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .divider {
+    border-top: 1px dashed #ddd;
+    margin: 15px 0;
+  }
+  
+  .btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .btn.add {
+    background: #007bff;
+    color: white;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .btn.remove {
+    background: #ff6868;
+    color: white;
+  }
+  
+  .btn.submit {
+    margin-top: 20px;
+    background: #28a745;
+    color: white;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .btn:hover {
+    opacity: 0.9;
+  }
+  .multiselect {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
@@ -338,4 +322,5 @@ textarea {
 .multiselect__clear:hover {
   color: #0056b3;
 }
-</style>
+  </style>
+  
