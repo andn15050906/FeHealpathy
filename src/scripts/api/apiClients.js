@@ -28,7 +28,7 @@ const createApiClient = (contentType) => {
 };
 
 const apiClient = createApiClient("application/json");
-const formApiClient = createApiClient("application/json");
+const formApiClient = createApiClient("multipart/formdata");
 
 const apiCall = async (client, method, url, data = null, params = null) => {
 try {
@@ -69,7 +69,7 @@ export const post = (url, data) => apiCall(apiClient, "post", url, data);
 export const patch = (url, data) => apiCall(apiClient, "patch", url, data);
 export const del = (url) => apiCall(apiClient, "delete", url);
 
-export const postForm = (url, data) => formApiCall(formApiClient, "post", url, data);
-export const patchForm = (url, data) => formApiCall(formApiClient, "patch", url, data);
+export const postForm = (url, data) => apiCall(formApiClient, "post", url, data);
+export const patchForm = (url, data) => apiCall(formApiClient, "patch", url, data);
 
 export default apiClient;
