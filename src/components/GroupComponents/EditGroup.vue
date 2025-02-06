@@ -282,4 +282,12 @@ function onFileChange(event) {
 .image-preview {
     margin-top: 10px;
 }
+
+.preview-img {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    object-fit: cover;
+}
 </style>
