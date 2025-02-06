@@ -9,14 +9,6 @@
       </div>
 
       <div class="form-group">
-        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-        <multiselect v-model="selectedKeywords" :options="availableKeywords" :multiple="true"
-          :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-          placeholder="Chọn từ khóa" label="name" track-by="id" class="multiselect" />
-        <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
-      </div>
-
-      <div class="form-group">
         <label for="thumb">🖼️ Hình ảnh Blog</label>
         <input type="file" id="thumb" @change="handleThumbUpload" accept="image/*" />
         <div v-if="previewImage" class="image-preview">
@@ -24,12 +16,20 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
+        <multiselect v-model="blog.selectedKeywords" :options="availableKeywords" :multiple="true"
+          :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+          placeholder="Chọn từ khóa" label="name" track-by="id" class="multiselect" />
+        <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
+      </div>
+
       <div class="sections">
         <h2>📚 Thêm Các Phần Tùy Chọn</h2>
         <div class="section" v-for="(section, index) in blog.sections" :key="index">
           <div class="form-group">
             <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
-            <input type="text" v-model="section.title" placeholder="Nhập tiêu đề phần" required />
+            <input type="text" v-model="section.header" placeholder="Nhập tiêu đề phần" required />
           </div>
           <div class="form-group">
             <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
@@ -55,126 +55,149 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, defineEmits, defineProps, onMounted } from 'vue';
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/services/tagService";
-import { updateArticle, getBlogById} from "@/services/blogService";
+import { updateArticle } from "@/services/blogService";
 
-export default {
-  name: "UpdateBlog",
-  components: { Multiselect },
-  data() {
-    return {
-      blog: {
-        title: "",
-        thumb: null,
-        sections: [],
-      },
-      previewImage: null,
-      selectedKeywords: [],
-      availableKeywords: [],
-    };
-  },
-  mounted() {
-    this.fetchAvailableKeywords();
-    this.fetchBlogData();
-  },
-  methods: {
-    async fetchAvailableKeywords() {
-      try {
-        const response = await getPagedTags();
-        if (Array.isArray(response) && response.length > 0) {
-          this.availableKeywords = response.map((tag) => ({
-            name: tag.title,
-            id: tag.id,
-          }));
-        } else {
-          this.availableKeywords = [];
-        }
-      } catch (error) {
-        console.error("Lỗi tải từ khóa:", error);
-        alert("Không thể tải danh sách từ khóa.");
-      }
-    },
 
-async fetchBlogData() {
-  const blogId = this.$route.params.id;
-  if (!blogId) {
-    console.error("Không có blogId trong URL");
-    return;
+const emits = defineEmits(['blogUpdated']);
+const props = defineProps({
+  blogData: {
+    type: Object,
+    required: true,
+  },
+});
+const blog = ref({
+  title: props.blogData?.title || "",
+  thumb: props.blogData?.Id || null,
+  selectedKeywords: Array.isArray(props.blogData?.tags) 
+    ? props.blogData.tags.map(tag => ({ id: tag.id, name: tag.title })) 
+    : [],
+  sections: Array.isArray(props.blogData?.sections) ? [...props.blogData.sections] : [],
+});
+
+
+const availableKeywords = ref([]);
+
+const previewImage = ref(props.blogData?.id || null);
+
+onMounted(async () => {
+  await fetchAvailableKeywords();
+  console.log("📌 Dữ liệu blogData trước khi khởi tạo:", JSON.parse(JSON.stringify(props.blogData)));
+  
+  if (props.blogData?.Id) {
+    previewImage.value = props.blogData.Id;
+    console.log("📌 Ảnh hiển thị sau khi gán:", previewImage.value);
+  } else {
+    console.log("⚠️ Không có URL ảnh trong dữ liệu blog.");
   }
+});
+
+const fetchAvailableKeywords = async () => {
   try {
-    const blogData = await getBlogById(blogId); 
-    if (blogData) {
-      this.blog = {
-        title: blogData.title,
-        content: blogData.content,
-        thumb: blogData.thumb,
-        sections: blogData.sections || [],
-      };
-      this.previewImage = blogData.thumb;
-      this.selectedKeywords = blogData.tags || [];
-    }
+    const response = await getPagedTags();
+    availableKeywords.value = response.map(tag => ({
+      name: tag.title,
+      id: tag.id,
+    }));
   } catch (error) {
-    console.error("Lỗi khi tải dữ liệu blog:", error);
+    console.error("Lỗi tải từ khóa:", error);
   }
-}
-,
-    handleThumbUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.blog.thumb = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.previewImage = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-
-    handleSectionThumbUpload(event, index) {
-      const file = event.target.files[0];
-      if (file) {
-        this.blog.sections[index].thumb = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.blog.sections[index].previewImage = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-
-    addSection() {
-      this.blog.sections.push({
-        title: "",
-        thumb: null,
-        previewImage: null,
-        content: "",
-      });
-    },
-
-    removeSection(index) {
-      this.blog.sections.splice(index, 1);
-    },
-
-    async submitBlog() {
-      try {
-        const response = await updateArticle(this.blog);
-        alert("Blog đã được cập nhật thành công!");
-        this.$router.push(`/blog/${response.id}`);
-      } catch (error) {
-        console.error("Lỗi khi cập nhật blog:", error);
-        alert("Có lỗi xảy ra. Vui lòng thử lại.");
-      }
-    },
-  },
 };
+
+const handleThumbUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    blog.value.thumb = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImage.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const handleSectionThumbUpload = (event, index) => {
+  const file = event.target.files[0];
+  if (file) {
+    blog.value.sections[index].thumb = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      blog.value.sections[index].previewImage = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+
+const addSection = () => {
+  blog.value.sections.push({
+    title: "",
+    thumb: null,
+    previewImage: null,
+    content: "",
+  });
+};
+
+
+const removeSection = (index) => {
+  blog.value.sections.splice(index, 1);
+};
+
+
+
+const submitBlog = async () => {
+    try {
+       
+        const formData = new FormData();
+        formData.append("Id", props.blogData.id);
+        formData.append("Title", blog.value.title);
+        formData.append("Status", "Published");
+        formData.append("IsCommentDisabled", false);
+
+        const currentTags = selectedKeywords.value.map(tag => tag.id);
+        const previousTags = props.blogData.tags || [];
+        const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
+        const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
+
+        formData.append("RemovedTags", JSON.stringify(removedTags));
+        formData.append("AddedTags", JSON.stringify(addedTags));
+
+        if (blog.value.thumb) {
+            formData.append("Thumb.File", blog.value.thumb);
+            formData.append("Thumb.Title", "Ảnh đại diện");
+        } else if (props.blogData.id) {
+            formData.append("Thumb.Url", props.blogData.id);
+        }
+
+        blog.value.sections.forEach((section, index) => {
+            formData.append(`Sections[${index}].Title`, section.title);
+            formData.append(`Sections[${index}].Content`, section.content);
+
+            if (section.thumb) {
+                formData.append(`Sections[${index}].Thumb.File`, section.thumb);
+                formData.append(`Sections[${index}].Thumb.Title`, `Ảnh cho phần ${index + 1}`);
+            }
+        });
+
+       
+        await updateArticle(formData);
+        emits("blogUpdated");
+        alert("Cập nhật blog thành công!");
+    } catch (error) {
+        console.error("Lỗi cập nhật blog:", error);
+        alert("Cập nhật thất bại.");
+    }
+};
+
 </script>
 
 
-  
-  <style scoped>
+
+<style scoped>
   body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;

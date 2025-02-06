@@ -1,5 +1,7 @@
 <template>
-    <div class="blog-management">
+  <div class="container my-5">
+    <div v-if="!isEditingBlog">
+      <div class="blog-management">
       <h1 class="title">📝 Quản Lý Blog</h1>
       <div class="header-actions">
         <router-link to="/blogs/create">
@@ -8,7 +10,8 @@
     </div>
       <div class="blog-list">
         <div class="blog-item" v-for="blog in blogs" :key="blog.id">
-          <img src="" alt="Blog Thumbnail" class="thumbnail" />
+          <img :src="blog.thumb?.url || 'https://placehold.co/150x150'" 
+          :alt="blog.title" class="thumbnail" />
           <div class="blog-details">
             <h2 class="blog-title">{{ blog.title }}</h2>
             <p class="blog-date">Ngày đăng: {{ formattedDate(blog.creationTime) }}</p>
@@ -22,47 +25,48 @@
       </div>
   
       <p v-if="blogs.length === 0" class="no-blogs">Chưa có blog nào được đăng!</p>
+      </div>
     </div>
-  </template>
-  
+        <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog"
+            @blogUpdated="handleBlogUpdated" />
+  </div>
+</template>
 <script>
 import moment from 'moment';
-import { getPagedArticles, deleteArticle, getBlogById } from '@/services/blogService';
-import { useRouter } from 'vue-router';
+import { getPagedArticles, deleteArticle } from '@/services/blogService';
+import UpdateBlog from './UpdateBlog.vue';
   export default {
+    components: { UpdateBlog },
     name: "BlogManagement",
     data() {
       return {
         blogs: [],
-      errorMessage: "",
-    loading: false,
+        isEditingBlog: false,
+        selectedBlog: null,
       };
     },
     methods: {
       formattedDate(value) {
         return moment(String(value)).format('MM/DD/YYYY hh:mm')
-    },
-    async fetchBlogs() {
-  this.loading = true;
-  this.errorMessage = "";
-  try {
-    const data = await getPagedArticles();
-    if (data.items && data.items.length > 0) {
-      this.blogs = data.items;
-    } else {
-      this.blogs = [];
-      this.errorMessage = "Chưa có blog nào!";
-    }
-  } catch (error) {
-    this.blogs = [];
-    this.errorMessage = "Lỗi khi tải dữ liệu blog. Vui lòng thử lại.";
-    console.error(error);
-  } finally {
-    this.loading = false;
-  }
-}
-,
-      
+      },
+      async fetchBlogs() {
+        try {
+        const data = await getPagedArticles();
+          if (data.items && data.items.length > 0) {
+            this.blogs = data.items;
+          } else {
+            this.blogs = [];
+            this.errorMessage = "Chưa có blog nào!";
+          }
+          } catch (error) {
+            this.blogs = [];
+            this.errorMessage = "Lỗi khi tải dữ liệu blog. Vui lòng thử lại.";
+            console.error(error);
+          } finally {
+            this.loading = false;
+          }
+      },
+
       async deleteBlog(blogId) {
       if (confirm("Bạn có chắc chắn muốn xóa blog này không?")) {
         try {
@@ -76,10 +80,14 @@ import { useRouter } from 'vue-router';
       }
     },
     editBlog(blog) {
-  this.$router.push(`/blogs/edit-blog/${blog.id}`);
-}
-,
+      this.selectedBlog = blog;
+      this.isEditingBlog = true;
     },
+    handleBlogUpdated() {
+    this.isEditingBlog = false;
+    this.selectedBlog = null;
+    },
+  },
     mounted() {
       this.fetchBlogs();
     }
