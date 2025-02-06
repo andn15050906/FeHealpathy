@@ -23,6 +23,11 @@
                     </label>
                     <span class="file-name">{{ conversationInfo.avatarUrl?.name || 'No file chosen' }}</span>
                 </div>
+
+                <!-- Image Preview -->
+                <div v-if="previewImage" class="image-preview">
+                    <img :src="previewImage" alt="Avatar Preview" class="preview-img" />
+                </div>
             </div>
 
             <!-- Add Members -->
@@ -66,6 +71,7 @@ const conversationInfo = ref({
     isPrivate: false,
 });
 
+const previewImage = ref(null); 
 const newMemberName = ref(null);
 const userSearchResults = ref([]);
 const members = ref([]);
@@ -84,6 +90,10 @@ onMounted(async () => {
                 avatarUrl: conversation.avatarUrl || null,
                 isPrivate: conversation.isPrivate || false
             };
+
+            if (conversation.avatarUrl) {
+                previewImage.value = conversation.avatarUrl;
+            }
 
             const updatedMembers = await Promise.all(conversation.members.map(async (member) => {
                 const userResponse = await getUsers({ id: member.creatorId });
@@ -151,7 +161,12 @@ function addMember() {
 
 function onFileChange(event) {
     const file = event.target.files[0];
-    conversationInfo.value.avatarUrl = file || null;
+    if (file) {
+        conversationInfo.value.avatarUrl = file;
+        previewImage.value = URL.createObjectURL(file);
+    } else {
+        previewImage.value = null;
+    }
 }
 </script>
 
@@ -262,5 +277,9 @@ function onFileChange(event) {
     padding: 10px;
     background-color: #f5f5f5;
     border-radius: 5px;
+}
+
+.image-preview {
+    margin-top: 10px;
 }
 </style>
