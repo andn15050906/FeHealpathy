@@ -1,0 +1,1952 @@
+{
+    "HomePage": {
+        "Title": "Healpathy - Where your mind revives",
+        "SubTitle": "Nurture the spirit, unleash the potential.",
+        "TryIt": "Try Healpathy for Free",
+        "AlreadyHaveAccount": "Already have an account?",
+        "Section1": {
+            "Title": "We're here to help you feel better.",
+            "SubTitle": "Live mindfully.",
+            "Description": "Navigate life's ups and downs with resilience, confidence and guided support.",
+            "LearnMore": "Learn More"
+        },
+        "Section2": {
+            "Title": "Empower skills.",
+            "SubTitle": "",
+            "Description": "Master skills that will help you conquer your life objectives",
+            "LearnMore": "Learn More"
+        },
+        "Section3": {
+            "Title": "Strengthen body.",
+            "SubTitle": "",
+            "Description": "Build your strength in motion and growth in action",
+            "LearnMore": "Learn More"
+        },
+        "Section4": {
+            "Title": "Over two thousand 5-star reviews.",
+            "SubTitle": "",
+            "Description": "",
+            "LearnMore": "Learn More"
+        },
+        "Testimonial": [
+            {
+                "Text": "When I cannot fall asleep, I turn on this app and am out within 5 minutes.",
+                "UserText": "A from America"
+            },
+            {
+                "Text": "I have a very busy brain and can find it hard to unwind. Now a daily practice is actually so wonderful and healing for me.",
+                "UserText": "B from Viet Nam"
+            },
+            {
+                "Text": "Healpathy has changed my life in immeasurable ways. I am more resilient and feel so much more connected to myself.",
+                "UserText": "C from England"
+            }
+        ],
+        "Pricing": {
+            "Title": "Start your free trial of Healpathy Premium.",
+            "Yearly": {
+                "Text": "Yearly",
+                "Price": "$100/yr."
+            },
+            "Trial": {
+                "Text": "14-Day Free Trial",
+                "Price": "Free."
+            },
+            "Monthly": {
+                "Text": "Monthly",
+                "Price": "$10/mo."
+            },
+            "Terms": {
+                "Text": "",
+                "Title": "Terms",
+                "CancelText": "Cancel anytime",
+                "Continue": "Continue"
+            }
+        }
+    },
+    "BlogMeta": {
+        "Author": {
+            "Name": "Kevinbkdev",
+            "Handle": "@Anhkolamgidauanhthe",
+            "AvatarUrl": "https://cdn.builder.io/api/v1/image/assets/TEMP/8b7a42b72730d189116847e4baf45c74505293ef9a4f8acb41ed9ee9d6d32ac4?apiKey=581cb509eedd462787009da53a17f69a&"
+        },
+        "FollowButtonText": "Theo dõi",
+        "Stats": [
+            {
+                "Icon": "https: //cdn.builder.io/api/v1/image/assets/TEMP/cfe7882a3a3e2bea6ad842a57720e62bc396ff8010098b94509f8c12dacff405?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Value": 591
+            },
+            {
+                "Icon": "https://cdn.builder.io/api/v1/image/assets/TEMP/e7b8b0d4afa93638cc139e9aead3bc9fa7c9b555dd36627e57fbf11f586d4353?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Value": 25
+            },
+            {
+                "Icon": "https: //cdn.builder.io/api/v1/image/assets/TEMP/86467d6eae000aff65fbab082a819d6489ace376cacf07b44b251297fd653b18?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Value": 14
+            }
+        ],
+        "Post": {
+            "Title": "[MongoDB - phần 3 Nguyên lý triển khai và cấu hình Sharding MongoDB",
+            "Meta": "Đã đăng vào Thứ Hai, 3: 00 SA - 12 phút đọc"
+        }
+    },
+    "BlogList": {
+        "Categories": [
+            {
+                "Id": "meditation",
+                "Title": "Meditation & Mindfulness"
+            },
+            {
+                "Id": "stress",
+                "Title": "Stress & Anxiety"
+            },
+            {
+                "Id": "sleep",
+                "Title": "Sleep"
+            },
+            {
+                "Id": "mental",
+                "Title": "Mental Health"
+            },
+            {
+                "Id": "growth",
+                "Title": "Personal Growth"
+            }
+        ],
+        "FeaturedArticles": [
+            {
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/49610b6b6a4b1b09706ea4c3d5d179b3b5d83006d10efb22887d03def1fc6c5b?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Tags": [
+                    "News",
+                    "Mental Health",
+                    "Mediation",
+                    "Mindfulness",
+                    "Personal Growth",
+                    "Sleep",
+                    "Stress & Anxiety"
+                ],
+                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
+                "Excerpt": "Healpathy's 'New Year Reset' is a 30-day mental health journey to help you recharge, restore, refresh & reconnect. All it takes is Just One Step each day for 30 days."
+            },
+            {
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/16a730674da83ae93a1649184c08b7a13cbb35ade295530aa913f1471c4f098f?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Title": "How to set (and stick to) healthy boundaries during the holidays",
+                "Excerpt": "It's the most wonderful time of the year? Explore how to set healthy boundaries with your family to reduce tension and help you stay sane during the holidays."
+            }
+        ],
+        "Articles": [
+            {
+                "Title": "A beginner's guide to a mindful Zentangle art practice",
+                "Date": "Dec 12, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/e8a355960cf6c3b4620db88948e79a577bfa6cce744c91135e179ead2da9cc3a?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "10 uplifting affirmations to boost your wellbeing",
+                "Date": "Dec 11, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/79ed7971bfe90cb61464c0522159933f88ffb326bd1b0935c4b00752c052f0c5?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
+                "Date": "Dec 10, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/ee79a2b4c6e3963f380491064ad853ce179f0bb87069ba87752ab67c7367d174?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Candle meditation: a step-by-step guide to practice at home",
+                "Date": "Dec 10, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/16a730674da83ae93a1649184c08b7a13cbb35ade295530aa913f1471c4f098f?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "What is cortisol face (and is it real or just a TikTok trend)?",
+                "Date": "Dec 12, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/feee755ef24172753a56c0ee561b2f44821c922a3209f7ae8f766072359c19f9?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "How to tell the difference between social anxiety vs. shyness",
+                "Date": "Dec 12, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/6d10d77b169f90e5ca26ca273b6768d8ec125e904ca0c5210d318db19b8e50da?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Do I have social anxiety? These are the signs to look out for",
+                "Date": "Dec 11, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/518966f13966471d424b01c4be1ffde31123c8e7de7ac1c74211fee1a9ba89e1?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Can stress cause vertigo? Here's what you need to know",
+                "Date": "Dec 11, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/c647b64a666649dcdc4b8321b05ee99c746537b607608813cf50b4795d9395a7?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
+                "Date": "Dec 10, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/93dfbcaa2b8ac455a98583925d2536464fc6a7e3f9f9a2f3717c37f369701c71?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Does red light therapy help you sleep? Plus, 4 tips to use it",
+                "Date": "Nov 22, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/5caff811dcd97cc4227841d2914a8ecf707da22260f0f1143b08626233c0a336?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "How to fix your circadian rhythm: 7 tips to get better sleep",
+                "Date": "Nov 22, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/9e77bbfb3e2a5b620551a29208a907eec82332a3404639ab7d0f145c5ff50c2e?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Do you have hypnopompic hallucinations? 5 tips to prevent them",
+                "Date": "Nov 18, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/f0332b837dcffa243cbab2b7907896c114ba34fcb719f19e991a4a78f459a8ef?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
+                "Date": "Dec 10, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/90430ece5901054596d5db1c75d2d941b6f835e72df47f628315be07d987674e?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Feeling the post-holiday blues? Try these 7 tips to manage",
+                "Date": "Dec 9, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/1932004e077c21f95d9f3c7ca49fd7c2bfe14447502b036732b0a21cca4d1909?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Healpathy and NCT partner to give new mothers the gift of time and peace of mind",
+                "Date": "Dec 3, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/1a8c6ed6be84077c7c422bdf2b5eff0c34505257d5beb3db56bbd6e8327bfa11?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "8 signs you may need a burnout coach (and how they can help)",
+                "Date": "Nov 26, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/c4f8dafbd1a421de3b7fb2da073ce7f35ed169ef5b6e4f153faecb57f88fcb40?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
+                "Date": "Dec 10, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/fd449cb011c57bec9b8a72521843baf13f6e5f605fff7f31350ca864485530d1?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "Is someone using reverse psychology on you? Here's what to do",
+                "Date": "Dec 4, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/09a4bdbb2b3dbd1fbaf4bce5015f1dcaf04a0a98e2c4f9d5730705f307a8c1a8?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "8 examples of high self-esteem (and how to improve yours)",
+                "Date": "Nov 27, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/18563bd422fb83c96c2d0b3051453c6c541be9cee45ca164e860a9d06ca63a46?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            },
+            {
+                "Title": "How do I get to know myself better? 8 ways to find the true you",
+                "Date": "Nov 21, 2024",
+                "Tags": [
+                    "Relationship",
+                    "Yoga",
+                    "Fitness"
+                ],
+                "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/834a7ccab65346f07147a26db56075860c796c88e5c1b4bceec3f5aaf6774871?apiKey=581cb509eedd462787009da53a17f69a&",
+                "Link": "#"
+            }
+        ]
+    },
+    "UserProfile": {
+        "UserInfo": {
+            "UserName": "Alec 123",
+            "Email": "Alec123@gmail.com",
+            "Avatar": "/assets/images/avatars/marc.jpg",
+            "FullName": "Alec Thompson",
+            "Role": "Admin",
+            "EnrollmentCount": 1,
+            "Description": " Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens' bed design but the back is... ",
+            "DateOfBirth": "2024-01-01T00:00:00.000Z",
+            "CreatedAt": "2024-01-01T00:00:00.000Z"
+        }
+    },
+    "YogaCatalog": {
+        "Lessons": [
+            {
+                "id": 1,
+                "title": "Transition to Camel",
+                "instructor": "Anna Arkan",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "47:57",
+                "level": "Intermediate",
+                "ratingCount": 245
+            },
+            {
+                "id": 2,
+                "title": "Strength and Stretch II",
+                "instructor": "Julia Crouch",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "28:54",
+                "level": "Intermediate",
+                "ratingCount": 189
+            },
+            {
+                "id": 3,
+                "title": "Meet The Need",
+                "instructor": "Nina Morris",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "35:29",
+                "level": "Intermediate",
+                "ratingCount": 167
+            },
+            {
+                "id": 4,
+                "title": "Flying Crow",
+                "instructor": "Sarah Van Tassel",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "1:15:11",
+                "level": "Intermediate",
+                "ratingCount": 203
+            },
+            {
+                "id": 5,
+                "title": "Hips Love You",
+                "instructor": "Alicia Cooper",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "53:15",
+                "level": "Beginner",
+                "ratingCount": 178
+            },
+            {
+                "id": 6,
+                "title": "Mindful Bow Breathing",
+                "instructor": "Ariana Adams",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "01:23",
+                "level": "Beginner",
+                "ratingCount": 156
+            },
+            {
+                "id": 7,
+                "title": "Practice for Embracing Body Changes",
+                "instructor": "Helen Gardner",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "44:56",
+                "level": "Beginner",
+                "ratingCount": 234
+            },
+            {
+                "id": 8,
+                "title": "Dancing Crane",
+                "instructor": "Brooke Morgan",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "08:12",
+                "level": "Beginner",
+                "ratingCount": 145
+            },
+            {
+                "id": 9,
+                "title": "Cherry Child Stand",
+                "instructor": "Sarah Van Tassel",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "59:29",
+                "level": "Intermediate",
+                "ratingCount": 267
+            },
+            {
+                "id": 10,
+                "title": "Good Morning Sunshine",
+                "instructor": "Julia Crouch",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "27:14",
+                "level": "Beginner",
+                "ratingCount": 198
+            },
+            {
+                "id": 11,
+                "title": "Practice for Spreading Your Wings",
+                "instructor": "Helen Gardner",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "25:30",
+                "level": "Beginner",
+                "ratingCount": 176
+            },
+            {
+                "id": 12,
+                "title": "Gentle Slow Flow Yoga",
+                "instructor": "Melissa Harper",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "54:45",
+                "level": "Beginner",
+                "ratingCount": 289
+            },
+            {
+                "id": 13,
+                "title": "Viloma Pranayama",
+                "instructor": "Tia McKenzie",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "05:26",
+                "level": "Beginner",
+                "ratingCount": 134
+            },
+            {
+                "id": 14,
+                "title": "Foot Therapy for Dancers",
+                "instructor": "Julia Crouch",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "16:51",
+                "level": "Beginner",
+                "ratingCount": 223
+            },
+            {
+                "id": 15,
+                "title": "Ignite the Fire Within: Core Fusion",
+                "instructor": "Melissa Harper",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "43:16",
+                "level": "Intermediate",
+                "ratingCount": 256
+            },
+            {
+                "id": 16,
+                "title": "Ignite the Fire Within: Breath in Motion",
+                "instructor": "Sarah Brown",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "56:02",
+                "level": "Intermediate",
+                "ratingCount": 278
+            },
+            {
+                "id": 17,
+                "title": "Ignite the Fire Within: Core Stability Flow",
+                "instructor": "Melissa Harper",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "28:11",
+                "level": "Intermediate",
+                "ratingCount": 245
+            },
+            {
+                "id": 18,
+                "title": "Partner Class with Julia Crouch and Melissa Krieger",
+                "instructor": "Julia Crouch",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "32:06",
+                "level": "Beginner",
+                "ratingCount": 167
+            },
+            {
+                "id": 19,
+                "title": "Box Breathing",
+                "instructor": "Tia McKenzie",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "04:44",
+                "level": "Beginner",
+                "ratingCount": 189
+            },
+            {
+                "id": 20,
+                "title": "Embodying Flow",
+                "instructor": "Sara Brown",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "28:04",
+                "level": "Intermediate",
+                "ratingCount": 234
+            },
+            {
+                "id": 21,
+                "title": "Back to the Mat: Core Awake",
+                "instructor": "Sara Brown",
+                "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
+                "duration": "25:35",
+                "level": "Beginner",
+                "ratingCount": 156
+            }
+        ]
+    },
+    "Community": {
+        "Groups": {
+            "Joined": [
+                {
+                    "id": "1",
+                    "name": "Name1",
+                    "isPublic": true,
+                    "description": "Description1",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
+                    "totalMembers": 1,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "1",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "2",
+                    "name": "Name2",
+                    "isPublic": true,
+                    "description": "Description2",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
+                    "totalMembers": 2,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "2",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "3",
+                    "name": "Name3",
+                    "isPublic": true,
+                    "description": "Description3",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 3,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "3",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "4",
+                    "name": "Name4",
+                    "isPublic": true,
+                    "description": "Description4",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 4,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "4",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                }
+            ],
+            "Recommended": [
+                {
+                    "id": "1",
+                    "name": "Name1",
+                    "isPublic": true,
+                    "description": "Description1",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
+                    "totalMembers": 1,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "1",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "2",
+                    "name": "Name2",
+                    "isPublic": true,
+                    "description": "Description2",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
+                    "totalMembers": 2,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "2",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                },
+                {
+                    "id": "3",
+                    "name": "Name3",
+                    "isPublic": true,
+                    "description": "Description3",
+                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
+                    "totalMembers": 3,
+                    "requireApprovedWhenPost": true,
+                    "groupStatus": 1,
+                    "createdBy": "3",
+                    "createdAt": "22/12/2024",
+                    "activityTime": "0001-01-01T00:00:00",
+                    "totalPosts": 0
+                }
+            ]
+        }
+    },
+    "GroupOverview": {
+        "Posts": [
+            {
+                "Id": 1,
+                "CreatedBy": 1,
+                "CreatedAt": "2024-01-01T00:00:00.000Z",
+                "Content": "Content1",
+                "TotalLikes": 1,
+                "PublicLevel": 0,
+                "AllowComment": true,
+                "Creator": {
+                    "Id": 1,
+                    "Avatar": "/assets/images/avatars/marc.jpg",
+                    "UserName": "Alec 123"
+                },
+                "Medias": [],
+                "LikeCount": 10
+            }
+        ]
+    },
+    "Assessments": {
+        "types": [
+            {
+                "id": "DASS-21",
+                "title": "DASS-21",
+                "description": "Depression, Anxiety and Stress Scale",
+                "questions": [
+                    {
+                        "text": "I find it hard to feel relaxed.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I have a dry mouth.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I don't feel any positive emotions.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I experience breathing irregularities (shortness of breath, difficulty breathing without exertion).",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I find it hard to start working.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I overreact to events.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I sweat (e.g., sweaty palms).",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel like I'm thinking too much.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I worry about situations that might embarrass me.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel like I have nothing to look forward to.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel easily irritated.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I find it hard to relax.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel depressed or disappointed.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I can't accept interruptions while I'm working.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel almost panicked.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I don't feel enthusiastic about anything anymore.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel like I'm not worth being a person.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel easily offended.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I hear my heartbeat clearly even when I'm not doing anything (e.g., increased heartbeat, irregular heartbeat).",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I often feel fear without reason.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    },
+                    {
+                        "text": "I feel life is meaningless.",
+                        "options": [
+                            "Not at all true for me",
+                            "Somewhat true for me, or occasionally true",
+                            "Mostly true for me, or true most of the time",
+                            "Completely true for me, or true almost all the time"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "MBTI",
+                "title": "MBTI",
+                "description": "Myers-Briggs Type Indicator",
+                "questions": [
+                    {
+                        "text": "Do you prefer to:",
+                        "options": [
+                            "Focus on the present moment.",
+                            "Think about the future possibilities."
+                        ]
+                    },
+                    {
+                        "text": "When meeting new people, do you:",
+                        "options": [
+                            "Enjoy initiating conversations.",
+                            "Feel reserved and wait for others to start."
+                        ]
+                    },
+                    {
+                        "text": "In your free time, do you:",
+                        "options": [
+                            "Plan activities in advance.",
+                            "Decide on activities spontaneously."
+                        ]
+                    },
+                    {
+                        "text": "When making decisions, do you:",
+                        "options": [
+                            "Rely on logic and facts.",
+                            "Consider personal feelings and relationships."
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer:",
+                        "options": [
+                            "Detailed instructions.",
+                            "General guidelines with freedom to interpret."
+                        ]
+                    },
+                    {
+                        "text": "When learning, do you:",
+                        "options": [
+                            "Prefer practical examples.",
+                            "Enjoy theoretical concepts."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel more comfortable:",
+                        "options": [
+                            "In structured environments.",
+                            "In flexible, open-ended environments."
+                        ]
+                    },
+                    {
+                        "text": "In social situations, do you:",
+                        "options": [
+                            "Thrive on interaction and activity.",
+                            "Feel energized by spending time alone."
+                        ]
+                    },
+                    {
+                        "text": "When faced with a problem, do you:",
+                        "options": [
+                            "Use tried and tested methods.",
+                            "Seek innovative and creative solutions."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easier to:",
+                        "options": [
+                            "Focus on the details.",
+                            "See the big picture."
+                        ]
+                    },
+                    {
+                        "text": "When working in a team, do you:",
+                        "options": [
+                            "Prefer a clear role and structure.",
+                            "Enjoy flexibility and sharing ideas."
+                        ]
+                    },
+                    {
+                        "text": "Do you usually:",
+                        "options": [
+                            "Stick to your plans.",
+                            "Adapt plans as circumstances change."
+                        ]
+                    },
+                    {
+                        "text": "When giving feedback, do you:",
+                        "options": [
+                            "Value honesty and directness.",
+                            "Focus on maintaining harmony and relationships."
+                        ]
+                    },
+                    {
+                        "text": "In decision-making, do you:",
+                        "options": [
+                            "Weigh the pros and cons carefully.",
+                            "Trust your instincts and feelings."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel more comfortable:",
+                        "options": [
+                            "Following a daily routine.",
+                            "Having freedom to change your plans."
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer to:",
+                        "options": [
+                            "Stick to practical and realistic ideas.",
+                            "Explore imaginative and abstract concepts."
+                        ]
+                    },
+                    {
+                        "text": "In conversations, do you:",
+                        "options": [
+                            "Lead the discussion.",
+                            "Listen and reflect more."
+                        ]
+                    },
+                    {
+                        "text": "When organizing tasks, do you:",
+                        "options": [
+                            "Create detailed lists and schedules.",
+                            "Keep things flexible and open-ended."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel energized by:",
+                        "options": [
+                            "Socializing with a group.",
+                            "Spending time alone or with a close friend."
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer to:",
+                        "options": [
+                            "Finish one task before starting another.",
+                            "Juggle multiple tasks at once."
+                        ]
+                    },
+                    {
+                        "text": "In a work environment, do you:",
+                        "options": [
+                            "Prefer predictable routines.",
+                            "Enjoy dynamic and changing environments."
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy more:",
+                        "options": [
+                            "Concrete tasks and facts.",
+                            "Abstract ideas and theories."
+                        ]
+                    },
+                    {
+                        "text": "When relaxing, do you prefer:",
+                        "options": [
+                            "Active, social activities.",
+                            "Quiet, solitary activities."
+                        ]
+                    },
+                    {
+                        "text": "Do you find satisfaction in:",
+                        "options": [
+                            "Completing tasks and achieving goals.",
+                            "Exploring new ideas and learning new things."
+                        ]
+                    },
+                    {
+                        "text": "When making plans, do you:",
+                        "options": [
+                            "Stick to a strict schedule.",
+                            "Allow room for spontaneous changes."
+                        ]
+                    },
+                    {
+                        "text": "Do you tend to:",
+                        "options": [
+                            "Make decisions based on objective criteria.",
+                            "Consider the emotional impact on others."
+                        ]
+                    },
+                    {
+                        "text": "In relationships, do you:",
+                        "options": [
+                            "Prefer clear communication and boundaries.",
+                            "Value emotional connection and understanding."
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy:",
+                        "options": [
+                            "Practical, hands-on tasks.",
+                            "Conceptual and abstract thinking."
+                        ]
+                    },
+                    {
+                        "text": "When working on a project, do you:",
+                        "options": [
+                            "Stick to the original plan.",
+                            "Adapt and change as needed."
+                        ]
+                    },
+                    {
+                        "text": "In your daily life, do you:",
+                        "options": [
+                            "Follow a structured routine.",
+                            "Embrace flexibility and spontaneity."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easier to:",
+                        "options": [
+                            "Focus on present realities.",
+                            "Imagine future possibilities."
+                        ]
+                    },
+                    {
+                        "text": "When discussing ideas, do you:",
+                        "options": [
+                            "Stick to the facts.",
+                            "Explore theories and concepts."
+                        ]
+                    },
+                    {
+                        "text": "In group settings, do you:",
+                        "options": [
+                            "Take the lead and direct.",
+                            "Listen and support others."
+                        ]
+                    },
+                    {
+                        "text": "When making plans, do you:",
+                        "options": [
+                            "Stick to a strict schedule.",
+                            "Allow room for changes and flexibility."
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "ENNEAGRAM",
+                "title": "Enneagram",
+                "description": "Nine types of personality",
+                "questions": [
+                    {
+                        "text": "Do you often seek perfection in everything you do?",
+                        "options": [
+                            "Yes, I strive for perfection.",
+                            "No, I prefer to be flexible and adaptive."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel the need to help others, even at your own expense?",
+                        "options": [
+                            "Yes, helping others is very important to me.",
+                            "No, I prioritize my own needs first."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it important to stand out and be recognized for your achievements?",
+                        "options": [
+                            "Yes, I want to be admired.",
+                            "No, I don't seek external validation."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel that you need to understand everything deeply and completely?",
+                        "options": [
+                            "Yes, understanding is crucial for me.",
+                            "No, I am okay with surface-level knowledge."
+                        ]
+                    },
+                    {
+                        "text": "Do you tend to avoid conflicts and seek peace in relationships?",
+                        "options": [
+                            "Yes, I avoid conflicts.",
+                            "No, I confront issues directly."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel a strong sense of fear about the future or uncertainties?",
+                        "options": [
+                            "Yes, I worry about the future.",
+                            "No, I am confident in facing uncertainties."
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy being spontaneous and experiencing new things without much planning?",
+                        "options": [
+                            "Yes, spontaneity is exciting.",
+                            "No, I prefer to plan things out."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel the need to be in control and assert your power in situations?",
+                        "options": [
+                            "Yes, I like to be in control.",
+                            "No, I am comfortable with others taking charge."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel driven to succeed and achieve your goals no matter what?",
+                        "options": [
+                            "Yes, success is very important to me.",
+                            "No, I am content with what I have."
+                        ]
+                    },
+                    {
+                        "text": "Do you focus on maintaining a positive image and being liked by others?",
+                        "options": [
+                            "Yes, I care about how others perceive me.",
+                            "No, I am true to myself regardless of others' opinions."
+                        ]
+                    },
+                    {
+                        "text": "Do you tend to be overly critical of yourself and others?",
+                        "options": [
+                            "Yes, I have high standards.",
+                            "No, I am more forgiving."
+                        ]
+                    },
+                    {
+                        "text": "Do you often find yourself avoiding discomfort and seeking pleasure?",
+                        "options": [
+                            "Yes, I seek comfort.",
+                            "No, I face discomfort head-on."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel a strong need to be needed and appreciated by others?",
+                        "options": [
+                            "Yes, I want to be helpful.",
+                            "No, I don't rely on others' appreciation."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel most comfortable when things are predictable and secure?",
+                        "options": [
+                            "Yes, I value security.",
+                            "No, I embrace uncertainty."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it important to know and adhere to the rules?",
+                        "options": [
+                            "Yes, rules are important.",
+                            "No, I think rules can be flexible."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel the need to prove your worth through accomplishments?",
+                        "options": [
+                            "Yes, I derive value from achievements.",
+                            "No, I am content with who I am."
+                        ]
+                    },
+                    {
+                        "text": "Do you often find yourself detached from others, preferring solitude?",
+                        "options": [
+                            "Yes, I prefer being alone.",
+                            "No, I enjoy socializing."
+                        ]
+                    },
+                    {
+                        "text": "Do you tend to be calm and composed even in stressful situations?",
+                        "options": [
+                            "Yes, I remain calm.",
+                            "No, I can get anxious."
+                        ]
+                    },
+                    {
+                        "text": "Do you often find yourself thinking about what could go wrong?",
+                        "options": [
+                            "Yes, I anticipate problems.",
+                            "No, I focus on the positives."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel a strong desire to protect those you care about?",
+                        "options": [
+                            "Yes, I am protective.",
+                            "No, I believe in letting people handle their own challenges."
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer to stick to traditions and established ways of doing things?",
+                        "options": [
+                            "Yes, I value tradition.",
+                            "No, I like to innovate."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel that you must be strong and avoid showing vulnerability?",
+                        "options": [
+                            "Yes, showing strength is important.",
+                            "No, I am comfortable showing vulnerability."
+                        ]
+                    },
+                    {
+                        "text": "Do you find joy in being productive and busy?",
+                        "options": [
+                            "Yes, being productive makes me happy.",
+                            "No, I value relaxation and downtime."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel the need to withdraw from social interactions to recharge?",
+                        "options": [
+                            "Yes, I need time alone.",
+                            "No, I gain energy from being with others."
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy brainstorming and coming up with new ideas?",
+                        "options": [
+                            "Yes, I love generating ideas.",
+                            "No, I prefer practical execution."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel responsible for fixing others' problems?",
+                        "options": [
+                            "Yes, I feel responsible.",
+                            "No, I let others handle their own issues."
+                        ]
+                    },
+                    {
+                        "text": "Do you have a strong desire to improve the world around you?",
+                        "options": [
+                            "Yes, making a difference is important to me.",
+                            "No, I focus on personal goals."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel restless and seek out new experiences?",
+                        "options": [
+                            "Yes, I seek adventure.",
+                            "No, I prefer stability."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it difficult to trust others easily?",
+                        "options": [
+                            "Yes, trust is hard for me.",
+                            "No, I trust easily."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel the need to take charge in group situations?",
+                        "options": [
+                            "Yes, I take the lead.",
+                            "No, I prefer others to lead."
+                        ]
+                    },
+                    {
+                        "text": "Do you seek to avoid pain and focus on positive experiences?",
+                        "options": [
+                            "Yes, I avoid pain.",
+                            "No, I confront pain when necessary."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel a strong sense of duty and responsibility towards your commitments?",
+                        "options": [
+                            "Yes, I take my commitments seriously.",
+                            "No, I am more flexible with commitments."
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel the need to be the best in what you do?",
+                        "options": [
+                            "Yes, I strive for excellence.",
+                            "No, I am satisfied with good enough."
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easy to adapt to change and go with the flow?",
+                        "options": [
+                            "Yes, I am adaptable.",
+                            "No, I prefer consistency."
+                        ]
+                    },
+                    {
+                        "text": "Do you feel energized by social interactions and being with others?",
+                        "options": [
+                            "Yes, I gain energy from people.",
+                            "No, I need time alone to recharge."
+                        ]
+                    },
+                    {
+                        "text": "Do you tend to overthink and analyze situations deeply?",
+                        "options": [
+                            "Yes, I analyze a lot.",
+                            "No, I act on instinct more often."
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "DEMOGRAPHIC_SURVEY",
+                "title": "Demographic Survey",
+                "description": "Collect demographic information",
+                "questions": [
+                    {
+                        "text": "What is your age?",
+                        "options": [
+                            "Under 18",
+                            "18-24",
+                            "25-34",
+                            "35-44",
+                            "45-54",
+                            "55-64",
+                            "65 or older"
+                        ]
+                    },
+                    {
+                        "text": "What is your gender?",
+                        "options": [
+                            "Male",
+                            "Female",
+                            "Non-binary/Third gender",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "What is the highest level of education you have completed?",
+                        "options": [
+                            "Less than high school",
+                            "High school diploma or equivalent",
+                            "Some college, no degree",
+                            "Associate degree",
+                            "Bachelor’s degree",
+                            "Master’s degree",
+                            "Doctorate or professional degree"
+                        ]
+                    },
+                    {
+                        "text": "What is your current employment status?",
+                        "options": [
+                            "Employed full-time",
+                            "Employed part-time",
+                            "Self-employed",
+                            "Unemployed, looking for work",
+                            "Unemployed, not looking for work",
+                            "Student",
+                            "Retired",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "What is your annual household income?",
+                        "options": [
+                            "Less than $20,000",
+                            "$20,000 - $34,999",
+                            "$35,000 - $49,999",
+                            "$50,000 - $74,999",
+                            "$75,000 - $99,999",
+                            "$100,000 - $149,999",
+                            "$150,000 or more",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "What is your current marital status?",
+                        "options": [
+                            "Single",
+                            "Married",
+                            "In a domestic partnership",
+                            "Divorced",
+                            "Widowed",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "What is your ethnicity? (Select all that apply)",
+                        "options": [
+                            "White",
+                            "Black or African American",
+                            "Hispanic or Latino",
+                            "Asian",
+                            "Native American or Alaska Native",
+                            "Native Hawaiian or Pacific Islander",
+                            "Other (please specify)",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "How many people live in your household, including yourself?",
+                        "options": [
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "5 or more"
+                        ]
+                    },
+                    {
+                        "text": "In which region do you live?",
+                        "options": [
+                            "Urban",
+                            "Suburban",
+                            "Rural"
+                        ]
+                    },
+                    {
+                        "text": "What is your primary language?",
+                        "options": [
+                            "English",
+                            "Spanish",
+                            "Chinese",
+                            "French",
+                            "Other (please specify)"
+                        ]
+                    },
+                    {
+                        "text": "What is your nationality?",
+                        "options": [
+                            "[Open text field]"
+                        ]
+                    },
+                    {
+                        "text": "What is your religious affiliation?",
+                        "options": [
+                            "Christianity",
+                            "Islam",
+                            "Hinduism",
+                            "Buddhism",
+                            "Judaism",
+                            "Atheist/Agnostic",
+                            "Other (please specify)",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "Do you have a disability?",
+                        "options": [
+                            "Yes",
+                            "No",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "What is your political affiliation?",
+                        "options": [
+                            "Conservative",
+                            "Liberal",
+                            "Moderate",
+                            "Independent",
+                            "Other (please specify)",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "Do you own or rent your home?",
+                        "options": [
+                            "Own",
+                            "Rent",
+                            "Other (please specify)"
+                        ]
+                    },
+                    {
+                        "text": "What is your primary mode of transportation?",
+                        "options": [
+                            "Personal vehicle",
+                            "Public transportation",
+                            "Bicycle",
+                            "Walking",
+                            "Other (please specify)"
+                        ]
+                    },
+                    {
+                        "text": "Do you have access to the internet at home?",
+                        "options": [
+                            "Yes",
+                            "No"
+                        ]
+                    },
+                    {
+                        "text": "Do you have health insurance?",
+                        "options": [
+                            "Yes",
+                            "No",
+                            "Prefer not to say"
+                        ]
+                    },
+                    {
+                        "text": "Do you have children?",
+                        "options": [
+                            "Yes",
+                            "No"
+                        ]
+                    },
+                    {
+                        "text": "Have you served in the military?",
+                        "options": [
+                            "Yes",
+                            "No",
+                            "Prefer not to say"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "STRENGTHFINDER",
+                "title": "StrengthFinder",
+                "description": "Identify and develop strengths",
+                "questions": [
+                    {
+                        "text": "Do you enjoy learning new things, even if they are not immediately useful?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often think about the future and what could happen?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you naturally see the connections between different ideas or concepts?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy organizing and structuring things to increase efficiency?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easy to empathize with others and understand their feelings?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel energized by competition and striving to win?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy working in a team and building strong relationships?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often focus on achieving goals and driving results?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you like to take charge and lead others in group settings?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often focus on what is right and wrong and stand by your principles?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy developing and nurturing others’ talents?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easy to adapt to change and new environments?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often see the best in people and focus on their strengths?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy taking risks and trying new approaches?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you focus on building harmonious relationships and avoiding conflicts?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often take time to reflect and think deeply about important matters?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy researching and gathering information?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you naturally inspire and motivate others to achieve more?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer to stick to routines and established ways of doing things?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often see yourself as a mediator, helping resolve disputes between people?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy working independently and taking responsibility for your own tasks?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel a strong need to make things better or more efficient?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you find it easy to start conversations and connect with new people?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often find yourself analyzing past experiences to improve future outcomes?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you focus on creating strategies and plans to achieve long-term goals?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy thinking outside the box and exploring creative solutions?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you prefer clarity and structure over ambiguity and uncertainty?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often seek feedback and use it to improve yourself?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you naturally focus on details and ensure everything is done perfectly?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you feel comfortable taking on new challenges and stepping out of your comfort zone?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often find yourself encouraging others and boosting their confidence?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy building networks and maintaining a broad range of connections?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you often feel compelled to take the lead in uncertain situations?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    },
+                    {
+                        "text": "Do you enjoy being recognized and appreciated for your efforts and contributions?",
+                        "options": [
+                            "Strongly agree",
+                            "Agree",
+                            "Neutral",
+                            "Disagree",
+                            "Strongly disagree"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

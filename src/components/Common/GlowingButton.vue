@@ -2,7 +2,8 @@
     <button class="glowing-button" :style="{
         background: getBgColor,
         color: textColor,
-        justifyContent: justify
+        justifyContent: justify,
+        padding: padding
     }">
         <slot />
     </button>
@@ -22,6 +23,10 @@ export default {
             type: String,
             default: 'center'
         },
+        padding: {
+            type: String,
+            default: '16px 32px'
+        },
     },
     computed: {
         getBgColor() {
@@ -39,7 +44,6 @@ export default {
     flex: 1;
     max-width: 300px;
     max-height: 300px;
-    padding: 16px 32px;
     text-align: center;
     border-radius: 100px;
     cursor: pointer;

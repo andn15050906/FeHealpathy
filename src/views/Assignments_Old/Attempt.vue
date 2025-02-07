@@ -38,8 +38,8 @@
               <span class="notifications" id="user-notifications"></span>
               <div role="main">
                 <form @submit.prevent="submitAssignment" id="responseform">
-                  <input v-model="timeSpent" type="hidden" id="time-spent"/>
-                  <input v-model="assignmentId" type="hidden" id="assignment-id"/>
+                  <input v-model="timeSpent" type="hidden" id="time-spent" />
+                  <input v-model="assignmentId" type="hidden" id="assignment-id" />
                   <div>
                     <div v-for="(question, index) in assignment.questions" :key="question.id" class="que multichoice">
                       <div class="info">
@@ -52,7 +52,8 @@
                             <div class="answer">
                               <input type="hidden" :value="index" />
                               <div v-for="choice in question.choices" :key="choice.id" class="r0">
-                                <input type="radio" :name="'answer-' + index" :value="choice.id" v-model="answers[index]" />
+                                <input type="radio" :name="'answer-' + index" :value="choice.id"
+                                  v-model="answers[index]" />
                                 <label :for="choice.id" class="m-l-1">
                                   {{ choice.content }}
                                 </label>
@@ -80,7 +81,7 @@
 </template>
 
 <script>
-import { getAssignment } from '@/services/assignmentService'; 
+import { getAssignment } from '@/scripts/api/services/assignmentService';
 
 export default {
   data() {
@@ -128,11 +129,7 @@ export default {
     },
   },
   beforeDestroy() {
-    clearInterval(this.timerInterval); 
+    clearInterval(this.timerInterval);
   },
 };
 </script>
-
-<style scoped>
-/* Đưa các styles tương tự như trong Razor Page vào đây */
-</style>

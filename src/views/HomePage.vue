@@ -5,10 +5,12 @@
                 <h1 class="hero-title">{{ HomePage.Title }}</h1>
                 <p class="hero-subtitle">{{ HomePage.SubTitle }}</p>
                 <div class="cta-buttons">
-                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">{{
-                        HomePage.TryIt }}</GlowingButton>
-                    <GlowingButton primary-color="transparent" secondary-color="transparent" textColor="#000">{{
-                        HomePage.AlreadyHaveAccount }}</GlowingButton>
+                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">
+                        <RouterLink :to="'register'" class="link">{{ HomePage.TryIt }}</RouterLink>
+                    </GlowingButton>
+                    <GlowingButton primary-color="transparent" secondary-color="transparent" textColor="#000">
+                        <RouterLink :to="'sign-in'" class="link-dark">{{ HomePage.AlreadyHaveAccount }}</RouterLink>
+                    </GlowingButton>
                 </div>
             </section>
 
@@ -16,27 +18,30 @@
                 <h2 class="section-title">{{ HomePage.Section1.Title }}</h2>
                 <div class="feature-cards">
                     <article class="feature-card">
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ff2025ec0e7ed8fcde827b280028e0d5f79b1565e32e25e44a5cdc5c118be574?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
-                            alt="Stress Relief Icon" class="feature-icon" />
-                        <h3 class="feature-title">{{ HomePage.Section1.SubTitle }}</h3>
-                        <p class="feature-description">{{ HomePage.Section1.Description }}</p>
-                        <a href="#learn-more" class="learn-more-link">{{ HomePage.Section1.LearnMore }}</a>
-                    </article>
-
-                    <article class="feature-card">
                         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/d8a46915f1cb450537c2df698c9fd9ac53e17b32b0c129fe00ede90fa3c9c495?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
                             alt="Sleep Better Icon" class="feature-icon" />
-                        <h3 class="feature-title">{{ HomePage.Section2.Title }}</h3>
-                        <p class="feature-description">{{ HomePage.Section2.Description }}</p>
-                        <a href="#learn-more" class="learn-more-link">{{ HomePage.Section2.LearnMore }}</a>
+                        <h3 class="feature-title">{{ HomePage.Section1.SubTitle }}</h3>
+                        <p class="feature-description">{{ HomePage.Section1.Description }}</p>
+                        <RouterLink :to="'practice'" class="learn-more-link">{{ HomePage.Section1.LearnMore }}
+                        </RouterLink>
                     </article>
 
                     <article class="feature-card">
                         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/39bfe16b2c35be4fac9ccd45455efd9b01cf834bd76ff75010fddc3f60dae972?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
                             alt="Mindfulness Icon" class="feature-icon" />
+                        <h3 class="feature-title">{{ HomePage.Section2.Title }}</h3>
+                        <p class="feature-description">{{ HomePage.Section2.Description }}</p>
+                        <RouterLink :to="'courses'" class="learn-more-link">{{ HomePage.Section1.LearnMore }}
+                        </RouterLink>
+                    </article>
+
+                    <article class="feature-card">
+                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ff2025ec0e7ed8fcde827b280028e0d5f79b1565e32e25e44a5cdc5c118be574?placeholderIfAbsent=true&apiKey=581cb509eedd462787009da53a17f69a"
+                            alt="Stress Relief Icon" class="feature-icon" />
                         <h3 class="feature-title">{{ HomePage.Section3.Title }}</h3>
                         <p class="feature-description">{{ HomePage.Section3.Description }}</p>
-                        <a href="#learn-more" class="learn-more-link">{{ HomePage.Section3.LearnMore }}</a>
+                        <RouterLink :to="'practice'" class="learn-more-link">{{ HomePage.Section1.LearnMore }}
+                        </RouterLink>
                     </article>
                 </div>
             </section>
@@ -57,7 +62,7 @@
             <section class="pricing-section">
                 <h2 class="section-title">{{ HomePage.Pricing.Title }}</h2>
                 <div class="pricing-options">
-                    <button class="pricing-option active" tabindex="0">
+                    <button class="pricing-option active">
                         <div class="pricing-header">
                             <span class="plan-name">{{ HomePage.Pricing.Yearly.Text }}</span>
                             <span class="plan-price">{{ HomePage.Pricing.Yearly.Price }}</span>
@@ -68,7 +73,7 @@
                         </div>
                     </button>
 
-                    <button class="pricing-option" tabindex="0">
+                    <button class="pricing-option">
                         <div class="pricing-header">
                             <span class="plan-name">{{ HomePage.Pricing.Monthly.Text }}</span>
                             <span class="plan-price">{{ HomePage.Pricing.Monthly.Text }}</span>
@@ -79,11 +84,6 @@
                     <a href="#terms" class="terms-link">{{ HomePage.Pricing.Terms.Title }}</a> |
                     <a href="#cancel" class="terms-link">{{ HomePage.Pricing.Terms.CancelText }}</a>
                 </p>
-                <div style="display: flex; justify-content: center;">
-                    <GlowingButton primaryColor="#4facfe" secondaryColor="#0062fe">
-                        {{ HomePage.Pricing.Terms.Continue }}
-                    </GlowingButton>
-                </div>
             </section>
         </main>
     </div>
@@ -92,18 +92,57 @@
 <script>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
-import json from '../api/data.json'
+import json from '../scripts/data/data.json'
+import router from '@/scripts/router';
+import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
+import { Noti } from '@/scripts/types/models';
 
 export default {
     name: 'HomePage',
+    methods: {
+        setActivePricing: function () {
+
+        },
+        navigateToSettingUp: function (notiId) {
+            this.$router.push({ name: 'SettingUp' });
+            this.$emit('removeNotification', notiId);
+        }
+    },
     data() {
         return {
+            user: null,
             HomePage: json.HomePage
         }
     },
     components: {
         GlowingButton,
         GlowingCard
+    },
+    mounted() {
+        // handle auth
+        if (router.currentRoute.value.query) {
+            var externalUser = router.currentRoute.value.query['external_redirect'];
+            if (externalUser) {
+                setUserAuthData({
+                    User: externalUser
+                });
+            }
+
+            this.$router.replace({ path: '/', query: {} });
+        }
+        this.user = getUserAuthData();
+
+        // handle setting up
+        if (!this.user)
+            return;
+        /*if (this.user.preferences && this.user.preferences.length == 0) {
+            this.$router.push({ name: 'SettingUp' });
+        }*/
+        if (this.user.settings && this.user.settings.length == 0) {
+            let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
+            noti.callback = () => this.navigateToSettingUp(noti.id);
+            this.$emit('addNotification', noti);
+        }
     }
 }
 </script>
@@ -218,6 +257,16 @@ export default {
     line-height: 2;
     color: rgba(0, 0, 0, 0.8);
     margin-bottom: 22px;
+}
+
+.link {
+    color: #fff;
+    text-decoration: none;
+}
+
+.link-dark {
+    color: #000;
+    text-decoration: none;
 }
 
 .learn-more-link {

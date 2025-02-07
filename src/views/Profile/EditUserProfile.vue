@@ -81,10 +81,12 @@
 
 <script>
 import { inject, ref, onMounted } from 'vue';
-import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
-import { getClientInfo, updateUserProfile } from '../../services/userService.js';
-import { handleFormSubmit } from '@/helpers/validation';
-import GlobalState from '@/helpers/globalState';
+import { ConvertTo_yyyy_mm_dd } from '../../scripts/logic/common';
+import { updateUserProfile } from '../../scripts/api/services/userService.js';
+import { getUserAuthData } from '@/scripts/api/services/authService';
+import { handleFormSubmit } from '@/scripts/logic/validation';
+import GlobalState from '@/scripts/logic/globalState';
+import dict from '@/scripts/data/dictionary.json';
 
 export default {
   data() {
@@ -112,30 +114,10 @@ export default {
 
     const loadingSpinner = inject('loadingSpinner');
     const sweetAlert = inject('sweetAlert');
-
-    const text = {
-      PersonalInfo: 'Personal Info',
-      FullName: 'Full Name',
-      AddYourName: 'Add your name',
-      NameDescription: 'Your name appears on your profile and next to your comments',
-      Edit: 'Edit',
-      Bio: 'Bio',
-      AddBio: 'Add Bio',
-      BioDescription: 'Your bio appears on your profile',
-      Avatar: 'Avatar',
-      UserName: 'UserName',
-      AddUserName: 'Add username',
-      Role: 'Role',
-      RequestInstructor: 'Request to become an instructor',
-      IsVerified: 'Verification status',
-      DateOfBirth: 'Date of Birth',
-      JoinDate: 'Join Date',
-      EnrollmentCount: 'Enrollment Count',
-      Confirm: 'Confirm'
-    };
+    const text = dict['en'];
 
     const roleMapping = {
-      1: 'Instructor',
+      1: 'Advisor',
       2: 'Learner',
       3: 'Admin'
     };
@@ -143,7 +125,7 @@ export default {
     const fetchProfile = async () => {
       try {
         loadingSpinner.showSpinner();
-        const clientData = await getClientInfo();
+        const clientData = await getUserAuthData();
         clientData.role = roleMapping[clientData.role] || 'Unknown';
         clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
         clientData.creationTime = formatDate(clientData.creationTime);
@@ -164,12 +146,10 @@ export default {
     };
 
     const getAvatarApiUrl = (avatarUrl, userId) => {
-      if (!avatarUrl || avatarUrl === '') return '/img/User_Empty.png';
-      return avatarUrl.startsWith('http')
-        ? avatarUrl
-        : `https://localhost:7277/api/Users/avatar/${userId}`;
+      if (!avatarUrl || avatarUrl === '')
+        return '/img/User_Empty.png';
+      return avatarUrl.startsWith('http') ? avatarUrl : `https://localhost:7277/api/Users/avatar/${userId}`;
     };
-
 
     const handleAvatarChange = event => {
       const file = event.target.files[0];

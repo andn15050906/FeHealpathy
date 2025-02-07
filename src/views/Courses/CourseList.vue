@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getCourses } from "../../services/courseService.js";
+import { getCourses } from "../../scripts/api/services/courseService.js";
 
 export default {
   data() {
@@ -77,5 +77,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

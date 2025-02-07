@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "agree": "我同意。",
+    "createAccount": "创建账户",
+    "email": "电子邮件",
+    "login": "登录",
+    "password": "密码",
+    "forgotPassword": "忘记密码？",
+    "resetPassword": "重置密码",
+    "submit": "提交",
+    "cancel": "取消"
+  },
+  "home": {
+    "welcome": "欢迎来到 HEALPATHY",
+    "description": "在这里您可以找到平静和健康。"
+  },
+  "error": {
+    "notFound": "未找到页面。",
+    "serverError": "服务器发生错误。"
+  },
+  "language": {
+    "brazilian_portuguese": "葡萄牙语",
+    "english": "英语",
+    "spanish": "西班牙语",
+    "simplified_chinese": "简体中文",
+    "persian": "波斯语"
+  }
+}

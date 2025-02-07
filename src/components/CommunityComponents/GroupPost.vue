@@ -78,7 +78,7 @@
 
 
 <script setup>
-import { onMounted, ref, defineProps, watch } from 'vue';
+import { ref, watch } from 'vue';
 import CommentLoader from '@/components/CommentComponents/CommentLoader.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 

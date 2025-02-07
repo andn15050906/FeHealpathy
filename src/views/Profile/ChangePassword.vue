@@ -10,7 +10,8 @@
             <div class="FieldWrapper">
               <div class="InputField">
                 <h3 class="InputField_label">{{ text.CurrentPassword }}</h3>
-                <input v-model="form.currentPassword" type="password" class="InputField_input" placeholder="Current Password" />
+                <input v-model="form.currentPassword" type="password" class="InputField_input"
+                  placeholder="Current Password" />
               </div>
             </div>
 
@@ -26,7 +27,8 @@
             <div class="FieldWrapper">
               <div class="InputField">
                 <h3 class="InputField_label">{{ text.ReTypeNewPassword }}</h3>
-                <input v-model="form.retypeNewPassword" type="password" class="InputField_input" placeholder="Retype New Password" />
+                <input v-model="form.retypeNewPassword" type="password" class="InputField_input"
+                  placeholder="Retype New Password" />
               </div>
             </div>
 
@@ -63,7 +65,7 @@
 
 <script>
 import { ref } from 'vue';
-import { updateUserProfile } from '@/services/userService.js';
+import { updateUserProfile } from '@/scripts/api/services/userService.js';
 
 export default {
   setup() {
@@ -134,7 +136,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Add your component styles here */
-</style>

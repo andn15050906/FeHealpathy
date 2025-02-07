@@ -18,9 +18,9 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref } from 'vue';
 import CreatePostPopup from './CreatePostPopup.vue';
-import GlobalState from '@/helpers/globalState';
+import GlobalState from '@/scripts/logic/globalState';
 
 const showCreationPopup = ref(false);
 const userProfile = ref({});
