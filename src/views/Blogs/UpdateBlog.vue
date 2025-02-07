@@ -32,12 +32,16 @@
             <input type="text" v-model="section.header" placeholder="Nhập tiêu đề phần" required />
           </div>
           <div class="form-group">
-            <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
-            <input type="file" @change="(e) => handleSectionThumbUpload(e, index)" accept="image/*" />
-            <div v-if="section.previewImage" class="image-preview">
-              <img :src="section.previewImage" alt="Hình ảnh phần" />
-            </div>
-          </div>
+          <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
+          <input type="file" @change="(e) => handleSectionThumbUpload(e, index)" accept="image/*" />
+  
+          <div v-if="section.previewImage" class="image-preview">
+        <img :src="section.previewImage" alt="Hình ảnh phần {{ index + 1 }}" />
+      </div>
+
+
+
+</div>
           <div class="form-group">
             <label>✏️ Nội dung Phần {{ index + 1 }}</label>
             <textarea v-model="section.content" placeholder="Nhập nội dung chi tiết" rows="4" required></textarea>
@@ -81,20 +85,35 @@ const blog = ref({
 
 
 const availableKeywords = ref([]);
-
 const previewImage = ref(props.blogData?.id || null);
 
 onMounted(async () => {
   await fetchAvailableKeywords();
-  console.log("📌 Dữ liệu blogData trước khi khởi tạo:", JSON.parse(JSON.stringify(props.blogData)));
-  
-  if (props.blogData?.Id) {
-    previewImage.value = props.blogData.Id;
-    console.log("📌 Ảnh hiển thị sau khi gán:", previewImage.value);
+
+  if (props.blogData?.thumb?.url) {
+    previewImage.value = props.blogData.thumb.url;
   } else {
-    console.log("⚠️ Không có URL ảnh trong dữ liệu blog.");
+    console.log("⚠️ Không có URL ảnh đại diện.");
+  }
+
+  if (props.blogData?.sections) {
+    console.log("📌 Dữ liệu Sections từ API:", props.blogData.sections);
+
+    blog.value.sections = props.blogData.sections.map((sections, index) => {
+      console.log(`📌 Sections ${index + 1} dữ liệu gốc:`, sections);
+
+      return {
+        header: sections.header || "",
+        content: sections.content || "",
+        thumb: null,
+        previewImage: sections.media?.url || null,
+      };
+    });
   }
 });
+
+
+
 
 const fetchAvailableKeywords = async () => {
   try {
@@ -121,16 +140,22 @@ const handleThumbUpload = (event) => {
 };
 
 const handleSectionThumbUpload = (event, index) => {
-  const file = event.target.files[0];
-  if (file) {
-    blog.value.sections[index].thumb = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      blog.value.sections[index].previewImage = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            blog.value.sections[index] = {
+                ...blog.value.sections[index],
+                thumb: file, // Cập nhật file ảnh mới
+                previewImage: e.target.result, // Hiển thị ảnh mới
+            };
+        };
+        reader.readAsDataURL(file);
+    }
 };
+
+
+
 
 
 const addSection = () => {
@@ -151,48 +176,59 @@ const removeSection = (index) => {
 
 const submitBlog = async () => {
     try {
-       
         const formData = new FormData();
+
+        // 🆗 1. Gửi ID, Title, Status
         formData.append("Id", props.blogData.id);
         formData.append("Title", blog.value.title);
-        formData.append("Status", "Published");
+        formData.append("Status", "Draft");
+
+        // 🆗 2. Sửa lỗi IsCommentDisabled (boolean)
         formData.append("IsCommentDisabled", false);
 
-        const currentTags = selectedKeywords.value.map(tag => tag.id);
-        const previousTags = props.blogData.tags || [];
+        // 🛠 3. Khai báo removedTags & addedTags trước khi sử dụng
+        const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
+        const previousTags = props.blogData.tags ? props.blogData.tags.map(tag => tag.id) : [];
         const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
         const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
 
-        formData.append("RemovedTags", JSON.stringify(removedTags));
-        formData.append("AddedTags", JSON.stringify(addedTags));
+        // 🛠 4. Đảm bảo RemovedTags & AddedTags luôn có dữ liệu (ngay cả khi rỗng)
+        if (removedTags.length === 0) formData.append("RemovedTags", "[]");
+        else removedTags.forEach(tag => formData.append("RemovedTags", tag));
 
+        if (addedTags.length === 0) formData.append("AddedTags", "[]");
+        else addedTags.forEach(tag => formData.append("AddedTags", tag));
+
+        // 🆗 5. Gửi hình ảnh đại diện (Thumb)
         if (blog.value.thumb) {
             formData.append("Thumb.File", blog.value.thumb);
             formData.append("Thumb.Title", "Ảnh đại diện");
-        } else if (props.blogData.id) {
-            formData.append("Thumb.Url", props.blogData.id);
+        } else if (props.blogData.thumb?.url) {
+            formData.append("Thumb.Url", props.blogData.thumb.url);
         }
 
+        // 🆗 6. Gửi danh sách Sections
         blog.value.sections.forEach((section, index) => {
-            formData.append(`Sections[${index}].Title`, section.title);
+            formData.append(`Sections[${index}].Title`, section.header); 
             formData.append(`Sections[${index}].Content`, section.content);
 
             if (section.thumb) {
                 formData.append(`Sections[${index}].Thumb.File`, section.thumb);
                 formData.append(`Sections[${index}].Thumb.Title`, `Ảnh cho phần ${index + 1}`);
+            } else if (section.previewImage) {
+                formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
             }
         });
 
-       
-        await updateArticle(formData);
-        emits("blogUpdated");
-        alert("Cập nhật blog thành công!");
+        console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
+
+        // Gọi API cập nhật bài viết
+        const response = await updateArticle(formData);
+        console.log("✅ Cập nhật blog thành công:", response);
     } catch (error) {
-        console.error("Lỗi cập nhật blog:", error);
-        alert("Cập nhật thất bại.");
+        console.error("❌ Lỗi cập nhật blog:", error);
     }
 };
-
 </script>
 
 

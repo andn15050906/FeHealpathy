@@ -155,9 +155,8 @@ export default {
     if (section.thumb instanceof File) {
       formData.append(`Sections[${index}].media.file`, section.thumb);
     }
-      formData.append(`Sections[${index}].media.title`, `Image for section ${index + 1}`);
+      formData.append(`Sections[${index}].media.title`, `HC Test ${index + 1}`);
     });
-
   try {
     const response = await createArticle(formData);
   } catch (error) {
