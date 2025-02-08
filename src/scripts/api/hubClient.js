@@ -1,5 +1,4 @@
-﻿import { hubUrl } from '@/scripts/env.js';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+﻿import { HubConnectionBuilder } from '@microsoft/signalr';
 import { getUserBearerToken } from '@/scripts/api/services/authService';
 import { CreateChatMessageDto, CreateReactionDto, UpdateChatMessageDto } from '../types/dtos';
 export {
@@ -14,7 +13,8 @@ class HubConnection {
         var bearer = getUserBearerToken();
         //console.log(bearer);
 
-        this.#connection = new HubConnectionBuilder().withUrl(hubUrl,
+        this.#connection = new HubConnectionBuilder().withUrl(
+            import.meta.env.VITE_HUB_URL,
             //{ headers: { "ngrok-skip-browser-warning": "69420" } }
             { accessTokenFactory: () => bearer }
         ).build();

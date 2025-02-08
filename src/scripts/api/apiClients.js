@@ -1,10 +1,9 @@
 import axios from "axios";
-import { backendApiBase } from '../env';
 import { clearUserAuthData } from '@/scripts/api/services/authService';
 
 const createApiClient = (contentType) => {
     const client = axios.create({
-        baseURL: backendApiBase,
+        baseURL: import.meta.env.VITE_BACKEND_URL + "/api",
         withCredentials: true,
         headers: {
             "Content-Type": contentType,
