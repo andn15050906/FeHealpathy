@@ -97,11 +97,7 @@ onMounted(async () => {
   }
 
   if (props.blogData?.sections) {
-    console.log("📌 Dữ liệu Sections từ API:", props.blogData.sections);
-
     blog.value.sections = props.blogData.sections.map((sections, index) => {
-      console.log(`📌 Sections ${index + 1} dữ liệu gốc:`, sections);
-
       return {
         header: sections.header || "",
         content: sections.content || "",
@@ -111,9 +107,6 @@ onMounted(async () => {
     });
   }
 });
-
-
-
 
 const fetchAvailableKeywords = async () => {
   try {
@@ -146,8 +139,8 @@ const handleSectionThumbUpload = (event, index) => {
         reader.onload = (e) => {
             blog.value.sections[index] = {
                 ...blog.value.sections[index],
-                thumb: file, // Cập nhật file ảnh mới
-                previewImage: e.target.result, // Hiển thị ảnh mới
+                thumb: file,
+                previewImage: e.target.result,
             };
         };
         reader.readAsDataURL(file);
@@ -178,36 +171,34 @@ const submitBlog = async () => {
     try {
         const formData = new FormData();
 
-        // 🆗 1. Gửi ID, Title, Status
         formData.append("Id", props.blogData.id);
         formData.append("Title", blog.value.title);
         formData.append("Status", "Draft");
+        formData.append("IsCommentDisabled", JSON.stringify(false));
 
-        // 🆗 2. Sửa lỗi IsCommentDisabled (boolean)
-        formData.append("IsCommentDisabled", false);
 
-        // 🛠 3. Khai báo removedTags & addedTags trước khi sử dụng
         const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
         const previousTags = props.blogData.tags ? props.blogData.tags.map(tag => tag.id) : [];
         const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
         const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
 
-        // 🛠 4. Đảm bảo RemovedTags & AddedTags luôn có dữ liệu (ngay cả khi rỗng)
-        if (removedTags.length === 0) formData.append("RemovedTags", "[]");
-        else removedTags.forEach(tag => formData.append("RemovedTags", tag));
+        if (addedTags.length > 0) {
+          addedTags.forEach(tag => formData.append("AddedTags", tag));
+        } 
 
-        if (addedTags.length === 0) formData.append("AddedTags", "[]");
-        else addedTags.forEach(tag => formData.append("AddedTags", tag));
+        if (removedTags.length > 0) {
+          removedTags.forEach(tag => formData.append("RemovedTags", tag));
+        } 
+        
+        formData.append("Thumb.Title", "Sau Khi Cap Nhat");
 
-        // 🆗 5. Gửi hình ảnh đại diện (Thumb)
-        if (blog.value.thumb) {
-            formData.append("Thumb.File", blog.value.thumb);
-            formData.append("Thumb.Title", "Ảnh đại diện");
+        if (blog.value.thumb instanceof File) {
+              formData.append("Thumb.File", blog.value.thumb);
         } else if (props.blogData.thumb?.url) {
-            formData.append("Thumb.Url", props.blogData.thumb.url);
+              formData.append("Thumb.Url", props.blogData.thumb.url);
         }
 
-        // 🆗 6. Gửi danh sách Sections
+
         blog.value.sections.forEach((section, index) => {
             formData.append(`Sections[${index}].Title`, section.header); 
             formData.append(`Sections[${index}].Content`, section.content);
@@ -222,7 +213,6 @@ const submitBlog = async () => {
 
         console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
 
-        // Gọi API cập nhật bài viết
         const response = await updateArticle(formData);
         console.log("✅ Cập nhật blog thành công:", response);
     } catch (error) {

@@ -146,7 +146,7 @@ export default {
     if (this.blog.thumb instanceof File) {
       formData.append("Thumb.File", this.blog.thumb);
     }
-    formData.append("Thumb.Title", "Thumbnail for the blog");
+    formData.append("Thumb.Title", "Phung Test Blog");
     this.blog.sections.forEach((section, index) => {
     const sectionId = section.id || this.generateUUID();
     formData.append(`Sections[${index}].id`, sectionId);
@@ -155,7 +155,7 @@ export default {
     if (section.thumb instanceof File) {
       formData.append(`Sections[${index}].media.file`, section.thumb);
     }
-      formData.append(`Sections[${index}].media.title`, `HC Test ${index + 1}`);
+      formData.append(`Sections[${index}].media.title`, `Cuong Test Section ${index + 1}`);
     });
   try {
     const response = await createArticle(formData);
