@@ -15,6 +15,8 @@
                 <Pagination :currentPage="currentPage" :totalPages="totalPages" @go-to-page="fetchMediaResources" />
             </div>
         </div>
+        <DeleteConfirmPopup v-model:isVisible="showDeletePopup" message="Are you sure you want to delete this media?"
+            url="" @confirmDelete="handleDeleteConfirm" />
     </div>
 </template>
 
@@ -30,9 +32,10 @@ import {
     updateMediaResource,
     deleteMediaResource,
 } from "../../../scripts/api/services/mediaResourcesService";
+import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
 
 export default {
-    components: { MediaList, Pagination, AddMusic, EditMusic },
+    components: { MediaList, Pagination, AddMusic, EditMusic, DeleteConfirmPopup },
     data() {
         return {
             mediaFiles: [],
@@ -42,6 +45,8 @@ export default {
             showEditMusic: false,
             selectedMusic: null,
             selectedMusicIndex: null,
+            showDeletePopup: false,
+            mediaToDelete: null
         };
     },
     methods: {
@@ -54,7 +59,7 @@ export default {
                     Title: "",
                     Type: null,
                     PageIndex: page - 1,
-                    PageSize: 10,
+                    PageSize: 10
                 };
                 const response = await getPagedMediaResources(params);
                 if (response && response.items) {
@@ -74,8 +79,7 @@ export default {
         },
         async createMedia(newMusic) {
             try {
-                const response = await createMediaResource(newMusic);
-                this.mediaFiles.push(response.data);
+                await createMediaResource(newMusic);
                 this.showAddMusic = false;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media added successfully!");
@@ -85,19 +89,12 @@ export default {
         },
         async updateMedia(updatedMusicFormData) {
             try {
-                const response = await updateMediaResource(updatedMusicFormData);
-                // const updatedMedia = response.data;
-                // if (this.selectedMusicIndex !== null) {
-                //     this.$set(this.mediaFiles, this.selectedMusicIndex, updatedMedia);
-                // }
+                await updateMediaResource(updatedMusicFormData);
                 this.showEditMusic = false;
                 this.selectedMusic = null;
-
                 await this.fetchMediaResources(this.currentPage);
-
                 toast.success("Media updated successfully!");
             } catch (error) {
-                console.log(error);
                 toast.error("Failed to update media.");
             }
         },
@@ -106,21 +103,42 @@ export default {
             this.selectedMusicIndex = index;
             this.showEditMusic = true;
         },
-        async deleteMedia(mediaId, index) {
-            if (confirm("Are you sure you want to delete this media?")) {
+        deleteMedia(mediaId, index) {
+            this.mediaToDelete = { id: mediaId, index: index };
+            this.showDeletePopup = true;
+        },
+        async handleDeleteConfirm(confirm) {
+            if (confirm && this.mediaToDelete) {
                 try {
-                    await deleteMediaResource(mediaId);
-                    this.mediaFiles.splice(index, 1);
+                    await deleteMediaResource(this.mediaToDelete.id);
+                    this.mediaToDelete = null;
+                    this.showDeletePopup = false;
                     await this.fetchMediaResources(this.currentPage);
                     toast.success("Media deleted successfully!");
                 } catch (error) {
                     toast.error("Failed to delete media.");
                 }
+            } else {
+                this.mediaToDelete = null;
+                this.showDeletePopup = false;
             }
-        },
+        }
     },
     mounted() {
         this.fetchMediaResources();
-    },
+    }
 };
 </script>
+
+<style scoped>
+.table {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item {
+    padding: 1rem;
+}
+</style>

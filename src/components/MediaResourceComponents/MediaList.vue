@@ -19,7 +19,7 @@
                     <td>{{ file.description }}</td>
                     <td>{{ formatDate(file.creationTime) }}</td>
                     <td>
-                        <button class="btn btn-secondary btn-sm me-2" @click="$emit('edit-media', file, index)">
+                        <button class="btn btn-warning btn-sm me-2" @click="$emit('edit-media', file, index)">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-danger btn-sm" @click="$emit('delete-media', file.id, index)">
