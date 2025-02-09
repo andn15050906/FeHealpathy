@@ -1,23 +1,33 @@
 <template>
   <div class="change-password-container">
-    <h2>Đổi Mật Khẩu</h2>
+    <h2>Change Password</h2>
+    <p class="subtitle">Enter a new password below to change your password</p>
     <form @submit.prevent="handleChangePassword">
       <div class="form-group">
-        <label>Mật khẩu hiện tại</label>
-        <input type="password" v-model="currentPassword" required placeholder="Nhập mật khẩu hiện tại"/>
+        <label>Current Password</label>
+        <div class="password-input">
+          <input :type="showCurrentPassword ? 'text' : 'password'" v-model="currentPassword" required placeholder="Enter current password"/>
+          <span @click="toggleShowCurrentPassword" class="toggle-icon">{{ showCurrentPassword ? '🙈' : '👁️' }}</span>
+        </div>
       </div>
       <div class="form-group">
-        <label>Mật khẩu mới</label>
-        <input type="password" v-model="newPassword" required placeholder="Nhập mật khẩu mới"/>
+        <label>New Password</label>
+        <div class="password-input">
+          <input :type="showNewPassword ? 'text' : 'password'" v-model="newPassword" required placeholder="Enter new password"/>
+          <span @click="toggleShowNewPassword" class="toggle-icon">{{ showNewPassword ? '🙈' : '👁️' }}</span>
+        </div>
       </div>
       <div class="form-group">
-        <label>Xác nhận mật khẩu mới</label>
-        <input type="password" v-model="confirmPassword" required placeholder="Nhập lại mật khẩu mới"/>
+        <label>Confirm New Password</label>
+        <div class="password-input">
+          <input :type="showConfirmPassword ? 'text' : 'password'" v-model="confirmPassword" required placeholder="Confirm new password"/>
+          <span @click="toggleShowConfirmPassword" class="toggle-icon">{{ showConfirmPassword ? '🙈' : '👁️' }}</span>
+        </div>
       </div>
-      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-      <p v-if="successMessage" class="success">{{ successMessage }}</p>
-      <button type="submit" :disabled="loading">
-        {{ loading ? "Đang cập nhật..." : "Đổi mật khẩu" }}
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <button type="submit" :disabled="loading" class="submit-btn">
+        {{ loading ? "Updating..." : "Change Password" }}
       </button>
     </form>
   </div>
@@ -35,31 +45,55 @@ export default {
     const loading = ref(false);
     const errorMessage = ref("");
     const successMessage = ref("");
+    const showCurrentPassword = ref(false);
+    const showNewPassword = ref(false);
+    const showConfirmPassword = ref(false);
+
+    const toggleShowCurrentPassword = () => {
+      showCurrentPassword.value = !showCurrentPassword.value;
+    };
+    const toggleShowNewPassword = () => {
+      showNewPassword.value = !showNewPassword.value;
+    };
+    const toggleShowConfirmPassword = () => {
+      showConfirmPassword.value = !showConfirmPassword.value;
+    };
+
+    const validatePassword = (password) => {
+      const conditions = [];
+
+        if (!/.{6,}/.test(password)) conditions.push("at least 6 characters");
+        if (!/[A-Z]/.test(password)) conditions.push("at least one uppercase letter");
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) conditions.push("one special character");
+
+        return conditions.length > 0 
+          ? `Password must contain ${conditions.join(", ")}.` 
+          : "";
+      };
+
 
     const handleChangePassword = async () => {
+      errorMessage.value = "";
+      successMessage.value = "";
+
       if (newPassword.value !== confirmPassword.value) {
-        errorMessage.value = "Mật khẩu mới và xác nhận không khớp";
+        errorMessage.value = "New password not match";
+        return;
+      }
+
+      const passwordError = validatePassword(newPassword.value);
+      if (passwordError) {
+        errorMessage.value = passwordError;
         return;
       }
 
       loading.value = true;
-      errorMessage.value = "";
-      successMessage.value = "";
-
-      const requestData = {
-        CurrentPassword: currentPassword.value,
-        NewPassword: newPassword.value
-      };
-
-      console.log("🟡 Dữ liệu gửi đi:", requestData);
 
       try {
-        const response = await changePassword(currentPassword.value, newPassword.value);
-        console.log("🟢 Dữ liệu trả về:", response);
-        successMessage.value = "Đổi mật khẩu thành công!";
+        await changePassword(currentPassword.value, newPassword.value);
+        successMessage.value = "Change passwood successful!";
       } catch (error) {
-        console.error("🔴 Lỗi khi gọi API:", error.response?.data || error.message);
-        errorMessage.value = error.response?.data?.message || "Có lỗi xảy ra!";
+        errorMessage.value = "Current password is wrong";
       } finally {
         loading.value = false;
       }
@@ -73,6 +107,12 @@ export default {
       loading,
       errorMessage,
       successMessage,
+      showCurrentPassword,
+      showNewPassword,
+      showConfirmPassword,
+      toggleShowCurrentPassword,
+      toggleShowNewPassword,
+      toggleShowConfirmPassword,
     };
   },
 };
@@ -83,66 +123,72 @@ export default {
   max-width: 400px;
   margin: 50px auto;
   padding: 30px;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #ffffff, #e3f2fd);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
-h2 {
-  text-align: center;
-  color: #007bff;
-  font-size: 24px;
-  margin-bottom: 20px;
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+}
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
 }
 .form-group {
   margin-bottom: 20px;
+  text-align: left;
 }
 label {
   display: block;
-  margin-bottom: 8px;
   font-weight: bold;
-  color: #333;
+  margin-bottom: 5px;
 }
-input {
-  width: 100%;
-  padding: 12px;
+.password-input {
+  display: flex;
+  align-items: center;
   border: 2px solid #ddd;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: border 0.3s, box-shadow 0.3s;
+  border-radius: 5px;
+  padding: 10px;
 }
-input:focus {
-  border-color: #007bff;
+.password-input input {
+  flex: 1;
+  border: none;
   outline: none;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+  font-size: 16px;
 }
-button {
+.toggle-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
+.submit-btn {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background: #ff8c00;
   color: white;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  border-radius: 5px;
   font-size: 18px;
-  transition: background 0.3s, transform 0.2s;
+  cursor: pointer;
+  transition: background 0.3s;
 }
-button:hover {
-  background: linear-gradient(135deg, #0056b3, #004494);
-  transform: scale(1.05);
+.submit-btn:hover {
+  background: #e07b00;
 }
-button:disabled {
+.submit-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
-}
-.error {
-  color: red;
-  font-weight: bold;
-  font-size: 14px;
-}
-.success {
-  color: green;
-  font-weight: bold;
-  font-size: 14px;
 }
 </style>
