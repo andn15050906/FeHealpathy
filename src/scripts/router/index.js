@@ -66,6 +66,7 @@ import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
+import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -391,6 +392,11 @@ const router = createRouter({
       path: '/calendar',
       name: 'Calendar',
       component: Calendar
+    },
+    {
+      path: '/YogaPractice',
+      name: 'YogaPractice',
+      component: YogaPractice
     }
   ]
 })
