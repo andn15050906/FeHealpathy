@@ -243,7 +243,7 @@ const router = createRouter({
     },
     // Practice - Survey
     {
-      path: '/survey',
+      path: '/surveys',
       name: 'Survey',
       component: ManageSurvey,
       meta: { requiresAuth: true }

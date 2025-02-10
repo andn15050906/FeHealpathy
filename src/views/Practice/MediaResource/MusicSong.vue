@@ -1,8 +1,10 @@
 <template>
-    <div class="music-song">
-        <img :src="currentSong.cover" alt="Cover art" class="music-song__cover" />
+    <div class="music-song" v-if="currentSong">
         <h3 class="music-song__title">{{ currentSong.name }}</h3>
         <h4 class="music-song__artist">{{ currentSong.artist }}</h4>
+    </div>
+    <div v-else class="music-song">
+        <p>No song selected</p>
     </div>
 </template>
 
@@ -12,7 +14,7 @@ export default {
     props: {
         currentSong: {
             type: Object,
-            required: true,
+            default: null,
         },
     },
 };
@@ -24,14 +26,6 @@ export default {
     flex-direction: column;
     align-items: center;
     margin-bottom: 10px;
-}
-
-.music-song__cover {
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .music-song__title {

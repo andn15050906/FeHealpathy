@@ -1,10 +1,10 @@
 <template>
     <div class="music-library">
         <ul class="library-list">
-            <li v-for="song in songs" :key="song.id"
-                :class="['library-item', { 'library-item--active': song.active, 'library-item--playing': song.id === currentSongId }]"
-                @click="selectSong(song)">
-                <img :src="song.cover" alt="Song cover" class="library-item__cover" />
+            <li v-for="song in songs" :key="song.id" :class="[
+                'library-item',
+                { 'library-item--active': song.active, 'library-item--playing': song.id === currentSongId }
+            ]" @click="selectSong(song)">
                 <div class="library-item__details">
                     <h4 class="library-item__name">{{ song.name }}</h4>
                     <p class="library-item__artist">{{ song.artist }}</p>
@@ -22,6 +22,10 @@ export default {
         songs: {
             type: Array,
             required: true,
+        },
+        currentSongId: {
+            type: [String, Number],
+            default: null,
         },
     },
     methods: {
@@ -50,7 +54,6 @@ export default {
     overflow-y: auto;
 }
 
-
 .library-list {
     list-style: none;
     padding: 0;
@@ -65,29 +68,6 @@ export default {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.library-item__duration {
-    font-size: 0.85rem;
-    color: #666;
-    margin-left: auto;
-    text-align: right;
-}
-
-.library-item:hover {
-    background-color: #f0f0f0;
-}
-
-.library-item--active {
-    background-color: #e0f7fa;
-}
-
-.library-item__cover {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    margin-right: 10px;
-    object-fit: cover;
 }
 
 .library-item__details {
@@ -106,6 +86,21 @@ export default {
     font-size: 0.85rem;
     color: #666;
     margin: 0;
+}
+
+.library-item__duration {
+    font-size: 0.85rem;
+    color: #666;
+    margin-left: auto;
+    text-align: right;
+}
+
+.library-item:hover {
+    background-color: #f0f0f0;
+}
+
+.library-item--active {
+    background-color: #e0f7fa;
 }
 
 .music-library::-webkit-scrollbar {
