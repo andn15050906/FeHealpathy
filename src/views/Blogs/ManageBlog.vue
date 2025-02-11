@@ -1,5 +1,5 @@
 <template>
-  <div class="container my-5">
+  <div class="">
     <div v-if="!isEditingBlog">
       <div class="blog-management">
       <h1 class="title">📝 Quản Lý Blog</h1>
@@ -16,9 +16,8 @@
             <h2 class="blog-title">{{ blog.title }}</h2>
             <p class="blog-date">Ngày đăng: {{ formattedDate(blog.creationTime) }}</p>
             <div class="actions">
-              <button class="btn view" @click="viewBlog(blog)">👁️ Xem</button>
               <button class="btn edit" @click="editBlog(blog)">✏️ Sửa</button>
-              <button class="btn delete" @click="deleteBlog(blog.id)">🗑️ Xóa</button>
+              <button class="btn delete" @click="openDeletePopup(blog)">🗑️ Xóa</button>
             </div>
           </div>
         </div>
@@ -29,20 +28,30 @@
     </div>
         <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog"
             @blogUpdated="handleBlogUpdated" />
+        
+            <DeleteConfirmPopup 
+            :message="'Delete this blog?'" 
+            :isVisible="isDeletePopupVisible" 
+            @confirmDelete="handleDeleteConfirm"
+            @update:isVisible="isDeletePopupVisible = $event"
+    />
   </div>
 </template>
 <script>
 import moment from 'moment';
 import { getPagedArticles, deleteArticle } from '@/services/blogService';
 import UpdateBlog from './UpdateBlog.vue';
+import DeleteConfirmPopup from '../../components/Common/DeleteConfirmPopup.vue';
   export default {
-    components: { UpdateBlog },
+    components: { UpdateBlog, DeleteConfirmPopup },
     name: "BlogManagement",
     data() {
       return {
         blogs: [],
         isEditingBlog: false,
         selectedBlog: null,
+        isDeletePopupVisible: false,
+        blogToDelete: null,
       };
     },
     methods: {
@@ -67,16 +76,25 @@ import UpdateBlog from './UpdateBlog.vue';
           }
       },
 
-      async deleteBlog(blogId) {
-      if (confirm("Bạn có chắc chắn muốn xóa blog này không?")) {
+      openDeletePopup(blog) {
+      this.blogToDelete = blog;
+      this.isDeletePopupVisible = true;
+    },
+
+    async handleDeleteConfirm(confirm) {
+      if (confirm && this.blogToDelete) {
         try {
-          await deleteArticle(blogId);
-          alert("Blog đã được xóa thành công.");
+          await deleteArticle(this.blogToDelete.id);
           this.fetchBlogs();
         } catch (error) {
           alert("Lỗi khi xóa blog. Vui lòng thử lại.");
           console.error(error);
+        } finally {
+          this.isDeletePopupVisible = false;
+          this.blogToDelete = null;
         }
+      } else {
+        this.isDeletePopupVisible = false;
       }
     },
     editBlog(blog) {

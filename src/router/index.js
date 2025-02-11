@@ -54,6 +54,7 @@ import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import MediaControl from '@/views/MediaResource/MediaControl.vue'
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
+import Request from '@/views/Profile/Advisor/Request.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -340,7 +341,12 @@ const router = createRouter({
       path: '/survey',
       name: 'Survey',
       component: ManageSurvey
-    }
+    },
+    {
+      path: '/request',
+      name: 'Request',
+      component: Request
+    },
   ]
 })
 

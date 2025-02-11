@@ -65,8 +65,9 @@ import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/services/tagService";
 import { updateArticle } from "@/services/blogService";
+import { useRouter } from 'vue-router';
 
-
+const router = useRouter();
 const emits = defineEmits(['blogUpdated']);
 const props = defineProps({
   blogData: {
@@ -214,7 +215,7 @@ const submitBlog = async () => {
         console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
 
         const response = await updateArticle(formData);
-        console.log("✅ Cập nhật blog thành công:", response);
+        router.go(0);
     } catch (error) {
         console.error("❌ Lỗi cập nhật blog:", error);
     }

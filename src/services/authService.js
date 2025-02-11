@@ -56,11 +56,6 @@ export const signOut = async () => {
   }
 };
 
-
-
-
-
-
 export const setUserAuthData = (data) => {
   localStorage.setItem('token', data.accessToken);
   localStorage.setItem('refresh', data.refreshToken);

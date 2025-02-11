@@ -65,7 +65,7 @@ export const getUserAvatar = async (resourceId) => {
 
 export const updateUserProfile = async (formData) => {
   try {
-    const response = await apiClient.patch(`/Users`, formData, {
+    const response = await apiClient.put(`/Users`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -73,12 +73,13 @@ export const updateUserProfile = async (formData) => {
     return response.data;
   } catch (error) {
     console.error(
-      "Error updating user profile:",
+      "❌ Error updating user profile:",
       error.response ? error.response.data : error.message
     );
     throw error;
   }
 };
+
 
 
 export const changePassword = async (currentPassword, newPassword) => {

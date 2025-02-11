@@ -159,6 +159,7 @@ export default {
     });
   try {
     const response = await createArticle(formData);
+    this.$router.push("/blogs/manage");
   } catch (error) {
     console.error("Lỗi khi tạo blog:", error);
     if (error.response && error.response.data) {

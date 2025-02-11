@@ -1,7 +1,6 @@
 <template>
   <div class="change-password-container">
-    <h2>Change Password</h2>
-    <p class="subtitle">Enter a new password below to change your password</p>
+    <h2 style="font-size: 30px;font-weight: bold;">Change Password</h2>
     <form @submit.prevent="handleChangePassword">
       <div class="form-group">
         <label>Current Password</label>
