@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     navigateToDiary() {
-      this.$router.push({ name: 'diaryList' })
+      this.$router.push({ name: 'DiaryWriting' })
     }
   }
 }
