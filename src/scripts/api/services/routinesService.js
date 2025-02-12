@@ -1,4 +1,4 @@
-import { get, post, patch, del } from "@/api/apiCall";
+import { get, post, patch, del } from  "@/scripts/api/apiClients";
 
 const API_BASE_URL = "/Routines";
 

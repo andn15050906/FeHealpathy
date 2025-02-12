@@ -55,11 +55,6 @@ function handleClick(confirm) {
 </script>
 
 <style scoped>
-.delete-confirm-popup {
-    max-width: 400px;
-    border-radius: 12px;
-}
-
 .v-card {
     padding: 20px;
     background-color: #ffffff;
