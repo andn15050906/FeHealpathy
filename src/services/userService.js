@@ -3,7 +3,7 @@ const API_BASE_URL = '/Users';
 
 export const getUserById = async (id) => {
   try {
-    const response = await apiClient.get(`${API_BASE_URL}${id}`);
+    const response = await apiClient.get(`${API_BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching user by ID:', error.response ? error.response.data : error.message);

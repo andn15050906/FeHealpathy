@@ -75,8 +75,6 @@ export default {
 	},
 	methods: {
 		async handleLogin() {
-			//...
-			// remember me
 			try {
 				const data = await signIn(this.identifier, this.password);
 				setUserAuthData(data);

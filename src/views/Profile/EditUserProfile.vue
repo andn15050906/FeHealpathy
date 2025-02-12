@@ -82,8 +82,8 @@
 <script>
 import { inject, ref, onMounted } from 'vue';
 import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
-import { updateUserProfile } from '../../services/userService.js';
-import { getUserAuthData } from '@/services/authService';
+import { updateUserProfile, getUserById } from '../../services/userService.js';
+import { getUserAuthData, setUserAuthData } from '@/services/authService';
 import { handleFormSubmit } from '@/helpers/validation';
 import GlobalState from '@/helpers/globalState';
 import dict from '@/api/dictionary.json';
@@ -124,25 +124,38 @@ export default {
     };
 
     const fetchProfile = async () => {
-      try {
-        loadingSpinner.showSpinner();
-        const clientData = getUserAuthData();
+  try {
+    loadingSpinner.showSpinner();
 
-        clientData.role = roleMapping[clientData.role] || 'Unknown';
-        clientData.dateOfBirth = formatDate(clientData.dateOfBirth);
-        clientData.creationTime = formatDate(clientData.creationTime);
-        
-        console.log("User Data from LocalStorage:", getUserAuthData());
+    // Lấy ID từ LocalStorage
+    const userAuthData = getUserAuthData();
+    const userId = userAuthData?.id;
+    
+    if (!userId) {
+      console.warn("⚠️ Không tìm thấy ID trong LocalStorage!");
+      return;
+    }
 
-        clientData.avatarUrl = getAvatarApiUrl(clientData.avatarUrl, clientData.id);
+    // Gọi API để lấy dữ liệu người dùng
+    const userData = await getUserById(userId);
 
-        Object.assign(form.value, clientData);
-      } catch (error) {
-        await sweetAlert.showError('Error fetching profile information.');
-      } finally {
-        loadingSpinner.hideSpinner();
-      }
-    };
+    // Chuyển đổi dữ liệu từ API
+    userData.role = roleMapping[userData.role] || 'Unknown';
+    userData.dateOfBirth = formatDate(userData.dateOfBirth);
+    userData.creationTime = formatDate(userData.creationTime);
+    userData.avatarUrl = getAvatarApiUrl(userData.avatarUrl);
+
+    // Gán dữ liệu vào form
+    Object.assign(form.value, userData);
+
+    console.log("✅ Dữ liệu người dùng từ API:", userData);
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy dữ liệu người dùng:", error);
+    await sweetAlert.showError('Không thể lấy thông tin người dùng.');
+  } finally {
+    loadingSpinner.hideSpinner();
+  }
+};
 
     const formatDate = (date) => {
       if (!date) return '';
@@ -185,19 +198,24 @@ export default {
       formData.append('Avatar.Title', 'User Profile Picture');
     }
 
-    console.log("📤 Data sent to API:", [...formData.entries()]);
-
     const response = await updateUserProfile(formData);
-    console.log("✅ API Response:", response);
 
     if (response) {
       form.value.avatarUrl = response.avatarUrl || form.value.avatarUrl;
 
       let updatedUser = getUserAuthData();
+
+      updatedUser.fullName = form.value.fullName;
+      updatedUser.bio = form.value.bio;
+      updatedUser.dateOfBirth = form.value.dateOfBirth;
       updatedUser.avatarUrl = response.avatarUrl;
-      localStorage.setItem('userProfile', JSON.stringify(updatedUser));
+
+      setUserAuthData(updatedUser);
+      console.log(updatedUser);
+
       await fetchProfile();
     } else {
+      console.log("API Response:", response);
       console.warn("⚠️ API did not return avatarUrl, keeping old value.");
     }
 
@@ -214,10 +232,6 @@ export default {
     sweetAlert.showError('Error updating profile.');
   }
 };
-
-
-
-
 
     const handleSubmit = () => handleFormSubmit(confirmChanges, sweetAlert);
 
