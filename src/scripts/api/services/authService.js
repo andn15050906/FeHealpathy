@@ -1,5 +1,4 @@
 import apiClient from '@/scripts/api/apiClients';
-import { backendApiBase } from '@/scripts/env';
 
 export const signIn = async (identifier, password) => {
   try {
@@ -16,7 +15,7 @@ export const signIn = async (identifier, password) => {
   }
 };
 
-export const getGoogleOAuthPath = () => backendApiBase + "/Auth/google-oauth/";
+export const getGoogleOAuthPath = () => import.meta.env.VITE_BACKEND_URL + "/api/Auth/google-oauth/";
 
 export const register = async (username, email, password) => {
   try {
@@ -67,10 +66,14 @@ export const setUserAuthData = (data) => {
   localStorage.setItem('userProfile', JSON.stringify(data.user ?? data.User));
 }
 
+export const getUserBearerToken = () => {
+  return localStorage.getItem('token');
+}
+
 export const getUserAuthData = () => {
   return JSON.parse(localStorage.getItem('userProfile'));
 }
 
-const clearUserAuthData = () => {
+export const clearUserAuthData = () => {
   localStorage.clear();
 }

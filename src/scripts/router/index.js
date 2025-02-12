@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getUserBearerToken } from '@/scripts/api/services/authService'
 
 import HomePage from '@/views/HomePage.vue'
 import SignIn from '@/views/Profile/SignIn.vue'
@@ -65,6 +66,7 @@ import EditGroup from '@/components/GroupComponents/EditGroup.vue'
 import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
+import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -390,13 +392,18 @@ const router = createRouter({
       path: '/calendar',
       name: 'Calendar',
       component: Calendar
+    },
+    {
+      path: '/YogaPractice',
+      name: 'YogaPractice',
+      component: YogaPractice
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = localStorage.getItem('token');
+    const token = getUserBearerToken();
     if (!token) {
       next('/sign-in');
     } else {

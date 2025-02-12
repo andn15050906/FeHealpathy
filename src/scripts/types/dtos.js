@@ -1,4 +1,21 @@
+import { isArrayOfType } from "../logic/validation";
+
+
 // Base
+export class CreateMediaDto {
+    constructor(url, file, title) {
+        this.Url = url;
+        this.File = file;
+        this.Title = title;
+    }
+}
+
+export class CreateReactionDto {
+    constructor(sourceId, content) {
+        this.SourceId = sourceId;
+        this.Content = content;
+    }
+}
 
 // User
 class UpdatePreferenceDto {
@@ -57,16 +74,20 @@ class UpdateSurveyDto {
 }
 
 // Submission
-class CreateMcqChoiceDto {
+export class CreateMcqChoiceDto {
     constructor(mcqQuestionId, mcqAnswerId) {
         this.mcqQuestionId = mcqQuestionId;
         this.mcqAnswerId = mcqAnswerId;
     }
 }
 
-class CreateSubmissionDto {
+export class CreateSubmissionDto {
     constructor(surveyId, choices) {
         this.surveyId = surveyId;
+
+        let isNotArrayError = !isArrayOfType(choices, CreateMcqChoiceDto);
+        if (isNotArrayError)
+            throw new Error(isNotArrayError)
         this.choices = choices;
     }
 }
@@ -76,4 +97,34 @@ class QuerySubmissionDto {
     //SurveyId
 }
 
-export { CreateMcqChoiceDto, CreateSubmissionDto }
+// ChatMessage
+export class CreateChatMessageDto {
+    constructor(conversationId, content, medias) {
+        this.ConversationId = conversationId;
+        this.Content = content;
+
+        if (medias) {
+            let isNotArrayError = !isArrayOfType(medias, CreateMediaDto);
+            if (isNotArrayError)
+                throw new Error(isNotArrayError)
+            this.Medias = medias;
+        }
+    }
+}
+
+export class UpdateChatMessageDto {
+    constructor(id, content, status, addedMedias, removedMedias) {
+        this.Id = id;
+        this.Content = content;
+        this.Status = status;
+
+        if (addedMedias) {
+            let isNotArrayError = !isArrayOfType(addedMedias, CreateMediaDto);
+            if (isNotArrayError)
+                throw new Error(isNotArrayError)
+            this.AddedMedias = addedMedias;
+        }
+        //...
+        this.RemovedMedias = removedMedias;
+    }
+}

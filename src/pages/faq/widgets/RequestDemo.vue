@@ -9,7 +9,7 @@
         <VaButton @click="showModal = !showModal">Contact Expert</VaButton>
       </div>
     </div>
-    <img alt="Contact expert" src="../request-demo.svg" />
+    <!--add request-demo image -->
   </VaCard>
 </template>
 

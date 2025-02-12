@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, defineProps } from 'vue';
+import { onMounted, ref } from 'vue';
 import dict from '@/scripts/data/dictionary.json';
 
 const text = ref({

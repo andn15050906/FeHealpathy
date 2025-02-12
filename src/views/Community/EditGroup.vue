@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from "vue-router";
 
 const route = useRoute();
