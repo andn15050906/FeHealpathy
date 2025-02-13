@@ -21,7 +21,7 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import EmojiPicker from "@/components/CommentComponents/EmojiPicker.vue";
-import GlobalState from "@/helpers/globalState";
+import GlobalState from "@/scripts/logic/globalState";
 
 const route = useRoute();
 const isDirectlyComment = ref(true);

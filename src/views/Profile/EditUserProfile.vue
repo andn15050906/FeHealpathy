@@ -81,12 +81,12 @@
 
 <script>
 import { inject, ref, onMounted } from 'vue';
-import { ConvertTo_yyyy_mm_dd } from '../../helpers/common';
-import { updateUserProfile, getUserById } from '../../services/userService.js';
-import { getUserAuthData, setUserAuthData } from '@/services/authService';
-import { handleFormSubmit } from '@/helpers/validation';
-import GlobalState from '@/helpers/globalState';
-import dict from '@/api/dictionary.json';
+import { ConvertTo_yyyy_mm_dd } from '../../scripts/logic/common';
+import { updateUserProfile, getUserById } from '../../scripts/api/services/userService.js';
+import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
+import { handleFormSubmit } from '@/scripts/logic/validation';
+import GlobalState from '@/scripts/logic/globalState';
+import dict from '@/scripts/data/dictionary.json';
 import { computed } from 'vue';
 
 export default {

@@ -139,7 +139,8 @@ import DeleteConfirmPopup from '../../components/Common/DeleteConfirmPopup.vue';
   text-align: center;
   margin-bottom: 20px;
 }
-  .create-blog-btn {
+
+.create-blog-btn {
   background-color: #28a745;
   color: #fff;
   border: none;
@@ -153,12 +154,13 @@ import DeleteConfirmPopup from '../../components/Common/DeleteConfirmPopup.vue';
 .create-blog-btn:hover {
   background-color: #218838;
 }
-  .blog-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 
   .blog-item {
     display: flex;

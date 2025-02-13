@@ -11,9 +11,9 @@
                 <div class="featured-articles">
                     <div v-for="(article, index) in featuredArticles" :key="index" class="featured-grid">
                         <div class="featured-main">
-                            <a href="#" class="article-link">
+                            <RouterLink :to="`/blogs/${article.Link ? article.Link : 1}`" class="article-link">
                                 <img :src="article.Thumb" alt="Featured" class="article-image" loading="lazy" />
-                            </a>
+                            </RouterLink>
                         </div>
                         <div class="article-content">
                             <div class="tag-list">
@@ -46,8 +46,8 @@
 <script>
 import { ref } from 'vue';
 import BlogFilters from '../../components/BlogComponents/BlogFilters.vue';
-import Tag from '@/components/Common/Tag.vue';
-import data from '../../api/data.json';
+import Tag from '@/components/Common/Misc/Tag.vue';
+import data from '../../scripts/data/data.json';
 import { useRouter } from "vue-router";
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 
@@ -71,7 +71,7 @@ export default {
             for (const key in updatedQuery) {
                 if (!updatedQuery[key]) delete updatedQuery[key];
             }
-            router.push({ path: '/search-blogs', query: updatedQuery });
+            router.push({ name: 'searchBlogs', query: updatedQuery });
         };
 
         const handleSearch = (query) => {

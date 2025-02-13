@@ -24,8 +24,8 @@
 
 <script>
 import { ref } from "vue";
-import SearchBar from "@/components/Helper/SearchBar.vue";
-import Tag from "@/components/Common/Tag.vue";
+import SearchBar from "@/components/Common/Input/SearchBar.vue";
+import Tag from "@/components/Common/Misc/Tag.vue";
 import { useRouter } from "vue-router";
 
 export default {
@@ -46,14 +46,14 @@ export default {
 
         const handleSearch = (query) => {
             router.push({
-                path: "/search-blogs",
+                name: 'searchBlogs',
                 query: { title: query.trim(), sort: sortOrder.value },
             });
         };
 
         const handleTagClick = (tag) => {
             router.push({
-                path: "/search-blogs",
+                name: 'searchBlogs',
                 query: { tag, sort: sortOrder.value },
             });
         };
@@ -61,7 +61,7 @@ export default {
         const handleSort = (sortBy) => {
             sortOrder.value = sortBy;
             router.push({
-                path: "/search-blogs",
+                name: 'searchBlogs',
                 query: { sort: sortOrder.value },
             });
         };

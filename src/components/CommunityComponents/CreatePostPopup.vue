@@ -57,9 +57,9 @@
 
 
 <script>
-import { FileHelper } from "@/helpers/fileHelper";
+import { FileHelper } from "@/scripts/logic/fileHelper";
 import { useRoute } from "vue-router";
-import GlobalState from '@/helpers/globalState';
+import GlobalState from '@/scripts/logic/globalState';
 
 export default {
     data() {

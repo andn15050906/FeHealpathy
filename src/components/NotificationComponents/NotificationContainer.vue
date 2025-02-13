@@ -12,7 +12,7 @@
 <script>
 import HighlightedNotification from '@/components/NotificationComponents/HighlightedNotification.vue';
 import QuestionNotification from './QuestionNotification.vue';
-import { Noti } from '@/api/Models';
+import { Noti } from '@/scripts/types/models';
 
 export default {
     name: 'NotificationContainer',
@@ -45,7 +45,7 @@ export default {
 .noti-container {
     position: fixed;
     top: 20px;
-    left: 40px;
+    left: 20px;
     margin-top: 50px;
     z-index: 1000;
 }

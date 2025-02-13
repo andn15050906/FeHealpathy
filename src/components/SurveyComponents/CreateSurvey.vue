@@ -1,99 +1,132 @@
 <template>
-    <div class="survey-container">
-        <h1 class="title">Create Survey</h1>
-        <div class="survey-details">
-            <div class="form-input">
-                <label class="form-label">Survey Name *</label>
-                <input v-model="survey.name" class="input-field" />
-            </div>
-            <div class="form-input">
-                <label class="form-label">Description *</label>
-                <textarea v-model="survey.description" class="input-field"></textarea>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Create Survey</h1>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Survey Name *</label>
+                    <input v-model="survey.name" type="text" class="form-control" placeholder="Enter survey name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description *</label>
+                    <textarea v-model="survey.description" class="form-control" rows="3"
+                        placeholder="Enter survey description"></textarea>
+                </div>
             </div>
         </div>
-        <div class="question-list">
-            <div v-for="(question, questionIndex) in questions" :key="questionIndex" class="question-card">
-                <button class="btn-icon" id="btn-deleteQuestion" @click="removeQuestion(questionIndex)">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-                <h2 class="section-title">Question {{ questionIndex + 1 }}</h2>
-                <!-- Question Content -->
-                <v-form class="form">
-                    <div class="form-input">
-                        <label class="form-label">Question Content *</label>
-                        <input v-model="question.content" class="input-field" />
-                    </div>
-                    <div class="form-input">
-                        <label class="form-label">Explanation *</label>
-                        <input v-model="question.explanation" class="input-field" />
-                    </div>
 
-                    <!-- Answers Section -->
-                    <div class="answers-section">
-                        <h3 class="answers-title">Answers</h3>
-                        <p class="instructions">
-                            Provide possible answers and mark the correct one(s).
-                        </p>
-                        <div v-for="(answer, answerIndex) in question.answers" :key="answerIndex" class="answer-row">
-                            <v-text-field v-model="answer.content" label="Answer Content" outlined
-                                :placeholder="'Answer ' + (answerIndex + 1)" class="answer-input" />
-                            <label class="checkbox-label"> 
-                                <input type="checkbox" v-model="answer.isCorrect" class="checkbox-input"> 
-                                Correct Answer 
-                            </label>
-                            <button class="btn-icon" id="btn-deleteAnswer"
-                                @click="removeAnswer(questionIndex, answerIndex)">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+        <div class="card mb-4">
+            <div class="card-body">
+                <label class="form-label">Upload Questions JSON File</label>
+                <input type="file" class="form-control" @change="handleFileUpload" accept="application/json" />
+            </div>
+        </div>
+
+        <div v-if="questions.length" class="mb-4">
+            <div v-for="(question, questionIndex) in questions" :key="questionIndex" class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Question {{ questionIndex + 1 }}</h2>
+                    <button class="btn btn-danger btn-sm" @click="removeQuestion(questionIndex)">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Question Content *</label>
+                        <input v-model="question.content" type="text" class="form-control"
+                            placeholder="Enter question content" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Explanation *</label>
+                        <input v-model="question.explanation" type="text" class="form-control"
+                            placeholder="Enter explanation" />
+                    </div>
+                    <div class="mb-3">
+                        <h3 class="h6">Answers</h3>
+                        <div v-for="(answer, answerIndex) in question.answers" :key="answerIndex"
+                            class="row align-items-center mb-1">
+                            <div class="col-md-10">
+                                <input v-model="answer.content" type="text" class="form-control"
+                                    :placeholder="'Answer ' + (answerIndex + 1)" />
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-danger btn-sm" @click="removeAnswer(questionIndex, answerIndex)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </div>
-                        <button class="btn-gray" @click.prevent="addAnswer(questionIndex)">
+                        <button class="btn btn-secondary btn-sm" @click.prevent="addAnswer(questionIndex)">
                             Add Answer
                         </button>
                     </div>
-                </v-form>
+                </div>
             </div>
         </div>
 
-        <!-- Add New Question -->
-        <button class="btn-gray" id="btn-add-question" @click="addQuestion">
-            Add New Question
-        </button>
+        <div class="mb-3 text-end">
+            <button class="btn btn-primary" @click="addQuestion">
+                Add New Question
+            </button>
+        </div>
 
-        <!-- Save All Questions -->
-        <div class="form-footer">
-            <button type="submit" class="btn-primary" :loading="isLoading" @click="saveSurvey">
+        <div class="text-end">
+            <button class="btn btn-success" :disabled="isLoading" @click="saveSurvey">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
                 Save Survey
+            </button>
+            <button class="btn btn-danger ms-2" @click="$emit('cancel')">
+                Cancel
             </button>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
+import { createSurvey } from "../../scripts/api/services/surveysService";
 
-// Initialize survey details and questions data
+const emits = defineEmits(["cancel", "surveyCreated"]);
+
 const survey = ref({
-    name: '',
-    description: ''
+    name: "",
+    description: "",
 });
 
 const questions = ref([
     {
-        content: '',
-        explanation: '',
-        answers: [
-            { content: '', isCorrect: false },
-        ],
+        content: "",
+        explanation: "",
+        answers: [{ content: "" }],
     },
 ]);
 
 const isLoading = ref(false);
+const dummySurveyId = "00000000-0000-0000-0000-000000000000";
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed)) {
+                questions.value = parsed;
+            }
+        } catch (error) {
+            console.error("Error parsing JSON file:", error);
+        }
+    };
+    reader.readAsText(file);
+}
 
 function addQuestion() {
     questions.value.push({
-        content: '',
-        explanation: '',
-        answers: [{ content: '', isCorrect: false }],
+        content: "",
+        explanation: "",
+        answers: [{ content: "" }],
     });
 }
 
@@ -102,7 +135,7 @@ function removeQuestion(index) {
 }
 
 function addAnswer(questionIndex) {
-    questions.value[questionIndex].answers.push({ content: '', isCorrect: false });
+    questions.value[questionIndex].answers.push({ content: "" });
 }
 
 function removeAnswer(questionIndex, answerIndex) {
@@ -112,211 +145,23 @@ function removeAnswer(questionIndex, answerIndex) {
 async function saveSurvey() {
     isLoading.value = true;
     try {
+        const transformedQuestions = questions.value.map((q) => ({
+            surveyId: dummySurveyId,
+            content: q.content,
+            explanation: q.explanation,
+            answers: q.answers.map((a) => ({ content: a.content })),
+        }));
         const payload = {
             name: survey.value.name,
             description: survey.value.description,
-            questions: questions.value
+            questions: transformedQuestions,
         };
-
-        console.log('Saving survey:', payload);
-
-        // Simulate API call
-        // await api.saveSurvey(payload);
+        const response = await createSurvey(payload);
+        emits("surveyCreated");
     } catch (error) {
-        console.error('Error saving survey:', error);
+        console.error("Error saving survey:", error);
     } finally {
         isLoading.value = false;
     }
 }
 </script>
-
-<style scoped>
-.survey-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: "Roboto", sans-serif;
-}
-
-.title {
-    font-size: 28px;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.survey-details {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    margin-bottom: 30px;
-}
-
-.form-input {
-    margin-bottom: 20px;
-}
-
-.question-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.btn-gray {
-    background-color: #ccc;
-    color: #333;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.checkbox-label {
-    margin-top: -20px;
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    font-size: 14px;
-    color: #666;
-}
-
-.checkbox-input {
-    margin-right: 5px;
-}
-
-.btn-gray:hover {
-    background-color: #bbb;
-}
-
-#btn-add-question {
-    margin-top: 20px;
-    display: block;
-    margin-left: auto;
-}
-
-.question-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    position: relative;
-}
-
-.section-title {
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.answers-title {
-    font-size: 18px;
-    font-weight: 500;
-}
-
-.instructions {
-    font-size: 14px;
-    color: #666;
-}
-
-.answer-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.answer-input {
-    flex: 1;
-}
-
-.checkbox {
-    margin-left: auto;
-}
-
-#btn-deleteQuestion {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-}
-
-.btn-icon {
-    background: none;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
-    color: #666;
-    font-size: 18px;
-}
-
-#btn-deleteAnswer {
-    margin-top: -20px;
-}
-
-.btn-icon:hover {
-    color: #000;
-}
-
-.btn-primary {
-    background-color: #863fb5;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #863fb5;
-}
-
-.add-question-btn {
-    margin-top: 20px;
-    display: block;
-    margin-left: auto;
-}
-
-.form-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 30px;
-}
-
-.form-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-    background-color: #863fb5;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
-}
-
-.form-button:hover {
-    background-color: #863fb5;
-}
-
-.form-button:disabled {
-    background-color: #c5cae9;
-    color: #fff;
-}
-
-.input-field {
-    border: none;
-    border-bottom: 1px solid #ccc;
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    outline: none;
-}
-
-.input-field:focus {
-    border-bottom-color: #863fb5;
-}
-</style>

@@ -1,121 +1,147 @@
 <template>
     <div class="create-group-container">
-        <h1 class="title">Create New Group</h1>
+        <h1 class="title">Create New Conversation</h1>
         <v-form @submit.prevent="onSubmit" class="form">
-            <!-- Group Title -->
-            <v-text-field
-                label="Group Name *"
-                v-model="groupInfo.title"
-                maxlength="45"
-                outlined
-                required
-                class="form-input"
-            />
+            <!-- Conversation Title -->
+            <v-text-field label="Conversation Name *" v-model="conversationInfo.title" maxlength="45" outlined required
+                class="form-input" />
 
             <!-- Privacy (Checkbox) -->
             <div class="custom-checkbox">
-                <input type="checkbox" v-model="checked" class="custom-checkbox__input"/>
-                <label class="privateGroup">Private Group</label>
+                <input type="checkbox" v-model="conversationInfo.isPrivate" class="custom-checkbox__input" />
+                <label class="privateConversation">Private Conversation</label>
             </div>
 
-            <!-- Group Avatar -->
+            <!-- Conversation Avatar -->
             <div class="form-input">
-                <label class="form-label">Group Avatar</label>
+                <label class="form-label">Conversation Avatar</label>
                 <div class="file-input-wrapper">
-                    <input 
-                        type="file" 
-                        id="file-upload" 
-                        @change="onFileChange" 
-                        accept="image/*" 
-                        class="custom-file-input"
-                    />
+                    <input type="file" id="file-upload" @change="onFileChange" accept="image/*"
+                        class="custom-file-input" />
                     <label for="file-upload" class="custom-file-label">
                         Choose File
                     </label>
-                    <span class="file-name">{{ groupInfo.avatarUrl?.name || 'No file chosen' }}</span>
+                    <span class="file-name">{{ conversationInfo.avatarUrl?.name || 'No file chosen' }}</span>
                 </div>
             </div>
 
-            <!-- Short Description -->
-            <v-textarea
-                label="Short Description"
-                v-model="groupInfo.shortDescription"
-                rows="3"
-                maxlength="200"
-                outlined
-                class="form-input"
-            />
+            <!-- Add Members -->
+            <div class="form-input">
+                <label class="form-label">Add Members</label>
+                <v-autocomplete v-model="newMemberName" :items="userSearchResults" item-title="fullName" item-value="id"
+                    label="Search for users" @input="onUserSearch" return-object outlined />
+                <v-btn @click="addMember" color="secondary" :disabled="!newMemberName">
+                    Add Member
+                </v-btn>
+            </div>
 
-            <!-- Full Description -->
-            <v-textarea
-                label="Detail Description"
-                v-model="groupInfo.description"
-                rows="5"
-                outlined
-                class="form-input"
-            />
-
-            <!-- Creator -->
-            <v-text-field
-                label="Creator *"
-                v-model="groupInfo.creatorId"
-                outlined
-                disabled
-                class="form-input"
-            />
+            <!-- Display Added Members -->
+            <div v-if="members.length > 0" class="members-list">
+                <p><strong>Members:</strong></p>
+                <ul>
+                    <li v-for="(member, index) in members" :key="index">{{ member.name }} (Admin: {{ member.isAdmin ?
+                        'Yes' : 'No' }})</li>
+                </ul>
+            </div>
 
             <!-- Submit Button -->
             <v-btn type="submit" color="primary" :loading="isLoading" class="form-button">
-                Create Group
+                Create Conversation
             </v-btn>
         </v-form>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
+import { createConversation } from '@/scripts/api/services/conversationService';
+import { getUsers } from '@/scripts/api/services/userService';
 
-const groupInfo = ref({
+const conversationInfo = ref({
     title: '',
     avatarUrl: null,
-    shortDescription: '',
-    description: '',
     isPrivate: false,
-    creatorId: 'Current User',
 });
 
+const members = ref([]);
+const newMemberName = ref(null);
+const userSearchResults = ref([]);
 const isLoading = ref(false);
 
 async function onSubmit() {
     isLoading.value = true;
+    const formData = new FormData();
+
+    formData.append('Title', conversationInfo.value.title);
+    formData.append('IsPrivate', conversationInfo.value.isPrivate);
+
+    if (conversationInfo.value.avatarUrl) {
+        const file = conversationInfo.value.avatarUrl;
+
+        formData.append('Thumb.File', file);
+        formData.append('Thumb.Title', file.name);
+    }
+
+    members.value.forEach((member, index) => {
+        formData.append(`Members[${index}].UserId`, member.id);
+        formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
+    });
+
     try {
-        // Call API to create group
-        // ...
-        
+        await createConversation(formData);
+        alert("Conversation created successfully!");
+
+        resetForm();
     } catch (error) {
-        
+        alert("Failed to create group. Please try again.");
     } finally {
         isLoading.value = false;
     }
 }
 
 function resetForm() {
-    groupInfo.value = {
+    conversationInfo.value = {
         title: '',
         avatarUrl: null,
-        shortDescription: '',
-        description: '',
         isPrivate: false,
-        creatorId: 'Current User',
     };
+    members.value = [];
+}
+
+async function onUserSearch(event) {
+    const query = event.target.value;
+    if (!query) return;
+    try {
+        if (query && typeof query === 'string') {
+            const response = await getUsers({ name: query });
+            userSearchResults.value = [...response.items];
+        } else {
+            userSearchResults.value = [];
+        }
+    } catch (error) {
+        console.error("Failed to fetch users", error);
+    }
+}
+
+function addMember() {
+    if (newMemberName.value) {
+        console.log("Selected User:", newMemberName.value);
+        members.value.push({
+            id: newMemberName.value.id,
+            name: newMemberName.value.fullName,
+            isAdmin: false,
+        });
+
+        newMemberName.value = null;
+    }
 }
 
 function onFileChange(event) {
     const file = event.target.files[0];
     if (file) {
-        groupInfo.value.avatarUrl = file;
+        conversationInfo.value.avatarUrl = file;
     } else {
-        groupInfo.value.avatarUrl = null;
+        conversationInfo.value.avatarUrl = null;
     }
 }
 </script>
@@ -207,25 +233,20 @@ function onFileChange(event) {
     color: #fff;
 }
 
-.my-checkbox {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.my-checkbox input[type="checkbox"] {
-  margin-right: 15px;
-}
-
 .custom-checkbox {
-  margin-top: -25px;
-  display: flex;
-  align-items: center; 
+    margin-top: -25px;
+    display: flex;
+    align-items: center;
 }
 
-.privateGroup {
-  margin-left: 10px;
+.privateConversation {
+    margin-left: 10px;
+}
+
+.members-list {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
 }
 </style>

@@ -1,87 +1,82 @@
 <template>
     <div>
-        <div v-if="!showAddMusic && !showEditMusic">
-            <h3 class="p-2">{{ mood.name }} - File List</h3>
-            <button class="btn btn-primary mb-3" @click="toggleAddMusic">
-                <i class="fas fa-plus me-1"></i> Add Music
-            </button>
-            <ul class="list-group mt-3">
-                <li v-for="(file, index) in mood.files" :key="index"
-                    class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><strong>{{ file.name }}</strong> <i>{{ file.url }}</i></span>
-                    <div>
-                        <button class="btn btn-secondary btn-sm" @click="editMusic(file, index)">
-                            <i class="fas fa-edit me-1"></i> Edit
+        <table class="table table-bordered table-hover table-responsive-md">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(file, index) in mediaFiles" :key="file.id" class="align-middle text-center">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ file.title }}</td>
+                    <td>{{ file.artist }}</td>
+                    <td>{{ file.description }}</td>
+                    <td>{{ formatDate(file.creationTime) }}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm me-2" @click="$emit('edit-media', file, index)">
+                            <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm mx-2" @click="handleDelete(index)">
-                            <i class="fas fa-trash me-1"></i> Delete
+                        <button class="btn btn-danger btn-sm" @click="$emit('delete-media', file.id, index)">
+                            <i class="fas fa-trash"></i>
                         </button>
-                    </div>
-                </li>
-            </ul>
-            <button class="btn btn-secondary mt-3" @click="$emit('back')">
-                <i class="fas fa-arrow-left me-1"></i> Back
-            </button>
-        </div>
-        <AddMusic v-if="showAddMusic" @add-music="addMusic" @cancel="toggleAddMusic" />
-        <EditMusic v-if="showEditMusic" :music="selectedMusic" @edit-music="updateMusic" @cancel="toggleEditMusic" />
+                    </td>
+                </tr>
+                <tr v-if="mediaFiles.length === 0">
+                    <td colspan="6" class="text-center text-muted">No media files available.</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
 <script>
-import AddMusic from './AddMusic.vue';
-import EditMusic from './EditMusic.vue';
-
 export default {
-    components: {
-        AddMusic,
-        EditMusic,
-    },
     props: {
-        mood: {
-            type: Object,
+        mediaFiles: {
+            type: Array,
             required: true,
         },
     },
-    data() {
-        return {
-            showAddMusic: false,
-            showEditMusic: false,
-            selectedMusic: null,
-            selectedMusicIndex: null,
-        };
-    },
     methods: {
-        toggleAddMusic() {
-            this.showAddMusic = !this.showAddMusic;
-        },
-        toggleEditMusic() {
-            this.showEditMusic = !this.showEditMusic;
-        },
-        addMusic(newMusic) {
-            this.mood.files.push(newMusic);
-            this.showAddMusic = false;
-        },
-        editMusic(music, index) {
-            this.selectedMusic = { ...music };
-            this.selectedMusicIndex = index;
-            this.showEditMusic = true;
-        },
-        updateMusic(updatedMusic) {
-            if (this.selectedMusicIndex !== null) {
-                this.$set(this.mood.files, this.selectedMusicIndex, updatedMusic);
-            }
-            this.showEditMusic = false;
-        },
-        handleDelete(index) {
-            this.$emit("delete-file", index);
+        formatDate(dateString) {
+            const options = { year: "numeric", month: "short", day: "numeric" };
+            return new Date(dateString).toLocaleDateString(undefined, options);
         },
     },
 };
 </script>
 
 <style scoped>
-.list-group-item {
-    font-size: 0.9rem;
+.table {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table-responsive-md {
+    overflow-x: auto;
 }
 </style>

@@ -330,5 +330,4 @@ body {
 .multiselect__clear:hover {
   color: #0056b3;
 }
-  </style>
-  
+</style>

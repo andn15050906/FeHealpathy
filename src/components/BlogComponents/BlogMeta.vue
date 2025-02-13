@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import data from '../../api/data.json';
+import data from '../../scripts/data/data.json';
 
 export default {
   name: 'BlogMeta',

@@ -34,7 +34,7 @@
 
 <script>
 import { ref } from "vue";
-import { changePassword } from "@/services/userService";
+import { changePassword } from "@/scripts/api/services/userService";
 
 export default {
   setup() {

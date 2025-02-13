@@ -46,7 +46,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import GroupCard from '@/components/CommunityComponents/GroupCard.vue';
-import data from '../../api/data.json';
+import data from '../../scripts/data/data.json';
 
 const joinedGroups = ref([]);
 const recommendedGroups = ref([]);

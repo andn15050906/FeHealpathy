@@ -8,7 +8,7 @@
 import data from "emoji-mart-vue-fast/data/all.json";
 import "emoji-mart-vue-fast/css/emoji-mart.css";
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
-import { defineComponent, defineEmits } from "vue";
+import { defineComponent } from "vue";
 
 let emojiIndex = new EmojiIndex(data);
 defineComponent({ Picker, EmojiIndex });
