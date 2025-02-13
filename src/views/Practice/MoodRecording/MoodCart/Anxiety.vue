@@ -86,6 +86,7 @@
 }
 
 .mood-icon {
+    margin-top: 190px;
     width: 400px;
     height: auto;
     object-fit: contain;

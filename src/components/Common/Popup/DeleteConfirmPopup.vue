@@ -1,5 +1,6 @@
 <template>
-    <v-dialog v-model="localVisible" persistent max-width="400px" class="delete-confirm-popup">
+    <v-dialog v-model="localVisible" persistent max-width="400px" class="delete-confirm-popup" :scrim="false">
+
         <v-card>
             <v-card-title class="d-flex align-center title-section">
                 <i class="fas fa-exclamation-circle text-danger mr-2"></i>
@@ -55,11 +56,6 @@ function handleClick(confirm) {
 </script>
 
 <style scoped>
-.delete-confirm-popup {
-    max-width: 400px;
-    border-radius: 12px;
-}
-
 .v-card {
     padding: 20px;
     background-color: #ffffff;

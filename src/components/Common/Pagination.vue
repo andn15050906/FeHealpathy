@@ -1,24 +1,17 @@
 <template>
-    <nav aria-label="Page navigation example" class="pagination-nav">
+    <nav aria-label="Page navigation" class="pagination-nav">
         <ul class="pagination">
-            <!-- Previous button -->
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
                 <a @click.prevent="goToPage(currentPage - 1)" class="page-link" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">Previous</span>
                 </a>
             </li>
-
-            <!-- Page numbers -->
             <li v-for="page in totalPagesArray" :key="page" class="page-item" :class="{ active: currentPage === page }">
                 <a @click.prevent="goToPage(page)" class="page-link">{{ page }}</a>
             </li>
-
-            <!-- Next button -->
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
                 <a @click.prevent="goToPage(currentPage + 1)" class="page-link" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
                 </a>
             </li>
         </ul>
@@ -37,18 +30,63 @@ export default {
             type: Number,
             required: true,
         },
+        goToPage: {
+            type: Function,
+            required: true,
+        },
     },
     computed: {
         totalPagesArray() {
             return Array.from({ length: this.totalPages }, (_, i) => i + 1);
         },
     },
-    methods: {
-        goToPage(page) {
-            if (page >= 1 && page <= this.totalPages) {
-                this.$emit("go-to-page", page);
-            }
-        },
-    },
 };
 </script>
+
+<style scoped>
+.pagination-nav {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    padding-left: 0;
+    margin: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.page-item {
+    margin: 0;
+}
+
+.page-link {
+    display: block;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    color: #007bff;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #ffffff;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    color: #ffffff;
+    border-color: #007bff;
+}
+</style>

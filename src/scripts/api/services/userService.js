@@ -1,8 +1,9 @@
 import apiClient from '@/scripts/api/apiClients';
+const API_BASE_URL = '/Users';
 
 export const getUserById = async (id) => {
   try {
-    const response = await apiClient.get(`/Users/${id}`);
+    const response = await apiClient.get(`${API_BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching user by ID:', error.response ? error.response.data : error.message);
@@ -62,10 +63,9 @@ export const getUserAvatar = async (resourceId) => {
   }
 };
 
-// Update user profile
 export const updateUserProfile = async (formData) => {
   try {
-    const response = await apiClient.patch(`/Users`, formData, {
+    const response = await apiClient.put(`/Users`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -73,27 +73,34 @@ export const updateUserProfile = async (formData) => {
     return response.data;
   } catch (error) {
     console.error(
-      "Error updating user profile:",
+      "❌ Error updating user profile:",
       error.response ? error.response.data : error.message
     );
     throw error;
   }
 };
 
-// export const changePassword = async (formData) => {
-//   try {
-//     const response = await apiClient.patch('/Users', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     });
 
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error updating password:', error.response ? error.response.data : error.message);
-//     throw error;
-//   }
-// };
+
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const formData = new FormData();
+    formData.append("CurrentPassword", currentPassword);
+    formData.append("NewPassword", newPassword);
+
+    const response = await apiClient.put(`${API_BASE_URL}`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 export const resetPassword = async (email, token, newPassword) => {
   try {

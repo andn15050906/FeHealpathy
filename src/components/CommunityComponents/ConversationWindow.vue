@@ -451,6 +451,7 @@ export default {
             this.messagingHandler = new MessagingHandler(new HubConnection());
 
             this.messagingHandler.addListener(MESSAGE_TYPES.CreateChatMessage.callback, response => {
+                console.log(response);
                 this.fetchedMessagesData.items.push(response);
                 if (response.conversationId == this.roomId) {
                     let sender = this.allUsers.find(user => user?._id === response.creatorId);
