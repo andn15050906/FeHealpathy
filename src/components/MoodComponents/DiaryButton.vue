@@ -1,7 +1,8 @@
 <template>
-  <div class="diary-button-container">
-    <button @click="navigateToDiary" class="diary-button" :title="'Writing diary'">
+  <div class="diary-button-container" @click="navigateToDiary">
+    <button class="diary-button" :title="'Writing diary'">
       <i class="fa-solid fa-pen-clip"></i>
+      <span class="diary-text">Writing diary</span>
     </button>
   </div>
 </template>
@@ -17,7 +18,7 @@ export default {
   },
   methods: {
     navigateToDiary() {
-      this.$router.push({ name: 'diaryList' })
+      this.$router.push({ name: 'DiaryWriting' })
     }
   }
 }
@@ -27,21 +28,26 @@ export default {
 .diary-button-container {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .diary-button {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.diary-button:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .diary-button i {
@@ -49,13 +55,9 @@ export default {
   color: #282828;
 }
 
-.diary-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: rgba(255, 255, 255, 1);
-}
-
-.diary-button:active {
-  transform: translateY(0);
+.diary-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #282828;
 }
 </style>
