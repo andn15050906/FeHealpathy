@@ -1,138 +1,193 @@
 <template>
-  <div class="ChangePassword_pageWrapper">
-    <section class="index-module_row">
-      <section class="index-module_col">
-        <div class="ChangePassword_wrapper">
-          <form @submit.prevent="handleSubmit" enctype="multipart/form-data">
-            <h2 class="ChangePassword_heading">{{ text.updateUserProfile }}</h2>
-
-            <!-- Current Password Field -->
-            <div class="FieldWrapper">
-              <div class="InputField">
-                <h3 class="InputField_label">{{ text.CurrentPassword }}</h3>
-                <input v-model="form.currentPassword" type="password" class="InputField_input"
-                  placeholder="Current Password" />
-              </div>
-            </div>
-
-            <!-- New Password Field -->
-            <div class="FieldWrapper">
-              <div class="InputField">
-                <h3 class="InputField_label">{{ text.NewPassword }}</h3>
-                <input v-model="form.newPassword" type="password" class="InputField_input" placeholder="New Password" />
-              </div>
-            </div>
-
-            <!-- Retype New Password Field -->
-            <div class="FieldWrapper">
-              <div class="InputField">
-                <h3 class="InputField_label">{{ text.ReTypeNewPassword }}</h3>
-                <input v-model="form.retypeNewPassword" type="password" class="InputField_input"
-                  placeholder="Retype New Password" />
-              </div>
-            </div>
-
-            <div class="row">
-              <div @click="openConfirmModal" class="Button_fieldButton">
-                {{ text.SaveChanges }}
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
-    </section>
-
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="app-confirm-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-danger">{{ text.Confirm }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p class="text-primary">{{ text.ConfirmQuestion }}</p>
-          </div>
-          <div class="modal-footer">
-            <button @click="confirmChanges" type="button" class="btn btn-outline-danger">Yes</button>
-            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
-          </div>
+  <div class="change-password-container">
+    <h2 style="font-size: 30px;font-weight: bold;">Change Password</h2>
+    <form @submit.prevent="handleChangePassword">
+      <div class="form-group">
+        <label>Current Password</label>
+        <div class="password-input">
+          <input :type="showCurrentPassword ? 'text' : 'password'" v-model="currentPassword" required placeholder="Enter current password"/>
+          <span @click="toggleShowCurrentPassword" class="toggle-icon">{{ showCurrentPassword ? '🙈' : '👁️' }}</span>
         </div>
       </div>
-    </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <div class="password-input">
+          <input :type="showNewPassword ? 'text' : 'password'" v-model="newPassword" required placeholder="Enter new password"/>
+          <span @click="toggleShowNewPassword" class="toggle-icon">{{ showNewPassword ? '🙈' : '👁️' }}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <div class="password-input">
+          <input :type="showConfirmPassword ? 'text' : 'password'" v-model="confirmPassword" required placeholder="Confirm new password"/>
+          <span @click="toggleShowConfirmPassword" class="toggle-icon">{{ showConfirmPassword ? '🙈' : '👁️' }}</span>
+        </div>
+      </div>
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <button type="submit" :disabled="loading" class="submit-btn">
+        {{ loading ? "Updating..." : "Change Password" }}
+      </button>
+    </form>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
-import { updateUserProfile } from '@/scripts/api/services/userService.js';
+import { ref } from "vue";
+import { changePassword } from "@/scripts/api/services/userService";
 
 export default {
   setup() {
-    const form = ref({
-      currentPassword: '',
-      newPassword: '',
-      retypeNewPassword: '',
-    });
+    const currentPassword = ref("");
+    const newPassword = ref("");
+    const confirmPassword = ref("");
+    const loading = ref(false);
+    const errorMessage = ref("");
+    const successMessage = ref("");
+    const showCurrentPassword = ref(false);
+    const showNewPassword = ref(false);
+    const showConfirmPassword = ref(false);
 
-    const text = {
-      ChangePassword: 'Change Password',
-      CurrentPassword: 'Current Password',
-      NewPassword: 'New Password',
-      ReTypeNewPassword: 'Retype New Password',
-      SaveChanges: 'Save Changes',
-      Confirm: 'Confirm',
-      ConfirmQuestion: 'Are you sure you want to change your password?',
+    const toggleShowCurrentPassword = () => {
+      showCurrentPassword.value = !showCurrentPassword.value;
+    };
+    const toggleShowNewPassword = () => {
+      showNewPassword.value = !showNewPassword.value;
+    };
+    const toggleShowConfirmPassword = () => {
+      showConfirmPassword.value = !showConfirmPassword.value;
     };
 
-    const validateForm = () => {
-      const errors = {};
-      if (!form.value.currentPassword) errors.currentPassword = 'Current Password is required';
-      if (!form.value.newPassword) errors.newPassword = 'New Password is required';
-      if (form.value.newPassword !== form.value.retypeNewPassword) errors.retypeNewPassword = 'Passwords do not match';
-      if (form.value.currentPassword === form.value.newPassword) errors.newPassword = 'New Password must be different from Current Password';
-      return errors;
-    };
+    const validatePassword = (password) => {
+      const conditions = [];
 
-    const openConfirmModal = () => {
-      new bootstrap.Modal(document.getElementById('app-confirm-modal')).show();
-    };
+        if (!/.{6,}/.test(password)) conditions.push("at least 6 characters");
+        if (!/[A-Z]/.test(password)) conditions.push("at least one uppercase letter");
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) conditions.push("one special character");
 
-    const confirmChanges = async () => {
-      const errors = validateForm();
-      if (Object.keys(errors).length) {
-        alert('Please correct the errors in the form.');
+        return conditions.length > 0 
+          ? `Password must contain ${conditions.join(", ")}.` 
+          : "";
+      };
+
+
+    const handleChangePassword = async () => {
+      errorMessage.value = "";
+      successMessage.value = "";
+
+      if (newPassword.value !== confirmPassword.value) {
+        errorMessage.value = "New password not match";
         return;
       }
 
-      try {
-        const formData = new FormData();
-        formData.append('CurrentPassword', form.value.currentPassword);
-        formData.append('NewPassword', form.value.newPassword);
+      const passwordError = validatePassword(newPassword.value);
+      if (passwordError) {
+        errorMessage.value = passwordError;
+        return;
+      }
 
-        await updateUserProfile(formData);
-        alert('Password updated successfully!');
-        form.value.currentPassword = '';
-        form.value.newPassword = '';
-        form.value.retypeNewPassword = '';
+      loading.value = true;
+
+      try {
+        await changePassword(currentPassword.value, newPassword.value);
+        successMessage.value = "Change passwood successful!";
       } catch (error) {
-        console.error('Error updating password:', error);
-        alert('Error updating password.');
+        errorMessage.value = "Current password is wrong";
+      } finally {
+        loading.value = false;
       }
     };
 
-    const handleSubmit = event => {
-      event.preventDefault();
-      openConfirmModal();
-    };
-
     return {
-      form,
-      text,
-      handleSubmit,
-      openConfirmModal,
-      confirmChanges
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      handleChangePassword,
+      loading,
+      errorMessage,
+      successMessage,
+      showCurrentPassword,
+      showNewPassword,
+      showConfirmPassword,
+      toggleShowCurrentPassword,
+      toggleShowNewPassword,
+      toggleShowConfirmPassword,
     };
-  }
+  },
 };
 </script>
+
+<style scoped>
+.change-password-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+}
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.password-input {
+  display: flex;
+  align-items: center;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+}
+.password-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+.toggle-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #ff8c00;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.submit-btn:hover {
+  background: #e07b00;
+}
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+</style>
