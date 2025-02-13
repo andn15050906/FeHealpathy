@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits, defineProps } from 'vue';
+import { ref, onMounted } from 'vue';
 import { updateSurvey } from '../../scripts/api/services/surveysService';
 
 const emits = defineEmits(['cancel', 'surveyUpdated']);

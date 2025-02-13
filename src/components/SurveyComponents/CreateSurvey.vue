@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { createSurvey } from "../../scripts/api/services/surveysService";
 
 const emits = defineEmits(["cancel", "surveyCreated"]);
