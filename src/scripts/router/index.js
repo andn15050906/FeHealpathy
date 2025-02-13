@@ -67,6 +67,7 @@ import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
+import Request from '@/views/Profile/Advisor/Request.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -270,10 +271,11 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/blogs/update',
+      path: '/blogs/edit-blog/:id',
       name: 'updateBlog',
       component: UpdateBlog,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      props: true
     },
     {
       path: '/blogs/:id',
@@ -397,7 +399,12 @@ const router = createRouter({
       path: '/YogaPractice',
       name: 'YogaPractice',
       component: YogaPractice
-    }
+    },
+    {
+      path: '/request',
+      name: 'Request',
+      component: Request
+    },
   ]
 })
 
