@@ -27,6 +27,7 @@
     "bootstrap": "^5.3.3",
     "boxicons": "^2.1.4",
     "chart.js": "^4.4.2",
+    "date-fns": "^4.1.0",
     "emoji-mart-vue-fast": "^15.0.3",
     "firebase": "^10.8.1",
     "moment": "^2.30.1",
