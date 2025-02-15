@@ -46,12 +46,13 @@
 import { inject } from 'vue';
 import router from '@/scripts/router';
 import { readErr } from '@/scripts/logic/common';
-import { getGoogleOAuthPath, setUserAuthData, signIn } from '@/scripts/api/services/authService';
+import { getGoogleOAuthPath, setUserAuthData, signIn, verifyEmail } from '@/scripts/api/services/authService';
 
 export default {
 	data() {
 		return {
 			loadingSpinner: inject('loadingSpinner'),
+			sweetAlert: inject('sweetAlert'),
 			identifier: "",
 			password: "",
 			rememberMe: false,
@@ -67,10 +68,10 @@ export default {
 			if (verifiedEmail && token) {
 				try {
 					await verifyEmail(verifiedEmail, token);
-					sweetAlert.showSuccess("Verified Email Successfully!");
+					await sweetAlert.showSuccess("Verified Email Successfully!");
 				}
 				catch (error) {
-					sweetAlert.showError('Invalid email validation request!');
+					await sweetAlert.showError('Invalid email validation request!');
 				}
 			}
 		}

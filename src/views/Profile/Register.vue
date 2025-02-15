@@ -92,7 +92,7 @@ export default {
 
       if (isPasswordValid && isRetypePasswordValid) {
         try {
-          await register(form.value.username, form.value.email, form.value.password);
+          await register(this.username, this.email, this.password);
           this.generalError = 'Registration successful! Please check your email to verify your account.';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
