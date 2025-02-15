@@ -40,6 +40,7 @@
 
 <script>
 import { createDiaryNote, getPagedDiaryNotes, updateDiaryNote } from "@/scripts/api/services/diaryNoteService";
+import { ConvertTo_yyyy_mm_dd } from "../../../scripts/logic/common";
 
 export default {
     name: 'DiaryWriting',
@@ -56,14 +57,20 @@ export default {
             memoryContent: '',
             mediaFiles: [],
             removedFileIds: [],
+            diaryNoteId: null,
             isEdit: false
         }
     },
     async mounted() {
         const title = this.$route.params.title;
         if (title) {
+            // Trường hợp chỉnh sửa diary cũ
             this.isEdit = true;
             await this.fetchDiaryNote(title);
+        } else {
+            // Trường hợp viết diary mới cho hôm nay
+            this.isEdit = false;
+            await this.fetchTodayDiary();
         }
     },
     methods: {
@@ -74,6 +81,7 @@ export default {
 
                 if (response.items && response.items.length > 0) {
                     const diary = response.items[0];
+                    this.diaryNoteId = diary.id;
                     this.memoryTitle = diary.title;
                     this.memoryDate = diary.creationTime ? diary.creationTime.split("T")[0] : new Date().toISOString().split("T")[0];
                     this.memoryContent = diary.content || "";
@@ -91,6 +99,33 @@ export default {
                 alert("Failed to load diary. Please try again.");
             }
         },
+
+        async fetchTodayDiary() {
+            const today = ConvertTo_yyyy_mm_dd(new Date());
+            const queryParams = { StartAfter: today };
+            try {
+                const response = await getPagedDiaryNotes(queryParams);
+
+                if (response.items && response.items.length > 0) {
+                    const diary = response.items[0];
+                    this.diaryNoteId = diary.id;
+                    this.memoryTitle = diary.title || "";
+                    this.memoryDate = diary.creationTime ? diary.creationTime.split("T")[0] : today;
+                    this.memoryContent = diary.content || "";
+                    this.mediaFiles = (diary.medias || []).map((media) => ({
+                        id: media.id,
+                        isOld: true,
+                        file: null,
+                        preview: media.url,
+                        url: media.url,
+                    }));
+                    this.isEdit = true;
+                } 
+            } catch (error) {
+                console.error("Failed to fetch today's diary note:", error);
+            }
+        },
+
         async handleSubmit() {
             if (!this.memoryTitle || !this.memoryDate || !this.memoryContent) {
                 alert("Please fill in all fields before saving.");
@@ -98,27 +133,25 @@ export default {
             }
 
             const formData = new FormData();
-            formData.append("Id", this.isEdit ? this.$route.params.id : "");
+            this.isEdit && formData.append("Id", this.diaryNoteId || "");
             formData.append("Title", this.memoryTitle);
             formData.append("Content", this.memoryContent);
 
             if (this.mediaFiles && this.mediaFiles.length > 0) {
                 this.mediaFiles.filter(file => !file.isOld).forEach((file, index) => {
                     if (file.url) {
-                        // If the file has URL (existing media), append the URL
                         formData.append(
                             !this.isEdit ? `Medias[${index}].Url` : `AddedMedias[${index}].Url`,
                             file.url
                         );
                     } else if (file.file) {
-                        // If the file is new (uploaded), append the actual file
                         formData.append(
-                            !this.isEdit ? `Medias[${index}].File` : `AddedMedias[${index}].File`,
+                            this.isEdit ? `AddedMedias[${index}].File` : `Medias[${index}].File`,
                             file.file
                         );
                     }
                     formData.append(
-                        !this.isEdit ? `Medias[${index}].Title` : `AddedMedias[${index}].Title`,
+                        this.isEdit ? `AddedMedias[${index}].Title` : `Medias[${index}].Title`,
                         file.file ? file.file.name : `Existing Media ${index}`);
                 });
             }
@@ -128,14 +161,13 @@ export default {
                 });
             }
 
-            console.log([...formData.entries()]);
-
             try {
-                if (this.isEdit) {
+                if (this.isEdit && this.diaryNoteId) {
                     await updateDiaryNote(formData);
                     alert("Memory updated successfully!");
                 } else {
-                    await createDiaryNote(formData);
+                    const response = await createDiaryNote(formData);
+                    this.diaryNoteId = response.id;
                     alert("Memory saved successfully!");
                 }
                 this.$router.push({ name: 'diaryList' });
@@ -167,7 +199,7 @@ export default {
         },
         removeFile(fileId) {
             this.removedFileIds.push(fileId);
-            this.mediaFiles = this.mediaFiles.filter(file => file.id != fileId);
+            this.mediaFiles = this.mediaFiles.filter(file => file.id !== fileId);
         }
     }
 }
