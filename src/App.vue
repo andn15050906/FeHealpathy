@@ -4,12 +4,12 @@
     <SweetAlert ref="sweetAlert" />
     <Header ref="headerRef" />
     <main>
-      <NotificationContainer v-if="isAuthenticated" ref="notificationRef" />
+      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
       <div class="page-container">
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
         <div class="partner-chat">
-          <ConversationWindow v-if="isAuthenticated" :single-room="true" @toggleChat="toggleChat" />
+          <ConversationWindow v-if="isAuthAndShown" :single-room="true" @toggleChat="toggleChat" />
         </div>
       </div>
     </main>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from 'vue';
+import { ref, provide, onMounted, computed } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { getUserAuthData } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
@@ -62,15 +62,21 @@ onMounted(async () => {
     isAuthenticated.value = true;
 });
 
+const isAuthAndShown = computed(() => {
+  return !['register', 'signIn'].includes(router.currentRoute.value.name) && isAuthenticated.value;
+})
+
 const headerRef = ref(null);
 const handleAuthenticated = (data) => {
-  isAuthenticated.value = true;
+  isAuthAndShown.value = true;
   headerRef.value.fetchUserProfile();
 }
 
 const notificationRef = ref(null);
-const addNotification = (data) => {
-  notificationRef.value.addNotification(data);
+const addNotification = async (data) => {
+  setTimeout(() => {
+    notificationRef.value.addNotification(data);
+  }, 100);
 }
 const removeNotification = (data) => {
   notificationRef.value.removeNotification(data);

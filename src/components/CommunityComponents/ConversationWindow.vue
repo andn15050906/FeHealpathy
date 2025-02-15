@@ -77,7 +77,14 @@ export default {
         this.addStyle(
             `.vac-icon-textarea-left, .vac-toggle-button, .vac-text-started {
                 display: none !important;
-            }`
+            }
+            .vac-message-wrapper .vac-message-box {
+                max-width: 90% !important;
+            }
+            .vac-message-wrapper .vac-offset-current {
+                margin-left: 20% !important;
+            }
+            `
         );
 
         this.currentUser = await getUserAuthData();
@@ -197,32 +204,39 @@ export default {
         },
 
         async fetchPartnerRoom() {
+            var users = [
+                {
+                    _id: this.currentUser.id,
+                    username: this.currentUser.fullName,
+                    avatar: this.currentUser.avatarUrl
+                },
+                {
+                    _id: "00000000-0000-0000-0000-000000000001",
+                    username: "Your AI Partner",
+                    avatar: 'https://img.freepik.com/free-vector/cartoon-style-robot-vectorart_78370-4103.jpg?t=st=1738321862~exp=1738325462~hmac=b560fdb38b0ed4d909df8515962e618b4608320fd6b2997b8773c39d498f10d4&w=826'
+                }
+            ];
+
+            this.allUsers = users;
+            this.roomId = this.currentUser.id;
+
             let fetchedRoom = {
                 id: this.currentUser.id,
                 roomId: this.currentUser.id,
-                roomName: 'Your AI partner',
-                avatar: 'https://img.freepik.com/free-vector/cartoon-style-robot-vectorart_78370-4103.jpg?t=st=1738321862~exp=1738325462~hmac=b560fdb38b0ed4d909df8515962e618b4608320fd6b2997b8773c39d498f10d4&w=826',
+                roomName: users[1].username,
+                avatar: users[1].avatar,
                 unreadCount: 0,
                 lastMessage: {},
-                users: [
-                    {
-                        _id: this.currentUser.id,
-                        username: this.currentUser.fullName,
-                        avatar: this.currentUser.avatarUrl
-                    }
-                ],
-                lastMessage: {
-                    content: '',
-                    timestamp: formatISODate(new Date())
-                }
+                users: Array.from(users.map(item => item._id)),
+                lastUpdated: {}
             }
 
-            this.rooms = this.rooms.concat([fetchedRoom])
-            this.listenLastMessage(fetchedRoom);
+            this.roomsLoaded = true;
+            this.setupFetchedRooms([fetchedRoom], users);
         },
 
         async fetchMoreRooms() {
-            if (this.endRooms && !this.startRooms) {
+            if (this.endRooms && !this.startRooms || this.isPartnerChat) {
                 this.roomsLoaded = true;
                 return;
             }
@@ -239,20 +253,24 @@ export default {
             });
 
             let fetchedRooms = [];
-            let conversationPromise = getPagedConversations().then(pagedConversations => {
-                fetchedRooms = Array.from((pagedConversations.items).map(item => {          //... filter user conversation only?
-                    return {
-                        id: item.id,
-                        roomId: item.id,
-                        roomName: item.title,
-                        avatar: item.avatarUrl,
-                        unreadCount: 0,                                                     //...
-                        lastMessage: {},                                                    //...
-                        users: Array.from(item.members.map(item => item.creatorId)),
-                        lastUpdated: item.creationTime
-                    }
-                }));
-            })
+            let conversationPromise = getPagedConversations({ Members: /*[*/this.currentUser.id/*]*/})
+                .then(pagedConversations => {
+                    fetchedRooms = Array.from(pagedConversations.items
+                        .filter(item => item.id != this.currentUser.id)                             //exclude partner chat
+                        .map(item => {
+                            return {
+                                id: item.id,
+                                roomId: item.id,
+                                roomName: item.title,
+                                avatar: item.avatarUrl,
+                                unreadCount: 0,                                                     //...
+                                lastMessage: {},                                                    //...
+                                users: Array.from(item.members.map(item => item.creatorId)),
+                                lastUpdated: item.creationTime
+                            }
+                        })
+                    );
+                })
 
             await Promise.all([userPromise, conversationPromise]);
 
@@ -261,17 +279,28 @@ export default {
             /*if (this.startRooms) this.endRooms = this.startRooms
             this.startRooms = docs[docs.length - 1]*/
 
+            this.setupFetchedRooms(fetchedRooms, this.allUsers);
+
+            if (!this.rooms.length) {
+                this.loadingRooms = false
+                this.roomsLoadedCount = 0
+            }
+
+            //this.listenUsersOnlineStatus(formattedRooms);
+        },
+
+        setupFetchedRooms(fetchedRooms, allUsers) {
             const formattedRooms = []
             fetchedRooms.forEach(room => {
                 // re-assign room users (convert from userId to user)
                 for (let i = 0; i < room.users.length; i++) {
-                    room.users[i] = this.allUsers.find(user => user?._id === room.users[i]);
+                    room.users[i] = allUsers.find(user => user?._id === room.users[i]);
                 }
 
                 // re-assign room name
                 const otherRoomUsers = room.users.filter(user => user._id != this.currentUser.id);
-                room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
-
+                //room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
+                room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner'
                 formattedRooms.push({
                     ...room,
                     roomId: room.id,
@@ -286,13 +315,6 @@ export default {
 
             this.rooms = this.rooms.concat(formattedRooms)
             formattedRooms.forEach(room => this.listenLastMessage(room))
-
-            if (!this.rooms.length) {
-                this.loadingRooms = false
-                this.roomsLoadedCount = 0
-            }
-
-            //this.listenUsersOnlineStatus(formattedRooms);
         },
 
         listenLastMessage(room) {
@@ -343,8 +365,6 @@ export default {
 
 
         fetchMessages({ room, options = {} }) {
-            //this.$emit('show-demo-options', false)
-
             if (options.reset)
                 this.resetMessages();
 
@@ -451,7 +471,11 @@ export default {
             this.messagingHandler = new MessagingHandler(new HubConnection());
 
             this.messagingHandler.addListener(MESSAGE_TYPES.CreateChatMessage.callback, response => {
-                console.log(response);
+                if (!this.fetchedMessagesData.items) {
+                    this.fetchMessages({ room: { roomId: this.roomId }});
+                    return;
+                }
+
                 this.fetchedMessagesData.items.push(response);
                 if (response.conversationId == this.roomId) {
                     let sender = this.allUsers.find(user => user?._id === response.creatorId);
