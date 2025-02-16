@@ -49,6 +49,7 @@ export const verifyEmail = async (email, token) => {
 export const signOut = async () => {
   try {
     clearUserAuthData();
+    await apiClient.post('/auth/SignOut');
   } catch (error) {
     console.error('Error signing out:', error);
     throw error;

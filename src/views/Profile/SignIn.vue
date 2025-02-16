@@ -85,7 +85,7 @@ export default {
 				const data = await signIn(this.identifier, this.password);
 				setUserAuthData(data);
 				this.generalError = '';
-				this.$emit('authenticated', data);
+				this.$emit('authenticated');
 				router.push('/');
 			} catch (error) {
 				this.generalError = readErr(error);
