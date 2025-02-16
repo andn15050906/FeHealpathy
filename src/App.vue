@@ -67,8 +67,8 @@ const isAuthAndShown = computed(() => {
 })
 
 const headerRef = ref(null);
-const handleAuthenticated = (data) => {
-  isAuthAndShown.value = true;
+const handleAuthenticated = () => {
+  isAuthenticated.value = true;
   headerRef.value.fetchUserProfile();
 }
 
