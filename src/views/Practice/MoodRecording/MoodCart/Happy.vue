@@ -56,16 +56,25 @@ export default {
             const today = ConvertTo_yyyy_mm_dd(new Date());
             const queryParams = { StartAfter: today };
             try {
-                const diaryNote = await getPagedDiaryNotes(queryParams);
+                const response = await getPagedDiaryNotes(queryParams);
 
-                if (diaryNote) {
-                    selectedMood.value = diaryNote.mood;
+                if (response) {
+                    const diaryNote = response.items[0]; 
+                    selectedMood.value = "Happy";
                     diaryNoteId.value = diaryNote.id;
+
+                    const formData = new FormData();
+                    formData.append("id", diaryNoteId.value);
+                    formData.append("mood", "Happy");
+
+                    await updateDiaryNote(formData);
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
                     try {
-                        const response = await createDiaryNote({ mood: "Happy"});
+                        const formData = new FormData();
+                        formData.append("mood", "Happy");
+                        const response = await createDiaryNote(formData);
                         diaryNoteId.value = response.id;
                         selectedMood.value = "Happy";
                     } catch (createError) {
@@ -81,16 +90,18 @@ export default {
         async function selectMood(mood) {
             selectedMood.value = mood;
             moodImage.value = moodImages[mood];
+            const formData = new FormData();
 
             try {
                 if (diaryNoteId.value) {
-                    await updateDiaryNote({ id: diaryNoteId.value, mood });
-                    console.log(`Mood updated: ${mood}`);
+                    formData.append("id", diaryNoteId.value);
+                    formData.append("mood", mood);
+
+                    await updateDiaryNote(formData);
                 } else {
-                    const today = ConvertTo_yyyy_mm_dd(new Date());
-                    const response = await createDiaryNote({ mood });
+                    formData.append("mood", mood);
+                    await createDiaryNoteWithMood(formData);
                     diaryNoteId.value = response.id;
-                    console.log(`Mood created: ${mood}`);
                 }
             } catch (error) {
                 console.error('Failed to save mood:', error);
