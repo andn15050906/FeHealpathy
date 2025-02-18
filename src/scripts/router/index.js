@@ -68,6 +68,7 @@ import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
+import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -404,6 +405,11 @@ const router = createRouter({
       path: '/request',
       name: 'Request',
       component: Request
+    },
+    {
+      path: '/roadmap',
+      name: 'PersonalRoadmap',
+      component: PersonalRoadmap
     },
   ]
 })

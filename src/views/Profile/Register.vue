@@ -41,11 +41,13 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import { register } from '@/scripts/api/services/authService';
 
 export default {
   data() {
     return {
+			loadingSpinner: inject('loadingSpinner'),
       username: "",
       email: "",
       password: "",
@@ -92,12 +94,16 @@ export default {
 
       if (isPasswordValid && isRetypePasswordValid) {
         try {
+          this.loadingSpinner.showSpinner();
           await register(this.username, this.email, this.password);
           this.generalError = 'Registration successful! Please check your email to verify your account.';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
           console.error('Registration error:', error);
           this.generalError = 'Registration failed. Please try again.';
+        }
+        finally {
+				  this.loadingSpinner.hideSpinner();
         }
       }
     },
