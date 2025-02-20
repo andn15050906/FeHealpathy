@@ -1,104 +1,162 @@
 <template>
-  <div class="blog-detail">
-    <button class="back-button" @click="goBack">← Quay lại</button>
-    <!--<h1 class="title">Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your
-      wellbeing</h1>
-    <p class="category">Meditation & Mindfulness</p>-->
-    <HeroImg />
+  <div class="blog-detail-container">
+    <h1 class="blog-title" v-if="blog">{{ blog.title }}</h1>
+    <p v-else>Đang tải...</p>
+
+
+    <div v-if="blog && blog.thumb" class="hero-image">
+    <img :src="blog.thumb.url" :alt="blog.thumb.title" />
+</div>
+
+
+    <div v-if="blog && blog.tags" class="keywords">
+      <span v-for="tag in blog.tags" :key="tag.id" class="tag">#{{ tag.title }}</span>
+    </div>
 
     <div class="actions">
-      <button @click="likeExercise" class="btn like">Like</button>
-      <button @click="shareExercise" class="btn share">Share</button>
+      <button @click="likeBlog" class="btn like">
+        👍 Thích ({{ likes }})
+      </button>
+      <button @click="shareBlog" class="btn share">
+        📤 Chia sẻ
+      </button>
     </div>
+
+    <div  v-if="blog && blog.sections && blog.sections.length" class="blog-content">
+      <div v-for="(section, index) in sortedSections" :key="index" class="section">
+        <h2 class="section-title">{{ section.header }}</h2>
+        <div v-if="section.media" class="section-image">
+          <img :src="section.media.url" :alt="section.media.title" />
+        </div>
+        <p class="section-text">{{ section.content }}</p>
+      </div>
+    </div>
+
     <div class="divider"></div>
-    <div class="blogmeta">
-      <p>
-        <BlogMeta />
-      </p>
-    </div>
+
+    <BlogCommentSection v-if="blog" :blogId="blog.id" />
+
     <div class="divider"></div>
-    <div class="blogdescription">
-      <ul>
-        <BlogContent />
-      </ul>
-    </div>
-    <div class="divider"></div>
-    <div class="blogcomment">
-      <ul>
-        <BlogCommentSection />
-      </ul>
-    </div>
-    <div class="divider"></div>
-    <div class="blogrelated">
-      <ul>
-        <BlogRelatedItems />
-      </ul>
-    </div>
+
+    <!-- 📌 Bài viết liên quan -->
+    <BlogRelatedItems v-if="blog" :currentBlogId="blog.id" />
+
     <ScrollToTop />
   </div>
 </template>
 
 <script>
-import HeroImg from '../../components/Common/Misc/HeroImg.vue'
-import BlogMeta from '../../components/BlogComponents/BlogMeta.vue'
-import ScrollToTop from '../../components/Common/Misc/ScrollToTop.vue'
-import BlogRelatedItems from '@/components/BlogComponents/BlogRelatedItems.vue'
-import BlogCommentSection from '@/components/BlogComponents/BlogCommentSection.vue';
-import BlogContent from '@/components/BlogComponents/BlogContent.vue';
+import ScrollToTop from "@/components/Common/Misc/ScrollToTop.vue";
+import BlogRelatedItems from "@/components/BlogComponents/BlogRelatedItems.vue";
+import BlogCommentSection from "@/components/BlogComponents/BlogCommentSection.vue";
+import { getPagedArticles } from "@/scripts/api/services/blogService";
 
 export default {
-  name: "BlogDetail",
-  methods: {
-    goBack() {
-      this.$router.go(-1);
-    },
-  },
   components: {
-    HeroImg,
-    BlogMeta,
+    ScrollToTop,
     BlogRelatedItems,
     BlogCommentSection,
-    BlogContent,
-    ScrollToTop
+  },
+  data() {
+    return {
+      blog: null,
+      loading: true,
+      likes: 0,
+    };
+  },
+  async created() {
+    await this.fetchBlogData();
+  },
+  methods: {
+    async fetchBlogData() {
+      try {
+        const response = await getPagedArticles();
+        const articles = response.items && Array.isArray(response.items) ? response.items : [];
+        const blogId = this.$route.params.id;
+        this.blog = articles.find((article) => String(article.id) === String(blogId));
+
+        if (!this.blog) {
+          console.error("Không tìm thấy bài viết với ID:", blogId);
+        }
+
+        this.loading = false;
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách blog:", error);
+        this.loading = false;
+      }
+    },
+    likeBlog() {
+      this.likes += 1;
+    },
+    shareBlog() {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url);
+      alert("📢 Đã sao chép link bài viết: " + url);
+    },
+  },
+  computed: {
+  sortedSections() {
+    return [...this.blog.sections].sort((a, b) => {
+      const numA = parseInt(a.header.match(/^\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.header.match(/^\d+/)?.[0] || "0", 10);
+      return numA - numB;
+    });
   }
+}
 };
 </script>
 
 <style scoped>
-.blog-detail {
-  font-family: "Poppins", Arial, sans-serif;
+/* 📌 Bố cục tổng thể */
+.blog-detail-container {
+  font-family: "Poppins", sans-serif;
   line-height: 1.8;
-  margin: 60px auto;
-  max-width: 900px;
+  margin: 40px auto;
+  max-width: 800px;
   color: #333;
-}
-
-.title {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  text-align: center;
-  color: #4caf50;
-}
-
-.category {
-  color: #777;
-  margin-bottom: 20px;
-  text-align: center;
-  font-style: italic;
-}
-
-.video-container {
-  margin-bottom: 20px;
+  background: #fff;
+  padding: 20px;
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.video {
+/* 📌 Tiêu đề bài viết */
+.blog-title {
+  font-size: 2.8em;
+  font-weight: bold;
+  text-align: center;
+  color: #2d3436;
+  margin: 30px 0 20px 0;
+}
+
+/* 📌 Ảnh đại diện blog */
+.hero-image img {
   width: 100%;
-  height: 400px;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto;
 }
 
+/* 📌 Tags (dưới ảnh đại diện) */
+.keywords {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 10px;
+}
+
+.tag {
+  display: inline-block;
+  background: #f3f3f3;
+  color: #555;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.9em;
+  margin-right: 5px;
+}
+
+/* 📌 Nút Like & Share */
 .actions {
   display: flex;
   justify-content: center;
@@ -107,18 +165,20 @@ export default {
 }
 
 .btn {
-  padding: 10px 25px;
+  padding: 12px 20px;
   border: none;
   border-radius: 25px;
+  font-size: 1em;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .btn:hover {
   transform: translateY(-2px);
 }
 
+/* Like */
 .like {
   background-color: #ff6868;
   color: white;
@@ -128,6 +188,7 @@ export default {
   background-color: #ff4d4d;
 }
 
+/* Share */
 .share {
   background-color: #68a0ff;
   color: white;
@@ -137,26 +198,51 @@ export default {
   background-color: #4d8cff;
 }
 
+/* 📌 Nội dung bài viết */
+.blog-content {
+  margin-top: 20px;
+}
+
+/* 📌 Tiêu đề từng phần */
+.section-title {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-top: 30px;
+}
+
+/* 📌 Ảnh từng phần */
+.section-image img {
+  display: block;
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  margin: 10px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 📌 Nội dung từng phần */
+.section-text {
+  font-size: 1.1em;
+  color: #444;
+  line-height: 1.8;
+  margin-top: 15px;
+  white-space: pre-line;
+}
+
+/* 📌 Ngăn cách giữa các phần */
 .divider {
   border-top: 1px solid #ddd;
   margin: 30px 0;
 }
 
-.blogmeta,
-.blogdescription,
-.blogcomment,
-.blogrelated {
-  background-color: #f9f9f9;
+/* 📌 Căn chỉnh bình luận & bài viết liên quan */
+.blogcomment, .blogrelated {
+  margin-top: 30px;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.exercise-item:hover {
-  transform: scale(1.05);
+  background: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 </style>
-
-<!--
-import BlogContent from '../../components/BlogComponents/BlogContent.vue'
--->
