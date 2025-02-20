@@ -7,7 +7,7 @@ import * as directives from "vuetify/directives";
 import { createPinia } from "pinia";
 import { toast } from "vue3-toastify";
 import VueFroala from "vue-froala-wysiwyg";
-import Vue3Tour from "vue3-tour";
+import VueTour from "vue3-tour";
 
 // Styles
 import "vuestic-ui/css";
@@ -72,7 +72,7 @@ app.use(toast, {
   theme: "light",
 });
 app.use(VueFroala);
-app.use(Vue3Tour);
+app.use(VueTour);
 
 // Mount app
 app.mount("#app");

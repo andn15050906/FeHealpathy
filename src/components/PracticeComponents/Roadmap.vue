@@ -1,7 +1,7 @@
 <template>
   <v-timeline align="start">
     <v-timeline-item v-for="(item, i) in timelineItems" :key="i" :dot-color="item.color" :icon="item.icon" fill-dot>
-      <v-card>
+      <v-card :id="item.id ?? `roadmap-step-${i + 1}`">
         <v-card-title :class="['text-h6', `bg-${item.color}`]">{{ item.title }}</v-card-title>
         <v-card-text class="bg-white text--primary">
           <p>{{ item.content }}</p>
