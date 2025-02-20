@@ -6,8 +6,8 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { createPinia } from "pinia";
 import { toast } from "vue3-toastify";
-import VueFroala from 'vue-froala-wysiwyg'
-import VueTour from 'vue-tour';
+import VueFroala from "vue-froala-wysiwyg";
+import Vue3Tour from "vue3-tour";
 
 // Styles
 import "vuestic-ui/css";
@@ -17,11 +17,11 @@ import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "vue3-toastify/dist/index.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
-import 'vue-tour/dist/vue-tour.css';
+import "vue3-tour/dist/vue3-tour.css";
 
-import App from './App.vue'
-import router from './scripts/router'
-import vuesticGlobalConfig from './scripts/plugins/vuestic-ui/global-config'
+import App from "./App.vue";
+import router from "./scripts/router";
+import vuesticGlobalConfig from "./scripts/plugins/vuestic-ui/global-config";
 
 // Cấu hình i18n
 const i18n = createI18n({
@@ -69,10 +69,10 @@ app.use(pinia);
 app.use(toast, {
   position: "top-right",
   autoClose: 3000,
-  theme: "light"
+  theme: "light",
 });
 app.use(VueFroala);
-app.use(VueTour);
+app.use(Vue3Tour);
 
 // Mount app
 app.mount("#app");
