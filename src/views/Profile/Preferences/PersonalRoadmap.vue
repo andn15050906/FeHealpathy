@@ -11,10 +11,26 @@
         Embrace the process, and take the first step toward a healthier mindset today!
     </div>
     <Roadmap :timelineItems="timelineItems"></Roadmap>
+    <div class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
+        <GlowingButton v-if="nextScreenCallback" @click="nextScreenCallback"
+            primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ data.nextScreen }}</GlowingButton>
+    </div>
 </template>
 
 <script setup>
 import Roadmap from '@/components/PracticeComponents/Roadmap.vue'
+import GlowingButton from '@/components/Common/GlowingButton.vue';
+
+const props = defineProps({
+    nextScreenCallback: {
+        type: Function,
+        required: false
+    }
+});
+
+var data = {
+    nextScreen: "Next"
+}
 
 const timelineItems = [
     {

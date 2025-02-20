@@ -12,6 +12,7 @@ import VueFroala from 'vue-froala-wysiwyg'
 import "vuestic-ui/css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "vuetify/styles";
+import '@mdi/font/css/materialdesignicons.css';
 import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "vue3-toastify/dist/index.css";
