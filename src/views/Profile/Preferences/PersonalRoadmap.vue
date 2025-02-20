@@ -1,5 +1,12 @@
 <template>
     <div>
+        <button @click="startTour">Start Tour</button>
+        <tour
+            v-if="isTourActive"
+            :steps="steps"
+            :options="tourOptions"
+            @end="isTourActive = false"
+        />
         CBT is a powerful therapeutic approach that equips individuals with the tools to understand and manage their
         thoughts and behaviors.
     </div>
@@ -15,6 +22,33 @@
 
 <script setup>
 import Roadmap from '@/components/PracticeComponents/Roadmap.vue'
+import { ref } from 'vue';
+import { Tour } from 'vue-tour';
+import 'vue-tour/dist/vue-tour.css';
+
+const isTourActive = ref(false);
+
+const steps = [
+    {
+        target: '.roadmap-section',
+        title: 'Step 1',
+        description: 'This is your roadmap section.',
+    },
+    {
+        target: '.timeline-item',
+        title: 'Step 2',
+        description: 'Click here to see details.',
+    },
+];
+
+const tourOptions = {
+    duration: 300,
+};
+
+const startTour = () => {
+    console.log("Starting tour");
+    isTourActive.value = true;
+};
 
 const timelineItems = [
     {

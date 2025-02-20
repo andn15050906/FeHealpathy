@@ -7,6 +7,7 @@ import * as directives from "vuetify/directives";
 import { createPinia } from "pinia";
 import { toast } from "vue3-toastify";
 import VueFroala from 'vue-froala-wysiwyg'
+import VueTour from 'vue-tour';
 
 // Styles
 import "vuestic-ui/css";
@@ -16,6 +17,7 @@ import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "vue3-toastify/dist/index.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
+import 'vue-tour/dist/vue-tour.css';
 
 import App from './App.vue'
 import router from './scripts/router'
@@ -69,7 +71,8 @@ app.use(toast, {
   autoClose: 3000,
   theme: "light"
 });
-app.use(VueFroala)
+app.use(VueFroala);
+app.use(VueTour);
 
 // Mount app
 app.mount("#app");
