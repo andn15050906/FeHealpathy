@@ -69,6 +69,8 @@ import ConversationWindow from '@/components/CommunityComponents/ConversationWin
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
+import StrictPersonalRoadmap from '@/views/Profile/Preferences/StrictPersonalRoadmap.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -410,6 +412,11 @@ const router = createRouter({
       path: '/roadmap',
       name: 'PersonalRoadmap',
       component: PersonalRoadmap
+    },
+    {
+      path: '/strict-personal-roadmap',
+      name: 'StrictPersonalRoadmap',
+      component: StrictPersonalRoadmap
     },
   ]
 })
