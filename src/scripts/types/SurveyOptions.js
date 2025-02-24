@@ -1,9 +1,11 @@
 class SurveyOptions {
-    constructor(survey, title, switchCallback, submitCallback) {
+    constructor(survey, title, switchCallback, submitCallback, isReadOnly, isTransparentStyle) {
         this.survey = survey;
         this.title = title;
         this.switchCallback = switchCallback;
         this.submitCallback = submitCallback;
+        this.isReadOnly = isReadOnly;
+        this.isTransparentStyle = isTransparentStyle;
     }
 }
 

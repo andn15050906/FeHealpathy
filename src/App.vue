@@ -88,6 +88,12 @@ const toggleChat = () => {
 }
 </script>
 
+<script>
+export default {
+  emits: ["handleAuthenticated", "addNotification", "removeNotification"]
+}
+</script>
+
 <style scoped>
 main {
   padding: 0 20px;

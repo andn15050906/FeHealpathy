@@ -69,6 +69,7 @@ import ConversationWindow from '@/components/CommunityComponents/ConversationWin
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
+import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -411,6 +412,13 @@ const router = createRouter({
       name: 'PersonalRoadmap',
       component: PersonalRoadmap
     },
+    {
+      path: '/submissions-review/:id',
+      name: 'SubmissionReview',
+      component: SubmissionReview,
+      props: true,
+      meta: { requiresAuth: true }
+    }
   ]
 })
 
