@@ -56,6 +56,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
+import UserActivity from '@/views/Statistics/UserActivity.vue'
 
 //components
 import NotFound from '@/components/Layouts/404.vue'
@@ -418,6 +419,11 @@ const router = createRouter({
       component: SubmissionReview,
       props: true,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/statistics/user-activity',
+      name: 'UserActivity',
+      component: UserActivity
     }
   ]
 })
