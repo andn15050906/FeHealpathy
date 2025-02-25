@@ -3,13 +3,13 @@
 
     <div class="roadmap-intro">
         <div class="roadmap-text">
-            This roadmap is designed to challenge you and push you towards significant personal growth and self-discovery.
+            This roadmap is designed to challenge you and push you towards significant personal growth and self-discovery through disciplined actions.
         </div>
         <div class="roadmap-text">
             At Healpathy, we believe in the power of discipline and commitment to achieve mental wellness and emotional stability.
         </div>
         <div class="roadmap-text">
-            Follow each step diligently, and hold yourself accountable for your progress to ensure a transformative experience.
+            Follow each step diligently, and hold yourself accountable for your progress to ensure a transformative experience. Remember, consistency is key to success.
         </div>
     </div>
 
@@ -42,34 +42,34 @@ export default {
             },
             steps: [
                 {
-                    target: "#strict-roadmap-step-1",
+                    target: "#roadmap-step-1",
                     header: { title: "Step 1: Acknowledge Your Challenges" },
-                    content: "Identify and write down the specific challenges you face in your daily life."
+                    content: "Identify and write down the specific challenges you face in your daily life. This is the first step towards overcoming them."
                 },
                 {
-                    target: "#strict-roadmap-step-2",
+                    target: "#roadmap-step-2",
                     header: { title: "Step 2: Set Clear Goals" },
-                    content: "Define measurable and achievable goals to overcome these challenges effectively."
+                    content: "Define measurable and achievable goals to overcome these challenges effectively. Clear goals provide direction."
                 },
                 {
-                    target: "#strict-roadmap-step-3",
+                    target: "#roadmap-step-3",
                     header: { title: "Step 3: Create a Daily Routine" },
-                    content: "Establish a strict daily routine that includes time for self-care and reflection."
+                    content: "Establish a strict daily routine that includes time for self-care and reflection. Consistency is crucial."
                 },
                 {
-                    target: "#strict-roadmap-step-4",
+                    target: "#roadmap-step-4",
                     header: { title: "Step 4: Monitor Your Progress" },
-                    content: "Keep a daily journal to track your feelings and progress towards your goals."
+                    content: "Keep a daily journal to track your feelings and progress towards your goals. Reflection helps you stay accountable."
                 },
                 {
-                    target: "#strict-roadmap-step-5",
+                    target: "#roadmap-step-5",
                     header: { title: "Step 5: Seek Accountability" },
-                    content: "Share your goals with a trusted friend or therapist to hold yourself accountable."
+                    content: "Share your goals with a trusted friend or therapist to hold yourself accountable. This support is vital for success."
                 }
             ],
             timelineItems: [
                 {
-                    color: 'red',
+                    color: '#6c7ee1',
                     icon: 'mdi-alert',
                     title: 'Acknowledge Your Challenges',
                     content: 'Write down your challenges to confront them directly. This step is crucial for understanding what holds you back and how to address it effectively.',
@@ -77,7 +77,7 @@ export default {
                     linkTitle: 'Learn more!'
                 },
                 {
-                    color: 'orange',
+                    color: '#92b9e3',
                     icon: 'mdi-target',
                     title: 'Set Clear Goals',
                     content: 'Define specific goals to work towards overcoming your challenges. Clear goals provide direction and motivation for your journey.',
@@ -85,7 +85,7 @@ export default {
                     linkTitle: 'Learn more!'
                 },
                 {
-                    color: 'yellow',
+                    color: '#ffc4a4',
                     icon: 'mdi-calendar',
                     title: 'Create a Daily Routine',
                     content: 'Establish a strict routine that prioritizes your mental health. A consistent routine helps build healthy habits and reduces stress.',
@@ -93,7 +93,7 @@ export default {
                     linkTitle: 'Learn more!'
                 },
                 {
-                    color: 'green',
+                    color: '#fba2d0',
                     icon: 'mdi-check-circle',
                     title: 'Monitor Your Progress',
                     content: 'Use a journal to reflect on your daily experiences and progress. Regular reflection helps you stay aware of your growth and areas for improvement.',
@@ -101,7 +101,7 @@ export default {
                     linkTitle: 'Learn more!'
                 },
                 {
-                    color: 'blue',
+                    color: '#c688eb',
                     icon: 'mdi-account-check',
                     title: 'Seek Accountability',
                     content: 'Engage with a friend or therapist to keep you accountable. Sharing your goals with others increases your commitment and support.',

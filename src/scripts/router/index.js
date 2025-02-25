@@ -70,7 +70,10 @@ import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
 import StrictPersonalRoadmap from '@/views/Profile/Preferences/StrictPersonalRoadmap.vue'
-
+import PhysicalRoadmap from '@/views/Profile/Preferences/PhysicalRoadmap.vue'
+import StrictPhysicalRoadmap from '@/views/Profile/Preferences/StrictPhysicalRoadmap.vue'
+import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
+import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -418,6 +421,27 @@ const router = createRouter({
       name: 'StrictPersonalRoadmap',
       component: StrictPersonalRoadmap
     },
+    {
+      path: '/physical-roadmap',
+      name: 'PhysicalRoadmap',
+      component: PhysicalRoadmap
+    },
+    {
+      path: '/strict-physical-roadmap',
+      name: 'StrictPhysicalRoadmap',
+      component: StrictPhysicalRoadmap
+    },
+    {
+      path: '/skill-roadmap',
+      name: 'SkillRoadmap',
+      component: SkillRoadmap
+    },
+    {
+      path: '/strict-skill-roadmap',
+      name: 'StrictSkillRoadmap',
+      component: StrictSkillRoadmap
+    }
+
   ]
 })
 

@@ -3,15 +3,13 @@
 
     <div class="roadmap-intro">
         <div class="roadmap-text">
-            CBT is a powerful therapeutic approach that equips individuals with the tools to understand and manage their
-            thoughts and behaviors.
+            CBT is a gentle therapeutic approach that equips individuals with the tools to understand and manage their thoughts and behaviors at a comfortable pace.
         </div>
         <div class="roadmap-text">
-            At Healpathy, we are committed to guiding you through this roadmap, ensuring that you have the support and
-            resources necessary for your mental health journey.
+            At Healpathy, we are committed to guiding you through this roadmap, ensuring that you have the support and resources necessary for your mental health journey.
         </div>
         <div class="roadmap-text">
-            Embrace the process, and take the first step toward a healthier mindset today!
+            Embrace the process, and take the first step toward a healthier mindset today! Remember, small steps lead to significant changes.
         </div>
     </div>
 
@@ -46,27 +44,27 @@ export default {
                 {
                     target: "#roadmap-step-1",
                     header: { title: "Step 1: Identify the Problem" },
-                    content: "Define your emotions and issues."
+                    content: "Gently define your emotions and issues to understand what you are feeling."
                 },
                 {
                     target: "#roadmap-step-2",
                     header: { title: "Step 2: Stabilize Your Mind" },
-                    content: "Reduce stress before entering the change process."
+                    content: "Practice relaxation techniques to reduce stress before entering the change process."
                 },
                 {
                     target: "#roadmap-step-3",
                     header: { title: "Step 3: Build Positive Habits" },
-                    content: "Create a foundation for long-term mental health."
+                    content: "Create a foundation for long-term mental health by establishing small, positive routines."
                 },
                 {
                     target: "#roadmap-step-4",
                     header: { title: "Step 4: Manage Stress & Emotions" },
-                    content: "Learn to maintain a positive mindset and expand your skills."
+                    content: "Learn to maintain a positive mindset and expand your skills through gentle practices."
                 },
                 {
                     target: "#roadmap-step-5",
                     header: { title: "Step 5: Evaluate & Continue Maintenance" },
-                    content: "Check your improvement and continue the process."
+                    content: "Check your improvement and continue the process at your own pace."
                 }
             ],
             timelineItems: [
