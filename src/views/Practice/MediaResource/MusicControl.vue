@@ -6,7 +6,7 @@
                 <MediaPlayer v-if="currentSong" :current-song="currentSong" :is-playing="isPlaying"
                     :audio-ref="audioRef" :song-info="songInfo" :songs="songs" @update-song-info="updateSongInfo"
                     @toggle-is-playing="toggleIsPlaying" @skip-track="skipTrackHandler" />
-                <MediaLibrary :songs="songs" :current-song-id="currentSong ? currentSong.id : null"
+                <MediaLibrary :media-list="songs" :current-song-id="currentSong ? currentSong.id : null"
                     @select-song="selectSong" />
             </div>
         </div>
@@ -18,8 +18,8 @@
 <script>
 import { ref, reactive, onMounted, onUnmounted } from "vue";
 import MediaPlayer from "./MediaPlayer.vue";
-import MediaLibrary from "./MediaLibrary.vue";
 import MediaDisplay from "./MediaDisplay.vue";
+import MediaLibrary from "./MediaLibrary.vue";
 import { getPagedMediaResources } from "../../../scripts/api/services/mediaResourcesService";
 export default {
     name: "MusicControl",
