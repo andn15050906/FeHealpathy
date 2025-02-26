@@ -10,8 +10,9 @@
     </div>
       <div class="blog-list">
         <div class="blog-item" v-for="blog in blogs" :key="blog.id">
-          <img :src="blog.thumb?.url || 'https://placehold.co/150x150'" 
-          :alt="blog.title" class="thumbnail" />
+          <img :src="blog.thumb?.url || 'https://placehold.co/16x9'" 
+     :alt="blog.title" class="thumbnail" />
+
           <div class="blog-details">
             <h2 class="blog-title">{{ blog.title }}</h2>
             <p class="blog-date">Ngày đăng: {{ formattedDate(blog.creationTime) }}</p>
@@ -230,6 +231,12 @@ import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue
     color: #888;
     font-size: 1rem;
   }
+  .thumbnail {
+  width: 20%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
   </style>
 
   

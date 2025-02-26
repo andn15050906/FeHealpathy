@@ -280,9 +280,10 @@ const router = createRouter({
       props: true
     },
     {
-      path: '/blogs/:id',
+      path: "/blog/:id",
       name: 'blogDetail',
-      component: BlogDetail
+      component: BlogDetail,
+      props: true
     },
     {
       path: '/blogs/search',
