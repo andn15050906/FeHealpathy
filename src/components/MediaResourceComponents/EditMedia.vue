@@ -27,9 +27,9 @@
         </div>
 
         <div class="mb-4">
-            <label for="artistName" class="form-label fw-semibold">Creator Name</label>
+            <label for="artistName" class="form-label fw-semibold">Artist Name</label>
             <input v-model="editedMedia.artist" type="text" class="form-control" id="artistName"
-                placeholder="Enter creator name" required />
+                placeholder="Enter artist name" required />
         </div>
 
         <div class="mb-4">
@@ -100,7 +100,7 @@ export default {
             }
         },
         async handleEditMedia() {
-            if (!this.editedMedia.title || !this.editedMedia.creator || !this.editedMedia.description) {
+            if (!this.editedMedia.title || !this.editedMedia.artist || !this.editedMedia.description) {
                 this.error = "Please fill all required fields.";
                 return;
             }
@@ -116,16 +116,16 @@ export default {
             try {
                 const formData = new FormData();
                 formData.append("Id", this.editedMedia.id);
+                formData.append("Title", this.editedMedia.title);
                 formData.append("Description", this.editedMedia.description);
-                formData.append("Creator", this.editedMedia.creator);
-                formData.append("ReplacedMedia.Title", this.editedMedia.title);
+                formData.append("Artist", this.editedMedia.artist);
 
                 if (this.editedMedia.file) {
-                    formData.append("ReplacedMedia.File", this.editedMedia.file);
+                    formData.append("File", this.editedMedia.file);
                 }
 
                 if (this.editedMedia.url) {
-                    formData.append("ReplacedMedia.Url", this.editedMedia.url);
+                    formData.append("Url", this.editedMedia.url);
                 }
 
                 this.$emit("edit-media", formData);

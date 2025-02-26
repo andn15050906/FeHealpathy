@@ -79,13 +79,12 @@ export default {
         },
         async createMedia(newMedia) {
             try {
-                const response = await createMediaResource(newMedia);
-                console.log("API Response:", response);
+                await createMediaResource(newMedia);
                 this.showAddMedia = false;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media added successfully!");
             } catch (error) {
-                console.error("Failed to add media:", error);
+                console.error("Failed to add media.");
             }
         },
         async updateMedia(updatedMediaFormData) {

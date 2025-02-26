@@ -1,153 +1,160 @@
 <template>
-    <div class="container-fluid">
-        <div class="content d-flex">
-            <div class="main-content" :class="{ 'main-content--shrinked': libraryStatus }">
-                <MediaDisplay v-if="currentMedia" :current-media="currentMedia" />
-                <MediaPlayer v-if="currentMedia" :current-media="currentMedia" :is-playing="isPlaying"
-                    :media-ref="mediaRef" :media-info="mediaInfo" :media-list="mediaList" @update-media-info="updateMediaInfo"
-                    @toggle-is-playing="toggleIsPlaying" @skip-media="skipMediaHandler" />
-                <MediaLibrary :media-list="mediaList" :current-media-id="currentMedia ? currentMedia.id : null"
-                    @select-media="selectMedia" />
+    <div class="media-player">
+        <div class="time-control">
+            <p class="time-control__current" v-if="mediaInfo">{{ getTime(mediaInfo?.currentTime || 0) }}</p>
+            <div class="track">
+                <div class="track__bar">
+                    <input type="range" min="0" :max="mediaInfo?.duration || 0" 
+                        :value="mediaInfo?.currentTime || 0"
+                        @input="dragHandler" class="track__input" />
+                    <div class="track__animate" :style="trackAnim"></div>
+                </div>
             </div>
+            <p class="time-control__total" v-if="mediaInfo">
+                {{ mediaInfo?.duration ? getTime(mediaInfo.duration) : '00:00' }}
+            </p>
         </div>
-        
-        <component 
-    :is="currentMedia && currentMedia.type === 'video' ? 'video' : 'audio'" 
-    v-if="currentMedia"
-    ref="mediaRef" 
-    :src="currentMedia ? currentMedia.url : ''" 
-    @timeupdate="timeUpdateHandler" 
-    @loadedmetadata="timeUpdateHandler"
-    @ended="handleMediaEnd" 
-    controls 
-/>
-
-            @ended="handleMediaEnd" controls />
     </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted, onUnmounted } from "vue";
-import MediaDisplay from "./MediaDisplay.vue";
-import MediaLibrary from "./MediaLibrary.vue";
-import { getPagedMediaResources } from "../../../scripts/api/services/mediaResourcesService";
 export default {
-    name: "MediaPlayer",
-    components: { MediaDisplay, MediaLibrary },
-    setup() {
-        const mediaList = ref([]);
-        const mediaRef = ref(null);
-        const isPlaying = ref(false);
-        const libraryStatus = ref(false);
-        const currentMedia = ref(null);
-        const mediaInfo = reactive({ currentTime: 0, duration: 0, animationPercentage: 0 });
-        const currentPage = ref(1);
-        const totalPages = ref(1);
-        const isLoading = ref(false);
-        const fetchMedia = async (page) => {
-            isLoading.value = true;
-            try {
-                const params = { Description: "", Artist: "", Title: "", PageIndex: page - 1, PageSize: 10 };
-                const response = await getPagedMediaResources(params);
-                if (response && response.items && response.items.length > 0) {
-                    const newMedia = response.items.map((item) => ({
-                        name: item.title,
-                        artist: item.artist,
-                        url: item.media.url,
-                        type: item.media.type === 1 ? 'audio' : 'video',
-                        id: item.id,
-                        active: false,
-                        duration: 0
-                    }));
-                    if (page === 1) {
-                        mediaList.value = newMedia;
-                        if (newMedia.length > 0) {
-                            newMedia[0].active = true;
-                            currentMedia.value = newMedia[0];
-                            mediaRef.value.src = newMedia[0].url;
-                        }
-                    } else {
-                        mediaList.value = mediaList.value.concat(newMedia);
-                    }
-                    newMedia.forEach((media) => {
-                        const element = document.createElement(media.type);
-                        element.src = media.url;
-                        element.addEventListener("loadedmetadata", () => { media.duration = element.duration; });
-                    });
-                    totalPages.value = response.pageCount || 1;
-                    currentPage.value = page;
-                }
-            } catch (error) {
-                console.error("Failed to fetch media", error);
-            } finally {
-                isLoading.value = false;
+    name: 'MediaPlayer',
+    props: {
+        mediaInfo: {
+            type: Object,
+            required: true,
+            default: () => ({ currentTime: 0, duration: 0 })
+        }
+    },
+    methods: {
+        getTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        },
+    },
+    computed: {
+        trackAnim() {
+            if (!this.mediaInfo || !this.mediaInfo.duration || this.mediaInfo.currentTime < 0) {
+                return { width: "0%" };
             }
-        };
-        onMounted(() => {
-            fetchMedia(1);
-        });
-        const setCurrentMedia = (media) => {
-            currentMedia.value = media;
-            mediaRef.value.src = media.url;
-            mediaList.value.forEach((m) => { m.active = m.id === media.id; });
-        };
-        const updateMediaInfo = (info) => { Object.assign(mediaInfo, info); };
-        const timeUpdateHandler = (e) => {
-            const current = e.target.currentTime;
-            const duration = e.target.duration || 1;
-            updateMediaInfo({ currentTime: current, duration, animationPercentage: (current / duration) * 100 });
-        };
-        const toggleIsPlaying = (status) => {
-            isPlaying.value = status;
-            status ? mediaRef.value.play() : mediaRef.value.pause();
-        };
-        const selectMedia = (media) => {
-            setCurrentMedia(media);
-            if (isPlaying.value) { mediaRef.value.play(); }
-        };
-        const handleMediaEnd = () => { skipMediaHandler("skip-forward"); };
-        const skipMediaHandler = (direction) => {
-            const currentIndex = mediaList.value.findIndex((media) => media.id === currentMedia.value.id);
-            let nextIndex = 0;
-            if (direction === "skip-forward") { nextIndex = (currentIndex + 1) % mediaList.value.length; }
-            else if (direction === "skip-back") { nextIndex = (currentIndex - 1 + mediaList.value.length) % mediaList.value.length; }
-            selectMedia(mediaList.value[nextIndex]);
-        };
-        return {
-            mediaList,
-            mediaRef,
-            isPlaying,
-            libraryStatus,
-            currentMedia,
-            mediaInfo,
-            setCurrentMedia,
-            updateMediaInfo,
-            toggleIsPlaying,
-            timeUpdateHandler,
-            selectMedia,
-            handleMediaEnd,
-            skipMediaHandler
-        };
-    }
+            const percentage = (this.mediaInfo.currentTime / this.mediaInfo.duration) * 100;
+            return { width: `${Math.min(percentage, 100)}%` };
+        },
+    },
 };
 </script>
 
-<style scoped>
-.container-fluid {
-    height: 100%;
-}
 
-.main-content {
+<style scoped>
+.media-player {
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: 1.8rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 16px;
-    flex-grow: 1;
-    transition: margin-left 0.3s ease;
-    margin-left: 0;
 }
 
-.main-content--shrinked {
-    margin-left: 20%;
+.time-control {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.time-control__current,
+.time-control__total {
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+}
+
+.track {
+    width: 100%;
+    height: 0.5rem;
+    background-color: #b7b7b7;
+    border-radius: 0.25rem;
+    margin: 0 1rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.track__bar {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    border-radius: 0.25rem;
+}
+
+.track__input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.track__input:focus {
+    outline: none;
+}
+
+.track__animate {
+    background: linear-gradient(to right, #2ab3bf, #205950);
+    height: 100%;
+    border-radius: 0.25rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transition: width 0.1s ease-in-out;
+}
+
+.play-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 2rem;
+}
+
+.play-control__button {
+    color: #2ab3bf;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.play-control__button:hover {
+    color: #205950;
+}
+
+.play-control__button--play,
+.play-control__button--pause {
+    font-size: 2rem;
+}
+
+.media-display {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.media-display__video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 1rem;
 }
 </style>
