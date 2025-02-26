@@ -2,11 +2,11 @@
     <div class="container-fluid">
         <div class="content d-flex">
             <div class="main-content" :class="{ 'main-content--shrinked': libraryStatus }">
-                <MusicSong v-if="currentSong" :current-song="currentSong" />
-                <MusicPlayer v-if="currentSong" :current-song="currentSong" :is-playing="isPlaying"
+                <MediaDisplay v-if="currentSong" :current-song="currentSong" />
+                <MediaPlayer v-if="currentSong" :current-song="currentSong" :is-playing="isPlaying"
                     :audio-ref="audioRef" :song-info="songInfo" :songs="songs" @update-song-info="updateSongInfo"
                     @toggle-is-playing="toggleIsPlaying" @skip-track="skipTrackHandler" />
-                <MusicLibrary :songs="songs" :current-song-id="currentSong ? currentSong.id : null"
+                <MediaLibrary :songs="songs" :current-song-id="currentSong ? currentSong.id : null"
                     @select-song="selectSong" />
             </div>
         </div>
@@ -17,13 +17,13 @@
 
 <script>
 import { ref, reactive, onMounted, onUnmounted } from "vue";
-import MusicPlayer from "./MusicPlayer.vue";
-import MusicSong from "./MusicSong.vue";
-import MusicLibrary from "./MusicLibrary.vue";
+import MediaPlayer from "./MediaPlayer.vue";
+import MediaLibrary from "./MediaLibrary.vue";
+import MediaDisplay from "./MediaDisplay.vue";
 import { getPagedMediaResources } from "../../../scripts/api/services/mediaResourcesService";
 export default {
     name: "MusicControl",
-    components: { MusicPlayer, MusicSong, MusicLibrary },
+    components: { MediaPlayer, MediaDisplay, MediaLibrary },
     setup() {
         const songs = ref([]);
         const audioRef = ref(null);

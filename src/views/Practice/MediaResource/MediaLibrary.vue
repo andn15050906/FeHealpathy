@@ -1,15 +1,15 @@
 <template>
-    <div class="music-library">
+    <div class="media-library">
         <ul class="library-list">
-            <li v-for="song in songs" :key="song.id" :class="[
+            <li v-for="media in mediaList" :key="media.id" :class="[
                 'library-item',
-                { 'library-item--active': song.active, 'library-item--playing': song.id === currentSongId }
-            ]" @click="selectSong(song)">
+                { 'library-item--active': media.active, 'library-item--playing': media.id === currentMediaId }
+            ]" @click="selectMedia(media)">
                 <div class="library-item__details">
-                    <h4 class="library-item__name">{{ song.name }}</h4>
-                    <p class="library-item__artist">{{ song.artist }}</p>
+                    <h4 class="library-item__name">{{ media.name }}</h4>
+                    <p class="library-item__artist">{{ media.artist }}</p>
                 </div>
-                <p class="library-item__duration">{{ formatTime(song.duration) }}</p>
+                <p class="library-item__duration">{{ formatTime(media.duration) }}</p>
             </li>
         </ul>
     </div>
@@ -17,20 +17,20 @@
 
 <script>
 export default {
-    name: "MusicLibrary",
+    name: "MediaLibrary",
     props: {
-        songs: {
+        mediaList: {
             type: Array,
             required: true,
         },
-        currentSongId: {
+        currentMediaId: {
             type: [String, Number],
             default: null,
         },
     },
     methods: {
-        selectSong(song) {
-            this.$emit("select-song", song);
+        selectMedia(media) {
+            this.$emit("select-media", media);
         },
         formatTime(duration) {
             if (!duration) return "00:00";
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style scoped>
-.music-library {
+.media-library {
     width: 100%;
     margin-top: 10px;
     background-color: #fff;
@@ -103,20 +103,20 @@ export default {
     background-color: #e0f7fa;
 }
 
-.music-library::-webkit-scrollbar {
+.media-library::-webkit-scrollbar {
     width: 8px;
 }
 
-.music-library::-webkit-scrollbar-thumb {
+.media-library::-webkit-scrollbar-thumb {
     background-color: #ccc;
     border-radius: 4px;
 }
 
-.music-library::-webkit-scrollbar-thumb:hover {
+.media-library::-webkit-scrollbar-thumb:hover {
     background-color: #bbb;
 }
 
-.music-library::-webkit-scrollbar-track {
+.media-library::-webkit-scrollbar-track {
     background-color: #f9f9f9;
 }
 </style>

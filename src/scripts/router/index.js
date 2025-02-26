@@ -27,7 +27,9 @@ import Angry from '@/views/Practice/MoodRecording/MoodCart/Angry.vue'
 import Eager from '@/views/Practice/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/Practice/MoodRecording/MoodCart/Anxiety.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment/SelfAssessment.vue'
+import MediaResources from '@/views/Practice/MediaResource/MediaResources.vue'
 import MusicControl from '@/views/Practice/MediaResource/MusicControl.vue'
+import VideoControl from '@/views/Practice/MediaResource/VideoControl.vue'
 import MediaControl from '@/views/Practice/MediaResource/MediaControl.vue'
 
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
@@ -232,8 +234,18 @@ const router = createRouter({
     },
     // Practice - Media Resources
     {
-      path: '/media-library',
+      path: '/media-resources',
+      name: 'MediaResources',
+      component: MediaResources
+    },
+    {
+      path: '/music-library',
       name: 'MusicControl',
+      component: MusicControl
+    },
+    {
+      path: '/video-library',
+      name: 'VideoControl',
       component: MusicControl
     },
     {

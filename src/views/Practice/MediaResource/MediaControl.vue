@@ -1,15 +1,15 @@
 <template>
     <div class="container mt-4">
-        <div v-if="showAddMusic">
-            <AddMusic @cancel="toggleAddMusic" @add-music="createMedia" />
+        <div v-if="showAddMedia">
+            <AddMedia @cancel="toggleAddMedia" @add-media="createMedia" />
         </div>
-        <div v-else-if="showEditMusic">
-            <EditMusic :music="selectedMusic" @cancel="toggleEditMusic" @edit-music="updateMedia" />
+        <div v-else-if="showEditMedia">
+            <EditMedia :media="selectedMedia" @cancel="toggleEditMedia" @edit-media="updateMedia" />
         </div>
         <div v-else>
             <MediaList :mediaFiles="mediaFiles" @edit-media="editMedia" @delete-media="deleteMedia" />
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn btn-primary" @click="toggleAddMusic">
+                <button class="btn btn-primary" @click="toggleAddMedia">
                     <i class="fas fa-plus me-1"></i> Add Media
                 </button>
                 <Pagination :currentPage="currentPage" :totalPages="totalPages" @go-to-page="fetchMediaResources" />
@@ -24,8 +24,8 @@
 import { toast } from "vue3-toastify";
 import MediaList from "../../../components/MediaResourceComponents/MediaList.vue";
 import Pagination from "../../../components/Common/Pagination.vue";
-import AddMusic from "../../../components/MediaResourceComponents/AddMusic.vue";
-import EditMusic from "../../../components/MediaResourceComponents/EditMusic.vue";
+import AddMedia from "../../../components/MediaResourceComponents/AddMedia.vue";
+import EditMedia from "../../../components/MediaResourceComponents/EditMedia.vue";
 import {
     getPagedMediaResources,
     createMediaResource,
@@ -35,16 +35,16 @@ import {
 import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
 
 export default {
-    components: { MediaList, Pagination, AddMusic, EditMusic, DeleteConfirmPopup },
+    components: { MediaList, Pagination, AddMedia, EditMedia, DeleteConfirmPopup },
     data() {
         return {
             mediaFiles: [],
             currentPage: 1,
             totalPages: 1,
-            showAddMusic: false,
-            showEditMusic: false,
-            selectedMusic: null,
-            selectedMusicIndex: null,
+            showAddMedia: false,
+            showEditMedia: false,
+            selectedMedia: null,
+            selectedMediaIndex: null,
             showDeletePopup: false,
             mediaToDelete: null
         };
@@ -70,28 +70,29 @@ export default {
                 toast.error("Failed to fetch media resources.");
             }
         },
-        toggleAddMusic() {
-            this.showAddMusic = !this.showAddMusic;
+        toggleAddMedia() {
+            this.showAddMedia = !this.showAddMedia;
         },
-        toggleEditMusic() {
-            this.showEditMusic = false;
-            this.selectedMusic = null;
+        toggleEditMedia() {
+            this.showEditMedia = false;
+            this.selectedMedia = null;
         },
-        async createMedia(newMusic) {
+        async createMedia(newMedia) {
             try {
-                await createMediaResource(newMusic);
-                this.showAddMusic = false;
+                const response = await createMediaResource(newMedia);
+                console.log("API Response:", response);
+                this.showAddMedia = false;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media added successfully!");
             } catch (error) {
-                toast.error("Failed to add media.");
+                console.error("Failed to add media:", error);
             }
         },
-        async updateMedia(updatedMusicFormData) {
+        async updateMedia(updatedMediaFormData) {
             try {
-                await updateMediaResource(updatedMusicFormData);
-                this.showEditMusic = false;
-                this.selectedMusic = null;
+                await updateMediaResource(updatedMediaFormData);
+                this.showEditMedia = false;
+                this.selectedMedia = null;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media updated successfully!");
             } catch (error) {
@@ -99,9 +100,9 @@ export default {
             }
         },
         editMedia(media, index) {
-            this.selectedMusic = { ...media };
-            this.selectedMusicIndex = index;
-            this.showEditMusic = true;
+            this.selectedMedia = { ...media };
+            this.selectedMediaIndex = index;
+            this.showEditMedia = true;
         },
         deleteMedia(mediaId, index) {
             this.mediaToDelete = { id: mediaId, index: index };
