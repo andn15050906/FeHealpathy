@@ -56,6 +56,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
+import UserActivity from '@/views/Statistics/UserActivity.vue'
 
 //components
 import NotFound from '@/components/Layouts/404.vue'
@@ -70,6 +71,7 @@ import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
 import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
+import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -419,6 +421,16 @@ const router = createRouter({
       component: SubmissionReview,
       props: true,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/statistics/user-activity',
+      name: 'UserActivity',
+      component: UserActivity
+    },
+    {
+      path: '/statistics/self-assessment',
+      name: 'SelfAssessment',
+      component: SelfAssessmentResult
     }
   ]
 })
