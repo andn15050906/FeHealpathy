@@ -246,7 +246,7 @@ const router = createRouter({
     {
       path: '/video-library',
       name: 'VideoControl',
-      component: MusicControl
+      component: VideoControl
     },
     {
       path: '/media/manage',

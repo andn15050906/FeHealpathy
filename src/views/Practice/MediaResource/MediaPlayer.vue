@@ -19,9 +19,9 @@
         <div class="play-control">
             <i @click="skipTrackHandler('skip-back')"
                 class="fas fa-angle-left play-control__button play-control__button--skip-back"></i>
-            <i v-if="!isPlaying" @click="playSongHandler"
+            <i v-if="!isPlaying" @click="playMediaHandler"
                 class="fas fa-play play-control__button play-control__button--play"></i>
-            <i v-else @click="playSongHandler"
+            <i v-else @click="playMediaHandler"
                 class="fas fa-pause play-control__button play-control__button--pause"></i>
             <i @click="skipTrackHandler('skip-forward')"
                 class="fas fa-angle-right play-control__button play-control__button--skip-forward"></i>
@@ -33,7 +33,7 @@
 export default {
     name: 'MediaPlayer',
     props: {
-        currentSong: {
+        currentMedia: {
             type: Object,
             required: true,
         },
@@ -45,7 +45,7 @@ export default {
             type: Object,
             required: true,
         },
-        songs: {
+        medias: {
             type: Array,
             required: true,
         },
@@ -61,7 +61,7 @@ export default {
                 this.audioRef.currentTime = currentTime;
             }
             
-            this.$emit("update-song-info", {
+            this.$emit("update-media-info", {
                 ...this.mediaInfo,
                 currentTime: parseFloat(currentTime),
             });
@@ -73,7 +73,7 @@ export default {
             }
         },
         
-        playSongHandler() {
+        playMediaHandler() {
             if (!this.audioRef) return;
             this.$emit("toggle-is-playing", !this.isPlaying);
         },
