@@ -4,9 +4,9 @@
             <div class="main-content" :class="{ 'main-content--shrinked': libraryStatus }">
                 <MediaDisplay v-if="currentSong" :current-song="currentSong" />
                 <MediaPlayer v-if="currentSong" :current-song="currentSong" :is-playing="isPlaying"
-                    :audio-ref="audioRef" :song-info="songInfo" :songs="songs" @update-song-info="updateSongInfo"
+                    :audio-ref="audioRef" :media-info="songInfo" :songs="songs" @update-song-info="updateSongInfo"
                     @toggle-is-playing="toggleIsPlaying" @skip-track="skipTrackHandler" />
-                <MediaLibrary :media-list="songs" :current-song-id="currentSong ? currentSong.id : null"
+                <MediaLibrary :songs="songs" :media-list="songs" :current-song-id="currentSong ? currentSong.id : null"
                     @select-song="selectSong" />
             </div>
         </div>
