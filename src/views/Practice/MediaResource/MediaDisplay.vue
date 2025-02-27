@@ -11,7 +11,6 @@
         <p>No media selected</p>
     </div>
 </template>
-
 <script>
 export default {
     name: "MediaDisplay",

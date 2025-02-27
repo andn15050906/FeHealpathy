@@ -2,16 +2,16 @@
     <div class="container-fluid">
         <div class="content d-flex">
             <div class="main-content" :class="{ 'main-content--shrinked': libraryStatus }">
-                <MediaDisplay v-if="currentSong" :current-song="currentSong" />
-                <MediaPlayer v-if="currentSong" :current-song="currentSong" :is-playing="isPlaying"
-                    :audio-ref="audioRef" :song-info="songInfo" :songs="songs" @update-song-info="updateSongInfo"
+                <MediaDisplay v-if="currentMedia" :current-media="currentMedia" />
+                <MediaPlayer v-if="currentMedia" :current-media="currentMedia" :is-playing="isPlaying"
+                    :audio-ref="audioRef" :media-info="mediaInfo" :medias="medias" @update-media-info="updatemediaInfo"
                     @toggle-is-playing="toggleIsPlaying" @skip-track="skipTrackHandler" />
-                <MediaLibrary :media-list="songs" :current-song-id="currentSong ? currentSong.id : null"
-                    @select-song="selectSong" />
+                <MediaLibrary :medias="medias" :media-list="medias" :current-media-id="currentMedia ? currentMedia.id : null"
+                    @select-media="selectMedia" />
             </div>
         </div>
         <audio ref="audioRef" @timeupdate="timeUpdateHandler" @loadedmetadata="timeUpdateHandler"
-            @ended="handleSongEnd" />
+            @ended="handlemediaEnd" />
     </div>
 </template>
 
@@ -25,12 +25,12 @@ export default {
     name: "MusicControl",
     components: { MediaPlayer, MediaDisplay, MediaLibrary },
     setup() {
-        const songs = ref([]);
+        const medias = ref([]);
         const audioRef = ref(null);
         const isPlaying = ref(false);
         const libraryStatus = ref(false);
-        const currentSong = ref(null);
-        const songInfo = reactive({ currentTime: 0, duration: 0, animationPercentage: 0 });
+        const currentMedia = ref(null);
+        const mediaInfo = reactive({ currentTime: 0, duration: 0, animationPercentage: 0 });
         const currentPage = ref(1);
         const totalPages = ref(1);
         const isLoading = ref(false);
@@ -40,7 +40,7 @@ export default {
                 const params = { Description: "", Artist: "", Title: "", Type: 1, PageIndex: page - 1, PageSize: 10 };
                 const response = await getPagedMediaResources(params);
                 if (response && response.items && response.items.length > 0) {
-                    const newSongs = response.items.map((item) => ({
+                    const newmedias = response.items.map((item) => ({
                         name: item.title,
                         artist: item.artist,
                         audio: item.media.url,
@@ -49,24 +49,24 @@ export default {
                         duration: 0
                     }));
                     if (page === 1) {
-                        songs.value = newSongs;
-                        if (newSongs.length > 0) {
-                            newSongs[0].active = true;
-                            currentSong.value = newSongs[0];
-                            audioRef.value.src = newSongs[0].audio;
+                        medias.value = newmedias;
+                        if (newmedias.length > 0) {
+                            newmedias[0].active = true;
+                            currentMedia.value = newmedias[0];
+                            audioRef.value.src = newmedias[0].audio;
                         }
                     } else {
-                        songs.value = songs.value.concat(newSongs);
+                        medias.value = medias.value.concat(newmedias);
                     }
-                    newSongs.forEach((song) => {
-                        const audio = new Audio(song.audio);
-                        audio.addEventListener("loadedmetadata", () => { song.duration = audio.duration; });
+                    newmedias.forEach((media) => {
+                        const audio = new Audio(media.audio);
+                        audio.addEventListener("loadedmetadata", () => { media.duration = audio.duration; });
                     });
                     totalPages.value = response.pageCount || 1;
                     currentPage.value = page;
                 }
             } catch (error) {
-                console.error("Failed to fetch songs", error);
+                console.error("Failed to fetch medias", error);
             } finally {
                 isLoading.value = false;
             }
@@ -85,46 +85,46 @@ export default {
         onUnmounted(() => {
             window.removeEventListener("scroll", handleScroll);
         });
-        const setCurrentSong = (song) => {
-            currentSong.value = song;
-            audioRef.value.src = song.audio;
-            songs.value.forEach((s) => { s.active = s.id === song.id; });
+        const setCurrentMedia = (media) => {
+            currentMedia.value = media;
+            audioRef.value.src = media.audio;
+            medias.value.forEach((s) => { s.active = s.id === media.id; });
         };
-        const updateSongInfo = (info) => { Object.assign(songInfo, info); };
+        const updatemediaInfo = (info) => { Object.assign(mediaInfo, info); };
         const timeUpdateHandler = (e) => {
             const current = e.target.currentTime;
             const duration = e.target.duration || 1;
-            updateSongInfo({ currentTime: current, duration, animationPercentage: (current / duration) * 100 });
+            updatemediaInfo({ currentTime: current, duration, animationPercentage: (current / duration) * 100 });
         };
         const toggleIsPlaying = (status) => {
             isPlaying.value = status;
             status ? audioRef.value.play() : audioRef.value.pause();
         };
-        const selectSong = (song) => {
-            setCurrentSong(song);
+        const selectMedia = (media) => {
+            setCurrentMedia(media);
             if (isPlaying.value) { audioRef.value.play(); }
         };
-        const handleSongEnd = () => { skipTrackHandler("skip-forward"); };
+        const handlemediaEnd = () => { skipTrackHandler("skip-forward"); };
         const skipTrackHandler = (direction) => {
-            const currentIndex = songs.value.findIndex((song) => song.id === currentSong.value.id);
+            const currentIndex = medias.value.findIndex((media) => media.id === currentMedia.value.id);
             let nextIndex = 0;
-            if (direction === "skip-forward") { nextIndex = (currentIndex + 1) % songs.value.length; }
-            else if (direction === "skip-back") { nextIndex = (currentIndex - 1 + songs.value.length) % songs.value.length; }
-            selectSong(songs.value[nextIndex]);
+            if (direction === "skip-forward") { nextIndex = (currentIndex + 1) % medias.value.length; }
+            else if (direction === "skip-back") { nextIndex = (currentIndex - 1 + medias.value.length) % medias.value.length; }
+            selectMedia(medias.value[nextIndex]);
         };
         return {
-            songs,
+            medias,
             audioRef,
             isPlaying,
             libraryStatus,
-            currentSong,
-            songInfo,
-            setCurrentSong,
-            updateSongInfo,
+            currentMedia,
+            mediaInfo,
+            setCurrentMedia,
+            updatemediaInfo,
             toggleIsPlaying,
             timeUpdateHandler,
-            selectSong,
-            handleSongEnd,
+            selectMedia,
+            handlemediaEnd,
             skipTrackHandler
         };
     }

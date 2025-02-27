@@ -6,13 +6,25 @@
                 <div class="track__bar">
                     <input type="range" min="0" :max="mediaInfo?.duration || 0" 
                         :value="mediaInfo?.currentTime || 0"
-                        @input="dragHandler" class="track__input" />
+                        @input="dragHandler" 
+                        @change="updateCurrentTime"
+                        class="track__input" />
                     <div class="track__animate" :style="trackAnim"></div>
                 </div>
             </div>
             <p class="time-control__total" v-if="mediaInfo">
                 {{ mediaInfo?.duration ? getTime(mediaInfo.duration) : '00:00' }}
             </p>
+        </div>
+        <div class="play-control">
+            <i @click="skipTrackHandler('skip-back')"
+                class="fas fa-angle-left play-control__button play-control__button--skip-back"></i>
+            <i v-if="!isPlaying" @click="playMediaHandler"
+                class="fas fa-play play-control__button play-control__button--play"></i>
+            <i v-else @click="playMediaHandler"
+                class="fas fa-pause play-control__button play-control__button--pause"></i>
+            <i @click="skipTrackHandler('skip-forward')"
+                class="fas fa-angle-right play-control__button play-control__button--skip-forward"></i>
         </div>
     </div>
 </template>
@@ -21,17 +33,59 @@
 export default {
     name: 'MediaPlayer',
     props: {
+        currentMedia: {
+            type: Object,
+            required: true,
+        },
+        isPlaying: {
+            type: Boolean,
+            required: true,
+        },
+        audioRef: {
+            type: Object,
+            required: true,
+        },
+        medias: {
+            type: Array,
+            required: true,
+        },
         mediaInfo: {
             type: Object,
             required: true,
-            default: () => ({ currentTime: 0, duration: 0 })
         }
     },
     methods: {
+        dragHandler(e) {
+            const currentTime = e.target.value;
+            if (this.audioRef) {
+                this.audioRef.currentTime = currentTime;
+            }
+            
+            this.$emit("update-media-info", {
+                ...this.mediaInfo,
+                currentTime: parseFloat(currentTime),
+            });
+        },
+        
+        updateCurrentTime(e) {
+            if (this.audioRef) {
+                this.audioRef.currentTime = parseFloat(e.target.value);
+            }
+        },
+        
+        playMediaHandler() {
+            if (!this.audioRef) return;
+            this.$emit("toggle-is-playing", !this.isPlaying);
+        },
+
         getTime(time) {
             const minutes = Math.floor(time / 60);
             const seconds = Math.floor(time % 60);
             return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        },
+
+        skipTrackHandler(direction) {
+            this.$emit("skip-track", direction);
         },
     },
     computed: {
