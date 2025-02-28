@@ -74,6 +74,7 @@ import PhysicalRoadmap from '@/views/Profile/Preferences/PhysicalRoadmap.vue'
 import StrictPhysicalRoadmap from '@/views/Profile/Preferences/StrictPhysicalRoadmap.vue'
 import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
 import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
+import Roadmaps from '@/views/Profile/Preferences/Roadmaps.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -440,6 +441,11 @@ const router = createRouter({
       path: '/strict-skill-roadmap',
       name: 'StrictSkillRoadmap',
       component: StrictSkillRoadmap
+    },
+    {
+      path: '/roadmaps',
+      name: 'Roadmaps',
+      component: Roadmaps
     }
 
   ]
