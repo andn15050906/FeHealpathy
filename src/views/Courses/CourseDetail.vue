@@ -58,7 +58,8 @@ export default {
 
     const course = ref({
       title: "Mastering Vue.js",
-      thumbUrl: "https://images.viblo.asia/94f4ac67-bebd-4d2e-9a39-2562525e74c3.jpeg",
+      thumbUrl:
+        "https://images.viblo.asia/94f4ac67-bebd-4d2e-9a39-2562525e74c3.jpeg",
       intro: "Learn Vue.js from beginner to advanced level.",
       description: "This course covers Vue 3, Vuex, Vue Router, and more.",
       price: 100,
@@ -75,49 +76,56 @@ export default {
         title: "Introduction to Vue",
         contentSummary: "Overview of Vue.js basics.",
         isPreviewable: true,
-        thumbUrl: "https://i.pinimg.com/550x/3a/69/ae/3a69ae3942d4a9da6c3cbc93b1c8f051.jpg",
+        thumbUrl:
+          "https://i.pinimg.com/550x/3a/69/ae/3a69ae3942d4a9da6c3cbc93b1c8f051.jpg",
       },
       {
         id: "lec2",
         title: "Vue Directives",
         contentSummary: "Learn v-bind, v-model, v-for.",
         isPreviewable: false,
-        thumbUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw50TxlxMp7fLYQfMbioTa6Vg7kJGKtFzibg&s",
+        thumbUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw50TxlxMp7fLYQfMbioTa6Vg7kJGKtFzibg&s",
       },
       {
         id: "lec3",
         title: "Vue Router",
         contentSummary: "How to set up routing in Vue.js.",
         isPreviewable: false,
-        thumbUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3zAUnS60PEt8CuYQkOzpNjZ-XeMW3liGkmg&s",
+        thumbUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3zAUnS60PEt8CuYQkOzpNjZ-XeMW3liGkmg&s",
       },
       {
         id: "lec4",
         title: "Vue State Management",
         contentSummary: "Understanding Vuex and Pinia.",
         isPreviewable: false,
-        thumbUrl: "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/02/y-nghia-cua-cac-icon-4.jpg",
+        thumbUrl:
+          "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/02/y-nghia-cua-cac-icon-4.jpg",
       },
       {
         id: "lec5",
         title: "Vue Composition API",
         contentSummary: "Using setup() and refs in Vue.",
         isPreviewable: true,
-        thumbUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL7_seRTRheWJpPnFCoOkAjxYrZz94HBgHx6av0_3e-YyBehej7q43akXypOG2wVakOPI&usqp=CAU",
+        thumbUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL7_seRTRheWJpPnFCoOkAjxYrZz94HBgHx6av0_3e-YyBehej7q43akXypOG2wVakOPI&usqp=CAU",
       },
       {
         id: "lec6",
         title: "Vue Composition API",
         contentSummary: "Using setup() and refs in Vue.",
         isPreviewable: true,
-        thumbUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRgMDpEX0wRun92n0LC79Cfyh8coqsamDUO_1f_wtD4miwDBDX4VwmcWJa1pzK99rxX5Y&usqp=CAU",
+        thumbUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRgMDpEX0wRun92n0LC79Cfyh8coqsamDUO_1f_wtD4miwDBDX4VwmcWJa1pzK99rxX5Y&usqp=CAU",
       },
       {
         id: "lec7",
         title: "Vue Composition API",
         contentSummary: "Using setup() and refs in Vue.",
         isPreviewable: true,
-        thumbUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ92FLxyclItwi4Ydx0BPndu9WAJNNaWM_9ikVo-JQXy61loR8Y86AGRGTCcuNi7pTNGe4&usqp=CAU",
+        thumbUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ92FLxyclItwi4Ydx0BPndu9WAJNNaWM_9ikVo-JQXy61loR8Y86AGRGTCcuNi7pTNGe4&usqp=CAU",
       },
     ]);
 
@@ -136,8 +144,9 @@ export default {
         : "N/A";
     });
 
-    const viewLecture = (lectureId) => {
-      router.push(`/lecture/${lectureId}`);
+    //Fix tạm UI, khi implement cần sửa lại để view lecture by id
+    const viewLecture = () => {
+      router.push("/lectures-detail");
     };
 
     return {
