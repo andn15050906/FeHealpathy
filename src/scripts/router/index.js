@@ -74,6 +74,7 @@ import Request from '@/views/Profile/Advisor/Request.vue'
 import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
 import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
+import CourseDetail from '@/views/Courses/CourseDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -327,6 +328,12 @@ const router = createRouter({
       path: '/courses/update',
       name: 'updateCourse',
       component: UpdateCourse,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/courses-detail',
+      name: 'courseDetail',
+      component: CourseDetail,
       meta: { requiresAuth: true }
     },
     /* /:id */
