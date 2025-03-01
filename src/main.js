@@ -4,6 +4,7 @@ import { createI18n } from "vue-i18n";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+import { VStepperVertical, VStepperVerticalItem } from 'vuetify/labs/VStepperVertical';
 import { createPinia } from "pinia";
 import { toast } from "vue3-toastify";
 import VueFroala from "vue-froala-wysiwyg";
@@ -13,6 +14,7 @@ import VueTour from "vue3-tour";
 import "vuestic-ui/css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "vuetify/styles";
+import '@mdi/font/css/materialdesignicons.css';
 import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "vue3-toastify/dist/index.css";
@@ -32,7 +34,10 @@ const i18n = createI18n({
 
 // Cấu hình Vuetify
 const vuetify = createVuetify({
-  components,
+  components: {
+    ...components,
+    VStepperVertical, VStepperVerticalItem
+  },
   directives,
   theme: {
     defaultTheme: "light",

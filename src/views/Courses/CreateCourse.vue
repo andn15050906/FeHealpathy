@@ -25,15 +25,26 @@
       </div>
 
       <div class="form-group">
-        <label for="image">🖼️ Course Image</label>
+        <label for="description">📝 Course Description</label>
+        <textarea
+          id="description"
+          v-model="course.description"
+          placeholder="Detailed course description"
+          rows="5"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="thumb">🖼️ Course Thumbnail</label>
         <input
           type="file"
-          id="image"
+          id="thumb"
           @change="handleImageUpload"
           accept="image/*"
         />
         <div v-if="previewImage" class="image-preview">
-          <img :src="previewImage" alt="Course Image" />
+          <img :src="previewImage" alt="Course Thumbnail" />
         </div>
       </div>
 
@@ -41,7 +52,7 @@
         <label for="category">📂 Course Category</label>
         <select
           id="category"
-          v-model="course.category"
+          v-model="course.leafCategoryId"
           required
           class="category-select"
         >
@@ -49,9 +60,9 @@
           <option
             v-for="(category, index) in availableCategories"
             :key="index"
-            :value="category"
+            :value="category.id"
           >
-            {{ category }}
+            {{ category.name }}
           </option>
         </select>
       </div>
@@ -62,118 +73,122 @@
           type="number"
           id="price"
           v-model="course.price"
-          placeholder="Enter course price (in VND)"
+          placeholder="Enter price (VND)"
           min="0"
           required
         />
       </div>
 
-      <div class="sections">
-        <h2>📚 Sections</h2>
+      <div class="form-group">
+        <label for="level">📈 Course Level</label>
+        <select id="level" v-model="course.level" required>
+          <option value="" disabled>Select level</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="outcomes">🏆 Course Outcomes</label>
+        <textarea
+          id="outcomes"
+          v-model="course.outcomes"
+          placeholder="Expected learning outcomes"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="requirements">📌 Course Requirements</label>
+        <textarea
+          id="requirements"
+          v-model="course.requirements"
+          placeholder="Course prerequisites"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Course Lectures -->
+      <div class="lectures">
+        <h2>📚 Course Lectures</h2>
         <div
-          class="section"
-          v-for="(section, index) in course.sections"
+          class="lecture"
+          v-for="(lecture, index) in course.lectures"
           :key="index"
         >
           <div class="form-group">
-            <label>📌 Section Title {{ index + 1 }}</label>
+            <label>📌 Lecture Title {{ index + 1 }}</label>
             <input
               type="text"
-              v-model="section.title"
-              placeholder="Insert section title"
+              v-model="lecture.title"
+              placeholder="Lecture title"
               required
             />
           </div>
 
           <div class="form-group">
-            <label>📄 Section Summary {{ index + 1 }}</label>
+            <label>📄 Lecture Content</label>
             <textarea
-              v-model="section.summary"
-              placeholder="Write a short summary for this section"
-              rows="2"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>
-            <input type="checkbox" v-model="section.isPreviewable" id="previewable-checkbox" />
-            <span class="custom-checkbox"></span> Is Previewable
-          </label>
-          </div>
-
-          <div class="form-group">
-            <label>📂 Add Resources for Section {{ index + 1 }}</label>
-            <input
-              type="file"
-              @change="handleResourceUpload($event, index)"
-              accept="image/*,video/*"
-              multiple
-            />
-            <div v-if="section.resources.length > 0" class="resource-preview">
-              <div
-                v-for="(resource, resIndex) in section.resources"
-                :key="resIndex"
-                class="single-resource"
-              >
-                <template v-if="resource.type === 'image'">
-                  <img :src="resource.preview" alt="Resource Image" />
-                </template>
-                <template v-else-if="resource.type === 'video'">
-                  <video controls :src="resource.preview" width="100%"></video>
-                </template>
-                <button
-                  type="button"
-                  class="btn remove"
-                  @click="removeResource(index, resIndex)"
-                >
-                  ❌ Remove Resource
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>✏️ Section Content {{ index + 1 }}</label>
-            <textarea
-              v-model="section.content"
-              placeholder="Insert section content"
+              v-model="lecture.content"
+              placeholder="Lecture content"
               rows="4"
               required
             ></textarea>
           </div>
 
-          <!-- <div class="form-group">
-         <label>📂 Quiz File (JSON) - Optional</label>
-          <input
-          type="file"
-          @change="handleQuizUpload($event, index)"
-          accept="application/json"
-        />
-        <div v-if="section.quiz" class="quiz-preview">
-          <p>📄 Quiz Loaded: {{ section.quiz.name }}</p>
-          <button
-      type="button"
-      class="btn remove-quiz"
-      @click="removeQuiz(index)"
-          >
-          ❌ Remove Quiz
-          </button>
-        </div>
-      </div> -->
+          <div class="form-group">
+            <label>
+              <input type="checkbox" v-model="lecture.isPreviewable" />
+              <span class="custom-checkbox"></span> Is Previewable
+            </label>
+          </div>
 
-          <button
-            type="button"
-            class="btn remove"
-            style="margin-top: 20px;"
-            @click="removeSection(index)"
+          <div class="form-group">
+            <label>📂 Upload Lecture Materials</label>
+            <input
+              type="file"
+              @change="handleLectureMediaUpload($event, index)"
+              accept="image/*,video/*,application/pdf"
+              multiple
+            />
+            <div v-if="lecture.medias.length > 0" class="resource-preview">
+              <div
+                v-for="(media, mediaIndex) in lecture.medias"
+                :key="mediaIndex"
+                class="single-resource"
+              >
+                <img
+                  v-if="media.type === 'image'"
+                  :src="media.preview"
+                  alt="Lecture Image"
+                />
+                <video
+                  v-else-if="media.type === 'video'"
+                  controls
+                  :src="media.preview"
+                ></video>
+                <a v-else :href="media.url" target="_blank">{{
+                  media.title
+                }}</a>
+                <button
+                  type="button"
+                  class="btn remove"
+                  @click="removeLectureMedia(index, mediaIndex)"
+                  >❌ Remove</button
+                >
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn remove" @click="removeLecture(index)"
+            >❌ Remove Lecture</button
           >
-            ❌ Delete Section
-          </button>
           <div class="divider"></div>
         </div>
-        <button type="button" class="btn add" @click="addSection">
-          ➕ Add Section
-        </button>
+        <button type="button" class="btn add" @click="addLecture"
+          >➕ Add Lecture</button
+        >
       </div>
 
       <div class="form-actions">
@@ -182,234 +197,225 @@
     </form>
   </div>
 </template>
-  
-  <script>
-  import Multiselect from 'vue-multiselect';
-  import 'vue-multiselect/dist/vue-multiselect.min.css';
-  export default {
-    name: "CourseCreation",
-    components: {
-    Multiselect,
-  },
-    data() {
-      return {
-        course: {
-          title: "",
-          keywords: "",
-          image: null,
-          category: "",
-          description: "",
-          price: "",
-          sections: [],
-          //quiz: null,
-        },
-        previewImage: null,
-        selectedKeywords: [],
-        availableCategories: [
-      "Yoga",
-      "Sức khỏe",
-      "Thiền",
-      "Giảm căng thẳng",
-      "Thể chất",
-      "Meditation",
-        ],
-      };
-    },
-    methods: {
-        handleResourceUpload(event, sectionIndex) {
-    const files = Array.from(event.target.files);
-    files.forEach((file) => {
-      const fileType = file.type.startsWith("image") ? "image" : "video";
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.course.sections[sectionIndex].resources.push({
-          type: fileType,
-          file: file,
-          preview: e.target.result,
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-  },
-  removeResource(sectionIndex, resourceIndex) {
-    this.course.sections[sectionIndex].resources.splice(resourceIndex, 1);
-  },
 
-      addSection() {
-        this.course.sections.push({
-          title: "",
-          image: null,
-          previewImage: null,
-          content: "",
-          resources: [],
-        });
+<script>
+export default {
+  name: "CreateCourse",
+  data() {
+    return {
+      course: {
+        title: "",
+        intro: "",
+        description: "",
+        price: 0,
+        level: "",
+        outcomes: "",
+        requirements: "",
+        thumb: { url: "", file: null, title: "" },
+        leafCategoryId: "",
+        lectures: [],
       },
-      handleSectionImageUpload(event, index) {
-        const file = event.target.files[0];
-        if (file) {
-          this.course.sections[index].image = file;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.$set(this.course.sections[index], "previewImage", e.target.result);
-          };
-          reader.readAsDataURL(file);
-        }
-      },
-      removeSection(index) {
-        this.course.sections.splice(index, 1);
-      },
-      submitCourse() {
-        if (!this.course.title) {
-          alert("Vui lòng nhập tiêu đề course!");
-          return;
-        }
-        if (!this.course.category) {
-        alert("Vui lòng chọn danh mục cho course!");
-        return;
-        }
-        if (this.course.price <= 0) {
-            alert("Please insert price correctly!");
-            return;
-  }
-      this.resetForm();
-      },
-      resetForm() {
-        this.course = {
-          title: "",
-          image: null,
-          sections: [],
+      previewImage: null,
+      availableCategories: [
+        { id: "1", name: "Yoga" },
+        { id: "2", name: "Meditation" },
+        { id: "3", name: "Health & Wellness" },
+      ],
+    };
+  },
+  methods: {
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.course.thumb.file = file;
+        this.course.thumb.title = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.previewImage = e.target.result;
         };
-        this.selectedKeywords = [];
-        this.previewImage = null;
-      },
-  //     handleQuizUpload(event, index) {
-  //   const file = event.target.files[0];
-  //   if (file && file.type === "application/json") {
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       try {
-  //         const quizData = JSON.parse(e.target.result);
-  //         this.$set(this.course.sections[index], "quiz", {
-  //           name: file.name,
-  //           data: quizData,
-  //         });
-  //       } catch (error) {
-  //         alert("Tệp JSON không hợp lệ!");
-  //       }
-  //     };
-  //     reader.readAsText(file);
-  //   } else {
-  //     alert("Vui lòng tải lên một tệp JSON!");
-  //   }
-  // },
-  removeQuiz(index) {
-    this.course.sections[index].quiz = null;
-  },
-
+        reader.readAsDataURL(file);
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .course-creation {
-    max-width: 800px;
-    margin: 20px auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-  }
-  
-  .title {
-    text-align: center;
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    color: #555;
-  }
-  
-  .form-group input,
-  textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  textarea {
-    resize: none;
-  }
-  
-  .image-preview img {
-    width: 100%;
-    max-width: 200px;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-  
-  .sections {
-    margin-top: 20px;
-  }
-  
-  .section {
-    background: #fafafa;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .divider {
-    border-top: 1px dashed #ddd;
-    margin: 15px 0;
-  }
-  
-  .btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  
-  .btn.add {
-    background: #007bff;
-    color: white;
-    display: block;
-    margin: 0 auto;
-  }
-  
-  .btn.remove {
-    background: #ff6868;
-    color: white;
-  }
-  
-  .btn.submit {
-    margin-top: 20px;
-    background: #28a745;
-    color: white;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .btn:hover {
-    opacity: 0.9;
-  }
-  .multiselect {
+    handleLectureMediaUpload(event, lectureIndex) {
+      const files = Array.from(event.target.files);
+      files.forEach((file) => {
+        const fileType = file.type.startsWith("image")
+          ? "image"
+          : file.type.startsWith("video")
+          ? "video"
+          : "document";
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.course.lectures[lectureIndex].medias.push({
+            type: fileType,
+            file: file,
+            preview: e.target.result,
+            url: "",
+            title: file.name,
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    addLecture() {
+      this.course.lectures.push({
+        title: "",
+        content: "",
+        isPreviewable: false,
+        medias: [],
+      });
+    },
+    removeLecture(index) {
+      this.course.lectures.splice(index, 1);
+    },
+    removeLectureMedia(lectureIndex, mediaIndex) {
+      this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
+    },
+    submitCourse() {
+      console.log("Submitting course:", this.course);
+      alert("Course created successfully!");
+      this.resetForm();
+    },
+    resetForm() {
+      this.course = {
+        title: "",
+        intro: "",
+        description: "",
+        price: 0,
+        level: "",
+        outcomes: "",
+        requirements: "",
+        thumb: { url: "", file: null, title: "" },
+        leafCategoryId: "",
+        lectures: [],
+      };
+      this.previewImage = null;
+    },
+
+    //     handleQuizUpload(event, index) {
+    //   const file = event.target.files[0];
+    //   if (file && file.type === "application/json") {
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => {
+    //       try {
+    //         const quizData = JSON.parse(e.target.result);
+    //         this.$set(this.course.sections[index], "quiz", {
+    //           name: file.name,
+    //           data: quizData,
+    //         });
+    //       } catch (error) {
+    //         alert("Tệp JSON không hợp lệ!");
+    //       }
+    //     };
+    //     reader.readAsText(file);
+    //   } else {
+    //     alert("Vui lòng tải lên một tệp JSON!");
+    //   }
+    // },
+  },
+};
+</script>
+
+<style scoped>
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+}
+
+.course-creation {
+  max-width: 800px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+textarea {
+  resize: none;
+}
+
+.image-preview img {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.sections {
+  margin-top: 20px;
+}
+
+.section {
+  background: #fafafa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.divider {
+  border-top: 1px dashed #ddd;
+  margin: 15px 0;
+}
+
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.btn.add {
+  background: #007bff;
+  color: white;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn.remove {
+  background: #ff6868;
+  color: white;
+}
+
+.btn.submit {
+  margin-top: 20px;
+  background: #28a745;
+  color: white;
+  width: 100%;
+  text-align: center;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+.multiselect {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
@@ -550,5 +556,4 @@ input[type="checkbox"]:checked + .custom-checkbox {
 input[type="checkbox"]:checked + .custom-checkbox::after {
   transform: translateX(20px);
 }
-  </style>
-  
+</style>

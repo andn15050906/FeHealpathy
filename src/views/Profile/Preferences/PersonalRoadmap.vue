@@ -14,6 +14,10 @@
     </div>
 
     <Roadmap :timelineItems="timelineItems"></Roadmap>
+    <div class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
+        <GlowingButton v-if="nextScreenCallback" @click="nextScreenCallback"
+            primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ data.nextScreen }}</GlowingButton>
+    </div>
 </template>
 
 <script>
@@ -27,6 +31,63 @@ export default {
             type: Boolean,
             default: true
         }
+<script setup>
+import Roadmap from '@/components/PracticeComponents/Roadmap.vue'
+import GlowingButton from '@/components/Common/GlowingButton.vue';
+
+const props = defineProps({
+    nextScreenCallback: {
+        type: Function,
+        required: false
+    }
+});
+
+var data = {
+    nextScreen: "Next"
+}
+
+const timelineItems = [
+    {
+        color: 'red-lighten-2',
+        icon: 'mdi-star',
+        title: 'Treatment Planning',
+        // Prioritize issues to address based on their impact on your life.
+        // Gain knowledge about your specific mental health concerns.
+        // Discuss how CBT has helped others with similar issues.
+        content: 'Utilize Case Conceptualization framework to make initial assessment. It is quite frequent to address automatic thoughts and intermediate beliefs as foci of treatment, while addressing core beliefs is often difficult.',
+        link: '/practice',
+        linkTitle: 'Find out more!'
+    },
+    {
+        color: 'purple-lighten-2',
+        icon: 'mdi-book-variant',
+        title: 'Goal Setting',
+        // Collaboratively set clear, measurable, and realistic goals for therapy.
+        content: "Goal setting is the process of collaboratively identifying specific therapeutic outcomes for treatment. Goals must be observable, measurable and achievable and relate to cognitive or behavioral changes relevant to the patient's presenting problem",
+        link: '/practice',
+        linkTitle: 'Find out more!'
+    },
+    {
+        color: 'green-lighten-1',
+        icon: 'mdi-airballoon',
+        title: 'Relaxation',
+        //Practice relaxation techniques such as deep breathing and mindfulness.
+        //Identify activities that bring joy or a sense of accomplishment.
+        //Gradually incorporate these activities into your routine to improve mood.
+        content: "Relaxation techniques are important for brief therapy. Some people respond to physical procedures (e.g., muscle relaxation and/or deep breathing), while others respond favorably to guided imagery",
+        link: '/practice',
+        linkTitle: 'Find out more!'
+    },
+    {
+        color: 'indigo-lighten-2',
+        icon: 'mdi-layers-triple',
+        title: 'Behavioral Activation',
+        //Keep a journal to track negative thoughts and their triggers.
+        //Challenge and reframe negative thoughts using evidence-based techniques.
+        //Replace distorted thoughts with more balanced, realistic ones.
+        content: "Make use of practice tools and monitor progress in mood, mastery and confidence",
+        link: '/groups',
+        linkTitle: 'Find out more!'
     },
     data() {
         return {

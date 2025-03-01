@@ -177,8 +177,13 @@ generateUUID() {
     return v.toString(16);
   });
 },
+formattedContent(text) {
+    if (!text) return "";
+    return text.replace(/\n/g, "<br>"); // Chuyển đổi xuống dòng thành <br>
+  },
   },
 };
+
 </script>
 
   

@@ -1,24 +1,27 @@
 <template>
-    <div class="music-player">
+    <div class="media-player">
         <div class="time-control">
-            <p class="time-control__current">{{ getTime(songInfo.currentTime) }}</p>
+            <p class="time-control__current" v-if="mediaInfo">{{ getTime(mediaInfo?.currentTime || 0) }}</p>
             <div class="track">
                 <div class="track__bar">
-                    <input type="range" min="0" :max="songInfo.duration || 0" :value="songInfo.currentTime"
-                        @input="dragHandler" class="track__input" />
+                    <input type="range" min="0" :max="mediaInfo?.duration || 0" 
+                        :value="mediaInfo?.currentTime || 0"
+                        @input="dragHandler" 
+                        @change="updateCurrentTime"
+                        class="track__input" />
                     <div class="track__animate" :style="trackAnim"></div>
                 </div>
             </div>
-            <p class="time-control__total">
-                {{ songInfo.duration ? getTime(songInfo.duration) : '00:00' }}
+            <p class="time-control__total" v-if="mediaInfo">
+                {{ mediaInfo?.duration ? getTime(mediaInfo.duration) : '00:00' }}
             </p>
         </div>
         <div class="play-control">
             <i @click="skipTrackHandler('skip-back')"
                 class="fas fa-angle-left play-control__button play-control__button--skip-back"></i>
-            <i v-if="!isPlaying" @click="playSongHandler"
+            <i v-if="!isPlaying" @click="playMediaHandler"
                 class="fas fa-play play-control__button play-control__button--play"></i>
-            <i v-else @click="playSongHandler"
+            <i v-else @click="playMediaHandler"
                 class="fas fa-pause play-control__button play-control__button--pause"></i>
             <i @click="skipTrackHandler('skip-forward')"
                 class="fas fa-angle-right play-control__button play-control__button--skip-forward"></i>
@@ -28,9 +31,9 @@
 
 <script>
 export default {
-    name: 'MusicPlayer',
+    name: 'MediaPlayer',
     props: {
-        currentSong: {
+        currentMedia: {
             type: Object,
             required: true,
         },
@@ -42,26 +45,36 @@ export default {
             type: Object,
             required: true,
         },
-        songInfo: {
-            type: Object,
-            required: true,
-        },
-        songs: {
+        medias: {
             type: Array,
             required: true,
         },
+        mediaInfo: {
+            type: Object,
+            required: true,
+        }
     },
     methods: {
         dragHandler(e) {
             const currentTime = e.target.value;
-            this.audioRef.currentTime = currentTime;
-
-            this.$emit("update-song-info", {
-                ...this.songInfo,
+            if (this.audioRef) {
+                this.audioRef.currentTime = currentTime;
+            }
+            
+            this.$emit("update-media-info", {
+                ...this.mediaInfo,
                 currentTime: parseFloat(currentTime),
             });
         },
-        playSongHandler() {
+        
+        updateCurrentTime(e) {
+            if (this.audioRef) {
+                this.audioRef.currentTime = parseFloat(e.target.value);
+            }
+        },
+        
+        playMediaHandler() {
+            if (!this.audioRef) return;
             this.$emit("toggle-is-playing", !this.isPlaying);
         },
 
@@ -77,22 +90,21 @@ export default {
     },
     computed: {
         trackAnim() {
-            if (!this.songInfo.duration || this.songInfo.currentTime < 0) {
+            if (!this.mediaInfo || !this.mediaInfo.duration || this.mediaInfo.currentTime < 0) {
                 return { width: "0%" };
             }
-            const percentage = (this.songInfo.currentTime / this.songInfo.duration) * 100;
-            return {
-                width: `${Math.min(percentage, 100)}%`,
-            };
+            const percentage = (this.mediaInfo.currentTime / this.mediaInfo.duration) * 100;
+            return { width: `${Math.min(percentage, 100)}%` };
         },
     },
 };
 </script>
 
+
 <style scoped>
-.music-player {
+.media-player {
     width: 100%;
-    height: 26%;
+    height: auto;
     background-color: #fff;
     border-radius: 1rem;
     padding: 1.8rem;
@@ -107,14 +119,14 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
 }
 
 .time-control__current,
 .time-control__total {
     font-size: 1rem;
     color: #666;
-    text-align: center; 
+    text-align: center;
 }
 
 .track {
@@ -152,29 +164,6 @@ export default {
     outline: none;
 }
 
-.track__input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 1.4rem;
-    width: 1.4rem;
-    background-color: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    cursor: pointer;
-    position: relative;
-    z-index: 3;
-}
-
-.track__input::-moz-range-thumb {
-    height: 1.4rem;
-    width: 1.4rem;
-    background-color: #fff;
-    border-radius: 50%;
-    border: 2px solid #2ab3bf;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-}
-
 .track__animate {
     background: linear-gradient(to right, #2ab3bf, #205950);
     height: 100%;
@@ -208,5 +197,18 @@ export default {
 .play-control__button--play,
 .play-control__button--pause {
     font-size: 2rem;
+}
+
+.media-display {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.media-display__video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 1rem;
 }
 </style>

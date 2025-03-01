@@ -3,7 +3,7 @@ import { get, postForm, patchForm, del } from '@/scripts/api/apiClients';
 const API_BASE_URL = '/Articles';
 
 export const getPagedArticles = async (queryParams = {}) => {
-    return await get(`${API_BASE_URL}`, queryParams);
+    return await get(`${API_BASE_URL}`, queryParams);    
 };
 
 export const createArticle = async (articleData) => {
