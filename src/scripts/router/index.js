@@ -72,14 +72,6 @@ import ConversationWindow from '@/components/CommunityComponents/ConversationWin
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 
-import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
-import StrictPersonalRoadmap from '@/views/Profile/Preferences/StrictPersonalRoadmap.vue'
-import PhysicalRoadmap from '@/views/Profile/Preferences/PhysicalRoadmap.vue'
-import StrictPhysicalRoadmap from '@/views/Profile/Preferences/StrictPhysicalRoadmap.vue'
-import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
-import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
-import Roadmaps from '@/views/Profile/Preferences/Roadmaps.vue'
-
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
 import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
@@ -471,36 +463,6 @@ const router = createRouter({
       path: '/statistics/user-activity',
       name: 'UserActivityResult',
       component: UserActivity
-    },
-    {
-      path: '/strict-personal-roadmap',
-      name: 'StrictPersonalRoadmap',
-      component: StrictPersonalRoadmap
-    },
-    {
-      path: '/physical-roadmap',
-      name: 'PhysicalRoadmap',
-      component: PhysicalRoadmap
-    },
-    {
-      path: '/strict-physical-roadmap',
-      name: 'StrictPhysicalRoadmap',
-      component: StrictPhysicalRoadmap
-    },
-    {
-      path: '/skill-roadmap',
-      name: 'SkillRoadmap',
-      component: SkillRoadmap
-    },
-    {
-      path: '/strict-skill-roadmap',
-      name: 'StrictSkillRoadmap',
-      component: StrictSkillRoadmap
-    },
-    {
-      path: '/roadmaps',
-      name: 'Roadmaps',
-      component: Roadmaps
     },
     {
       path: '/statistics/self-assessment',

@@ -61,6 +61,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
+  gap: 40px;
   justify-content: center;
   align-items: center;
   width: 100%;
