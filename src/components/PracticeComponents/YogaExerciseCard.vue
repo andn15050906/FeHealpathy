@@ -22,7 +22,7 @@
 
 
 <script setup>
-import GlowingCard from '../Common/GlowingCard.vue';
+import GlowingCard from '@/components/Common/GlowingCard.vue';
 
 const props = defineProps({
     excercise: {

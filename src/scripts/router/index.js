@@ -134,7 +134,10 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'editProfile',
-      component: EditUserProfile,
+      components: {
+        default: EditUserProfile,
+        roadmapProgress: RoadmapProgress
+      },
       meta: { requiresAuth: true }
     },
     {
@@ -160,7 +163,10 @@ const router = createRouter({
     {
       path: '/practice',
       name: 'practiceToolList',
-      component: PracticeToolList
+      components: {
+        default: PracticeToolList,
+        roadmapProgress: RoadmapProgress
+      }
     },
     // Practice - Yoga
     {
@@ -278,7 +284,10 @@ const router = createRouter({
     {
       path: '/blogs',
       name: 'blogCatalog',
-      component: BlogCatalog
+      components: {
+        default: BlogCatalog,
+        roadmapProgress: RoadmapProgress
+      }
     },
     {
       path: '/blogs/manage',
@@ -329,22 +338,25 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/courses/update',
+      path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      props: true
     },
     {
-      path: '/courses-detail',
+      path: '/courses/:id',
       name: 'courseDetail',
       component: CourseDetail,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      props: true
     },
     {
-      path: '/lectures-detail',
+      path: '/lectures/:id',
       name: 'lectureDetail',
       component: LectureDetail,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      props: true
     },
     /* /:id */
     /* ? considering /search */

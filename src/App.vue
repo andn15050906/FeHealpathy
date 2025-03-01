@@ -110,12 +110,15 @@ main {
 }
 
 .page-container {
-  display: flex;
   min-height: 100vh;
   width: 1200px;
   background-color: #fff;
   margin-top: 60px;
   padding: 40px;
+}
+
+.page-container:has(.left-sidebar) {
+  display: flex;
 }
 
 .left-sidebar {
