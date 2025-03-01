@@ -6,11 +6,12 @@
     <main>
       <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
       <div class="page-container">
+        <RouterView class="left-sidebar" v-if="isAuthenticated" name="roadmapProgress"></RouterView>
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
-        <div class="partner-chat">
-          <ConversationWindow v-if="isAuthAndShown" :single-room="true" @toggleChat="toggleChat" />
-        </div>
+      </div>
+      <div class="partner-chat">
+        <ConversationWindow v-if="isAuthAndShown" :single-room="true" @toggleChat="toggleChat" />
       </div>
     </main>
     <Footer />
@@ -109,11 +110,16 @@ main {
 }
 
 .page-container {
+  display: flex;
   min-height: 100vh;
   width: 1200px;
   background-color: #fff;
   margin-top: 60px;
   padding: 40px;
+}
+
+.left-sidebar {
+  flex: 0.5;
 }
 
 .partner-chat {

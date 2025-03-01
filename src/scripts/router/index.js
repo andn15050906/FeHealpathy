@@ -71,7 +71,7 @@ import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
-import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
 import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 
@@ -90,7 +90,10 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      component: HomePage
+      components: {
+        default: HomePage,
+        roadmapProgress: RoadmapProgress
+      }
     },
     {
       path: '/faq',
@@ -423,11 +426,6 @@ const router = createRouter({
       component: Request
     },
     {
-      path: '/roadmap',
-      name: 'PersonalRoadmap',
-      component: PersonalRoadmap
-    },
-    {
       path: '/submissions-review/:id',
       name: 'SubmissionReview',
       component: SubmissionReview,
@@ -436,12 +434,12 @@ const router = createRouter({
     },
     {
       path: '/statistics/user-activity',
-      name: 'UserActivity',
+      name: 'UserActivityResult',
       component: UserActivity
     },
     {
       path: '/statistics/self-assessment',
-      name: 'SelfAssessment',
+      name: 'SelfAssessmentResult',
       component: SelfAssessmentResult
     }
   ]
