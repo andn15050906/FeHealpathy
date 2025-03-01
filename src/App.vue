@@ -138,3 +138,9 @@ footer {
   z-index: 100;
 }
 </style>
+
+<style>
+.v-timeline-item__body, .v-step {
+  z-index: 0;
+}
+</style>
