@@ -59,7 +59,7 @@ import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
 import UserActivity from '@/views/Statistics/UserActivity.vue'
-
+import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
 //components
 import NotFound from '@/components/Layouts/404.vue'
 import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
@@ -139,6 +139,12 @@ const router = createRouter({
         default: EditUserProfile,
         roadmapProgress: RoadmapProgress
       },
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/advisor/edit-profile',
+      name: 'editAdvisor',
+      component: EditAdvisor,
       meta: { requiresAuth: true }
     },
     {
