@@ -24,12 +24,18 @@
             <li><router-link to="/change-password">Change Password</router-link></li>
             <hr class="menu-divider" />
 
-            <li v-if="user.role === 'Learner' || user.role === 'Advisor'">
+            <li v-if="user.role === 'Member' || user.role === 'Advisor'">
               <router-link to="/enrolled-course">Enrolled courses</router-link>
             </li>
+            <hr class="menu-divider" />
             <li v-if="user.role === 'Advisor'">
+              <div class="dropdown-group">
+              <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
+              <hr class="menu-divider" />
               <router-link to="/courses">Manage courses</router-link>
+              <hr class="menu-divider" />
               <router-link to="/blogs/manage">Manage blogs</router-link>
+            </div>
             </li>
             <li v-if="user.role === 'Admin'">
               <router-link to="/admin">Admin</router-link>
@@ -361,5 +367,10 @@ ul {
 
 .menu-toggle:focus {
   outline: none;
+}
+
+.dropdown-group {
+  display: flex;
+  flex-direction: column;
 }
 </style>
