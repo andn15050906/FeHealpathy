@@ -1,112 +1,159 @@
 <template>
-    <div>
-        CBT is a powerful therapeutic approach that equips individuals with the tools to understand and manage their
-        thoughts and behaviors.
+    <v-tour name="roadmap-tour" v-if="isTourActive" :steps="roadmap.tourSteps" :options="tourOptions" @end="isTourActive = false" />
+    <div class="roadmap-intro">
+        <div v-for="introText in roadmap.introTexts" class="roadmap-text">
+            {{ introText }}
+        </div>
     </div>
-    <div>
-        At Healpathy, we are committed to guiding you through this roadmap, ensuring that you have the support and
-        resources necessary for your mental health journey.
-    </div>
-    <div>
-        Embrace the process, and take the first step toward a healthier mindset today!
-    </div>
-    <Roadmap :timelineItems="timelineItems"></Roadmap>
-    <div class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
-        <GlowingButton v-if="nextScreenCallback" @click="nextScreenCallback"
-            primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ data.nextScreen }}</GlowingButton>
+    <Roadmap :timelineItems="roadmap.timelineItems"></Roadmap>
+    <div v-if="nextScreenCallback" class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
+        <GlowingButton @click="nextScreenCallback" primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ text.nextScreen }}</GlowingButton>
     </div>
 </template>
 
-<script setup>
-import Roadmap from '@/components/PracticeComponents/Roadmap.vue'
-import GlowingButton from '@/components/Common/GlowingButton.vue';
+<script>
+import Roadmap from "@/components/PracticeComponents/Roadmap.vue";
+import GlowingButton from "@/components/Common/GlowingButton.vue";
+import "vue3-tour/dist/vue3-tour.css";
+import { roadmaps } from '@/scripts/data/roadmaps.js';
 
-const props = defineProps({
-    nextScreenCallback: {
-        type: Function,
-        required: false
+export default {
+    components: { Roadmap, GlowingButton },
+    props: {
+        enableTour: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
+        nextScreenCallback: {
+            type: Function,
+            required: false
+        }
+    },
+    data() {
+        return {
+            text: {
+                nextScreen: "Next"
+            },
+            isTourEnabled: false,
+            isTourActive: true,
+            tourOptions: {
+                highlight: true,
+                labels: {
+                    buttonSkip: "Skip",
+                    buttonPrevious: "Back",
+                    buttonNext: "Next",
+                    buttonStop: "Finish",
+                }
+            },
+            roadmap: roadmaps['mental-roadmap']
+        }
+    },
+    mounted() {
+        if (this.enableTour) {
+            this.$tours['roadmap-tour'].start();
+        }
+    },
+    methods: {
+        toggleTour() {
+            this.isTourActive = !this.isTourActive;
+        }
     }
-});
+}
+</script>
 
-var data = {
-    nextScreen: "Next"
+<style scoped>
+html {
+    scroll-behavior: smooth;
 }
 
-const timelineItems = [
-    {
-        color: 'red-lighten-2',
-        icon: 'mdi-star',
-        title: 'Treatment Planning',
-        // Prioritize issues to address based on their impact on your life.
-        // Gain knowledge about your specific mental health concerns.
-        // Discuss how CBT has helped others with similar issues.
-        content: 'Utilize Case Conceptualization framework to make initial assessment. It is quite frequent to address automatic thoughts and intermediate beliefs as foci of treatment, while addressing core beliefs is often difficult.',
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'purple-lighten-2',
-        icon: 'mdi-book-variant',
-        title: 'Goal Setting',
-        // Collaboratively set clear, measurable, and realistic goals for therapy.
-        content: "Goal setting is the process of collaboratively identifying specific therapeutic outcomes for treatment. Goals must be observable, measurable and achievable and relate to cognitive or behavioral changes relevant to the patient's presenting problem",
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'green-lighten-1',
-        icon: 'mdi-airballoon',
-        title: 'Relaxation',
-        //Practice relaxation techniques such as deep breathing and mindfulness.
-        //Identify activities that bring joy or a sense of accomplishment.
-        //Gradually incorporate these activities into your routine to improve mood.
-        content: "Relaxation techniques are important for brief therapy. Some people respond to physical procedures (e.g., muscle relaxation and/or deep breathing), while others respond favorably to guided imagery",
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'indigo-lighten-2',
-        icon: 'mdi-layers-triple',
-        title: 'Behavioral Activation',
-        //Keep a journal to track negative thoughts and their triggers.
-        //Challenge and reframe negative thoughts using evidence-based techniques.
-        //Replace distorted thoughts with more balanced, realistic ones.
-        content: "Make use of practice tools and monitor progress in mood, mastery and confidence",
-        link: '/groups',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'red-lighten-2',
-        icon: 'mdi-star',
-        title: 'Skills development',
-        //Improve interpersonal skills to enhance relationships and assertiveness.
-        //Learn coping strategies to manage anxiety during exposure.
-        //Role-play scenarios to practice new skills in a safe environment.
-        content: "The aim of exposure therapy is to reduce the patient's anxiety response to feared stimuli and increase the patient's ability to experience and tolerate anxiety. The process includes creating a thoughtfully constructed hierarchy of feared stimuli organized by the patient's reported degree of fear",
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'purple-lighten-2',
-        icon: 'mdi-star',
-        title: 'Exposure Therapy',
-        //Establish relationships
-        //Confront fears in a controlled, gradual manner to reduce avoidance behaviors.
-        content: "The aim of exposure therapy is to reduce the patient's anxiety response to feared stimuli and increase the patient's ability to experience and tolerate anxiety. The process includes creating a thoughtfully constructed hierarchy of feared stimuli organized by the patient's reported degree of fear",
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    },
-    {
-        color: 'green-lighten-1',
-        icon: 'mdi-star',
-        title: 'Reflection and Maintaining Changes',
-        //Regularly review your progress toward therapy goals
-        //Discuss what strategies have been effective and where adjustments may be needed.
-        //Develop a plan to maintain gains achieved during therapy.
-        //Stay connected
-        content: 'Review skills learned in treatment, and to vocalize and problem-solve concerns about functioning outside treatment',
-        link: '/practice',
-        linkTitle: 'Find out more!'
-    }
-]
-</script>
+.roadmap-intro {
+    background-color: #ffffff; 
+    padding: 30px;
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 30px; 
+    border: 1px solid #e0e0e0; 
+    transition: all 0.3s ease; 
+}
+
+.roadmap-intro:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); 
+    transform: translateY(-2px); 
+}
+
+.roadmap-header {
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    color: #154EC1; 
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+
+.roadmap-text {
+    font-size: 1.2rem; 
+    color: #444; 
+    margin-bottom: 15px; 
+    line-height: 1.6; 
+    font-family: 'Poppins', sans-serif; 
+    text-align: center; 
+}
+
+.v-tour__target {
+    outline: 3px solid #ff6f61 !important; 
+    border-radius: 8px; 
+}
+
+.v-tour__button {
+    background-color: #007bff !important; 
+    color: white !important;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 8px 16px;
+    transition: 0.3s;
+}
+
+.v-tour__button:hover {
+    background-color: #0056b3 !important;
+}
+
+.timeline-item {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    transition: 0.3s;
+    font-size: 3.5rem;
+}
+
+.timeline-item:hover {
+    background: #e9ecef;
+    transform: translateY(-3px);
+}
+
+.timeline-item-content {
+    margin-top: 10px;
+    font-size: 2rem;
+}
+
+.timeline-item-title {
+    font-size: 2.5rem;
+}
+
+.roadmap-intro a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.roadmap-intro a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.roadmap-step {
+    margin-bottom: 24px; 
+}
+
+</style>

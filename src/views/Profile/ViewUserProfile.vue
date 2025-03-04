@@ -1,5 +1,5 @@
 <template>
-    <v-container id="user-profile" fluid tag="section">
+    <v-container id="user-profile" class="content" fluid tag="section">
         <v-row justify="center">
             <v-col cols="12" md="8">
                 <v-card class="v-card--material pa-3 v-card v-sheet theme--light v-card--material--has-heading">
@@ -94,6 +94,10 @@ export default {
 @import '../../assets/css/vuetify-custom/v-app.css';
 @import '../../assets/css/vuetify-custom/v-app-vendor.css';
 @import '../../assets/css/vuetify-custom/chunk-7e72fb0e.a9a7c615.css';
+
+.content {
+    width: 100%;
+}
 
 .white-text {
     color: #fff;

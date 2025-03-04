@@ -1,7 +1,7 @@
 <template>
     <div class="container text-center">
         <SingleSelectSurvey v-if="childIndex == 0" :options="firstEvaluationOptions"></SingleSelectSurvey>
-        <PersonalRoadmap v-if="childIndex == 1" :nextScreenCallback="() => switchChild(true)" />
+        <PersonalRoadmap v-if="childIndex == 1" :nextScreenCallback="() => switchChild(true)" :enableTour="true" />
         <SingleSelectSurvey v-if="childIndex == 2" :options="wellnessSurveyOptions"></SingleSelectSurvey>
         <!--Additionally provided-->
         <multiple-select-survey v-if="childIndex == 3" :options="whatYouWantSurveyOptions"></multiple-select-survey>

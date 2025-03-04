@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, defineExpose, watch } from 'vue';
+import { ref, watch } from 'vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import { SurveyOptions } from '@/scripts/types/SurveyOptions';
 
