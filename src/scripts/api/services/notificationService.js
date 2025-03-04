@@ -24,3 +24,25 @@ export const updateNotification = async (notificationId, status) => {
     throw error;
   }
 };
+
+export const submitAdvisorRequest = async (cvFile, introduction, experience, certificates) => {
+  try {
+    const formData = new FormData();
+    formData.append("CV.File", cvFile);
+    formData.append("CV.Url", "");
+    formData.append("CV.Title", cvFile.name);
+    formData.append("Introduction", introduction);
+    formData.append("Experience", experience);
+
+    certificates.forEach((cert) => {
+      formData.append("Certificates", cert);
+    });
+
+    const response = await apiClient.post("/notifications/advisor", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting advisor request:", error);
+    throw error;
+  }
+};
+
