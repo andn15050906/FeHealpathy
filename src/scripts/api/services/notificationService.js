@@ -29,15 +29,15 @@ export const submitAdvisorRequest = async (cvFile, introduction, experience, cer
   try {
     const formData = new FormData();
     formData.append("CV.File", cvFile);
-    formData.append("CV.Url", ""); 
     formData.append("CV.Title", cvFile.name);
     formData.append("Introduction", introduction);
     formData.append("Experience", experience);
 
     // ✅ Gửi file PDF trực tiếp vào "Certificates" thay vì JSON
-    certificates.forEach((cert) => {
+    certificates.forEach((cert, index) => {
       if (cert instanceof File) {
-        formData.append("Certificates", cert); // Append trực tiếp file PDF
+        formData.append(`Certificates[${index}].File`, cert);
+        formData.append(`Certificates[${index}].Title`, cert.name);
       }
     });
 
@@ -47,8 +47,7 @@ export const submitAdvisorRequest = async (cvFile, introduction, experience, cer
       console.log(`${key}:`, value);
     }
 
-    // ✅ Không đặt 'Content-Type', để trình duyệt tự động xử lý
-    const response = await apiClient.post("/Notifications/Advisor", formData);
+    const response = await apiClient.postForm("/Notifications/Advisor", formData);
 
     console.log("✅ API Response:", response.data);
     return response.data;
@@ -57,10 +56,3 @@ export const submitAdvisorRequest = async (cvFile, introduction, experience, cer
     throw error;
   }
 };
-
-
-
-
-
-
-
