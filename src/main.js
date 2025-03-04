@@ -72,7 +72,7 @@ app.use(vuetify);
 app.use(createVuestic({ config: vuesticGlobalConfig }));
 app.use(pinia);
 app.use(toast, {
-  position: "top-right",
+  position: "bottom-left",
   autoClose: 3000,
   theme: "light",
 });
