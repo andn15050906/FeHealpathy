@@ -1,9 +1,9 @@
 <template>
   <div class="container mt-5 p-4 bg-white shadow rounded" style="max-width: 600px;">
-    <div v-if="status === 'pending'">
+    <!-- <div v-if="status === 'pending'">
       <h1 class="text-center text-success">Đang đợi phê duyệt...</h1>
-    </div>
-    <div v-else>
+    </div> -->
+    <div>
       <h1 class="text-center mb-4">Request To Be An Advisor</h1>
 
       <div class="mb-3">
@@ -59,29 +59,44 @@ export default {
     };
 
     const submitRequest = async () => {
-      if (!cvFile.value || !introduction.value || !experience.value) {
-        alert("Please upload CV, provide an introduction, and describe your experience.");
-        return;
-      }
+  if (!cvFile.value || !introduction.value.trim() || !experience.value.trim()) {
+    alert("Please upload CV, provide an introduction, and describe your experience.");
+    return;
+  }
 
-      try {
-        await submitAdvisorRequest(cvFile.value, introduction.value, experience.value, certificates.value);
-        status.value = 'pending';
-        localStorage.setItem('advisor_request_status', 'pending');
-      } catch (error) {
-        alert("Error submitting request. Please try again.");
-      }
-    };
+  console.log("Submitting data before sending:", {
+    cv: cvFile.value ? cvFile.value.name : null,
+    introduction: introduction.value,
+    experience: experience.value,
+    certificates: certificates.value.map(cert => cert.name)
+  });
+
+  try {
+    await submitAdvisorRequest(cvFile.value, introduction.value.trim(), experience.value.trim(), certificates.value);
+    status.value = 'pending';
+    localStorage.setItem('advisor_request_status', 'pending');
+  } catch (error) {
+    console.error("Error submitting request:", error);
+    alert("Error submitting request. Please try again.");
+  }
+};
+
 
     const checkRequestStatus = async () => {
       try {
         const notifications = await getNotifications();
-        const advisorRequest = notifications.find(n => n.type === 'advisor_request' && n.status === 'pending');
-        if (advisorRequest) {
-          status.value = 'pending';
-          localStorage.setItem('advisor_request_status', 'pending');
+        console.log("API Response for notifications:", notifications);
+        
+        if (notifications && Array.isArray(notifications.items)) {
+          const advisorRequest = notifications.items.find(n => n.type === 2 && n.status === 0);
+          if (advisorRequest) {
+            status.value = 'pending';
+            localStorage.setItem('advisor_request_status', 'pending');
+          } else {
+            localStorage.removeItem('advisor_request_status');
+          }
         } else {
-          localStorage.removeItem('advisor_request_status');
+          console.warn("Unexpected response format for notifications:", notifications);
         }
       } catch (error) {
         console.error("Error checking advisor request status:", error);
