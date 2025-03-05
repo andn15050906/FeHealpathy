@@ -1,14 +1,20 @@
 import apiClient from '@/scripts/api/apiClients';
+import {get, postForm, patchForm, del } from '@/scripts/api/apiClients';
 
-export const getCourses = async () => {
+const API_BASE_URL = '/Courses';
+
+export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   try {
-    const response = await apiClient.get('/Courses');
+    const response = await apiClient.get(`/Courses`, {
+      params: params,
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching courses:', error);
     throw error;
   }
 };
+
 
 export const getCourseDetail = async (courseId) => {
   try {
@@ -28,4 +34,16 @@ export const getDiscountedCourses = async () => {
     console.error('Error fetching discounted courses:', error);
     throw error;
   }
+};
+
+export const createCourse = async (courseData) => {
+  return await postForm(`${API_BASE_URL}`, courseData);
+};
+
+export const updateCourse = async (courseData) => {
+  return await patchForm(`${API_BASE_URL}`, courseData);
+};
+
+export const deleteCourse = async (courseId) => {
+  return await del(`${API_BASE_URL}/${courseId}`);
 };

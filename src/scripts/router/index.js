@@ -17,6 +17,7 @@ import FaqPage from '@/pages/faq/FaqPage.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
 import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
+import ManageYoga from '@/views/Practice/Yoga/ManageYoga.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import DiaryWriting from '@/views/Practice/Diary/DiaryWriting.vue'
 import DiaryList from '@/views/Practice/Diary/DiaryList.vue'
@@ -452,6 +453,11 @@ const router = createRouter({
       path: '/YogaPractice',
       name: 'YogaPractice',
       component: YogaPractice
+    },
+    {
+      path: '/yogas/manage',
+      name: 'ManageYoga',
+      component: ManageYoga
     },
     {
       path: '/request',
