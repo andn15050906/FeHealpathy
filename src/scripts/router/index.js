@@ -76,6 +76,11 @@ import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
 import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
 import Roadmaps from '@/views/Profile/Preferences/Roadmaps.vue'
 
+import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
+import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
+import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
+import ViewReports from '@/views/Admin/ViewReports.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -446,8 +451,33 @@ const router = createRouter({
       path: '/roadmaps',
       name: 'Roadmaps',
       component: Roadmaps
-    }
+    },
 
+    // Admin
+    {
+      path: '/admin/moderate-users',
+      name: 'ModerateUsers',
+      component: ModerateUsers,
+     // meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/create-admin',
+      name: 'CreateAdminAccounts',
+      component: CreateAdminAccounts,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/moderate-content',
+      name: 'ModerateUploadedContent',
+      component: ModerateUploadedContent,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/view-reports',
+      name: 'ViewReports',
+      component: ViewReports,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    }
   ]
 })
 
