@@ -1,9 +1,9 @@
 <template>
   <div class="container mt-5 p-4 bg-white shadow rounded" style="max-width: 600px;">
-    <!-- <div v-if="status === 'pending'">
+    <div v-if="status === 'pending'">
       <h1 class="text-center text-success">Đang đợi phê duyệt...</h1>
-    </div> -->
-    <div>
+    </div>
+    <div v-else>
       <h1 class="text-center mb-4">Request To Be An Advisor</h1>
 
       <div class="mb-3">
