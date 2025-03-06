@@ -23,6 +23,7 @@
           </div>
         </div>
       </div>
+      <!-- Events Sidebar -->
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
@@ -33,28 +34,53 @@
             <div v-if="currentEvents.length === 0" class="no-events">
               No events for this day
             </div>
-            <div v-else v-for="(event, idx) in currentEvents" :key="event.id || idx" class="event-item"
-              :style="{ border: '2px solid ' + event.tag }">
+            <div v-else v-for="(event, idx) in currentEvents" :key="event.id || idx"
+              class="event-item holding-wrapper mt-1"
+              :class="{ collapsed: event.completed || event.closed, holding: event.holding }"
+              :style="[{ borderLeft: '4px solid ' + (event.completed || event.closed ? '#bbb' : event.tag) }, { '--event-color': event.tag }]"
+              @mousedown="startHold(event)" @mouseup="cancelHold" @mouseleave="cancelHold">
               <div class="event-info">
-                <div class="event-title">{{ event.title }}</div>
-                <div class="event-description">{{ event.description }}</div>
-                <div class="event-extra" v-if="event.objective || (event.startTime && event.endTime)">
-                  <div v-if="event.objective">
-                    <strong>Objective:</strong> {{ event.objective }}
-                  </div>
-                  <div v-if="event.startTime && event.endTime" class="timeline-label">
-                    <strong>Timeline:</strong> {{ event.startTime }} - {{ event.endTime }}
-                  </div>
+                <div class="event-title" :class="{ collapsed: event.completed || event.closed }">
+                  <span class="title-text" :class="{ collapsed: event.completed || event.closed }">
+                    {{ event.title }}
+                  </span>
+                  <template v-if="event.closed">
+                    <i class="fa-solid fa-ban closed-icon"></i>
+                  </template>
+                  <template v-else-if="event.completed">
+                    <i class="fa-solid fa-check completed-icon"></i>
+                  </template>
                 </div>
+                <template v-if="!event.completed && !event.closed">
+                  <div class="event-description">
+                    {{ event.description }}
+                  </div>
+                  <div class="event-extra" v-if="event.objective || (event.startTime && event.endTime)">
+                    <div v-if="event.objective" class="objective-text">
+                      <strong>Objective:</strong> {{ event.objective }}
+                    </div>
+                    <div v-if="event.startTime && event.endTime" class="timeline-label">
+                      <strong>Timeline:</strong> {{ event.startTime }} - {{ event.endTime }}
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="timeline-label collapsed">
+                    {{ event.startTime }} - {{ event.endTime }}
+                  </div>
+                </template>
               </div>
-              <div class="event-actions">
-                <button class="edit-event-btn" @click.stop="editEvent(event)">
-                  <i class="fa-solid fa-edit"></i>
-                </button>
-                <button class="delete-event-btn" @click.stop="confirmDeleteEvent(event)">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
+              <template v-if="!event.completed && !event.closed">
+                <div class="event-actions">
+                  <button class="edit-event-btn" @click.stop="editEvent(event)" :style="{ color: event.tag }">
+                    <i class="fa-solid fa-edit"></i>
+                  </button>
+                  <button class="delete-event-btn" @click.stop="confirmDeleteEvent(event)"
+                    :style="{ color: event.tag }">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </template>
             </div>
           </div>
         </transition>
@@ -69,7 +95,7 @@
         <ul class="timeline">
           <li v-for="(event, idx) in sortedEventsForSelectedDay" :key="event.id || idx">
             <div class="timeline-marker"></div>
-            <div class="timeline-content">
+            <div class="timeline-content" :class="{ completed: event.completed || event.closed }">
               <div class="timeline-time">{{ event.startTime }} - {{ event.endTime }}</div>
               <div class="timeline-title">{{ event.title }}</div>
               <div class="timeline-description">{{ event.description }}</div>
@@ -83,19 +109,21 @@
     </transition>
     <transition name="fade">
       <div v-if="showEventForm" class="event-form-modal">
-        <div class="modal-content">
-          <h3>{{ isEditing ? 'Edit Event' : 'New Event' }}</h3>
+        <div class="modal-content add-event-form">
+          <h3>{{ isEditing ? "Edit Event" : "New Event" }}</h3>
           <div class="form-group">
-            <label>Title</label>
-            <input v-model="newEvent.title" class="form-input" />
+            <label for="title">Title</label>
+            <input id="title" v-model="newEvent.title" class="form-input" placeholder="Enter event title" />
           </div>
           <div class="form-group">
-            <label>Description</label>
-            <textarea v-model="newEvent.description" class="form-input"></textarea>
+            <label for="description">Description</label>
+            <textarea id="description" v-model="newEvent.description" class="form-input"
+              placeholder="Enter event description"></textarea>
           </div>
           <div class="form-group">
-            <label>Objectives</label>
-            <input v-model="newEvent.objective" class="form-input" />
+            <label for="objective">Objective</label>
+            <input id="objective" v-model="newEvent.objective" class="form-input"
+              placeholder="Enter objective (optional)" />
           </div>
           <div class="form-group">
             <label>Tag</label>
@@ -111,25 +139,27 @@
             </div>
           </div>
           <div class="form-group">
-            <label>Repeat</label>
-            <select v-model="newEvent.repeat" class="form-input">
+            <label for="repeat">Repeat</label>
+            <select id="repeat" v-model="newEvent.repeat" class="form-input">
               <option value="none">None</option>
               <option value="weekday">Weekday (Mon-Fri)</option>
               <option value="allMonth">All Month</option>
               <option value="weekends">Weekends (Sat, Sun)</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Start Time</label>
-            <input type="time" v-model="newEvent.startTime" class="form-input" />
-          </div>
-          <div class="form-group">
-            <label>End Time</label>
-            <input type="time" v-model="newEvent.endTime" class="form-input" />
+          <div class="form-group time-group">
+            <div>
+              <label for="startTime">Start Time</label>
+              <input id="startTime" type="time" v-model="newEvent.startTime" class="form-input" />
+            </div>
+            <div>
+              <label for="endTime">End Time</label>
+              <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
+            </div>
           </div>
           <div class="modal-actions">
-            <button @click="cancelEvent">Cancel</button>
-            <button class="btn btn-success" @click="saveEvent">Save</button>
+            <button class="btn cancel-btn" @click="cancelEvent">Cancel</button>
+            <button class="btn save-btn" @click="saveEvent">Save</button>
           </div>
         </div>
       </div>
@@ -140,6 +170,8 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import {
   startOfMonth,
   endOfMonth,
@@ -153,6 +185,24 @@ import {
   format
 } from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
+
+const delayMapping = {
+  "#e74c3c": 2,
+  "#e67e22": 5,
+  "#f1c40f": 10,
+  "#3498db": 20,
+  "#2ecc71": 30
+};
+
+function getDeadline(event) {
+  if (!event.date || !event.endTime) return new Date();
+  const additional = Number(event.additionalTime) || 0;
+  const [year, month, day] = event.date.split("-").map(Number);
+  const [hour, minute] = event.endTime.split(":").map(Number);
+  let deadline = new Date(year, month - 1, day, hour, minute, 0, 0);
+  deadline.setMinutes(deadline.getMinutes() + additional);
+  return deadline;
+}
 
 function getRoundedTime(date) {
   let hours = date.getHours();
@@ -213,7 +263,8 @@ export default {
         { color: "#f1c40f", label: "Moderate" },
         { color: "#e67e22", label: "High" },
         { color: "#e74c3c", label: "Critical" }
-      ]
+      ],
+      holdTimer: null
     };
   },
   computed: {
@@ -249,11 +300,7 @@ export default {
     currentEvents() {
       return this.localEvents.filter(e => {
         if (!e) return false;
-        const eventDate = e.creationTime
-          ? new Date(e.creationTime)
-          : e.date
-            ? new Date(e.date)
-            : null;
+        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, this.selectedDate);
       });
@@ -265,6 +312,23 @@ export default {
         return a.startTime.localeCompare(b.startTime);
       });
     }
+  },
+  mounted() {
+    setInterval(() => {
+      const now = new Date();
+      this.localEvents.forEach(event => {
+        if (!event.completed && !event.closed && event.date && event.endTime && event.additionalTime != null) {
+          const deadline = getDeadline(event);
+          if (now > deadline) {
+            event.closed = true;
+            toast.error("Event closed due to deadline!", {
+              duration: 150,
+              position: "bottom-center"
+            });
+          }
+        }
+      });
+    }, 30000);
   },
   methods: {
     dayClasses(day) {
@@ -278,11 +342,7 @@ export default {
     hasEvents(day) {
       return this.localEvents.some(e => {
         if (!e) return false;
-        const eventDate = e.creationTime
-          ? new Date(e.creationTime)
-          : e.date
-            ? new Date(e.date)
-            : null;
+        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, day.date);
       });
@@ -290,11 +350,7 @@ export default {
     getEventCount(day) {
       return this.localEvents.filter(e => {
         if (!e) return false;
-        const eventDate = e.creationTime
-          ? new Date(e.creationTime)
-          : e.date
-            ? new Date(e.date)
-            : null;
+        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, day.date);
       }).length;
@@ -322,7 +378,6 @@ export default {
     },
     saveEvent() {
       if (!this.newEvent.title) return;
-      // Nếu repeat là "none", xử lý thông thường
       if (this.newEvent.repeat === "none") {
         if (this.isEditing) {
           const index = this.localEvents.findIndex(e => e.id === this.newEvent.id);
@@ -332,7 +387,6 @@ export default {
         } else {
           const newId = Date.now();
           const newEvent = { ...this.newEvent, id: newId, date: this.selectedDate };
-          // Kiểm tra trùng lặp: nếu đã có event với cùng tiêu đề và startTime trên ngày đó thì không thêm nữa
           const exists = this.localEvents.some(e =>
             dfIsSameDay(new Date(e.date), this.selectedDate) &&
             e.title === newEvent.title &&
@@ -343,7 +397,6 @@ export default {
           }
         }
       } else {
-        // Với các option repeat, tạo event theo yêu cầu cho các ngày trong tháng
         const monthStart = startOfMonth(this.currentDate);
         const monthEnd = endOfMonth(this.currentDate);
         for (let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)) {
@@ -353,7 +406,6 @@ export default {
           } else if (this.newEvent.repeat === "weekends") {
             if (day.getDay() !== 0 && day.getDay() !== 6) continue;
           }
-          // Kiểm tra trùng lặp cho từng ngày
           const exists = this.localEvents.some(e =>
             dfIsSameDay(new Date(e.date), day) &&
             e.title === this.newEvent.title &&
@@ -397,26 +449,52 @@ export default {
       }
       this.showDeletePopup = false;
       this.eventToDelete = null;
+    },
+    startHold(event) {
+      if (event.closed) return;
+      this.holdTimer = setTimeout(() => {
+        const wasCompleted = event.completed;
+        this.toggleComplete(event);
+        toast.success(
+          wasCompleted ? "Event marked as undone!" : "Event marked as done!",
+          { duration: 1000, position: "bottom-center" }
+        );
+      }, 500);
+      event.holding = true;
+    },
+    cancelHold() {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+      this.currentEvents.forEach(e => (e.holding = false));
+    },
+    toggleComplete(event) {
+      event.completed = !event.completed;
+      event.holding = false;
     }
   }
 };
 </script>
 
 <style scoped>
+/* Container & Layout */
 .container {
+  max-width: 1200px;
   margin: 20px auto;
+  padding: 0 10px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .calendar-wrapper {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
-  background: white;
+  background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
 }
 
+/* Calendar */
 .header {
   display: flex;
   align-items: center;
@@ -429,7 +507,7 @@ export default {
 
 .nav-btn {
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid hwb(214 0% 75%);
   padding: 5px 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -456,12 +534,15 @@ export default {
 
 .calendar-day {
   position: relative;
-  padding: 12px;
-  min-height: 42px;
+  padding: 10px;
   text-align: center;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.calendar-day:hover {
+  transform: scale(1.02);
 }
 
 .current-month {
@@ -475,28 +556,32 @@ export default {
 
 .selected {
   background: #3498db !important;
-  color: white !important;
+  color: #fff !important;
 }
 
 .event-count {
   position: absolute;
   top: 2px;
   right: 2px;
-  background: #e74c3c;
+  background: #a2d5a2;
   color: #fff;
-  font-size: 0.7rem;
-  width: 18px;
-  height: 18px;
+  font-size: 0.6rem;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: default;
+  font-weight: bold;
 }
 
+/* Events Sidebar */
 .events-sidebar {
   border-left: 1px solid #eee;
   padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .selected-date {
@@ -519,33 +604,73 @@ export default {
   overflow-y: auto;
 }
 
+/* Event Item */
 .event-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  margin: 8px 0;
+  padding: 8px 12px;
+  margin-bottom: 8px;
   border-radius: 6px;
-  transition: 0.2s;
+  background: #fafafa;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.event-item:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.event-item.collapsed {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .event-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .event-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-weight: 600;
   margin-bottom: 4px;
+  padding-right: 8px;
+  overflow: hidden;
+}
+
+.title-text {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title-text.collapsed {
+  text-decoration: line-through;
+  color: #777;
 }
 
 .event-description {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.9rem;
+  margin-bottom: 4px;
 }
 
 .event-extra {
-  margin-top: 4px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.8rem;
   color: #7f8c8d;
 }
@@ -560,12 +685,21 @@ export default {
 }
 
 .edit-event-btn,
-.delete-event-btn {
+.delete-event-btn,
+.complete-event-btn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #3498db;
+  transition: color 0.2s;
+}
+
+.edit-event-btn:hover {
+  color: #011d41;
+}
+
+.delete-event-btn:hover {
+  color: #ff4040;
 }
 
 .add-event-btn {
@@ -577,13 +711,14 @@ export default {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s;
 }
 
 .add-event-btn:hover {
   background: #2980b9;
 }
 
+/* Timeline */
 .timeline-container {
   margin: 20px auto;
   background: #fff;
@@ -594,6 +729,7 @@ export default {
 
 .timeline-container h3 {
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .timeline {
@@ -606,7 +742,7 @@ export default {
   display: flex;
   position: relative;
   padding-left: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .timeline-marker {
@@ -643,30 +779,31 @@ export default {
 }
 
 .timeline-objective {
-  margin-top: 4px;
   font-size: 0.85rem;
   color: #7f8c8d;
+  margin-top: 4px;
 }
 
-.event-form-modal,
-.delete-modal {
+.event-form-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 
-.modal-content {
-  background: whitesmoke;
-  padding: 25px;
+.modal-content.add-event-form {
+  background: #ffffff;
+  padding: 30px;
   border-radius: 10px;
-  width: 80%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .form-group {
@@ -677,15 +814,16 @@ export default {
   display: block;
   font-weight: 600;
   margin-bottom: 5px;
-  color: #2c3e50;
+  color: #333;
 }
 
 .form-input {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-sizing: border-box;
+  font-size: 0.95rem;
 }
 
 .tag-options {
@@ -727,18 +865,42 @@ export default {
   font-size: 0.85rem;
 }
 
+.time-group {
+  display: flex;
+  gap: 10px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 .modal-actions button {
-  padding: 8px 20px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn {
+  font-weight: 600;
+}
+
+.cancel-btn {
+  background: #ddd;
+  color: #333;
+}
+
+.save-btn {
+  background: #3498db;
+  color: #fff;
+}
+
+.save-btn:hover {
+  background: #2980b9;
 }
 
 .fade-enter-active,
@@ -749,5 +911,53 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.holding-wrapper.holding::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0%;
+  height: 100%;
+  background-color: var(--event-color);
+  opacity: 0.85;
+  animation: slideIn 0.5s forwards;
+  z-index: 1;
+  border-radius: 5px;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.completed-icon,
+.closed-icon {
+  margin-left: 8px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.completed-icon {
+  color: #28a745;
+}
+
+.closed-icon {
+  color: #ff4040;
+}
+
+.title-text,
+.event-description,
+.objective-text {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
