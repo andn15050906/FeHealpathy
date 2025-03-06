@@ -33,9 +33,14 @@
               <router-link to="/courses">Manage courses</router-link>
               <router-link to="/blogs/manage">Manage blogs</router-link>
             </li>
-            <li v-if="user.role === 'Admin'">
+            <li v-if="user.role === 2">
               <router-link to="/admin">Admin</router-link>
-              <router-link to="/blogs/manage">Manage blogs</router-link>
+            </li>
+            <li v-if="user.role === 2">
+            <router-link to="/blogs/manage">Manage blogs</router-link>
+            </li>
+            <li v-if="user.role === 2">
+            <router-link to="/advisor/moderate-advisors">Moderate Advisor</router-link>
             </li>
             <hr v-if="['Learner', 'Advisor', 'Admin'].includes(user.role)" class="menu-divider" />
 

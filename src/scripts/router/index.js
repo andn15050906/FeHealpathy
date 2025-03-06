@@ -76,6 +76,8 @@ import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
 import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
 import Roadmaps from '@/views/Profile/Preferences/Roadmaps.vue'
 
+import ModerateAdvisors from '@/views/Admin/ModerateAdvisors.vue'
+
 import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
@@ -453,6 +455,13 @@ const router = createRouter({
       component: Roadmaps
     },
 
+
+    // Advisor
+    {
+      path: '/advisor/moderate-advisors',
+      name: 'ModerateAdvisors',
+      component: ModerateAdvisors,
+    },
     // Admin
     {
       path: '/admin/moderate-users',
