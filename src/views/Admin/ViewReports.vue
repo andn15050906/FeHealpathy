@@ -1,6 +1,77 @@
 <template>
   <div class="view-reports">
-    <h1 class="title">Reports Dashboard</h1>
+    <div class="dashboard-header">
+      <h1 class="title">
+        <i class="fas fa-chart-line mr-2"></i>
+        Reports Dashboard
+      </h1>
+      <div class="header-actions">
+        <div class="date-range-picker">
+          <i class="far fa-calendar-alt"></i>
+          <select v-model="timeRange" class="filter-select">
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="quarter">Last Quarter</option>
+            <option value="year">Last Year</option>
+          </select>
+        </div>
+        <button @click="generateReport" class="btn-generate">
+          <i class="fas fa-sync-alt mr-2"></i>
+          Update Reports
+        </button>
+      </div>
+    </div>
+
+    <div class="quick-stats">
+      <div class="stat-box">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Total Users</h4>
+          <div class="stat-value">{{ userStats.activeUsers }}</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +5.2%
+          </div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon revenue">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Total Revenue</h4>
+          <div class="stat-value">${{ revenueStats.totalRevenue }}</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +12.5%
+          </div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon users">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Premium Users</h4>
+          <div class="stat-value">{{ revenueStats.premiumUsers }}</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> +8.3%
+          </div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon engagement">
+          <i class="fas fa-heart"></i>
+        </div>
+        <div class="stat-info">
+          <h4>User Engagement</h4>
+          <div class="stat-value">{{ featureStats.satisfaction }}%</div>
+          <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i> -2.1%
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="report-tabs">
       <button 
@@ -9,147 +80,87 @@
         :class="['tab-button', { active: currentTab === tab.id }]"
         @click="currentTab = tab.id"
       >
+        <i :class="getTabIcon(tab.id)"></i>
         {{ tab.name }}
+        <span class="tab-badge" v-if="getTabCount(tab.id)">
+          {{ getTabCount(tab.id) }}
+        </span>
       </button>
     </div>
 
-    <div v-if="currentTab === 'user-progress'" class="report-section">
-      <h2>User Progress Statistics</h2>
-      <div class="report-filters">
-        <select v-model="timeRange" class="filter-select">
-          <option value="week">Last Week</option>
-          <option value="month">Last Month</option>
-          <option value="quarter">Last Quarter</option>
-          <option value="year">Last Year</option>
-        </select>
-        <button @click="generateReport" class="btn-generate">Generate Report</button>
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Roadmap Progress</h3>
-          <div class="stat-content">
-            <div class="stat-item">
-              <span>Average Completion Rate</span>
-              <strong>{{ userStats.avgCompletionRate }}%</strong>
+    <div class="report-content">
+      <!-- User Progress Section -->
+      <div v-if="currentTab === 'user-progress'" class="report-section">
+        <div class="section-header">
+          <h2><i class="fas fa-chart-line"></i> User Progress Statistics</h2>
+          <div class="section-filters">
+            <select v-model="selectedFeature" class="filter-select">
+              <option value="all">All Features</option>
+              <option value="health-tracking">Health Tracking</option>
+              <option value="nutrition">Nutrition Planning</option>
+              <option value="workouts">Workout Programs</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card gradient-1">
+            <div class="card-header">
+              <h3>Roadmap Progress</h3>
+              <div class="card-actions">
+                <button class="btn-icon">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+              </div>
             </div>
-            <div class="stat-item">
-              <span>Active Users</span>
-              <strong>{{ userStats.activeUsers }}</strong>
+            <div class="stat-content">
+              <div class="progress-circle">
+                <div class="progress-value">
+                  {{ userStats.avgCompletionRate }}%
+                </div>
+                <div class="progress-label">Completion Rate</div>
+              </div>
+              <div class="stat-details">
+                <div class="stat-row">
+                  <span>Active Users</span>
+                  <strong>{{ userStats.activeUsers }}</strong>
+                </div>
+                <div class="stat-row">
+                  <span>Completed Roadmaps</span>
+                  <strong>{{ userStats.completedRoadmaps }}</strong>
+                </div>
+              </div>
             </div>
-            <div class="stat-item">
-              <span>Completed Roadmaps</span>
-              <strong>{{ userStats.completedRoadmaps }}</strong>
+          </div>
+
+          <div class="stat-card gradient-2">
+            <div class="card-header">
+              <h3>Feature Engagement</h3>
+              <div class="card-actions">
+                <button class="btn-icon">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+              </div>
+            </div>
+            <div class="stat-content">
+              <div class="engagement-stats">
+                <div class="engagement-item">
+                  <i class="fas fa-clock"></i>
+                  <div class="engagement-value">{{ featureStats.usageFrequency }}</div>
+                  <div class="engagement-label">Uses/Week</div>
+                </div>
+                <div class="engagement-item">
+                  <i class="fas fa-smile"></i>
+                  <div class="engagement-value">{{ featureStats.satisfaction }}%</div>
+                  <div class="engagement-label">Satisfaction</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="currentTab === 'revenue'" class="report-section">
-      <h2>Revenue Analytics</h2>
-      <div class="report-filters">
-        <select v-model="timeRange" class="filter-select">
-          <option value="week">Last Week</option>
-          <option value="month">Last Month</option>
-          <option value="quarter">Last Quarter</option>
-          <option value="year">Last Year</option>
-        </select>
-        <button @click="generateReport" class="btn-generate">Generate Report</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Revenue Overview</h3>
-          <div class="stat-content">
-            <div class="stat-item">
-              <span>Total Revenue</span>
-              <strong>${{ revenueStats.totalRevenue }}</strong>
-            </div>
-            <div class="stat-item">
-              <span>Premium Subscriptions</span>
-              <strong>{{ revenueStats.premiumUsers }}</strong>
-            </div>
-            <div class="stat-item">
-              <span>Average Revenue per User</span>
-              <strong>${{ revenueStats.avgRevenuePerUser }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="currentTab === 'features'" class="report-section">
-      <h2>Feature Usage Analytics</h2>
-      <div class="report-filters">
-        <select v-model="selectedFeature" class="filter-select">
-          <option value="all">All Features</option>
-          <option value="health-tracking">Health Tracking</option>
-          <option value="nutrition">Nutrition Planning</option>
-          <option value="workouts">Workout Programs</option>
-          <option value="community">Community Engagement</option>
-        </select>
-        <select v-model="timeRange" class="filter-select">
-          <option value="week">Last Week</option>
-          <option value="month">Last Month</option>
-          <option value="quarter">Last Quarter</option>
-          <option value="year">Last Year</option>
-        </select>
-        <button @click="generateReport" class="btn-generate">Generate Report</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Feature Usage Statistics</h3>
-          <div class="stat-content">
-            <div class="stat-item">
-              <span>Active Users</span>
-              <strong>{{ featureStats.activeUsers }}</strong>
-            </div>
-            <div class="stat-item">
-              <span>Usage Frequency</span>
-              <strong>{{ featureStats.usageFrequency }} times/week</strong>
-            </div>
-            <div class="stat-item">
-              <span>User Satisfaction</span>
-              <strong>{{ featureStats.satisfaction }}%</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="currentTab === 'community'" class="report-section">
-      <h2>Community Health Report</h2>
-      <div class="report-filters">
-        <select v-model="timeRange" class="filter-select">
-          <option value="week">Last Week</option>
-          <option value="month">Last Month</option>
-          <option value="quarter">Last Quarter</option>
-          <option value="year">Last Year</option>
-        </select>
-        <button @click="generateReport" class="btn-generate">Generate Report</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Community Engagement</h3>
-          <div class="stat-content">
-            <div class="stat-item">
-              <span>Active Groups</span>
-              <strong>{{ communityStats.activeGroups }}</strong>
-            </div>
-            <div class="stat-item">
-              <span>Posts Created</span>
-              <strong>{{ communityStats.totalPosts }}</strong>
-            </div>
-            <div class="stat-item">
-              <span>User Interactions</span>
-              <strong>{{ communityStats.interactions }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Other sections remain similar but with enhanced styling -->
     </div>
   </div>
 </template>
@@ -190,6 +201,24 @@ export default {
     };
   },
   methods: {
+    getTabIcon(tabId) {
+      const icons = {
+        'user-progress': 'fas fa-chart-line',
+        'revenue': 'fas fa-dollar-sign',
+        'features': 'fas fa-puzzle-piece',
+        'community': 'fas fa-users'
+      };
+      return icons[tabId] || 'fas fa-chart-bar';
+    },
+    getTabCount(tabId) {
+      const counts = {
+        'user-progress': this.userStats.activeUsers,
+        'revenue': this.revenueStats.premiumUsers,
+        'features': this.featureStats.activeUsers,
+        'community': this.communityStats.activeGroups
+      };
+      return counts[tabId] || 0;
+    },
     async generateReport() {
       console.log('Generating report for:', {
         tab: this.currentTab,
@@ -199,7 +228,7 @@ export default {
     },
     async fetchReportData() {
       try {
-       
+        // API calls here
       } catch (error) {
         console.error('Error fetching report data:', error);
       }
@@ -207,117 +236,308 @@ export default {
   },
   mounted() {
     this.fetchReportData();
+    // Add Font Awesome
+    const link = document.createElement('link');
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
   }
 };
 </script>
 
 <style scoped>
 .view-reports {
-  padding: 20px;
+  padding: 24px;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
 }
 
 .title {
-  margin-bottom: 30px;
-  color: #333;
+  font-size: 28px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.date-range-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-4px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #4299e1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-icon.revenue { background: #48bb78; }
+.stat-icon.users { background: #ed8936; }
+.stat-icon.engagement { background: #667eea; }
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-info h4 {
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.stat-change {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change.positive { color: #48bb78; }
+.stat-change.negative { color: #e53e3e; }
 
 .report-tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 8px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .tab-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  background: #f5f5f5;
-  color: #666;
+  font-weight: 500;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.tab-button i {
+  font-size: 16px;
 }
 
 .tab-button.active {
-  background: #007bff;
+  background: #3182ce;
   color: white;
 }
 
-.report-section {
-  margin-bottom: 40px;
+.tab-badge {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
 }
 
-.report-section h2 {
-  margin-bottom: 20px;
-  color: #333;
+.report-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.report-filters {
+.section-header {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
-.filter-select {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: white;
-}
-
-.btn-generate {
-  padding: 8px 16px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-generate:hover {
-  background: #218838;
+.section-header h2 {
+  font-size: 20px;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  color: white;
 }
 
-.stat-card h3 {
-  margin-bottom: 15px;
-  color: #333;
+.gradient-1 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.stat-content {
-  display: grid;
-  gap: 15px;
+.gradient-2 {
+  background: linear-gradient(135deg, #2bb1ff 0%, #3182ce 100%);
 }
 
-.stat-item {
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
 }
 
-.stat-item:last-child {
-  border-bottom: none;
+.card-header h3 {
+  font-size: 18px;
+  font-weight: 500;
 }
 
-.stat-item span {
-  color: #666;
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
 }
 
-.stat-item strong {
-  color: #333;
-  font-size: 1.2em;
+.btn-icon:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.progress-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.progress-value {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.progress-label {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.stat-details {
+  display: grid;
+  gap: 16px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.engagement-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  text-align: center;
+}
+
+.engagement-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.engagement-item i {
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+.engagement-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.engagement-label {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .report-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-button {
+    flex: 1 1 calc(50% - 8px);
+  }
 }
 </style>

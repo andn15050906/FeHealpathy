@@ -80,6 +80,7 @@ import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
 import ViewReports from '@/views/Admin/ViewReports.vue'
+import Dashboard from '@/views/Admin/Dashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -455,10 +456,16 @@ const router = createRouter({
 
     // Admin
     {
+      path: '/admin',
+      name: 'AdminDashboard',
+      component: Dashboard,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
       path: '/admin/moderate-users',
       name: 'ModerateUsers',
       component: ModerateUsers,
-     // meta: { requiresAuth: true, requiresAdmin: true }
+      //meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/admin/create-admin',
