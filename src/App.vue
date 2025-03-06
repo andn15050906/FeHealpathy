@@ -4,14 +4,15 @@
     <SweetAlert ref="sweetAlert" />
     <Header ref="headerRef" />
     <main>
-      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
+      <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar"></RoadmapProgress>
       <div class="page-container">
-        <RouterView class="left-sidebar" v-if="isAuthenticated" name="roadmapProgress"></RouterView>
+        <!--<RouterView class="left-sidebar" v-if="isAuthAndShown" name="roadmapProgress"></RouterView>-->
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
       </div>
-      <div class="partner-chat">
-        <ConversationWindow v-if="isAuthAndShown" :single-room="true" @toggleChat="toggleChat" />
+      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
+      <div class="partner-chat" v-if="isAuthAndShown">
+        <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
       </div>
     </main>
     <Footer />
@@ -28,6 +29,7 @@ import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 import ConversationWindow from './components/CommunityComponents/ConversationWindow.vue';
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -117,12 +119,21 @@ main {
   padding: 40px;
 }
 
-.page-container:has(.left-sidebar) {
+/*.page-container:has(.left-sidebar) {
   display: flex;
+}*/
+
+.page-container:has(.home-background) {
+  padding: 0;
 }
 
 .left-sidebar {
-  flex: 0.5;
+  /*flex: 0.5;*/
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 350px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 .partner-chat {
@@ -132,6 +143,7 @@ main {
   z-index: 1000;
   height: 460px;
   width: 360px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 footer {

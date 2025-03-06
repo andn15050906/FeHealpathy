@@ -86,7 +86,7 @@
                 </p>
             </section>
         </main>
-        <main v-if="isLoggedIn" class="main-content">
+        <main v-if="isLoggedIn" class="main-content home-background">
             <PersonalRoadmap></PersonalRoadmap>
         </main>
     </div>
@@ -171,6 +171,11 @@ export default {
 <style scoped>
 .home-container {
     background: #fff;
+}
+
+.home-background {
+    background-image: radial-gradient(circle 369px at -2.9% 12.9%, rgba(247, 234, 163, 1) 0%, rgba(236, 180, 238, 0.56) 46.4%, rgba(163, 203, 247, 1) 100.7%);
+    padding: 40px 80px !important;
 }
 
 .main-header {
