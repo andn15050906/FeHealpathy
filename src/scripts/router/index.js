@@ -77,6 +77,12 @@ import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
+
+import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
+import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
+import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
+import ViewReports from '@/views/Admin/ViewReports.vue'
+import Dashboard from '@/views/Admin/Dashboard.vue'
 import RoadmapBuilder from '@/components/PracticeComponents/RoadmapBuilder.vue'
 
 const router = createRouter({
@@ -471,9 +477,46 @@ const router = createRouter({
       component: SelfAssessmentResult
     },
     {
+      path: '/roadmaps',
+      name: 'Roadmaps',
+      component: Roadmaps
+    },
+    {
       path: '/roadmap-builder',
       name: 'RoadmapBuilder',
       component: RoadmapBuilder
+    },
+
+    // Admin
+    {
+      path: '/admin',
+      name: 'AdminDashboard',
+      component: Dashboard,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/moderate-users',
+      name: 'ModerateUsers',
+      component: ModerateUsers,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/create-admin',
+      name: 'CreateAdminAccounts',
+      component: CreateAdminAccounts,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/moderate-content',
+      name: 'ModerateUploadedContent',
+      component: ModerateUploadedContent,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/view-reports',
+      name: 'ViewReports',
+      component: ViewReports,
+      //meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })
