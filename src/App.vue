@@ -1,4 +1,5 @@
 <template>
+  <!--<Guider v-if="isAuthAndShown" ref="guiderRef" />-->
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
@@ -27,6 +28,7 @@ import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
+//import Guider from '@/components/PracticeComponents/Guider.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 import ConversationWindow from './components/CommunityComponents/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
@@ -35,6 +37,7 @@ const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
 const router = useRouter();
 const isAuthenticated = ref(false);
+//const guiderRef = ref(null);
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -48,6 +51,11 @@ provide('sweetAlert', {
   showWarning: (message) => sweetAlert.value.showAlert({ icon: 'warning', title: 'Warning', text: message }),
   showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
 });
+
+/*provide('guider', {
+  highlight: (targetElementId, offsetX, offsetY, width, height, position) =>
+    guiderRef.value.highlight(targetElementId, offsetX, offsetY, width, height, position)
+});*/
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {

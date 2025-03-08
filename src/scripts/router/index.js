@@ -77,6 +77,7 @@ import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
+import RoadmapBuilder from '@/components/PracticeComponents/RoadmapBuilder.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -468,6 +469,11 @@ const router = createRouter({
       path: '/statistics/self-assessment',
       name: 'SelfAssessmentResult',
       component: SelfAssessmentResult
+    },
+    {
+      path: '/roadmap-builder',
+      name: 'RoadmapBuilder',
+      component: RoadmapBuilder
     }
   ]
 })

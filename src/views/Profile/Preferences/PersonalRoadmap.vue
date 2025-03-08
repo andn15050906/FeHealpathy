@@ -12,9 +12,10 @@
 </template>
 
 <script>
+//import { inject } from 'vue';
+import "vue3-tour/dist/vue3-tour.css";
 import Roadmap from "@/components/PracticeComponents/Roadmap.vue";
 import GlowingButton from "@/components/Common/GlowingButton.vue";
-import "vue3-tour/dist/vue3-tour.css";
 import { roadmaps } from '@/scripts/data/roadmaps.js';
 
 export default {
@@ -46,13 +47,15 @@ export default {
                     buttonStop: "Finish",
                 }
             },
-            roadmap: roadmaps['mental-roadmap']
+            roadmap: roadmaps['mental-roadmap']//,
+            //guider: inject('guider')
         }
     },
     mounted() {
         if (this.enableTour) {
             this.$tours['roadmap-tour'].start();
         }
+        /*this.guider.highlight(`roadmap-btn-${1}`);*/
     },
     methods: {
         toggleTour() {
