@@ -477,11 +477,6 @@ const router = createRouter({
       component: SelfAssessmentResult
     },
     {
-      path: '/roadmaps',
-      name: 'Roadmaps',
-      component: Roadmaps
-    },
-    {
       path: '/roadmap-builder',
       name: 'RoadmapBuilder',
       component: RoadmapBuilder
