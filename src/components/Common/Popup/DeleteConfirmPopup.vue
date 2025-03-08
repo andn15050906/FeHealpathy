@@ -34,7 +34,7 @@ const props = defineProps({
     },
     url: {
         type: String,
-        required: false, //test
+        required: true
     },
 });
 

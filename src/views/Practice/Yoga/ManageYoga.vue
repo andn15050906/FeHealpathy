@@ -4,7 +4,7 @@
       <div class="yoga-management">
         <h1 class="title">🧘 Yoga Management</h1>
         <div class="header-actions">
-          <router-link to="/yoga/create">
+          <router-link :to="{ name: 'CreateYoga' }">
             <button class="create-yoga-btn btn">✅  Create A Yoga Lesson</button>
           </router-link>
         </div>

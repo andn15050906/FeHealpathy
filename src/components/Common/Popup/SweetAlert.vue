@@ -29,8 +29,3 @@ export default {
   }
 };
 </script>
-Swal.fire({
-  icon: 'success',
-  title: 'Test Alert',
-  text: 'Nếu bạn thấy popup này, SweetAlert hoạt động!',
-});

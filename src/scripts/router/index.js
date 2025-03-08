@@ -71,6 +71,7 @@ import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
+import CreateYogaLesson from '@/views/Practice/Yoga/CreateYoga.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
@@ -458,6 +459,11 @@ const router = createRouter({
       path: '/yogas/manage',
       name: 'ManageYoga',
       component: ManageYoga
+    },
+    {
+      path: '/yoga/create',
+      name: 'CreateYoga',
+      component: CreateYogaLesson
     },
     {
       path: '/request',

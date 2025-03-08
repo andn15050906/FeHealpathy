@@ -24,11 +24,11 @@
             <li><router-link to="/change-password">Change Password</router-link></li>
             <hr class="menu-divider" />
 
-            <li v-if="user.role === 0 || user.role === 1">
+            <li>
               <router-link to="/enrolled-course">Enrolled courses</router-link>
             </li>
 
-            <li v-if="user.role == 'Member'">
+            <li v-if="user.role == 0">
               <hr class="menu-divider" />
               <router-link to="/request">Request to be an advisor</router-link>
             </li>
