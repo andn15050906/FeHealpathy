@@ -1,16 +1,19 @@
 <template>
+  <!--<Guider v-if="isAuthAndShown" ref="guiderRef" />-->
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
     <Header ref="headerRef" />
     <main>
-      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
+      <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar"></RoadmapProgress>
       <div class="page-container">
+        <!--<RouterView class="left-sidebar" v-if="isAuthAndShown" name="roadmapProgress"></RouterView>-->
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
-        <div class="partner-chat">
-          <ConversationWindow v-if="isAuthAndShown" :single-room="true" @toggleChat="toggleChat" />
-        </div>
+      </div>
+      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
+      <div class="partner-chat" v-if="isAuthAndShown">
+        <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
       </div>
     </main>
     <Footer />
@@ -25,13 +28,16 @@ import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
+//import Guider from '@/components/PracticeComponents/Guider.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 import ConversationWindow from './components/CommunityComponents/ConversationWindow.vue';
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
 const router = useRouter();
 const isAuthenticated = ref(false);
+//const guiderRef = ref(null);
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -45,6 +51,11 @@ provide('sweetAlert', {
   showWarning: (message) => sweetAlert.value.showAlert({ icon: 'warning', title: 'Warning', text: message }),
   showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
 });
+
+/*provide('guider', {
+  highlight: (targetElementId, offsetX, offsetY, width, height, position) =>
+    guiderRef.value.highlight(targetElementId, offsetX, offsetY, width, height, position)
+});*/
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
@@ -88,6 +99,12 @@ const toggleChat = () => {
 }
 </script>
 
+<script>
+export default {
+  emits: ["handleAuthenticated", "addNotification", "removeNotification"]
+}
+</script>
+
 <style scoped>
 main {
   padding: 0 20px;
@@ -110,6 +127,23 @@ main {
   padding: 40px;
 }
 
+/*.page-container:has(.left-sidebar) {
+  display: flex;
+}*/
+
+.page-container:has(.home-background) {
+  padding: 0;
+}
+
+.left-sidebar {
+  /*flex: 0.5;*/
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 350px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
 .partner-chat {
   position: fixed;
   bottom: 0;
@@ -117,6 +151,7 @@ main {
   z-index: 1000;
   height: 460px;
   width: 360px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
 footer {

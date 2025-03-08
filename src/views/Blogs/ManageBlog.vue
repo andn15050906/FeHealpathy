@@ -10,8 +10,9 @@
     </div>
       <div class="blog-list">
         <div class="blog-item" v-for="blog in blogs" :key="blog.id">
-          <img :src="blog.thumb?.url || 'https://placehold.co/150x150'" 
-          :alt="blog.title" class="thumbnail" />
+          <img :src="blog.thumb?.url || 'https://placehold.co/16x9'" 
+     :alt="blog.title" class="thumbnail" />
+
           <div class="blog-details">
             <h2 class="blog-title">{{ blog.title }}</h2>
             <p class="blog-date">Ngày đăng: {{ formattedDate(blog.creationTime) }}</p>
@@ -63,6 +64,7 @@ import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue
         const data = await getPagedArticles();
           if (data.items && data.items.length > 0) {
             this.blogs = data.items;
+            console.log(data);
           } else {
             this.blogs = [];
             this.errorMessage = "Chưa có blog nào!";
@@ -173,11 +175,13 @@ import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue
   }
   
   .thumbnail {
-    width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 10px;
     margin-right: 20px;
+    width: 20%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
   }
   
   .blog-details {
@@ -230,6 +234,7 @@ import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue
     color: #888;
     font-size: 1rem;
   }
+
   </style>
 
   

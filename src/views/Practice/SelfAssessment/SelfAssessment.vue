@@ -2,109 +2,110 @@
   <div class="container mt-5 stress-assessment">
     <h2 class="mb-4 text-title">Tests</h2>
     <div class="test-options">
-      <div v-for="(type, index) in assessmentTypes" :key="type.id" class="test-option" @click="openTest(type.id)">
-        <div class="icon-container">
-          <img :src="type.icon" alt="icon" class="icon" />
-        </div>
-        <span class="option-title">{{ type.title }}</span>
+      <div v-for="(item, index) in surveys" :key="item.id" class="test-option" @click="openTest(item.id)">
+        <div class="test-option-image" :style="{ backgroundImage: 'url(' + item.icon + ')' }"></div>
+        <!--<span class="option-title">{{ item.name }}</span>-->
       </div>
     </div>
 
     <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <span class="close" @click="closePopup">&times;</span>
-        <h3 class="text-center text-title">{{ currentTest.title }}</h3>
-        <h5 class="text-center">Please answer the following questions:</h5>
-        <div class="progress mb-4" style="height: 30px;">
-          <div class="progress-bar progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"
-            aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
+        <h3 class="text-center text-title">{{ currentSurvey.title }}</h3>
+        <h5 class="text-center">{{ text.pleaseAnswer }}</h5>
         <div class="questions-container">
-          <h5>Question {{ currentQuestionIndex + 1 }}:</h5>
-          <p>{{ currentTest.questions[currentQuestionIndex].text }}</p>
-          <div class="question-list">
-            <div v-for="(question, index) in currentTest.questions" :key="index" class="question-item"
-              @click="currentQuestionIndex = index">
-              <span :class="{ 'answered': answers[index] !== undefined, 'current': currentQuestionIndex === index }">
-                {{ index + 1 }}
-              </span>
-            </div>
+          <div class="survey-container">
+            <SingleSelectSurvey :options="currentSurveyOptions" :padding='"0"' :isSinglePage="true" ref="currentSurveyRef"></SingleSelectSurvey>
           </div>
-          <div>
-            <div v-for="(option, optionIndex) in currentTest.questions[currentQuestionIndex].options"
-              :key="optionIndex">
-              <input type="radio" :name="'question' + currentQuestionIndex" :value="option"
-                @change="selectAnswer(option)"
-                :class="{ 'selected': answers[currentQuestionIndex] === option, 'answered': answers[currentQuestionIndex] !== undefined }" />
-              {{ option }}
-            </div>
-          </div>
-          <button @click="nextQuestion" class="btn btn-primary mt-3 mx-auto d-block">Next</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import data from '@/scripts/data/data';
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { SurveyOptions } from "@/scripts/types/SurveyOptions";
+import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/scripts/types/dtos';
+import { useRouter } from 'vue-router';
+import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import { createSubmission } from '@/scripts/api/services/submissionsService';
+import SingleSelectSurvey from '@/components/SurveyComponents/SingleSelectSurvey.vue';
 
-export default {
-  data() {
-    return {
-      assessmentTypes: data.Assessments.types,
-      currentTest: {},
-      showPopup: false,
-      currentQuestionIndex: 0,
-      answers: [],
-      progress: 0,
-      score: null,
-      evaluation: '',
-    };
-  },
-  methods: {
-    openTest(testId) {
-      this.currentTest = data.Assessments.types.find(type => type.id === testId);
-      this.currentQuestionIndex = 0;
-      this.showPopup = true;
-    },
-    closePopup() {
-      this.showPopup = false;
-      this.resetTest();
-    },
-    resetTest() {
-      this.answers = [];
-      this.progress = 0;
-      this.score = null;
-      this.evaluation = '';
-      this.currentQuestionIndex = 0;
-    },
-    selectAnswer(answer) {
-      this.answers[this.currentQuestionIndex] = answer;
-      this.updateProgress();
-    },
-    nextQuestion() {
-      this.currentQuestionIndex++;
-      this.updateProgress();
-    },
-    updateProgress() {
-      const answeredQuestions = this.answers.filter(answer => answer !== undefined).length;
-      this.progress = (answeredQuestions / this.currentTest.questions.length) * 100;
-    },
-    submitAnswers() {
-      this.score = this.calculateScore(this.answers);
-      this.evaluation = this.evaluateStressLevel(this.score);
-    },
-    calculateScore(answers) {
-      return answers.length;
-    },
-    evaluateStressLevel(score) {
-      if (score < 5) return 'Low Stress';
-      if (score < 10) return 'Moderate Stress';
-      return 'High Stress';
-    },
-  },
-};
+const text = {
+  //Please answer the following questions:
+  pleaseAnswer : "Bạn hãy trả lời những câu hỏi sau:"
+}
+const surveys = ref([]);
+const showPopup = ref(false);
+const currentSurvey = ref({});
+const currentSurveyRef = ref();
+const currentQuestionIndex = ref(0);
+const router = useRouter();
+
+onMounted(async () => {
+  // filter
+  surveys.value = (await getPagedSurveys()).items
+    .filter(item => item.name.includes("DASS-21") || item.name.includes("GAD-7"))
+    .map(item => {
+      return {
+        ...item,
+        icon: item.name.includes("DASS-21")
+          ? "/assets/images/surveys/Survey_DASS21.png"
+          : "/assets/images/surveys/Survey_Enneagram.webp" }});
+})
+const currentSurveyOptions = computed(() => new SurveyOptions(
+  currentSurvey.value,
+  '',
+  null,
+  currentSurvey.value.name.includes("DASS-21")
+    ? submitDASS21
+    : submitGAD7,
+  false,
+  true
+))
+
+const openTest = (testId) => {
+  currentSurvey.value = surveys.value.find(survey => survey.id === testId);
+  currentQuestionIndex.value = 0;
+  showPopup.value = true;
+}
+const closePopup = () => {
+  showPopup.value = false;
+  //currentSurveyRef.resetSurvey();
+}
+const submitSurvey = async (survey, questionsWithAnswer) => {
+  let data = new CreateSubmissionDto(
+    survey.id,
+    questionsWithAnswer
+      .filter(item => survey.questions.find(question => question.id == item.questionId))
+      .map(item => {
+          return new CreateMcqChoiceDto(item.questionId, item.answerId)
+      })
+  );
+  //return
+  return await createSubmission(data);
+}
+const submitDASS21 = async (questionsWithAnswer) => {
+  let survey = surveys.value.find(item => item.name.includes("DASS-21"));
+  try {
+    var response = await submitSurvey(survey, questionsWithAnswer);
+    router.push({ name: 'SubmissionReview', params: { id: response }});
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+const submitGAD7 = async (questionsWithAnswer) => {
+  let survey = surveys.value.find(item => item.name.includes("GAD-7"));
+  try {
+    var response = await submitSurvey(survey, questionsWithAnswer);
+    router.push({ name: 'SubmissionReview', params: { id: response }});
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
 </script>
 
 <style scoped>
@@ -130,6 +131,13 @@ export default {
   color: white;
   flex: 1 1 calc(50% - 20px);
   margin: 10px;
+}
+
+.test-option-image {
+  height: 90%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
 }
 
 .test-option:nth-child(1),
@@ -178,7 +186,7 @@ export default {
   border-radius: 10px;
   width: 80%;
   max-width: 900px;
-  max-height: 80vh;
+  min-height: 80vh;
   overflow-y: auto;
 }
 
@@ -188,37 +196,13 @@ export default {
   font-size: 20px;
 }
 
+.progress, .survey-container {
+  width: 95%;
+}
+
 .questions-container {
   max-height: 600px;
   overflow-y: auto;
-}
-
-.question-list {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.question-item {
-  cursor: pointer;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  text-align: center;
-  background-color: #D3D3D3;
-}
-
-.question-item:hover {
-  background-color: #e7f1ff;
-}
-
-.question-item.current {
-  background-color: #4CAF50;
-}
-
-.question-item.answered {
-  background-color: #4CAF50;
 }
 
 input[type="radio"] {

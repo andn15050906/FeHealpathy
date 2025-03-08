@@ -23,29 +23,43 @@
             <hr class="menu-divider" />
             <li><router-link to="/change-password">Change Password</router-link></li>
             <hr class="menu-divider" />
-            <li><router-link to="/roadmap">Your roadmap</router-link></li>
-            <hr class="menu-divider" />
 
-            <li v-if="user.role === 'Learner' || user.role === 'Advisor'">
+            <li>
               <router-link to="/enrolled-course">Enrolled courses</router-link>
             </li>
-            <li v-if="user.role === 'Advisor'">
-              <router-link to="/courses">Manage courses</router-link>
-              <router-link to="/blogs/manage">Manage blogs</router-link>
+
+            <li v-if="user.role == 0">
+              <hr class="menu-divider" />
+              <router-link to="/request">Request to be an advisor</router-link>
             </li>
+
+            <li v-if="user.role === 1">
+              <hr class="menu-divider" />
+              <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
+            </li>
+            <li v-if="user.role === 1">
+              <hr class="menu-divider" />
+              <router-link to="/courses">Manage courses</router-link>
+            </li>
+            <li v-if="user.role === 1">
+            <router-link to="/blogs/manage">Manage blogs</router-link>
+            </li>
+            
             <li v-if="user.role === 2">
               <router-link to="/admin">Admin</router-link>
             </li>
             <li v-if="user.role === 2">
-            <router-link to="/blogs/manage">Manage blogs</router-link>
+              <router-link to="/advisor/moderate-advisors">Moderate Advisor</router-link>
             </li>
             <li v-if="user.role === 2">
-            <router-link to="/advisor/moderate-advisors">Moderate Advisor</router-link>
+              <hr class="menu-divider" />
+              <router-link to="/yogas/manage">Manage Yoga Practice</router-link>
             </li>
-            <hr v-if="['Learner', 'Advisor', 'Admin'].includes(user.role)" class="menu-divider" />
 
             <li>
+              <hr class="menu-divider" />
               <button @click="signOut">Sign Out</button>
+              <hr class="menu-divider" />
             </li>
           </ul>
         </div>
@@ -101,9 +115,7 @@ export default {
             role: clientData.role || 'Member',
           };
         }
-        // else {
-        //   console.log('User not logged in or invalid status');
-        // }
+        console.log("User role:", this.user.role);
       } catch (error) {
         console.error('Error fetching user status:', error);
       }
@@ -171,6 +183,8 @@ export default {
     //   }
     // },
   }
+
+  
 };
 
 </script>
@@ -246,6 +260,7 @@ ul {
   z-index: 1000;
   display: block;
   width: max-content;
+  left: -15px;
 }
 
 .dropdown-menu li {
@@ -256,16 +271,9 @@ ul {
   transition: background-color 0.2s;
 }
 
-.menu-divider {
-  border: none;
-  border-bottom: 1px solid #ccc;
-  margin: 5px 0;
-}
-
 .dropdown-menu li:hover {
   background-color: #f3f3f3;
 }
-
 
 .dropdown-menu li a,
 .dropdown-menu li button {
@@ -283,6 +291,12 @@ ul {
 .dropdown-menu li a:hover,
 .dropdown-menu li button:hover {
   background-color: #f3f3f3;
+}
+
+.menu-divider {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
 }
 
 .login-btn {
@@ -369,4 +383,5 @@ ul {
 .menu-toggle:focus {
   outline: none;
 }
+
 </style>

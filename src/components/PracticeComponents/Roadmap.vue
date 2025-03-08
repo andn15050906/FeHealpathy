@@ -6,7 +6,7 @@
         <v-card-text class="bg-white text--primary">
           <p class="roadmap-content">{{ item.content }}</p>
           <RouterLink :to="item.link">
-            <v-btn :color="item.color" variant="outlined">{{ item.linkTitle }}</v-btn>
+            <v-btn :id="`roadmap-btn-${i + 1}`" :color="item.color" variant="outlined">{{ item.linkTitle ?? 'Find out more!' }}</v-btn>
           </RouterLink>
         </v-card-text>
       </v-card>
