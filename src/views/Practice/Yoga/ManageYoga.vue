@@ -1,31 +1,31 @@
 <template>
   <div>
-    <div v-if="!isEditingCourse">
-      <div class="course-management">
-        <h1 class="title">🧘 Course Management</h1>
+    <div v-if="!isEditingYoga">
+      <div class="yoga-management">
+        <h1 class="title">🧘 Yoga Management</h1>
         <div class="header-actions">
-          <router-link to="/course/create">
-            <button class="create-course-btn btn">✅  Create A Course</button>
+          <router-link :to="{ name: 'CreateYoga' }">
+            <button class="create-yoga-btn btn">✅  Create A Yoga Lesson</button>
           </router-link>
         </div>
 
-        <p v-if="isLoading">Loading ...</p>
+        <p v-if="isLoading">Đang tải dữ liệu...</p>
 
-        <div class="course-list" v-if="!isLoading">
-          <div class="course-item" v-for="course in courses" :key="course.id">
-            <img :src="course.thumbUrl || 'https://placehold.co/16x9'" :alt="course.title" class="thumbnail" />
-            <div class="course-details">
-              <h2 class="course-title">{{ course.title }}</h2>
-              <p class="course-date">Date: {{ formattedDate(course.creationTime) }}</p>
+        <div class="yoga-list" v-if="!isLoading">
+          <div class="yoga-item" v-for="yoga in yogas" :key="yoga.id">
+            <img :src="yoga.thumbUrl || 'https://placehold.co/16x9'" :alt="yoga.title" class="thumbnail" />
+            <div class="yoga-details">
+              <h2 class="yoga-title">{{ yoga.title }}</h2>
+              <p class="yoga-date">Date: {{ formattedDate(yoga.creationTime) }}</p>
               <div class="actions">
-                <button class="btn edit" @click="editcourse(course)">✏️ Update</button>
-                <button class="btn delete" @click="openDeletePopup(course)">🗑️ Delete</button>
+                <button class="btn edit" @click="editYoga(yoga)">✏️ Update</button>
+                <button class="btn delete" @click="openDeletePopup(yoga)">🗑️ Delete</button>
               </div>
             </div>
           </div>
         </div>
 
-        <p v-if="courses.length === 0 && !isLoading" class="no-courses">Chưa có bài course nào được đăng!</p>
+        <p v-if="yogas.length === 0 && !isLoading" class="no-yogas">Chưa có bài yoga nào được đăng!</p>
       </div>
     </div>
 
@@ -37,9 +37,9 @@
       </button>
     </div>
 
-    <UpdateCourse v-if="isEditingcourse" :courseData="selectedcourse" @courseUpdated="handlecourseUpdated" />
+    <UpdateYoga v-if="isEditingYoga" :yogaData="selectedYoga" @yogaUpdated="handleYogaUpdated" />
     <DeleteConfirmPopup 
-      :message="'Xóa lớp course này?'" 
+      :message="'Xóa lớp yoga này?'" 
       :isVisible="isDeletePopupVisible" 
       @confirmDelete="handleDeleteConfirm"
       @update:isVisible="isDeletePopupVisible = $event"
@@ -50,37 +50,37 @@
 <script>
 import moment from 'moment';
 import { getCourses, deleteCourse } from '@/scripts/api/services/courseService';
-import UpdateCourse from './UpdateCourse.vue';
+import UpdateYoga from './UpdateYoga.vue';
 import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
 
 export default {
-  components: { UpdateCourse, DeleteConfirmPopup },
-  name: "ManageCourse",
+  components: { UpdateYoga, DeleteConfirmPopup },
+  name: "ManageYoga",
   data() {
     return {
-      courses: [],
+      yogas: [],
       currentPage: 1,
       itemsPerPage: 20,
       totalPages: 1,
       totalCount: 0,
       isLoading: false,  // Thêm trạng thái loading
-      isEditingCourse: false,
-      selectedcourse: null,
+      isEditingYoga: false,
+      selectedYoga: null,
       isDeletePopupVisible: false,
-      courseToDelete: null,
+      yogaToDelete: null,
     };
   },
   methods: {
     async handleDeleteConfirm(confirm) {
-      if (confirm && this.courseToDelete) {
+      if (confirm && this.yogaToDelete) {
         try {
-          await deleteCourse(this.courseToDelete.id);
-          this.fetchCourses();
+          await deleteCourse(this.yogaToDelete.id);
+          this.fetchYogas();
         } catch (error) {
-          alert("Lỗi khi xóa lớp course. Vui lòng thử lại.");
+          alert("Lỗi khi xóa lớp yoga. Vui lòng thử lại.");
         } finally {
           this.isDeletePopupVisible = false;
-          this.courseToDelete = null;
+          this.yogaToDelete = null;
         }
       } else {
         this.isDeletePopupVisible = false;
@@ -89,25 +89,25 @@ export default {
     formattedDate(value) {
       return moment(String(value)).format('MM/DD/YYYY hh:mm');
     },
-    async fetchCourses() {
+    async fetchYogas() {
       try {
         this.isLoading = true;
-        this.courses = [];
+        this.yogas = [];
         const params = { pageIndex: this.currentPage - 1, pageSize: this.itemsPerPage };
         const data = await getCourses(params);
 
         if (data.items) {
-          this.courses = data.items;
+          this.yogas = data.items;
           this.totalCount = data.totalCount;
           this.totalPages = data.pageCount;
         } else {
-          this.courses = [];
+          this.yogas = [];
           this.totalCount = 0;
           this.totalPages = 1;
         }
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu course:", error);
-        this.courses = [];
+        console.error("Lỗi khi tải dữ liệu yoga:", error);
+        this.yogas = [];
         this.totalCount = 0;
         this.totalPages = 1;
       } finally {
@@ -117,13 +117,13 @@ export default {
     changePage(page) {
       if (page !== this.currentPage && page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
-        this.courses = [];
-        this.fetchCourses();
+        this.yogas = [];
+        this.fetchYogas();
       }
     },
   },
   mounted() {
-    this.fetchCourses();
+    this.fetchYogas();
   }
 };
 </script>
@@ -140,7 +140,7 @@ export default {
     padding: 0;
   }
 
-  .course-management {
+  .yoga-management {
     max-width: 900px;
     margin: 20px auto;
     background: #fff;
@@ -156,13 +156,13 @@ export default {
     margin-bottom: 20px;
   }
 
-  /* Căn giữa nút tạo lớp course giống Blog */
+  /* Căn giữa nút tạo lớp Yoga giống Blog */
   .header-actions {
     text-align: center;
     margin-bottom: 20px;
   }
 
-  .create-course-btn {
+  .create-yoga-btn {
     background-color: #28a745;
     color: #fff;
     border: none;
@@ -174,17 +174,17 @@ export default {
   }
 
   /* Thêm hiệu ứng hover giống Blog */
-  .create-course-btn:hover {
+  .create-yoga-btn:hover {
     background-color: #218838;
   }
 
-  .course-list {
+  .yoga-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  .course-item {
+  .yoga-item {
     display: flex;
     align-items: center;
     padding: 15px;
@@ -204,18 +204,18 @@ export default {
   }
 
   /* Căn chỉnh phần chi tiết giống Blog */
-  .course-details {
+  .yoga-details {
     flex: 1;
   }
 
-  .course-title {
+  .yoga-title {
     font-size: 1.2rem;
     margin: 0;
     color: #333;
   }
 
   /* Cập nhật margin giống Blog */
-  .course-date {
+  .yoga-date {
     font-size: 0.9rem;
     color: #888;
     margin: 5px 0;
@@ -246,7 +246,7 @@ export default {
     color: white;
   }
 
-  .no-courses {
+  .no-yogas {
     text-align: center;
     color: #888;
     font-size: 1rem;

@@ -17,6 +17,7 @@ import FaqPage from '@/pages/faq/FaqPage.vue'
 import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
 import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
 import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
+import ManageYoga from '@/views/Practice/Yoga/ManageYoga.vue'
 import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
 import DiaryWriting from '@/views/Practice/Diary/DiaryWriting.vue'
 import DiaryList from '@/views/Practice/Diary/DiaryList.vue'
@@ -59,7 +60,7 @@ import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
 import UserActivity from '@/views/Statistics/UserActivity.vue'
-
+import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
 //components
 import NotFound from '@/components/Layouts/404.vue'
 import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
@@ -70,6 +71,7 @@ import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
 import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
+import CreateYogaLesson from '@/views/Practice/Yoga/CreateYoga.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
 
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
@@ -146,6 +148,12 @@ const router = createRouter({
         default: EditUserProfile,
         roadmapProgress: RoadmapProgress
       },
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/advisor/edit-profile',
+      name: 'editAdvisor',
+      component: EditAdvisor,
       meta: { requiresAuth: true }
     },
     {
@@ -453,6 +461,16 @@ const router = createRouter({
       path: '/YogaPractice',
       name: 'YogaPractice',
       component: YogaPractice
+    },
+    {
+      path: '/yogas/manage',
+      name: 'ManageYoga',
+      component: ManageYoga
+    },
+    {
+      path: '/yoga/create',
+      name: 'CreateYoga',
+      component: CreateYogaLesson
     },
     {
       path: '/request',
