@@ -15,7 +15,6 @@ export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   }
 };
 
-
 export const getCourseDetail = async (courseId) => {
   try {
     const response = await apiClient.get(`/courses/${courseId}`);

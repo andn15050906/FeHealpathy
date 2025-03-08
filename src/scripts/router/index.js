@@ -80,6 +80,8 @@ import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
 
+import ModerateAdvisors from '@/views/Admin/ModerateAdvisors.vue'
+
 import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
@@ -500,6 +502,13 @@ const router = createRouter({
       component: RoadmapBuilder
     },
 
+
+    // Advisor
+    {
+      path: '/advisor/moderate-advisors',
+      name: 'ModerateAdvisors',
+      component: ModerateAdvisors,
+    },
     // Admin
     {
       path: '/admin',
