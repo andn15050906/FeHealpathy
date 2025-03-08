@@ -20,7 +20,7 @@
 
 <script>
 import GlowingButton from '@/components/Common/GlowingButton.vue';
-import { SurveyOptions } from './SurveyOptions';
+import { SurveyOptions } from '@/scripts/types/SurveyOptions';
 
 export default {
     components: { GlowingButton },

@@ -40,7 +40,6 @@ try {
 	return response.data;
 } catch (error) {
 	logError(error);
-	//handleError(error);
 	throw error;
 }
 };
@@ -49,7 +48,7 @@ const logError = error =>
 {
 	if (error.response) {
 		if (error.response.status === 401
-			&& error.response.headers['www-authenticate']?.includes('The token expired')
+			//&& error.response.headers['www-authenticate']?.includes('The token expired')
 			&& !window.location.href.includes("/sign-in")) {
 			clearUserAuthData();
 			window.location.href = "/sign-in";

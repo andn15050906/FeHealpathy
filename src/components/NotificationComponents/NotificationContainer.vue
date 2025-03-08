@@ -45,7 +45,7 @@ export default {
 .noti-container {
     position: fixed;
     top: 20px;
-    left: 20px;
+    right: 20px;
     margin-top: 50px;
     z-index: 1000;
 }

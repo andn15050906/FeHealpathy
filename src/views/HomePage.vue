@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <main class="main-content">
+        <main v-if="!isLoggedIn" class="main-content">
             <section class="hero-section">
                 <h1 class="hero-title">{{ HomePage.Title }}</h1>
                 <p class="hero-subtitle">{{ HomePage.SubTitle }}</p>
@@ -86,6 +86,9 @@
                 </p>
             </section>
         </main>
+        <main v-if="isLoggedIn" class="main-content home-background">
+            <PersonalRoadmap></PersonalRoadmap>
+        </main>
     </div>
 </template>
 
@@ -96,6 +99,7 @@ import json from '../scripts/data/data.json'
 import router from '@/scripts/router';
 import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
 import { Noti } from '@/scripts/types/models';
+import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
 
 export default {
     name: 'HomePage',
@@ -111,12 +115,14 @@ export default {
     data() {
         return {
             user: null,
+            isLoggedIn: false,
             HomePage: json.HomePage
         }
     },
     components: {
         GlowingButton,
-        GlowingCard
+        GlowingCard,
+        PersonalRoadmap
     },
     mounted() {
         // handle auth
@@ -145,12 +151,14 @@ export default {
         }
         this.user = getUserAuthData();
 
-        // handle setting up
         if (!this.user)
             return;
+
+        this.isLoggedIn = true;
         /*if (this.user.preferences && this.user.preferences.length == 0) {
             this.$router.push({ name: 'SettingUp' });
         }*/
+        // handle setting up
         if (this.user.settings && this.user.settings.length == 0) {
             let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
             noti.callback = () => this.navigateToSettingUp(noti.id);
@@ -163,6 +171,11 @@ export default {
 <style scoped>
 .home-container {
     background: #fff;
+}
+
+.home-background {
+    background-image: radial-gradient(circle 369px at -2.9% 12.9%, rgba(247, 234, 163, 1) 0%, rgba(236, 180, 238, 0.56) 46.4%, rgba(163, 203, 247, 1) 100.7%);
+    padding: 40px 80px !important;
 }
 
 .main-header {

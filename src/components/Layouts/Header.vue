@@ -23,8 +23,6 @@
             <hr class="menu-divider" />
             <li><router-link to="/change-password">Change Password</router-link></li>
             <hr class="menu-divider" />
-            <li><router-link to="/roadmap">Your roadmap</router-link></li>
-            <hr class="menu-divider" />
 
             <li v-if="user.role === 'Learner' || user.role === 'Advisor'">
               <router-link to="/enrolled-course">Enrolled courses</router-link>
@@ -241,6 +239,7 @@ ul {
   z-index: 1000;
   display: block;
   width: max-content;
+  left: -15px;
 }
 
 .dropdown-menu li {
@@ -251,16 +250,9 @@ ul {
   transition: background-color 0.2s;
 }
 
-.menu-divider {
-  border: none;
-  border-bottom: 1px solid #ccc;
-  margin: 5px 0;
-}
-
 .dropdown-menu li:hover {
   background-color: #f3f3f3;
 }
-
 
 .dropdown-menu li a,
 .dropdown-menu li button {
@@ -278,6 +270,12 @@ ul {
 .dropdown-menu li a:hover,
 .dropdown-menu li button:hover {
   background-color: #f3f3f3;
+}
+
+.menu-divider {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
 }
 
 .login-btn {

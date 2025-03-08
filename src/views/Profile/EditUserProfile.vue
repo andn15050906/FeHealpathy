@@ -257,6 +257,10 @@ export default {
 @import '../../assets/css/vuetify-custom/v-app-vendor.css';
 @import '../../assets/css/vuetify-custom/chunk-7e72fb0e.a9a7c615.css';
 
+.content {
+  width: 100%;
+}
+
 .white-text {
   color: #fff;
 }

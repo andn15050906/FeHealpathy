@@ -28,7 +28,9 @@ import Angry from '@/views/Practice/MoodRecording/MoodCart/Angry.vue'
 import Eager from '@/views/Practice/MoodRecording/MoodCart/Eager.vue'
 import Anxiety from '@/views/Practice/MoodRecording/MoodCart/Anxiety.vue'
 import SelfAssessment from '@/views/Practice/SelfAssessment/SelfAssessment.vue'
+import MediaResources from '@/views/Practice/MediaResource/MediaResources.vue'
 import MusicControl from '@/views/Practice/MediaResource/MusicControl.vue'
+import VideoControl from '@/views/Practice/MediaResource/VideoControl.vue'
 import MediaControl from '@/views/Practice/MediaResource/MediaControl.vue'
 
 import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
@@ -56,6 +58,7 @@ import GroupOverview from '@/views/Community/GroupOverview.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
 
 import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
+import UserActivity from '@/views/Statistics/UserActivity.vue'
 
 //components
 import NotFound from '@/components/Layouts/404.vue'
@@ -68,13 +71,12 @@ import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
 import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
 import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
 import Request from '@/views/Profile/Advisor/Request.vue'
-import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
-import StrictPersonalRoadmap from '@/views/Profile/Preferences/StrictPersonalRoadmap.vue'
-import PhysicalRoadmap from '@/views/Profile/Preferences/PhysicalRoadmap.vue'
-import StrictPhysicalRoadmap from '@/views/Profile/Preferences/StrictPhysicalRoadmap.vue'
-import SkillRoadmap from '@/views/Profile/Preferences/SkillRoadmap.vue'
-import StrictSkillRoadmap from '@/views/Profile/Preferences/StrictSkillRoadmap.vue'
-import Roadmaps from '@/views/Profile/Preferences/Roadmaps.vue'
+
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
+import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
+import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
+import CourseDetail from '@/views/Courses/CourseDetail.vue'
+import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
 
 import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
@@ -97,7 +99,10 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      component: HomePage
+      components: {
+        default: HomePage,
+        roadmapProgress: RoadmapProgress
+      }
     },
     {
       path: '/faq',
@@ -136,7 +141,10 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'editProfile',
-      component: EditUserProfile,
+      components: {
+        default: EditUserProfile,
+        roadmapProgress: RoadmapProgress
+      },
       meta: { requiresAuth: true }
     },
     {
@@ -162,7 +170,10 @@ const router = createRouter({
     {
       path: '/practice',
       name: 'practiceToolList',
-      component: PracticeToolList
+      components: {
+        default: PracticeToolList,
+        roadmapProgress: RoadmapProgress
+      }
     },
     // Practice - Yoga
     {
@@ -248,9 +259,19 @@ const router = createRouter({
     },
     // Practice - Media Resources
     {
-      path: '/media-library',
+      path: '/media-resources',
+      name: 'MediaResources',
+      component: MediaResources
+    },
+    {
+      path: '/music-library',
       name: 'MusicControl',
       component: MusicControl
+    },
+    {
+      path: '/video-library',
+      name: 'VideoControl',
+      component: VideoControl
     },
     {
       path: '/media/manage',
@@ -259,7 +280,7 @@ const router = createRouter({
     },
     // Practice - Survey
     {
-      path: '/survey',
+      path: '/surveys',
       name: 'Survey',
       component: ManageSurvey,
       meta: { requiresAuth: true }
@@ -270,7 +291,10 @@ const router = createRouter({
     {
       path: '/blogs',
       name: 'blogCatalog',
-      component: BlogCatalog
+      components: {
+        default: BlogCatalog,
+        roadmapProgress: RoadmapProgress
+      }
     },
     {
       path: '/blogs/manage',
@@ -291,9 +315,10 @@ const router = createRouter({
       props: true
     },
     {
-      path: '/blogs/:id',
+      path: "/blog/:id",
       name: 'blogDetail',
-      component: BlogDetail
+      component: BlogDetail,
+      props: true
     },
     {
       path: '/blogs/search',
@@ -320,10 +345,25 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/courses/update',
+      path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+      props: true
+    },
+    {
+      path: '/courses/:id',
+      name: 'courseDetail',
+      component: CourseDetail,
+      meta: { requiresAuth: true },
+      props: true
+    },
+    {
+      path: '/lectures/:id',
+      name: 'lectureDetail',
+      component: LectureDetail,
+      meta: { requiresAuth: true },
+      props: true
     },
     /* /:id */
     /* ? considering /search */
@@ -419,34 +459,21 @@ const router = createRouter({
       component: Request
     },
     {
-      path: '/roadmap',
-      name: 'PersonalRoadmap',
-      component: PersonalRoadmap
+      path: '/submissions-review/:id',
+      name: 'SubmissionReview',
+      component: SubmissionReview,
+      props: true,
+      meta: { requiresAuth: true }
     },
     {
-      path: '/strict-personal-roadmap',
-      name: 'StrictPersonalRoadmap',
-      component: StrictPersonalRoadmap
+      path: '/statistics/user-activity',
+      name: 'UserActivityResult',
+      component: UserActivity
     },
     {
-      path: '/physical-roadmap',
-      name: 'PhysicalRoadmap',
-      component: PhysicalRoadmap
-    },
-    {
-      path: '/strict-physical-roadmap',
-      name: 'StrictPhysicalRoadmap',
-      component: StrictPhysicalRoadmap
-    },
-    {
-      path: '/skill-roadmap',
-      name: 'SkillRoadmap',
-      component: SkillRoadmap
-    },
-    {
-      path: '/strict-skill-roadmap',
-      name: 'StrictSkillRoadmap',
-      component: StrictSkillRoadmap
+      path: '/statistics/self-assessment',
+      name: 'SelfAssessmentResult',
+      component: SelfAssessmentResult
     },
     {
       path: '/roadmaps',
