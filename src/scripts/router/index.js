@@ -78,6 +78,12 @@ import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
 
+import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
+import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
+import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
+import ViewReports from '@/views/Admin/ViewReports.vue'
+import Dashboard from '@/views/Admin/Dashboard.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -468,6 +474,43 @@ const router = createRouter({
       path: '/statistics/self-assessment',
       name: 'SelfAssessmentResult',
       component: SelfAssessmentResult
+    },
+    {
+      path: '/roadmaps',
+      name: 'Roadmaps',
+      component: Roadmaps
+    },
+
+    // Admin
+    {
+      path: '/admin',
+      name: 'AdminDashboard',
+      component: Dashboard,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/moderate-users',
+      name: 'ModerateUsers',
+      component: ModerateUsers,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/create-admin',
+      name: 'CreateAdminAccounts',
+      component: CreateAdminAccounts,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/moderate-content',
+      name: 'ModerateUploadedContent',
+      component: ModerateUploadedContent,
+      //meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/view-reports',
+      name: 'ViewReports',
+      component: ViewReports,
+      //meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })
