@@ -75,7 +75,7 @@
 import { ref, onMounted, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import ImageInput from '@/components/Helper/ImageInput.vue';
+import ImageInput from '@/components/Common/Misc/ImageInput.vue';
 import GlobalState from '@/scripts/logic/globalState';
 
 const publicityOptions = [

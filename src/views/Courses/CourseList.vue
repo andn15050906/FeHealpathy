@@ -25,8 +25,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { getCourses } from "../../scripts/api/services/courseService.js";
-import CourseCard from '@/views/Courses/components/CourseCard.vue';
+import { getCourses } from "@/scripts/api/services/courseService.js";
+import CourseCard from '@/components/CourseComponents/CourseCard.vue';
 import { onMounted } from 'vue';
 
 const itemsPerPage = 12;

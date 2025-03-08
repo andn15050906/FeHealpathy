@@ -1,93 +1,87 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getUserBearerToken } from '@/scripts/api/services/authService'
 
+import SignIn from '@/views/Auth/SignIn.vue';
+import Register from '@/views/Auth/Register.vue'
+import ForgotPassword from '@/views/Auth/ForgotPassword.vue'
+import ResetPassword from '@/views/Auth/ResetPassword.vue'
+
 import HomePage from '@/views/HomePage.vue'
-import SignIn from '@/views/Profile/SignIn.vue'
-import Register from '@/views/Profile/Register.vue'
-import ChangePassword from '@/views/Profile/ChangePassword.vue'
-import ForgotPassword from '@/views/Profile/ForgotPassword.vue'
-import ResetPassword from '@/views/Profile/ResetPassword.vue'
-import EditUserProfile from '@/views/Profile/EditUserProfile.vue'
-import ViewUserProfile from '@/views/Profile/ViewUserProfile.vue'
-import Settings from '@/views/Profile/Settings/Settings.vue'
-import SettingUp from '@/views/Profile/Preferences/SettingUp.vue'
+import FaqPage from '@/views/FaqPage.vue'
+import NotFound from '@/views/404.vue'
 
-import FaqPage from '@/pages/faq/FaqPage.vue'
+import ViewUserProfile from '@/views/Profile/PersonalProfile/ViewUserProfile.vue'
+import EditUserProfile from '@/views/Profile/PersonalProfile/EditUserProfile.vue'
+import ChangePassword from '@/views/Profile/PersonalProfile/ChangePassword.vue'
+import RequestToBeAdvisor from '@/views/Profile/PersonalProfile/RequestToBeAdvisor.vue'
+import Settings from '@/views/Profile/Settings.vue'
+import SettingUp from '@/views/Profile/SettingUp.vue'
+import UserActivity from '@/views/Profile/Statistics/UserActivity.vue'
+import SelfAssessmentResult from '@/views/Profile/Statistics/SelfAssessmentResult.vue'
+import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 
-import PracticeToolList from '@/views/Practice/PracticeToolList.vue'
-import YogaExerciseDetail from '@/views/Practice/Yoga/YogaExerciseDetail.vue'
-import YogaView from '@/views/Practice/Yoga/YogaCatalog.vue'
-import ManageYoga from '@/views/Practice/Yoga/ManageYoga.vue'
-import HabitTracking from '@/views/Practice/HabitTracking/HabitTracking.vue'
-import DiaryWriting from '@/views/Practice/Diary/DiaryWriting.vue'
-import DiaryList from '@/views/Practice/Diary/DiaryList.vue'
-import MoodOverview from '@/views/Practice/MoodRecording/MoodOverview.vue'
-import EmotionTracking from '@/views/Practice/MoodRecording/EmotionTracking.vue'
-import Happy from '@/views/Practice/MoodRecording/MoodCart/Happy.vue'
-import Sad from '@/views/Practice/MoodRecording/MoodCart/Sad.vue'
-import Angry from '@/views/Practice/MoodRecording/MoodCart/Angry.vue'
-import Eager from '@/views/Practice/MoodRecording/MoodCart/Eager.vue'
-import Anxiety from '@/views/Practice/MoodRecording/MoodCart/Anxiety.vue'
-import SelfAssessment from '@/views/Practice/SelfAssessment/SelfAssessment.vue'
-import MediaResources from '@/views/Practice/MediaResource/MediaResources.vue'
-import MusicControl from '@/views/Practice/MediaResource/MusicControl.vue'
-import VideoControl from '@/views/Practice/MediaResource/VideoControl.vue'
-import MediaControl from '@/views/Practice/MediaResource/MediaControl.vue'
+import PracticeToolList from '@/views/PracticeTools/PracticeToolList.vue'
+import SelfAssessment from '@/views/PracticeTools/SelfAssessment/SelfAssessment.vue'
+import DiaryList from '@/views/PracticeTools/Diary/DiaryList.vue'
+import DiaryWriting from '@/views/PracticeTools/Diary/DiaryWriting.vue'
+import MoodOverview from '@/views/PracticeTools/MoodRecording/MoodOverview.vue'
+import EmotionTracking from '@/views/PracticeTools/MoodRecording/EmotionTracking.vue'
+import Happy from '@/views/PracticeTools/MoodRecording/MoodCart/Happy.vue'
+import Sad from '@/views/PracticeTools/MoodRecording/MoodCart/Sad.vue'
+import Angry from '@/views/PracticeTools/MoodRecording/MoodCart/Angry.vue'
+import Eager from '@/views/PracticeTools/MoodRecording/MoodCart/Eager.vue'
+import Anxiety from '@/views/PracticeTools/MoodRecording/MoodCart/Anxiety.vue'
+import MediaResources from '@/views/PracticeTools/MediaResource/MediaResources.vue'
+import MusicControl from '@/views/PracticeTools/MediaResource/MusicControl.vue'
+import VideoControl from '@/views/PracticeTools/MediaResource/VideoControl.vue'
+import MediaControl from '@/views/PracticeTools/MediaResource/MediaControl.vue'
+import YogaView from '@/views/PracticeTools/Yoga/YogaCatalog.vue'
+import YogaExerciseDetail from '@/views/PracticeTools/Yoga/YogaExerciseDetail.vue'
+import YogaPractice from '@/views/PracticeTools/Yoga/YogaPractice.vue'
+import HabitTracking from '@/views/PracticeTools/HabitTracking/HabitTracking.vue'
 
-import ManageSurvey from '@/views/Admin/ManageSurvey.vue'
-
-import BlogDetail from '@/views/Blogs/BlogDetail.vue'
-import CreateBlog from '@/views/Blogs/CreateBlog.vue'
-import ManageBlog from '@/views/Blogs/ManageBlog.vue'
-import UpdateBlog from '@/views/Blogs/UpdateBlog.vue'
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
+import BlogDetail from '@/views/Blogs/BlogDetail.vue'
 import SearchBlogResult from '@/views/Blogs/SearchBlogResult.vue'
 
 import CourseList from '@/views/Courses/CourseList.vue'
-import ManageCourse from '@/views/Courses/ManageCourse.vue'
-import CreateCourse from '@/views/Courses/CreateCourse.vue'
-import UpdateCourse from '@/views/Courses/UpdateCourse.vue'
-
-import CreateAssignment from '@/views/Assignments_Old/Create.vue'
-import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
-import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
-import ReviewAssignment from '@/views/Assignments_Old/Review.vue'
-import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'
+import CourseDetail from '@/views/Courses/CourseDetail.vue'
+import LectureDetail from '@/views/Courses/LectureDetail.vue'
+import CoursePayment from '@/views/Courses/CoursePayment.vue'
 
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
 import ViewGroup from '@/views/Community/ViewGroup.vue'
+import CreateGroup from '@/views/Community/CreateGroup.vue'
+import EditGroup from '@/views/Community/EditGroup.vue'
+import ConversationWindow from '@/views/Community/ConversationWindow.vue'
 
-import PaymentsPage from '@/pages/payments/PaymentsPage.vue'
-import UserActivity from '@/views/Statistics/UserActivity.vue'
+import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
+import ModerateAdvisors from '@/views/Profile/Admin/ModerateAdvisors.vue'
+import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
+import CreateAdminAccounts from '@/views/Profile/Admin/CreateAdminAccounts.vue'
+import ModerateUploadedContent from '@/views/Profile/Admin/ModerateUploadedContent.vue'
+import ViewReports from '@/views/Profile/Admin/ViewReports.vue'
+import ManageSurvey from '@/views/Profile/Admin/ManageSurvey.vue'
+import ManageYoga from '@/views/Profile/Admin/ManageYoga.vue'
+import CreateYogaLesson from '@/views/Profile/Admin/CreateYoga.vue'
+
+import ViewAdvisor from '@/views/Profile/Advisor/ViewAdvisor.vue'
 import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
-//components
-import NotFound from '@/components/Layouts/404.vue'
-import DailyQuestion from '@/components/NotificationComponents/DailyQuestion.vue'
-import Calendar from '@/components/Common/Misc/Calendar.vue'
-import CreateGroup from '@/components/GroupComponents/CreateGroup.vue'
-import EditGroup from '@/components/GroupComponents/EditGroup.vue'
-import CreateSurvey from '@/components/SurveyComponents/CreateSurvey.vue'
-import EditSurvey from '@/components/SurveyComponents/EditSurvey.vue'
-import ConversationWindow from '@/components/CommunityComponents/ConversationWindow.vue'
-import YogaPractice from '@/views/Practice/Yoga/YogaPractice.vue'
-import CreateYogaLesson from '@/views/Practice/Yoga/CreateYoga.vue'
-import Request from '@/views/Profile/Advisor/Request.vue'
+import Payment from '@/views/Profile/Advisor/Payment.vue'
+import CreateBlog from '@/views/Profile/Advisor/Manage/CreateBlog.vue'
+import ManageBlog from '@/views/Profile/Advisor/Manage/ManageBlog.vue'
+import UpdateBlog from '@/views/Profile/Advisor/Manage/UpdateBlog.vue'
+import ManageCourse from '@/views/Profile/Advisor/Manage/ManageCourse.vue'
+import CreateCourse from '@/views/Profile/Advisor/Manage/CreateCourse.vue'
+import UpdateCourse from '@/views/Profile/Advisor/Manage/UpdateCourse.vue'
+import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
-import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
-import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
-import SelfAssessmentResult from '@/views/Statistics/SelfAssessmentResult.vue'
-import CourseDetail from '@/views/Courses/CourseDetail.vue'
-import LectureDetail from '@/views/Courses/Lectures/LectureDetail.vue'
-
-import ModerateAdvisors from '@/views/Admin/ModerateAdvisors.vue'
-
-import ModerateUsers from '@/views/Admin/ModerateUsers.vue'
-import CreateAdminAccounts from '@/views/Admin/CreateAdminAccounts.vue'
-import ModerateUploadedContent from '@/views/Admin/ModerateUploadedContent.vue'
-import ViewReports from '@/views/Admin/ViewReports.vue'
-import Dashboard from '@/views/Admin/Dashboard.vue'
-import RoadmapBuilder from '@/components/PracticeComponents/RoadmapBuilder.vue'
+/*import CreateAssignment from '@/views/Assignments_Old/Create.vue'
+import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
+import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
+import ReviewAssignment from '@/views/Assignments_Old/Review.vue'
+import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'*/
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -104,10 +98,11 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      components: {
+      component: HomePage
+      /*components: {
         default: HomePage,
         roadmapProgress: RoadmapProgress
-      }
+      }*/
     },
     {
       path: '/faq',
@@ -146,10 +141,7 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'editProfile',
-      components: {
-        default: EditUserProfile,
-        roadmapProgress: RoadmapProgress
-      },
+      component: EditUserProfile,
       meta: { requiresAuth: true }
     },
     {
@@ -181,10 +173,7 @@ const router = createRouter({
     {
       path: '/practice',
       name: 'practiceToolList',
-      components: {
-        default: PracticeToolList,
-        roadmapProgress: RoadmapProgress
-      }
+      component: PracticeToolList
     },
     // Practice - Yoga
     {
@@ -244,12 +233,6 @@ const router = createRouter({
     },
     // End of diary
     {
-      path: '/daily-question',
-      name: 'dailyQuestion',
-      component: DailyQuestion,
-      meta: { requiresAuth: true }
-    },
-    {
       // not called
       path: '/emotion-tracking',
       name: 'emotionTracking',
@@ -302,10 +285,7 @@ const router = createRouter({
     {
       path: '/blogs',
       name: 'blogCatalog',
-      components: {
-        default: BlogCatalog,
-        roadmapProgress: RoadmapProgress
-      }
+      component: BlogCatalog
     },
     {
       path: '/blogs/manage',
@@ -417,7 +397,7 @@ const router = createRouter({
     },
 
     // Assignment - Old
-    {
+    /*{
       path: '/assignments/create',
       name: 'CreateAssignment',
       component: CreateAssignment,
@@ -446,18 +426,13 @@ const router = createRouter({
       name: 'AttemptAssignment',
       component: AttemptAssignment,
       meta: { requiresAuth: true }
-    },
+    },*/
 
     // Others
     {
       path: '/payments',
       name: 'Payments',
-      component: PaymentsPage
-    },
-    {
-      path: '/calendar',
-      name: 'Calendar',
-      component: Calendar
+      component: CoursePayment
     },
     {
       path: '/YogaPractice',
@@ -475,9 +450,9 @@ const router = createRouter({
       component: CreateYogaLesson
     },
     {
-      path: '/request',
+      path: '/request-advisor',
       name: 'Request',
-      component: Request
+      component: RequestToBeAdvisor
     },
     {
       path: '/submissions-review/:id',

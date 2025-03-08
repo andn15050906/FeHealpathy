@@ -30,7 +30,7 @@ import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
 //import Guider from '@/components/PracticeComponents/Guider.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
-import ConversationWindow from './components/CommunityComponents/ConversationWindow.vue';
+import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
 
 const loadingSpinner = ref(null);

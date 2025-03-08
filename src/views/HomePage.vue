@@ -99,7 +99,7 @@ import json from '../scripts/data/data.json'
 import router from '@/scripts/router';
 import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
 import { Noti } from '@/scripts/types/models';
-import PersonalRoadmap from '@/views/Profile/Preferences/PersonalRoadmap.vue'
+import PersonalRoadmap from '@/components/RoadmapComponents/PersonalRoadmap.vue'
 
 export default {
     name: 'HomePage',

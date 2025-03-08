@@ -30,7 +30,7 @@
 
             <li v-if="user.role == 0">
               <hr class="menu-divider" />
-              <router-link to="/request">Request to be an advisor</router-link>
+              <router-link to="/request-advisor">Request to be an advisor</router-link>
             </li>
 
             <li v-if="user.role === 1">
