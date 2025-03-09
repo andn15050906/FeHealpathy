@@ -171,7 +171,7 @@ export default {
 
 <style scoped>
 .new-entry-button {
-  background: #673ab7; /* Màu tím sáng */
+  background: #673ab7;
   color: white;
   padding: 12px 18px;
   border: none;
@@ -265,6 +265,7 @@ export default {
 }
 
 .header-section {
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   width: 80%;
@@ -318,13 +319,14 @@ export default {
 }
 
 .book {
-  padding-top: 20px;
-  display: flex;
-  width: 900px; 
-  height: 700px;
-  margin: auto;
   position: relative;
+  width: 800px;
+  height: 600px;
+  display: flex;
+  box-shadow: -15px 0 25px rgba(0, 0, 0, 0.2), 10px 0 15px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #d4c5a1 20%, #f5f5f5 80%);
   perspective: 2000px;
+  border-radius: 15px;
 }
 
 .page.cover {
@@ -350,12 +352,43 @@ export default {
   flex: 1;
   width: 50%;
   height: 100%;
-  background: #f5f5f5;
-  padding: 30px; 
+  background: #fdfaf6;
+  padding: 40px 50px;
   text-align: center;
+  font-family: "Georgia", serif;
+  line-height: 1.8;
+  border-radius: 5px;
   cursor: pointer;
   transform-origin: left;
   transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), 6px 6px 15px rgba(0, 0, 0, 0.15),
+    8px 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 100%;
+  height: 100%;
+  background: #f3f1eb;
+  border-radius: 5px;
+  z-index: -1;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15), 6px 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 100%;
+  height: 100%;
+  background: #eae5dc;
+  border-radius: 5px;
+  z-index: -2;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.12);
 }
 
 .flippingright {
