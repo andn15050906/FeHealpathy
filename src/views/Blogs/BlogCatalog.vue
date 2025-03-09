@@ -1,6 +1,10 @@
 <template>
-    <h4>Blog Catalog</h4>
+    <h4 class="page-title">Blog Catalog</h4>
   
+    <div class="search-section">
+      <input type="text" placeholder="Search blogs..." v-model="searchQuery" class="search-input"/>
+    </div>
+
     <div class="filter-section">
       <button v-for="filter in filters" :key="filter.value"
         :class="['filter-btn', selectedTags.includes(filter.value) ? 'active' : '']"
@@ -32,6 +36,7 @@ import { getPagedTags } from "@/scripts/api/services/tagService.js";
 import { onMounted } from 'vue';
 
 const selectedTags = ref([]);
+const searchQuery = ref('');
 const itemsPerPage = 20;
 const blogs = ref([]);
 const currentPage = ref(1);
@@ -40,11 +45,7 @@ const paginatedblogs = computed(() => {
   const end = start + itemsPerPage;
   return blogs.value.slice(start, end);
 });
-const filters = ref([
-  { value: 'all', label: 'All' },
-  { value: 'tech', label: 'Technology' },
-  { value: 'life', label: 'Lifestyle' }
-]);
+const filters = ref([]);
 const currentFilter = ref('all');
 
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
@@ -59,14 +60,16 @@ function toggleTag(tagId) {
 }
 
 const filteredBlogs = computed(() => {
-  if (selectedTags.value.length === 0) {
-    return blogs.value;
-  }
-  return blogs.value.filter(blog => 
-    selectedTags.value.every(tagId => 
+  let result = blogs.value;
+  if (selectedTags.value.length > 0) {
+    result = result.filter(blog => selectedTags.value.every(tagId =>
       blog.tags.some(tag => tag.id === tagId)
-    )
-  );
+    ));
+  }
+  if (searchQuery.value) {
+    result = result.filter(blog => blog.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+  }
+  return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
 });
 
 onMounted(async () => {
@@ -186,4 +189,33 @@ function applyFilter(filterValue) {
     color: white;
     border-color: #5488c7;
   }
+
+  .page-title {
+  font-size: 32px;
+  text-align: center;
+  margin: 40px 0;
+  color: #1b1b1b;
+}
+
+.search-section {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 800px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  border-color: #007BFF;
+  outline: none;
+}
   </style>

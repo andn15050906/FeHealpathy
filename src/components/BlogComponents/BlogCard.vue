@@ -139,7 +139,7 @@ const formatDate = (dateString) => {
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 8px;
-    color : blue;
+    color: #00bfff;
 }
 .tags {
     display: flex;
