@@ -23,7 +23,6 @@
           </div>
         </div>
       </div>
-      <!-- Events Sidebar -->
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
@@ -90,21 +89,8 @@
       </div>
     </div>
     <transition name="fade">
-      <div class="timeline-container" v-if="sortedEventsForSelectedDay.length">
-        <h3>Timeline for {{ selectedDayName }} ({{ formattedSelectedDate }})</h3>
-        <ul class="timeline">
-          <li v-for="(event, idx) in sortedEventsForSelectedDay" :key="event.id || idx">
-            <div class="timeline-marker"></div>
-            <div class="timeline-content" :class="{ completed: event.completed || event.closed }">
-              <div class="timeline-time">{{ event.startTime }} - {{ event.endTime }}</div>
-              <div class="timeline-title">{{ event.title }}</div>
-              <div class="timeline-description">{{ event.description }}</div>
-              <div v-if="event.objective" class="timeline-objective">
-                <strong>Objective:</strong> {{ event.objective }}
-              </div>
-            </div>
-          </li>
-        </ul>
+      <div class="task-chart-section" v-if="currentEvents.length">
+        <canvas ref="taskChart"></canvas>
       </div>
     </transition>
     <transition name="fade">
@@ -172,38 +158,10 @@
 <script>
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  addDays,
-  subMonths,
-  addMonths,
-  isSameDay as dfIsSameDay,
-  isSameMonth,
-  format
-} from "date-fns";
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subMonths, addMonths, isSameDay as dfIsSameDay, isSameMonth, format } from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
-
-const delayMapping = {
-  "#e74c3c": 2,
-  "#e67e22": 5,
-  "#f1c40f": 10,
-  "#3498db": 20,
-  "#2ecc71": 30
-};
-
-function getDeadline(event) {
-  if (!event.date || !event.endTime) return new Date();
-  const additional = Number(event.additionalTime) || 0;
-  const [year, month, day] = event.date.split("-").map(Number);
-  const [hour, minute] = event.endTime.split(":").map(Number);
-  let deadline = new Date(year, month - 1, day, hour, minute, 0, 0);
-  deadline.setMinutes(deadline.getMinutes() + additional);
-  return deadline;
-}
-
+import { Chart, registerables } from "chart.js";
+Chart.register(...registerables);
 function getRoundedTime(date) {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -218,13 +176,20 @@ function getRoundedTime(date) {
   hours = hours % 24;
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
-
 function formatTime(date) {
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
-
+function getDeadline(event) {
+  if (!event.date || !event.endTime) return new Date();
+  const additional = Number(event.additionalTime) || 0;
+  const [year, month, day] = event.date.split("-").map(Number);
+  const [hour, minute] = event.endTime.split(":").map(Number);
+  let deadline = new Date(year, month - 1, day, hour, minute, 0, 0);
+  deadline.setMinutes(deadline.getMinutes() + additional);
+  return deadline;
+}
 export default {
   name: "Calendar",
   components: { DeleteConfirmPopup },
@@ -264,8 +229,27 @@ export default {
         { color: "#e67e22", label: "High" },
         { color: "#e74c3c", label: "Critical" }
       ],
-      holdTimer: null
+      holdTimer: null,
+      chartInstance: null
     };
+  },
+  watch: {
+    events: {
+      handler(newEvents) {
+        this.localEvents = [...newEvents];
+      },
+      immediate: true,
+      deep: true
+    },
+    completedCount(newVal, oldVal) {
+      if (newVal !== oldVal) this.renderChart();
+    },
+    closedCount(newVal, oldVal) {
+      if (newVal !== oldVal) this.renderChart();
+    },
+    remainingCount(newVal, oldVal) {
+      if (newVal !== oldVal) this.renderChart();
+    }
   },
   computed: {
     daysOfWeek() {
@@ -300,7 +284,7 @@ export default {
     currentEvents() {
       return this.localEvents.filter(e => {
         if (!e) return false;
-        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
+        const eventDate = e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, this.selectedDate);
       });
@@ -311,6 +295,15 @@ export default {
         if (!b.startTime) return 1;
         return a.startTime.localeCompare(b.startTime);
       });
+    },
+    completedCount() {
+      return this.currentEvents.filter(task => task.completed).length;
+    },
+    closedCount() {
+      return this.currentEvents.filter(task => task.closed).length;
+    },
+    remainingCount() {
+      return this.currentEvents.filter(task => !task.completed && !task.closed).length;
     }
   },
   mounted() {
@@ -321,14 +314,12 @@ export default {
           const deadline = getDeadline(event);
           if (now > deadline) {
             event.closed = true;
-            toast.error("Event closed due to deadline!", {
-              duration: 150,
-              position: "bottom-center"
-            });
+            toast.error("Event closed due to deadline!", { duration: 150, position: "bottom-center" });
           }
         }
       });
     }, 30000);
+    this.renderChart();
   },
   methods: {
     dayClasses(day) {
@@ -342,7 +333,7 @@ export default {
     hasEvents(day) {
       return this.localEvents.some(e => {
         if (!e) return false;
-        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
+        const eventDate = e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, day.date);
       });
@@ -350,7 +341,7 @@ export default {
     getEventCount(day) {
       return this.localEvents.filter(e => {
         if (!e) return false;
-        const eventDate = e.creationTime ? new Date(e.creationTime) : e.date ? new Date(e.date) : null;
+        const eventDate = e.date ? new Date(e.date) : null;
         if (!eventDate) return false;
         return dfIsSameDay(eventDate, day.date);
       }).length;
@@ -373,52 +364,60 @@ export default {
     },
     editEvent(event) {
       this.isEditing = true;
-      this.newEvent = { ...event };
+      this.newEvent = { ...event, isUpdate: true };
       this.showEventForm = true;
     },
-    saveEvent() {
+    saveAddEvent() {
       if (!this.newEvent.title) return;
+      let savedEvent;
       if (this.newEvent.repeat === "none") {
-        if (this.isEditing) {
-          const index = this.localEvents.findIndex(e => e.id === this.newEvent.id);
-          if (index !== -1) {
-            this.localEvents.splice(index, 1, { ...this.newEvent, date: this.selectedDate });
-          }
-        } else {
-          const newId = Date.now();
-          const newEvent = { ...this.newEvent, id: newId, date: this.selectedDate };
-          const exists = this.localEvents.some(e =>
-            dfIsSameDay(new Date(e.date), this.selectedDate) &&
-            e.title === newEvent.title &&
-            e.startTime === newEvent.startTime
-          );
-          if (!exists) {
-            this.localEvents.push(newEvent);
-          }
+        const newId = Date.now().toString();
+        savedEvent = { ...this.newEvent, id: newId, date: this.selectedDate };
+        const exists = this.localEvents.some(e =>
+          dfIsSameDay(new Date(e.date), this.selectedDate) &&
+          e.title === savedEvent.title &&
+          e.startTime === savedEvent.startTime
+        );
+        if (!exists) {
+          this.localEvents.push(savedEvent);
         }
       } else {
-        const monthStart = startOfMonth(this.currentDate);
-        const monthEnd = endOfMonth(this.currentDate);
-        for (let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)) {
+        for (let d = new Date(startOfMonth(this.currentDate)); d <= endOfMonth(this.currentDate); d.setDate(d.getDate() + 1)) {
           const day = new Date(d);
-          if (this.newEvent.repeat === "weekday") {
-            if (day.getDay() === 0 || day.getDay() === 6) continue;
-          } else if (this.newEvent.repeat === "weekends") {
-            if (day.getDay() !== 0 && day.getDay() !== 6) continue;
-          }
+          if (this.newEvent.repeat === "weekday" && (day.getDay() === 0 || day.getDay() === 6)) continue;
+          if (this.newEvent.repeat === "weekends" && (day.getDay() !== 0 && day.getDay() !== 6)) continue;
           const exists = this.localEvents.some(e =>
             dfIsSameDay(new Date(e.date), day) &&
             e.title === this.newEvent.title &&
             e.startTime === this.newEvent.startTime
           );
           if (!exists) {
-            const newId = Date.now() + day.getDate();
-            const newEvent = { ...this.newEvent, id: newId, date: new Date(day) };
+            const newEvent = { ...this.newEvent, date: new Date(day) };
             this.localEvents.push(newEvent);
           }
         }
+        savedEvent = null;
       }
+      this.$emit("save-event", savedEvent || this.newEvent);
       this.cancelEvent();
+    },
+    saveUpdateEvent() {
+      if (!this.newEvent.title) return;
+      let updatedEvent;
+      const index = this.localEvents.findIndex(e => e.id === this.newEvent.id);
+      if (index !== -1) {
+        updatedEvent = { ...this.newEvent, date: this.selectedDate };
+        this.localEvents.splice(index, 1, updatedEvent);
+      }
+      this.$emit("save-event", updatedEvent);
+      this.cancelEvent();
+    },
+    saveEvent() {
+      if (this.isEditing) {
+        this.saveUpdateEvent();
+      } else {
+        this.saveAddEvent();
+      }
     },
     cancelEvent() {
       this.showEventForm = false;
@@ -445,7 +444,7 @@ export default {
     },
     handleDeleteConfirm(c) {
       if (c) {
-        this.localEvents = this.localEvents.filter(e => e.id !== this.eventToDelete.id);
+        this.$emit("delete-event", this.eventToDelete);
       }
       this.showDeletePopup = false;
       this.eventToDelete = null;
@@ -455,10 +454,7 @@ export default {
       this.holdTimer = setTimeout(() => {
         const wasCompleted = event.completed;
         this.toggleComplete(event);
-        toast.success(
-          wasCompleted ? "Event marked as undone!" : "Event marked as done!",
-          { duration: 1000, position: "bottom-center" }
-        );
+        toast.success(wasCompleted ? "Event marked as undone!" : "Event marked as done!", { duration: 1000, position: "bottom-center" });
       }, 500);
       event.holding = true;
     },
@@ -470,13 +466,41 @@ export default {
     toggleComplete(event) {
       event.completed = !event.completed;
       event.holding = false;
+    },
+    renderChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+      if (!this.$refs.taskChart) return;
+      const ctx = this.$refs.taskChart.getContext("2d");
+      const progressData = [this.completedCount, this.remainingCount, this.closedCount];
+      this.chartInstance = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Completed", "Remaining", "Closed"],
+          datasets: [
+            {
+              data: progressData,
+              backgroundColor: ["#28a745", "#3498db", "#ff4040"],
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom" },
+            title: { display: true, text: "Task Progress Today" }
+          }
+        }
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-/* Container & Layout */
 .container {
   max-width: 1200px;
   margin: 20px auto;
@@ -494,7 +518,6 @@ export default {
   padding: 20px;
 }
 
-/* Calendar */
 .header {
   display: flex;
   align-items: center;
@@ -575,7 +598,6 @@ export default {
   font-weight: bold;
 }
 
-/* Events Sidebar */
 .events-sidebar {
   border-left: 1px solid #eee;
   padding-left: 20px;
@@ -604,7 +626,6 @@ export default {
   overflow-y: auto;
 }
 
-/* Event Item */
 .event-item {
   display: flex;
   justify-content: space-between;
@@ -718,70 +739,22 @@ export default {
   background: #2980b9;
 }
 
-/* Timeline */
-.timeline-container {
+.task-chart-section {
   margin: 20px auto;
   background: #fff;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.timeline-container h3 {
-  margin-bottom: 15px;
   text-align: center;
-}
-
-.timeline {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.timeline li {
-  display: flex;
   position: relative;
-  padding-left: 30px;
-  margin-bottom: 15px;
+  height: 350px;
 }
 
-.timeline-marker {
-  position: absolute;
-  left: 0;
-  top: 5px;
-  width: 12px;
-  height: 12px;
-  background: #3498db;
-  border-radius: 50%;
-}
-
-.timeline-content {
-  background: #f8f9fa;
-  padding: 10px;
-  border-radius: 4px;
-  width: 100%;
-}
-
-.timeline-time {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.timeline-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.timeline-description {
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.timeline-objective {
-  font-size: 0.85rem;
-  color: #7f8c8d;
-  margin-top: 4px;
+.task-chart-section canvas {
+  max-width: 300px;
+  max-height: 300px;
+  margin: 0 auto;
+  display: block;
 }
 
 .event-form-modal {
