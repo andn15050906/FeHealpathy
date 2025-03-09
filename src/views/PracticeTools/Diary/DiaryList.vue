@@ -13,9 +13,14 @@
           :attributes="calendarAttributes"
           class="custom-calendar"
         />
-        <router-link to="/diary/diary-writing">
-          <button class="new-entry-button">Write a diary note for today</button>
-        </router-link>
+        <div class="write-note-container">
+          <div class="arrow-animation">➡️</div>
+          <router-link to="/diary/diary-writing">
+            <button class="new-entry-button"
+              >Write a diary note for today</button
+            >
+          </router-link>
+        </div>
       </div>
 
       <div
@@ -24,7 +29,11 @@
         @click.self="nextPage"
       >
         <div v-if="currentEntry">
-          <button class="delete-button fixed" @click.stop="confirmDelete(currentEntry.id)">🗑️</button>
+          <button
+            class="delete-button fixed"
+            @click.stop="confirmDelete(currentEntry.id)"
+            >🗑️</button
+          >
           <input
             type="text"
             v-model="currentEntry.title"
@@ -162,18 +171,19 @@ export default {
 
 <style scoped>
 .new-entry-button {
-  margin-top: 10px;
-  font-size: medium;
-  padding: 10px 15px;
-  background: #a974cf;
+  background: #673ab7; /* Màu tím sáng */
   color: white;
+  padding: 12px 18px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .new-entry-button:hover {
-  background: #5a0099;
+  background: #512da8;
 }
 
 .custom-calendar {
@@ -268,6 +278,36 @@ export default {
 
 .calendar-container {
   margin-bottom: 20px;
+}
+
+.write-note-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  margin-left: -50px;
+}
+
+.arrow-animation {
+  font-size: 24px;
+  color: #ff9800;
+  animation: moveArrow 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes moveArrow {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(10px);
+    opacity: 0;
+  }
 }
 
 .date-picker {
