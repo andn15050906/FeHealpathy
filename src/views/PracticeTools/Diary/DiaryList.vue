@@ -318,13 +318,13 @@ export default {
 }
 
 .book {
+  padding-top: 20px;
   display: flex;
-  width: 800px;
-  height: 600px;
-  padding: 30px;
+  width: 900px; 
+  height: 700px;
   margin: auto;
   position: relative;
-  perspective: 1500px;
+  perspective: 2000px;
 }
 
 .page.cover {
@@ -341,11 +341,19 @@ export default {
   padding: 20px;
 }
 
+.cover-title {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
 .page {
   flex: 1;
+  width: 50%;
+  height: 100%;
   background: #f5f5f5;
-  padding: 20px;
+  padding: 30px; 
   text-align: center;
+  cursor: pointer;
   transform-origin: left;
   transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
