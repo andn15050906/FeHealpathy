@@ -2,56 +2,41 @@
   <div class="diary-container">
     <header class="header-section">
       <h1 class="diary-title">📖 My Diary Entries</h1>
-      <router-link to="/diary/diary-writing" class="new-entry-button">
-        <span>New Entry</span> ➕
-      </router-link>
     </header>
 
-    <div class="calendar-and-book">
-      <div class="calendar-container">
+    <div class="book">
+      <div class="page cover">
+        <h2 class="cover-title">📕 My Diary</h2>
         <v-calendar
           v-model="selectedDate"
           @dayclick="goToNearestEntry"
           :attributes="calendarAttributes"
           class="custom-calendar"
         />
+        <router-link to="/diary/diary-writing">
+          <button class="new-entry-button">Write a diary note for today</button>
+        </router-link>
       </div>
 
-      <div class="book">
-        <div class="page cover" v-if="currentPageIndex === 0" @click="nextPage">
-          <h2 class="cover-title">📕 My Diary</h2>
-        </div>
-
-        <div
-          class="page diary-page left"
-          :class="{ flippingleft: isFlippingLeft }"
-          v-if="prevEntry"
-          @click="prevPage"
-        >
-          <div v-if="prevEntry">
-            <h2 class="entry-title">{{ prevEntry.title }}</h2>
-            <p class="entry-date">{{ formatDate(prevEntry.creationTime) }}</p>
-            <p class="entry-content">{{ prevEntry.content }}</p>
-          </div>
-        </div>
-
-        <div
-          class="page diary-page right"
-          :class="{ flippingright: isFlippingRight }"
-          @click="nextPage"
-        >
-          <div v-if="currentEntry">
-            <h2 class="entry-title">{{ currentEntry.title }}</h2>
-            <p class="entry-date">{{
-              formatDate(currentEntry.creationTime)
-            }}</p>
-            <p class="entry-content">{{ currentEntry.content }}</p>
-            <button
-              class="edit-button"
-              @click.stop="viewEntry(currentEntry.id, currentEntry.title)"
-              >✏️</button
-            >
-          </div>
+      <div
+        class="page diary-page right"
+        :class="{ flippingright: isFlippingRight }"
+        @click.self="nextPage"
+      >
+        <div v-if="currentEntry">
+          <button class="delete-button fixed" @click.stop="confirmDelete(currentEntry.id)">🗑️</button>
+          <input
+            type="text"
+            v-model="currentEntry.title"
+            @input="updateDiary"
+            class="entry-title"
+          />
+          <p class="entry-date">{{ formatDate(currentEntry.creationTime) }}</p>
+          <textarea
+            v-model="currentEntry.content"
+            @input="updateDiary"
+            class="entry-content"
+          ></textarea>
         </div>
       </div>
     </div>
@@ -59,7 +44,11 @@
 </template>
 
 <script>
-import { getPagedDiaryNotes } from "@/scripts/api/services/diaryNoteService";
+import {
+  getPagedDiaryNotes,
+  deleteDiaryNote,
+  updateDiaryNote,
+} from "@/scripts/api/services/diaryNoteService";
 import Swal from "sweetalert2";
 import { Calendar } from "v-calendar";
 import "v-calendar/style.css";
@@ -73,7 +62,6 @@ export default {
       currentPageIndex: 0,
       selectedDate: new Date(),
       isFlippingRight: false,
-      isFlippingLeft: false,
     };
   },
   computed: {
@@ -84,11 +72,6 @@ export default {
     },
     currentEntry() {
       return this.orderedEntries[this.currentPageIndex] || null;
-    },
-    prevEntry() {
-      return this.currentPageIndex > 0
-        ? this.orderedEntries[this.currentPageIndex - 1]
-        : null;
     },
     calendarAttributes() {
       return this.entries.map((entry) => ({
@@ -120,35 +103,55 @@ export default {
         setTimeout(() => {
           this.currentPageIndex++;
           this.isFlippingRight = false;
-        }, 800);
-      }
-    },
-    prevPage() {
-      if (this.currentPageIndex > 0) {
-        this.isFlippingLeft = true;
-        setTimeout(() => {
-          this.currentPageIndex--;
-          this.isFlippingLeft = false;
-        }, 800);
+        }, 400);
       }
     },
     goToNearestEntry(day) {
-      const selectedDate = new Date(day.id).toISOString().split("T")[0]; // Chuyển về format YYYY-MM-DD
-      const index = this.orderedEntries.findIndex(
-        (entry) => entry.creationTime.startsWith(selectedDate) // Kiểm tra ngày trùng khớp
+      const selectedDate = new Date(day.id).toISOString().split("T")[0];
+      const index = this.orderedEntries.findIndex((entry) =>
+        entry.creationTime.startsWith(selectedDate)
       );
-
       if (index !== -1) {
         this.currentPageIndex = index;
       } else {
         Swal.fire("Not Found", "No diary entry found for this date.", "info");
       }
     },
-    viewEntry(diaryId, diaryTitle) {
-      this.$router.push({
-        name: "DiaryWriting",
-        params: { id: diaryId, title: diaryTitle },
+    async updateDiary() {
+      if (!this.currentEntry) return;
+      const formData = new FormData();
+      formData.append("Id", this.currentEntry.id);
+      formData.append("Title", this.currentEntry.title);
+      formData.append("Content", this.currentEntry.content);
+
+      try {
+        await updateDiaryNote(formData);
+      } catch (error) {
+        console.error("Error updating diary:", error);
+      }
+    },
+    async confirmDelete(entryId) {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to recover this diary entry!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
       });
+
+      if (result.isConfirmed) {
+        await this.deleteDiary(entryId);
+      }
+    },
+    async deleteDiary(entryId) {
+      try {
+        await deleteDiaryNote(entryId);
+        this.entries = this.entries.filter((entry) => entry.id !== entryId);
+        Swal.fire("Deleted!", "Your diary entry has been deleted.", "success");
+      } catch (error) {
+        Swal.fire("Error", "Failed to delete diary entry.", "error");
+      }
     },
   },
   mounted() {
@@ -158,9 +161,42 @@ export default {
 </script>
 
 <style scoped>
+.new-entry-button {
+  margin-top: 10px;
+  font-size: medium;
+  padding: 10px 15px;
+  background: #a974cf;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.new-entry-button:hover {
+  background: #5a0099;
+}
+
 .custom-calendar {
-  max-width: 300px;
-  flex-shrink: 0;
+  max-width: 280px;
+  margin-top: 10px;
+}
+
+.entry-title {
+  font-size: 20px;
+  font-weight: bold;
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: center;
+}
+
+.entry-content {
+  width: 100%;
+  height: 400px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  padding: 10px;
 }
 
 .calendar-and-book {
@@ -169,8 +205,29 @@ export default {
   justify-content: center;
   gap: 40px;
   width: 100%;
-  margin-top: 150px;
-  margin-left: 60px;
+  margin-top: 50px;
+}
+
+.delete-button {
+  position: absolute;
+  top: 35px;
+  right: 35px;
+  font-size: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.delete-button.fixed {
+  position: absolute;
+  top: 35px;
+  right: 35px;
+  font-size: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .diary-container {
@@ -209,16 +266,6 @@ export default {
   color: #282828;
 }
 
-.new-entry-button {
-  background: #282828;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 8px;
-  text-decoration: none;
-  font: 600 16px Manrope, sans-serif;
-  cursor: pointer;
-}
-
 .calendar-container {
   margin-bottom: 20px;
 }
@@ -232,8 +279,9 @@ export default {
 
 .book {
   display: flex;
-  width: 700px;
+  width: 800px;
   height: 600px;
+  padding: 30px;
   margin: auto;
   position: relative;
   perspective: 1500px;
@@ -241,16 +289,16 @@ export default {
 
 .page.cover {
   flex: 1;
-  background: #282828;
+  background: #a974cf;
   color: white;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 24px;
   font-weight: bold;
-  cursor: pointer;
-  transform-origin: right;
   transition: transform 0.6s;
+  padding: 20px;
 }
 
 .page {
@@ -258,7 +306,6 @@ export default {
   background: #f5f5f5;
   padding: 20px;
   text-align: center;
-  cursor: pointer;
   transform-origin: left;
   transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
