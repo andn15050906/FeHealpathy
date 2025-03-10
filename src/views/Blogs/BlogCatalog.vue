@@ -13,6 +13,12 @@
       </button>
     </div>
   
+      <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
+            <option selected value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+      </select>
+
+
     <div class="blogs-container">
       <div class="blog-grid">
         <blogCard v-for="blog in filteredBlogs" :key="blog.id" :blog="blog" />
@@ -29,7 +35,7 @@
   </template>
   
 <script setup>
-import { ref, computed, defineEmits } from 'vue';
+import { ref, computed, defineEmits, watch } from 'vue';
 import { getPagedArticles } from "@/scripts/api/services/blogService.js";
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 
@@ -37,6 +43,7 @@ import { onMounted } from 'vue';
 
 const selectedTags = ref([]);
 const searchQuery = ref('');
+const sortOption = ref('name-asc');
 const itemsPerPage = 20;
 const blogs = ref([]);
 const currentPage = ref(1);
@@ -72,30 +79,34 @@ const filteredBlogs = computed(() => {
   return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
 });
 
+function sortBlogs() {
+  if (sortOption.value === 'name-asc') {
+    blogs.value.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortOption.value === 'name-desc') {
+    blogs.value.sort((a, b) => b.title.localeCompare(a.title));
+  }
+}
+
+watch(sortOption, () => {
+  sortBlogs();
+  changePage(1);
+});
+
+
 onMounted(async () => {
   try {
     const blogResponse = await getPagedArticles();
-    if (blogResponse && blogResponse.items) {
-      blogs.value = blogResponse.items.map(blog => ({ ...blog }));
-    } else {
-      console.error('No blog items found');
-    }
-
+    blogs.value = blogResponse?.items?.map(blog => ({ ...blog })) || [];
     const tagResponse = await getPagedTags();
-    if (tagResponse && tagResponse.length > 0) {
-      filters.value = tagResponse.map(tag => ({
-        value: tag.id,
-        label: tag.title
-      }));
-    } else {
-      console.error('No tag items found');
-    }
+    sortBlogs();
+    filters.value = tagResponse?.map(tag => ({
+      value: tag.id,
+      label: tag.title
+    })) || [];
   } catch (error) {
     console.error("Failed to fetch blogs or tags", error);
   }
 });
-
-
 
 
 function changePage(page) {
@@ -145,6 +156,7 @@ function applyFilter(filterValue) {
     justify-content: center;
     gap: 15px;
     margin-bottom: 30px;
+    flex-wrap: wrap;
   }
   
   .filter-btn {

@@ -17,7 +17,16 @@
       <!-- Courses -->
       <div v-if="currentTab === 'courses'" class="tab-content">
         <div class="content-header">
-          <h2>Pending Courses</h2>
+          <h2>Your Courses</h2>
+        </div>
+        <div class="content-header">
+          <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
+            <option selected value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="price-asc">Price Low-High</option>
+            <option value="price-desc">Price High-Low</option>
+          </select>
+
           <input v-model="searchQuery[currentTab]" placeholder="Search..." class="search-input" />
         </div>
         <table class="content-table">
@@ -45,14 +54,11 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-view" @click="viewContent(item)">
-                  <i class="fas fa-eye"></i>
-                </button>
                 <button class="btn btn-approve" @click="approveContent(item)">
-                  <i class="fas fa-check"></i>
+                  <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-reject" @click="rejectContent(item)">
-                  <i class="fas fa-times"></i>
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
@@ -69,6 +75,13 @@
       <div v-if="currentTab === 'blogs'" class="tab-content">
         <div class="content-header">
           <h2>Pending Blog Posts</h2>
+        </div>
+        <div class="content-header">
+          <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
+            <option selected value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+          </select>
+
           <input v-model="searchQuery[currentTab]" placeholder="Search..." class="search-input" />
         </div>
         <table class="content-table">
@@ -94,9 +107,6 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-view" @click="viewContent(item)">
-                  <i class="fas fa-eye"></i>
-                </button>
                 <button class="btn btn-approve" @click="approveContent(item)">
                   <i class="fas fa-check"></i>
                 </button>
@@ -139,9 +149,6 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-view" @click="viewContent(item)">
-                  <i class="fas fa-eye"></i>
-                </button>
                 <button class="btn btn-approve" @click="approveContent(item)">
                   <i class="fas fa-check"></i>
                 </button>
@@ -164,6 +171,7 @@
     components: { Pagination },
     data() {
       return {
+        sortOption: 'name-asc',
         currentPage: 1,  // Trang hiện tại (bắt đầu từ 1)
         totalPages: 1,   // Tổng số trang
         pageSize: 20,    // Số khóa học mỗi trang
@@ -198,29 +206,47 @@ methods: {
         this.currentPage = page;
         this.$nextTick(() => this.fetchCourses());
     }
+},
+sortCourses() {
+    if (this.sortOption === 'name-asc') {
+      this.courses.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (this.sortOption === 'name-desc') {
+      this.courses.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (this.sortOption === 'price-asc') {
+      this.courses.sort((a, b) => a.price - b.price);
+    } else if (this.sortOption === 'price-desc') {
+      this.courses.sort((a, b) => b.price - a.price);
+    }
+  },
+  sortBlogs() {
+  if (this.sortOption === 'name-asc') {
+    this.blogs.sort((a, b) => a.title.localeCompare(b.title)); 
+  } else if (this.sortOption === 'name-desc') {
+    this.blogs.sort((a, b) => b.title.localeCompare(a.title));
+  }
 }
-
 ,
-    async fetchBlogs() {
-        try {
-            const response = await getPagedArticles();
-            this.blogs = Array.isArray(response.items) ? response.items : [];
-            const blogTab = this.tabs.find(tab => tab.id === 'blogs');
-        if (blogTab) {
-            blogTab.count = response.totalCount;
-        }
-            console.log(response);
-        } catch (error) {
-            console.error('Error fetching blogs:', error);
-            this.blogs = [];
-        }
-    },
+  async fetchBlogs() {
+  try {
+    const response = await getPagedArticles();
+    this.blogs = Array.isArray(response.items) ? response.items : [];
+    const blogTab = this.tabs.find(tab => tab.id === 'blogs');
+    if (blogTab) {
+      blogTab.count = response.totalCount;
+    }
+    this.sortBlogs(); // Sắp xếp lại blog sau khi fetch
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    this.blogs = [];
+  }
+},
     async fetchCourses() {
     try {
         console.log("Fetching courses for page:", this.currentPage);
 
         const params = {
-            pageIndex: this.currentPage - 1,  // Đảm bảo đúng index
+            pageIndex: this.currentPage - 1,
             pageSize: this.pageSize
         };
 
@@ -233,28 +259,17 @@ methods: {
         this.courses = response.items || [];
         this.totalPages = response.pageCount;
 
-        // Cập nhật số lượng courses vào tab
         const courseTab = this.tabs.find(tab => tab.id === 'courses');
         if (courseTab) {
             courseTab.count = response.totalCount;
         }
+        this.sortCourses();
     } catch (error) {
         console.error('Error fetching courses:', error);
         this.courses = [];
     }
 }
-
-
 ,
-      viewContent(item) {
-        console.log('View details:', item);
-      },
-      approveContent(item) {
-        console.log('Approve:', item);
-      },
-      rejectContent(item) {
-        console.log('Reject:', item);
-      }
     },
     computed: {
         filteredCourses() {
@@ -350,10 +365,10 @@ methods: {
   }
   
   .content-table th,
-  .content-table td {
+  .content-table td,
+  .content-table tr {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #eee;
   }
   
   .content-table th {
@@ -431,7 +446,11 @@ methods: {
 .content-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #eee;
   vertical-align: top; /* Căn chữ lên trên */
 }
+
+.content-table tr {
+  border-bottom: 1px solid #eee;
+}
+
   </style>
