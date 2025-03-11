@@ -1,7 +1,6 @@
 <template>
   <div id="app" class="container">
-    <Calendar :events="habits" :initialDate="today" @save-event="handleSaveHabit"
-      @delete-event="handleDeleteHabit" />
+    <Calendar :events="habits" :initialDate="today" @save-event="handleSaveHabit" @delete-event="handleDeleteHabit" />
   </div>
 </template>
 
@@ -24,6 +23,7 @@ export default {
   setup() {
     const habits = ref([]);
     const today = new Date();
+
     const loadRoutines = async () => {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -45,44 +45,72 @@ export default {
         tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
       }));
     };
+
     onMounted(() => { loadRoutines(); });
+
     const createPayload = (habit, isUpdate = false) => {
-      const dateStr = habit.date
-        ? (habit.date instanceof Date ? habit.date.toISOString().split("T")[0] : habit.date)
-        : today.toISOString().split("T")[0];
-      const startDateTime = new Date(dateStr + "T" + habit.startTime + ":00");
-      const endDateTime = new Date(dateStr + "T" + habit.endTime + ":00");
+      const dateStr = typeof habit.date === 'string' ? habit.date :
+        new Date(habit.date).toISOString().split('T')[0];
+
+      console.log(dateStr);
+      console.log('habit.startTime', habit.startTime);
+      console.log('habit.endTime', habit.endTime);
+
+      const startDateTime = new Date(`${dateStr}T${habit.startTime}`);
+      const endDateTime = new Date(`${dateStr}T${habit.endTime}`);
+
       const payload = {
         title: habit.title,
-        description: habit.description,
-        objective: habit.objective,
+        description: habit.description || "",
+        objective: habit.objective || "",
         repeater: 0,
-        repeaterSequenceId: isUpdate ? habit.repeaterSequenceId : null,
-        startDate: startDateTime.toISOString(),
-        endDate: endDateTime.toISOString(),
-        isCompleted: habit.completed,
-        isClosed: habit.closed,
+        repeaterSequenceId: habit.repeaterSequenceId || null,
+        startDate: startDateTime,
+        endDate: endDateTime,
+        isCompleted: habit.completed || false,
+        isClosed: habit.closed || false,
         tag: tagMapping[habit.tag] || 0
       };
-      if (!isUpdate) { payload.id = habit.id; }
+
+      if (isUpdate) {
+        payload.id = habit.id;
+      }
+
       return payload;
     };
+
     const handleSaveHabit = async (habit) => {
-      let payload;
-      if (habit.isUpdate) {
-        payload = createPayload(habit, true); //TODO: Update on case UpdateRoutine since pass payload to BE = null
-        await updateRoutine(payload);
-      } else {
-        payload = createPayload(habit, false);
-        await createRoutine(payload);
+      try {
+        if (habit.isUpdate) {
+          const payload = createPayload(habit, true);
+          console.log(payload);
+          await updateRoutine(payload);
+        } else {
+          const payload = createPayload(habit, false);
+          console.log(payload);
+          await createRoutine(payload);
+        }
+        await loadRoutines();
+      } catch (error) {
+        console.error("Error saving habit:", error);
       }
-      await loadRoutines();
     };
+
     const handleDeleteHabit = async (habitToDelete) => {
-      await deleteRoutine(habitToDelete.id);
-      await loadRoutines();
+      try {
+        await deleteRoutine(habitToDelete.id);
+        await loadRoutines();
+      } catch (error) {
+        console.error("Error deleting habit:", error);
+      }
     };
-    return { habits, today, handleSaveHabit, handleDeleteHabit };
+
+    return {
+      habits,
+      today,
+      handleSaveHabit,
+      handleDeleteHabit
+    };
   }
 };
 </script>

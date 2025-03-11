@@ -89,7 +89,7 @@
       </div>
     </div>
     <transition name="fade">
-      <div class="task-chart-section" v-if="currentEvents.length">
+      <div class="task-chart-section" v-if="currentEvents.length > 0">
         <canvas ref="taskChart"></canvas>
       </div>
     </transition>
@@ -143,25 +143,38 @@
               <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
             </div>
           </div>
+          <div v-if="timeError" class="error-message">{{ timeError }}</div>
           <div class="modal-actions">
             <button class="btn cancel-btn" @click="cancelEvent">Cancel</button>
-            <button class="btn save-btn" @click="saveEvent">Save</button>
+            <button class="btn save-btn" @click="saveEvent" :disabled="!!timeError">Save</button>
           </div>
         </div>
       </div>
     </transition>
-    <DeleteConfirmPopup :message="`Are you sure you want to delete the event '${eventToDelete?.title}'?`"
-      :isVisible="showDeletePopup" @confirmDelete="handleDeleteConfirm" @update:isVisible="showDeletePopup = false" />
+    <DeleteConfirmPopup :message="`Are you sure you want to delete this habit?`" :isVisible="showDeletePopup"
+      @confirmDelete="handleDeleteConfirm" @update:isVisible="showDeletePopup = false" />
   </div>
 </template>
 
 <script>
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subMonths, addMonths, isSameDay as dfIsSameDay, isSameMonth, format } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  subMonths,
+  addMonths,
+  isSameDay as dfIsSameDay,
+  isSameMonth,
+  format
+} from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
+
 function getRoundedTime(date) {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -176,11 +189,13 @@ function getRoundedTime(date) {
   hours = hours % 24;
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
+
 function formatTime(date) {
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
+
 function getDeadline(event) {
   if (!event.date || !event.endTime) return new Date();
   const additional = Number(event.additionalTime) || 0;
@@ -190,6 +205,7 @@ function getDeadline(event) {
   deadline.setMinutes(deadline.getMinutes() + additional);
   return deadline;
 }
+
 export default {
   name: "Calendar",
   components: { DeleteConfirmPopup },
@@ -218,6 +234,7 @@ export default {
         startTime,
         endTime
       },
+      timeError: "",
       eventToDelete: null,
       showEventForm: false,
       showDeletePopup: false,
@@ -241,14 +258,25 @@ export default {
       immediate: true,
       deep: true
     },
-    completedCount(newVal, oldVal) {
-      if (newVal !== oldVal) this.renderChart();
+    localEvents: {
+      handler(newVal) {
+        if (this.currentEvents.length > 0) {
+          this.$nextTick(() => {
+            this.renderChart();
+          });
+        } else if (this.chartInstance) {
+          this.chartInstance.destroy();
+          this.chartInstance = null;
+        }
+      },
+      immediate: true,
+      deep: true
     },
-    closedCount(newVal, oldVal) {
-      if (newVal !== oldVal) this.renderChart();
+    'newEvent.startTime': function () {
+      this.validateTimeConstraints();
     },
-    remainingCount(newVal, oldVal) {
-      if (newVal !== oldVal) this.renderChart();
+    'newEvent.endTime': function () {
+      this.validateTimeConstraints();
     }
   },
   computed: {
@@ -307,6 +335,7 @@ export default {
     }
   },
   mounted() {
+    this.renderChart();
     setInterval(() => {
       const now = new Date();
       this.localEvents.forEach(event => {
@@ -315,13 +344,37 @@ export default {
           if (now > deadline) {
             event.closed = true;
             toast.error("Event closed due to deadline!", { duration: 150, position: "bottom-center" });
+            this.renderChart();
           }
         }
       });
     }, 30000);
-    this.renderChart();
   },
   methods: {
+    validateTimeConstraints() {
+      if (!this.newEvent.startTime || !this.newEvent.endTime) {
+        this.timeError = "";
+        return;
+      }
+
+      const startTime = this.newEvent.startTime;
+      const endTime = this.newEvent.endTime;
+
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+
+      if (startHour > endHour || (startHour === endHour && startMinute >= endMinute)) {
+        this.timeError = "Start time must be earlier than end time";
+        return;
+      }
+
+      if (endHour === 0 && endMinute === 0) {
+        this.timeError = "End time cannot be midnight (00:00)";
+        return;
+      }
+
+      this.timeError = "";
+    },
     dayClasses(day) {
       return {
         "calendar-day": true,
@@ -357,60 +410,73 @@ export default {
     },
     selectDay(day) {
       this.selectedDate = day.date;
+      this.$nextTick(() => {
+        this.renderChart();
+      });
     },
     openNewEventForm() {
       this.isEditing = false;
+      this.timeError = "";
       this.showEventForm = true;
     },
     editEvent(event) {
       this.isEditing = true;
       this.newEvent = { ...event, isUpdate: true };
+      this.timeError = "";
       this.showEventForm = true;
+      this.validateTimeConstraints();
     },
     saveAddEvent() {
       if (!this.newEvent.title) return;
-      let savedEvent;
-      if (this.newEvent.repeat === "none") {
-        const newId = Date.now().toString();
-        savedEvent = { ...this.newEvent, id: newId, date: this.selectedDate };
-        const exists = this.localEvents.some(e =>
-          dfIsSameDay(new Date(e.date), this.selectedDate) &&
-          e.title === savedEvent.title &&
-          e.startTime === savedEvent.startTime
-        );
-        if (!exists) {
-          this.localEvents.push(savedEvent);
-        }
-      } else {
-        for (let d = new Date(startOfMonth(this.currentDate)); d <= endOfMonth(this.currentDate); d.setDate(d.getDate() + 1)) {
-          const day = new Date(d);
-          if (this.newEvent.repeat === "weekday" && (day.getDay() === 0 || day.getDay() === 6)) continue;
-          if (this.newEvent.repeat === "weekends" && (day.getDay() !== 0 && day.getDay() !== 6)) continue;
-          const exists = this.localEvents.some(e =>
-            dfIsSameDay(new Date(e.date), day) &&
-            e.title === this.newEvent.title &&
-            e.startTime === this.newEvent.startTime
-          );
-          if (!exists) {
-            const newEvent = { ...this.newEvent, date: new Date(day) };
-            this.localEvents.push(newEvent);
-          }
-        }
-        savedEvent = null;
+
+      this.validateTimeConstraints();
+      if (this.timeError) return;
+
+      let savedEvent = {
+        ...this.newEvent,
+        id: Date.now().toString(),
+        date: format(this.selectedDate, "yyyy-MM-dd"),
+        completed: false,
+        closed: false
+      };
+
+      const exists = this.localEvents.some(e =>
+        dfIsSameDay(new Date(e.date), this.selectedDate) &&
+        e.title === savedEvent.title &&
+        e.startTime === savedEvent.startTime
+      );
+
+      if (!exists) {
+        this.localEvents.push(savedEvent);
       }
-      this.$emit("save-event", savedEvent || this.newEvent);
+
+      this.$emit("save-event", savedEvent);
       this.cancelEvent();
+      setTimeout(() => {
+        this.renderChart();
+      }, 1000);
     },
     saveUpdateEvent() {
       if (!this.newEvent.title) return;
-      let updatedEvent;
+
+      this.validateTimeConstraints();
+      if (this.timeError) return;
+
       const index = this.localEvents.findIndex(e => e.id === this.newEvent.id);
       if (index !== -1) {
-        updatedEvent = { ...this.newEvent, date: this.selectedDate };
+        const updatedEvent = {
+          ...this.newEvent,
+          date: format(this.selectedDate, "yyyy-MM-dd")
+        };
+
         this.localEvents.splice(index, 1, updatedEvent);
+        this.$emit("save-event", updatedEvent);
       }
-      this.$emit("save-event", updatedEvent);
+
       this.cancelEvent();
+      setTimeout(() => {
+        this.renderChart();
+      }, 1000);
     },
     saveEvent() {
       if (this.isEditing) {
@@ -422,6 +488,7 @@ export default {
     cancelEvent() {
       this.showEventForm = false;
       this.isEditing = false;
+      this.timeError = "";
       const now = new Date();
       const startTime = getRoundedTime(now);
       const [startHour, startMinute] = startTime.split(":").map(Number);
@@ -448,13 +515,22 @@ export default {
       }
       this.showDeletePopup = false;
       this.eventToDelete = null;
+      this.renderChart();
     },
     startHold(event) {
       if (event.closed) return;
       this.holdTimer = setTimeout(() => {
-        const wasCompleted = event.completed;
-        this.toggleComplete(event);
-        toast.success(wasCompleted ? "Event marked as undone!" : "Event marked as done!", { duration: 1000, position: "bottom-center" });
+        event.completed = !event.completed;
+        event.isUpdate = true;
+        event.holding = false;
+        toast.success(
+          event.completed ? "Event marked as done!" : "Event marked as undone!",
+          { position: "bottom-center" }
+        );
+        this.$emit("save-event", event);
+        setTimeout(() => {
+          this.renderChart();
+        }, 1000);
       }, 500);
       event.holding = true;
     },
@@ -463,17 +539,17 @@ export default {
       this.holdTimer = null;
       this.currentEvents.forEach(e => (e.holding = false));
     },
-    toggleComplete(event) {
-      event.completed = !event.completed;
-      event.holding = false;
-    },
     renderChart() {
       if (this.chartInstance) {
         this.chartInstance.destroy();
       }
-      if (!this.$refs.taskChart) return;
+      if (!this.$refs.taskChart || this.currentEvents.length === 0) return;
       const ctx = this.$refs.taskChart.getContext("2d");
-      const progressData = [this.completedCount, this.remainingCount, this.closedCount];
+      const progressData = [
+        this.completedCount,
+        this.remainingCount,
+        this.closedCount
+      ];
       this.chartInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
