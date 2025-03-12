@@ -1,4 +1,7 @@
 <template>
+  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true"
+    :centered="true"></StatisticsTabs>
+
   <div class="container">
     <h1 class="title">📊 Survey Statistics (Self Assessment)</h1>
 
@@ -7,30 +10,32 @@
       <table>
         <thead>
           <tr>
-            <th>Date</th>
+            <th>Survey Taken</th>
             <th>Score</th>
             <th>Evaluation</th>
+            <th>Date</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(result, index) in surveyResults" :key="index">
-            <td>{{ result.date }}</td>
-            <td>{{ result.score }}</td>
-            <td :class="getEvaluationClass(result.score)">
-              {{ getEvaluation(result.score) }}
+            <td>{{ result.surveyTitle }}</td>
+            <td>{{ result.score }} / {{ result.maxScore }}</td>
+            <td :class="result.bands[0].ratingClass">
+              {{ getEvaluation(result) }}
             </td>
+            <td>{{ localFormatISODate(result.creationTime) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="charts-container">
-      <div class="chart-box">
+      <div :style="{ width: '30%' }">
         <h2>🎯 Survey Result Ratio</h2>
         <canvas ref="pieChart"></canvas>
       </div>
 
-      <div class="chart-box" id="bar-chart">
+      <div :style="{ width: '60%' }">
         <h2>📊 Survey Scores Over Time</h2>
         <canvas ref="barChart"></canvas>
       </div>
@@ -39,46 +44,46 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import Chart from "chart.js/auto";
+import { formatISODateWithHMS, formatISODate } from '@/scripts/logic/common';
+import { calcSurveyResult } from '@/scripts/logic/utils';
+import { getUserProfile } from '@/scripts/api/services/authService';
+import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
+import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
 
 export default {
-  name: "SurveyStatistics",
+  components: { StatisticsTabs },
+  methods: {
+    localFormatISODate(date) {
+      return formatISODateWithHMS(date);
+    }
+  },
   setup() {
     const pieChart = ref(null);
     const barChart = ref(null);
 
-    const surveyResults = ref([
-      { date: "2025-03-01", score: 85 },
-      { date: "2025-03-05", score: 60 },
-      { date: "2025-03-10", score: 40 },
-      { date: "2025-03-15", score: 75 },
-      { date: "2025-03-20", score: 90 },
-    ]);
-
+    const surveyResults = ref([]);
     const positive = ref(0);
     const neutral = ref(0);
     const negative = ref(0);
+    const maxRenderedScore = ref(0);
 
-    surveyResults.value.forEach((result) => {
-      if (result.score >= 80) positive.value++;
-      else if (result.score >= 50) neutral.value++;
-      else negative.value++;
-    });
-
-    const getEvaluation = (score) => {
-      return score >= 80
-        ? "Positive 👍"
-        : score >= 50
-        ? "Neutral ⚠️"
-        : "Negative 😔";
+    const getEvaluation = (result) => {
+      let band = result.bands[0];
+      if (band) {
+        if (band.ratingClass == 'bad')
+          return "Negative 😔";
+        else if (band.ratingClass == 'average')
+          return "Neutral ⚠️"
+        else if (band.ratingClass == 'good')
+          return "Positive 👍"
+      }
+      return "Neutral ⚠️";
     };
 
-    const getEvaluationClass = (score) => {
-      return score >= 80 ? "positive" : score >= 50 ? "neutral" : "negative";
-    };
-
-    onMounted(() => {
+    const renderCharts = () => {
       new Chart(pieChart.value, {
         type: "pie",
         data: {
@@ -95,18 +100,12 @@ export default {
       new Chart(barChart.value, {
         type: "bar",
         data: {
-          labels: surveyResults.value.map((r) => r.date),
+          labels: surveyResults.value.map(r => `${r.surveyTitle} (${formatISODate(r.creationTime)})`),
           datasets: [
             {
-              label: "Survey Score",
-              data: surveyResults.value.map((r) => r.score),
-              backgroundColor: [
-                "#4CAF50",
-                "#FFC107",
-                "#E91E63",
-                "#03A9F4",
-                "#8E44AD",
-              ],
+              label: "Survey Score (based on Score scale = 100)",
+              data: surveyResults.value.map((r) => (r.score / r.maxScore) * 100),    // r.maxScore > 0
+              backgroundColor: ["#4CAF50", "#FFC107", "#E91E63", "#03A9F4", "#8E44AD"],
               borderWidth: 1,
             },
           ],
@@ -114,19 +113,60 @@ export default {
         options: {
           indexAxis: "y",
           responsive: true,
-          scales: {
-            x: { min: 0, max: 100 },
-          },
+          scales: { x: { min: 0, max: /*maxRenderedScore.value*/ 100 } },
         },
       });
-    });
+    }
+
+    (async () => {
+      let userId = (await getUserProfile()).id;
+
+      let submissionsPromise = getPagedSubmissions({ creatorId: userId });
+      let surveysPromise = getPagedSurveys();
+      await Promise.all([submissionsPromise, surveysPromise]);
+      let submissions = (await submissionsPromise).items;
+      let surveys = (await surveysPromise).items.filter(_ => _.bands.length > 0);
+
+      let resultArr = [];
+      for (let submission of submissions) {
+        let survey = surveys.find(item => item.id == submission.surveyId);
+        if (survey) {
+          let result = calcSurveyResult(survey, submission.choices);
+          resultArr.push({
+            surveyTitle: survey.name,
+            creationTime: submission.creationTime,
+            score: result.score,
+            maxScore: result.maxScore,
+            bands: result.bands
+          });
+        }
+      }
+
+      maxRenderedScore.value = Math.max(...resultArr.map(_ => _.maxScore));
+      console.log(resultArr);
+
+      surveyResults.value = resultArr;
+      surveyResults.value.forEach((result) => {
+        let band = result.bands[0];
+        if (band) {
+          if (band.ratingClass == 'bad')
+            negative.value++;
+          else if (band.ratingClass == 'average')
+            neutral.value++;
+          else if (band.ratingClass == 'good')
+            positive.value++;
+        }
+      });
+
+      renderCharts();
+    })()
 
     return {
       surveyResults,
       getEvaluation,
-      getEvaluationClass,
       pieChart,
       barChart,
+      renderCharts
     };
   },
 };
@@ -169,17 +209,17 @@ th {
   background: #f9f9f9;
 }
 
-.positive {
+.good {
   color: #4caf50;
   font-weight: bold;
 }
 
-.neutral {
+.average {
   color: #ffc107;
   font-weight: bold;
 }
 
-.negative {
+.bad {
   color: #e91e63;
   font-weight: bold;
 }
@@ -190,17 +230,7 @@ th {
   align-items: start;
   flex-wrap: wrap;
   padding-bottom: 40px;
-}
-
-.chart-box {
-  width: 50%;
-  margin-bottom: 40px;
   text-align: center;
-}
-
-#bar-chart canvas {
-  width: 75% !important;
-  height: 270px !important;
 }
 
 .chart-box canvas {

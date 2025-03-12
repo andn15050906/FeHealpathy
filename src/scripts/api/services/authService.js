@@ -71,8 +71,17 @@ export const getUserBearerToken = () => {
   return localStorage.getItem('token');
 }
 
-export const getUserAuthData = () => {
-  return JSON.parse(localStorage.getItem('userProfile'));
+export const getUserProfile = () => {
+  try {
+    return JSON.parse(localStorage.getItem('userProfile'));
+  }
+  catch (err) {
+    clearUserAuthData();
+  }
+}
+
+export const setUserProfile = (profile) => {
+  localStorage.setItem('userProfile', JSON.stringify(profile));
 }
 
 export const clearUserAuthData = () => {

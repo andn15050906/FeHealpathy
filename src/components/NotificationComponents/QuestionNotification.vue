@@ -1,7 +1,7 @@
 <template>
     <div>
         <HighlightedNotification :noti="notification" />
-        <DailyQuestion v-if="showModal" :question="questionPreview" @close="showModal = false" />
+        <DailyQuestion v-if="showModal" :notification="notification" @close="saveAndClose" />
     </div>
 </template>
 
@@ -9,6 +9,7 @@
 import HighlightedNotification from '@/components/NotificationComponents/HighlightedNotification.vue';
 import DailyQuestion from './DailyQuestion.vue'
 import { Noti } from '@/scripts/types/models';
+import { logQuestionOfTheDay } from '@/scripts/api/services/activityLogService'
 
 export default {
     name: 'QuestionNotification',
@@ -49,7 +50,6 @@ export default {
         // cái này để apply thông báo thật
         // this.scheduleRandomNotification();
 
-        // cái này set time về 3s kể từ lúc load page dùng để test thông báo
         setTimeout(() => {
             this.notification = new Noti(
                 true,
@@ -74,19 +74,23 @@ export default {
             }
 
             setTimeout(() => {
-                this.notification.isShown = true;
                 this.notification.questionPreview = this.getRandomQuestionPreview();
+                this.notification.isShown = true;
             }, timeUntilNotification);
         },
         getRandomQuestionPreview() {
             return this.questions[Math.floor(Math.random() * this.questions.length)];
         },
+        getRandomGreeting() {
+            return this.greetings[Math.floor(Math.random() * this.greetings.length)];
+        },
         openQuestionModal() {
             this.showModal = true;
             this.notification.isShown = false;
         },
-        getRandomGreeting() {
-            return this.greetings[Math.floor(Math.random() * this.greetings.length)];
+        saveAndClose(question, answer) {
+            logQuestionOfTheDay(question, answer);
+            this.showModal = false;
         }
     }
 }

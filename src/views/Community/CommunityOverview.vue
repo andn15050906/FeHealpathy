@@ -12,7 +12,7 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
         <GroupCard v-for="group in joinedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
-            :group-info="group" :to-link="'/group/' + group.id" />
+            :group-info="group" :to-link="'chat'/*'/group/' + group.id*/" />
     </div>
     <div class="mx-8 mt-4 pa-4">
         <span class="font-weight-bold text-subtitle-1">
@@ -21,7 +21,7 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
         <GroupCard v-for="group in recommendedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
-            :group-info="group" :to-link="'/group/' + group.id" />
+            :group-info="group" :to-link="'chat'/*/group/' + group.id*/" />
     </div>
     <div class="d-flex flex-wrap mx-8" v-if="!isDataFetched">
         <div v-for="i in 8" :key="i" class="px-2 mb-4">

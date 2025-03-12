@@ -7,6 +7,10 @@ function ConvertTo_yyyy_mm_dd(date) {
         + '-' + (((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())))
 }
 
+function ConvertToDateAndTime(isoDate) {
+
+}
+
 function readErr(error) {
     if (!error.response) {
         console.log(error);
@@ -90,6 +94,26 @@ export const formatISODate = (isoDate) => {
         return result;
     }
 };
+
+export const formatISODateWithHMS = (isoDate) => {
+    const date = new Date(isoDate);
+    
+    if (isNaN(date)) {
+        throw new Error('Invalid date format');
+    }
+    
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    
+    return date.toLocaleString('en-US', options);;
+}
 
 export const reactionMap = {
     'U+1F601': '😁',

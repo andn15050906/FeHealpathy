@@ -80,7 +80,19 @@ export const updateUserProfile = async (formData) => {
   }
 };
 
-
+export const updateRoadmap = async (roadmapId) => {
+  let formData = new FormData();
+  formData.append('RoadmapId', roadmapId);
+  try {
+    const response = await apiClient.put(`/Users`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
 
 export const changePassword = async (currentPassword, newPassword) => {
   try {

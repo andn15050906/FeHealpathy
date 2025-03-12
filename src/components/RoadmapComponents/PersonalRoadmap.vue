@@ -1,11 +1,11 @@
 <template>
-    <v-tour name="roadmap-tour" v-if="isTourActive" :steps="roadmap.tourSteps" :options="tourOptions" @end="isTourActive = false" />
+    <v-tour name="roadmap-tour" v-if="isTourActive" :steps="roadmap?.tourSteps" :options="tourOptions" @end="isTourActive = false" />
     <div class="roadmap-intro">
-        <div v-for="introText in roadmap.introTexts" class="roadmap-text">
+        <div v-for="introText in roadmap?.introTexts" class="roadmap-text">
             {{ introText }}
         </div>
     </div>
-    <Roadmap :timelineItems="roadmap.timelineItems"></Roadmap>
+    <Roadmap :timelineItems="roadmap?.timelineItems ?? []"></Roadmap>
     <div v-if="nextScreenCallback" class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
         <GlowingButton @click="nextScreenCallback" primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ text.nextScreen }}</GlowingButton>
     </div>
@@ -16,6 +16,7 @@
 import "vue3-tour/dist/vue3-tour.css";
 import Roadmap from "@/components/RoadmapComponents/Roadmap.vue";
 import GlowingButton from "@/components/Common/GlowingButton.vue";
+import { inject } from "vue";
 import { roadmaps } from '@/scripts/data/roadmaps.js';
 
 export default {
@@ -47,19 +48,47 @@ export default {
                     buttonStop: "Finish",
                 }
             },
-            roadmap: roadmaps['mental-roadmap']//,
+            roadmap: roadmaps["mental-roadmap"],
+            roadmapProgress: inject('roadmapProgress')
             //guider: inject('guider')
         }
     },
-    mounted() {
+    async mounted() {
         if (this.enableTour) {
             this.$tours['roadmap-tour'].start();
         }
+
+        setTimeout(() => {
+            this.setRoadmap();
+        }, 5000)
         /*this.guider.highlight(`roadmap-btn-${1}`);*/
     },
     methods: {
         toggleTour() {
             this.isTourActive = !this.isTourActive;
+        },
+        setRoadmap() {
+            let personalRoadmap = this.roadmapProgress.getPersonalRoadmap();
+            console.log(personalRoadmap);
+            this.roadmap = {
+                name: personalRoadmap.title,
+                introTexts: personalRoadmap.introText?.split('.') || '',
+                steps: personalRoadmap.phases.sort((a, b) => a.index - b.index).map((_, index) => {
+                    return {
+                        target: `#roadmap-step-${index}`,
+                        header: { title: `Step ${index}: ${_.title}` }
+                    }
+                }),
+                timelineItems: personalRoadmap.phases.sort((a, b) => a.index - b.index).map((_, index) => {
+                    return {
+                        color: index == 0 ? '#FF8A80' : index == 1 ? '#BA68C8' : index == 2 ? '#7986CB' : index == 3 ? '#81C784' : '#64B5F6',
+                        icon: index == 0 ? 'mdi-account-heart': index == 1 ? 'mdi-bullseye' : index == 2 ? 'mdi-clock-outline' : index == 3 ? 'mdi-emoticon-happy' : 'mdi-rocket-launch',
+                        title: _.title,
+                        content: _.description,
+                        link: '/practice'
+                    }
+                })
+            }
         }
     }
 }

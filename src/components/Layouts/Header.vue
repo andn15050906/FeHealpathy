@@ -19,14 +19,11 @@
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
             <hr class="menu-divider" />
+            <li><router-link to="/statistics/self-assessment">Statistics</router-link></li>
+            <hr class="menu-divider" />
             <li><router-link to="/settings">Settings</router-link></li>
             <hr class="menu-divider" />
-            <li><router-link to="/change-password">Change Password</router-link></li>
-            <hr class="menu-divider" />
-
-            <li>
-              <router-link to="/enrolled-course">Enrolled courses</router-link>
-            </li>
+            <li><router-link to="/enrolled-course">Enrolled courses</router-link></li>
 
             <li v-if="user.role == 0">
               <hr class="menu-divider" />
@@ -72,7 +69,7 @@
 </template>
 
 <script>
-import { getUserAuthData, signOut } from '@/scripts/api/services/authService';
+import { getUserProfile, signOut } from '@/scripts/api/services/authService';
 import Logo from '@/components/Common/Misc/Logo.vue';
 // import { getNotifications, updateNotification } from '@/scripts/api/services/notificationService';
 
@@ -107,7 +104,7 @@ export default {
   methods: {
     async fetchUserProfile() {
       try {
-        const clientData = await getUserAuthData();
+        const clientData = await getUserProfile();
         if (clientData) {
           this.isLoggedIn = true;
           this.user = {

@@ -76,29 +76,21 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <v-btn color="warning" class="mr-0 white-text" >
+      <RouterLink :to="change-password">Change Password</RouterLink>
+    </v-btn>
   </div>
 </template>
 
 <script>
-import { inject, ref, onMounted } from 'vue';
-import { ConvertTo_yyyy_mm_dd } from '../../../scripts/logic/common';
-import { updateUserProfile, getUserById } from '../../../scripts/api/services/userService.js';
-import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
-import { handleFormSubmit } from '@/scripts/logic/validation';
-import GlobalState from '@/scripts/logic/globalState';
+import { inject, ref, onBeforeMount } from 'vue';
 import dict from '@/scripts/data/dictionary.json';
-import { computed } from 'vue';
+import { updateUserProfile, getUserById } from '@/scripts/api/services/userService.js';
+import { getUserProfile, setUserProfile } from '@/scripts/api/services/authService';
+import { handleFormSubmit } from '@/scripts/logic/validation';
 
 export default {
-  data() {
-    var userProfile = GlobalState.getUserProfile();
-
-    return {
-      UserProfile: userProfile,
-      UserProfile_UserInfo_DateOfBirth: ConvertTo_yyyy_mm_dd(new Date(userProfile.DateOfBirth)),
-      UserProfile_UserInfo_JoinDate: ConvertTo_yyyy_mm_dd(new Date(userProfile.JoinDate))
-    }
-  },
   setup() {
     const form = ref({
       fullName: '',
@@ -118,44 +110,33 @@ export default {
     const text = dict['en'];
 
     const roleMapping = {
-    0: 'Member',
-    1: 'Advisor',
-    2: 'Admin'
+      0: 'Member',
+      1: 'Advisor',
+      2: 'Admin'
     };
 
     const fetchProfile = async () => {
-  try {
-    loadingSpinner.showSpinner();
+      try {
+        loadingSpinner.showSpinner();
 
-    // Lấy ID từ LocalStorage
-    const userAuthData = getUserAuthData();
-    const userId = userAuthData?.id;
-    
-    if (!userId) {
-      console.warn("⚠️ Không tìm thấy ID trong LocalStorage!");
-      return;
-    }
+        const userAuthData = getUserProfile();
 
-    // Gọi API để lấy dữ liệu người dùng
-    const userData = await getUserById(userId);
+        const userData = await getUserById(userAuthData?.id);
+        userData.role = roleMapping[userData.role] || 'Unknown';
+        userData.dateOfBirth = formatDate(userData.dateOfBirth);
+        userData.creationTime = formatDate(userData.creationTime);
+        userData.avatarUrl = getAvatarApiUrl(userData.avatarUrl);
 
-    // Chuyển đổi dữ liệu từ API
-    userData.role = roleMapping[userData.role] || 'Unknown';
-    userData.dateOfBirth = formatDate(userData.dateOfBirth);
-    userData.creationTime = formatDate(userData.creationTime);
-    userData.avatarUrl = getAvatarApiUrl(userData.avatarUrl);
+        Object.assign(form.value, userData);
 
-    // Gán dữ liệu vào form
-    Object.assign(form.value, userData);
-
-    console.log("✅ Dữ liệu người dùng từ API:", userData);
-  } catch (error) {
-    console.error("❌ Lỗi khi lấy dữ liệu người dùng:", error);
-    await sweetAlert.showError('Không thể lấy thông tin người dùng.');
-  } finally {
-    loadingSpinner.hideSpinner();
-  }
-};
+        console.log("✅ Dữ liệu người dùng từ API:", userData);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy dữ liệu người dùng:", error);
+        await sweetAlert.showError('Không thể lấy thông tin người dùng.');
+      } finally {
+        loadingSpinner.hideSpinner();
+      }
+    };
 
     const formatDate = (date) => {
       if (!date) return '';
@@ -170,12 +151,12 @@ export default {
     };
 
     const handleAvatarChange = event => {
-  const file = event.target.files[0];
-  if (file) {
-    form.value.avatar = file;
-    form.value.avatarUrl = URL.createObjectURL(file);
-    console.log("🔍 File selected:", file);
-  }
+      const file = event.target.files[0];
+      if (file) {
+        form.value.avatar = file;
+        form.value.avatarUrl = URL.createObjectURL(file);
+        console.log("🔍 File selected:", file);
+      }
     };
 
 
@@ -185,60 +166,50 @@ export default {
     };
 
     const confirmChanges = async () => {
-  try {
-    loadingSpinner.showSpinner();
-    const formData = new FormData();
+      try {
+        loadingSpinner.showSpinner();
 
-    formData.append('FullName', form.value.fullName);
-    formData.append('Bio', form.value.bio);
-    formData.append('DateOfBirth', form.value.dateOfBirth);
+        const formData = new FormData();
+        formData.append('FullName', form.value.fullName);
+        formData.append('Bio', form.value.bio);
+        formData.append('DateOfBirth', form.value.dateOfBirth);
+        if (form.value.avatar) {
+          formData.append('Avatar.File', form.value.avatar);
+          formData.append('Avatar.Title', 'User Profile Picture');
+        }
 
-    if (form.value.avatar) {
-      formData.append('Avatar.File', form.value.avatar);
-      formData.append('Avatar.Title', 'User Profile Picture');
-    }
+        const response = await updateUserProfile(formData);
+        if (response)
+          form.value.avatarUrl = response.avatarUrl || form.value.avatarUrl;
+          
+        let updatedUser = getUserProfile();
+        updatedUser.fullName = form.value.fullName;
+        updatedUser.bio = form.value.bio;
+        updatedUser.dateOfBirth = form.value.dateOfBirth;
+        updatedUser.avatarUrl = form.value.avatarUrl;
+        setUserProfile(updatedUser);
 
-    const response = await updateUserProfile(formData);
+        await fetchProfile();
 
-    if (response) {
-      form.value.avatarUrl = response.avatarUrl || form.value.avatarUrl;
+        loadingSpinner.hideSpinner();
 
-      let updatedUser = getUserAuthData();
+        await sweetAlert.showAlert({
+          icon: 'success',
+          title: 'Profile Updated',
+          text: 'Your profile has been successfully updated!'
+        });
 
-      updatedUser.fullName = form.value.fullName;
-      updatedUser.bio = form.value.bio;
-      updatedUser.dateOfBirth = form.value.dateOfBirth;
-      updatedUser.avatarUrl = response.avatarUrl;
-
-      setUserAuthData(updatedUser);
-      console.log(updatedUser);
-
-      await fetchProfile();
-    } else {
-      console.log("API Response:", response);
-      console.warn("⚠️ API did not return avatarUrl, keeping old value.");
-    }
-
-    loadingSpinner.hideSpinner();
-
-    await sweetAlert.showAlert({
-      icon: 'success',
-      title: 'Profile Updated',
-      text: 'Your profile has been successfully updated!'
-    });
-
-  } catch (error) {
-    console.error("❌ Update Profile Error:", error);
-    sweetAlert.showError('Error updating profile.');
-  }
-};
+      } catch (error) {
+        console.error("❌ Update Profile Error:", error);
+        sweetAlert.showError('Error updating profile.');
+      }
+    };
 
     const handleSubmit = () => handleFormSubmit(confirmChanges, sweetAlert);
 
-    onMounted(() => {
+    onBeforeMount(() => {
       fetchProfile();
     });
-
 
     return {
       form,
@@ -265,6 +236,11 @@ export default {
   color: #fff;
 }
 
+.white-text a {
+  color: #fff;
+  text-decoration: none;
+}
+
 .v-card--material {
   overflow: visible;
 }
@@ -282,5 +258,9 @@ export default {
 .sub-footer {
   position: relative;
   top: -20px;
+}
+
+.v-btn {
+  padding: 0 12px;
 }
 </style>

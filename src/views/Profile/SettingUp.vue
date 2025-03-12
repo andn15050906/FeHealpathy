@@ -16,11 +16,15 @@ import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/scripts/types/dtos';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
 import { createSubmission } from '@/scripts/api/services/submissionsService';
 import { getAllPreferenceSurveys, updateUserPreference } from '@/scripts/api/services/preferencesService'
+import { getRoadmap } from '@/scripts/api/services/recommendService';
+import { updateRoadmap } from '@/scripts/api/services/userService';
+import { getUserProfile, setUserProfile } from '@/scripts/api/services/authService';
 import SingleSelectSurvey from "@/components/SurveyComponents/SingleSelectSurvey.vue";
 import MultipleSelectSurvey from "@/components/SurveyComponents/MultipleSelectSurvey.vue";
 import PersonalRoadmap from '../../components/RoadmapComponents/PersonalRoadmap.vue';
 
 const sweetAlert = inject('sweetAlert');
+const spinner = inject('loadingSpinner');
 const childIndex = ref(-1);
 const firstEvaluationOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
 const wellnessSurveyOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
@@ -49,10 +53,21 @@ const submitWellnessSurvey = async (questionsWithAnswer) => {
     switchChild(true);
 }
 const submitWhatYouWantSurvey = async (selectedOptions) => {
+    spinner.showSpinner();
     await updateUserPreference({
         sourceId: whatYouWantSurveyOptions.value.survey.id,
         preferenceValueIds: selectedOptions
     });
+    let recommendedRoadmap = await getRoadmap();
+    if (recommendedRoadmap) {
+        await updateRoadmap(recommendedRoadmap);
+
+        let user = getUserProfile();
+        user.roadmapId = recommendedRoadmap;
+        setUserProfile(user);
+    }
+    spinner.hideSpinner();
+
     await sweetAlert.showSuccess("Setting up successfully!").then(() => { router.push({ path: '/' }); });
 }
 

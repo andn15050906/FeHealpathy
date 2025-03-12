@@ -5,7 +5,7 @@
     <SweetAlert ref="sweetAlert" />
     <Header ref="headerRef" />
     <main>
-      <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar"></RoadmapProgress>
+      <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
       <div class="page-container">
         <!--<RouterView class="left-sidebar" v-if="isAuthAndShown" name="roadmapProgress"></RouterView>-->
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
@@ -23,7 +23,7 @@
 <script setup>
 import { ref, provide, onMounted, computed } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
-import { getUserAuthData } from '@/scripts/api/services/authService';
+import { getUserProfile } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
@@ -37,6 +37,7 @@ const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
 const router = useRouter();
 const isAuthenticated = ref(false);
+const roadmapProgress = ref(null);
 //const guiderRef = ref(null);
 
 provide('loadingSpinner', {
@@ -51,6 +52,10 @@ provide('sweetAlert', {
   showWarning: (message) => sweetAlert.value.showAlert({ icon: 'warning', title: 'Warning', text: message }),
   showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
 });
+
+provide('roadmapProgress', {
+  getPersonalRoadmap: () => roadmapProgress.value.getPersonalRoadmap()
+})
 
 /*provide('guider', {
   highlight: (targetElementId, offsetX, offsetY, width, height, position) =>
@@ -69,7 +74,7 @@ onMounted(async () => {
     }, 300);
   });
 
-  if (await getUserAuthData())
+  if (await getUserProfile())
     isAuthenticated.value = true;
 });
 
@@ -140,7 +145,7 @@ main {
   position: fixed;
   top: 60px;
   left: 0;
-  width: 350px;
+  width: calc((100vw - 1200px)/2 - 8px);
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
@@ -162,5 +167,8 @@ footer {
 <style>
 .v-timeline-item__body, .v-step {
   z-index: 0;
+}
+.v-tab__slider {
+    display: none !important;
 }
 </style>

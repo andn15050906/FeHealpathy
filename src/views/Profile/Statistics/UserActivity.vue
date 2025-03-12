@@ -1,8 +1,10 @@
 <template>
+  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true"
+    :centered="true"></StatisticsTabs>
+
   <div class="container">
     <h1 id="title" style="text-align: center">Activity Statistics</h1>
 
-    <!-- Recent Notable Activities -->
     <div class="section">
       <h2>📌 Recent Notable Activities</h2>
       <table>
@@ -10,26 +12,25 @@
           <tr>
             <th>Time</th>
             <th>Action</th>
-            <th>Result</th>
+            <th>Content</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(activity, index) in recentActivities" :key="index">
-            <td>{{ activity.time }}</td>
+            <td>{{ activity.creationTime }}</td>
             <td>{{ activity.action }}</td>
-            <td
-              :class="
-                activity.result.includes('negative') ? 'alert' : 'highlight'
-              "
-            >
-              {{ activity.result }}
+            <!--<td :class="activity.content.includes('negative') ? 'alert' : 'highlight'">
+              {{ activity.content }}
+            </td>-->
+            <td>
+              <a href="/" v-if="activity.content.type == 'link'">{{ activity.content.display }}</a>
+              <span v-else>{{ activity.content.display }}</span>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Mood & Activity Trend Chart -->
     <div class="section">
       <h2>📈 Mood & Activity Trends</h2>
       <canvas ref="moodChart"></canvas>
@@ -38,48 +39,98 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeMount } from "vue";
 import Chart from "chart.js/auto";
+import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
+import { formatISODateWithHMS, formatISODate } from '@/scripts/logic/common';
+import { calcSurveyResult } from '@/scripts/logic/utils';
+import { getUserProfile } from '@/scripts/api/services/authService';
+import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
+import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
 
 const recentActivities = ref([
-  {
-    time: "2024-03-02 08:30",
+  /*{
+    creationTime: "2024-03-02 08:30",
     action: "Answered Question of the Day",
-    result: "✅ Positive response",
+    content: "✅ Positive response",
   },
   {
-    time: "2024-03-03 14:00",
+    creationTime: "2024-03-03 14:00",
     action: "Updated Mood",
-    result: "😔 Slightly negative mood ⚠️",
+    content: "😔 Slightly negative mood ⚠️",
   },
   {
-    time: "2024-03-04 20:00",
+    creationTime: "2024-03-04 20:00",
     action: "Joined a chat group",
-    result: "💬 Sent 5 messages",
+    content: "💬 Sent 5 messages",
   },
   {
-    time: "2024-03-05 16:45",
+    creationTime: "2024-03-05 16:45",
     action: "Completed stress management exercise",
-    result: "✅ Success!",
+    content: "✅ Success!",
   },
   {
-    time: "2024-03-06 10:00",
+    creationTime: "2024-03-06 10:00",
     action: "Completed 10 minutes of meditation",
-    result: "🧘‍♂️ Done",
+    content: "🧘‍♂️ Done",
   },
   {
-    time: "2024-03-07 09:00",
+    creationTime: "2024-03-07 09:00",
     action: "Filled out a survey",
-    result: "📝 Submitted feedback",
+    content: "📝 Submitted feedback",
   },
   {
-    time: "2024-03-07 17:00",
+    creationTime: "2024-03-07 17:00",
     action: "Completed a course",
-    result: "🎓 Finished 'Stress Control' course",
-  },
+    content: "🎓 Finished 'Stress Control' course",
+  },*/
 ]);
 
 const moodChart = ref(null);
+
+onBeforeMount(async () => {
+  let userId = (await getUserProfile()).id;
+  var activityLogs = (await getActivityLogs()).filter(_ => _.creatorId == userId);
+  console.log(activityLogs);
+  recentActivities.value = activityLogs.map(log => {
+    let json = undefined;
+    try {
+      json = JSON.parse(log.content);
+    } catch (e) { }
+
+    console.log(json);
+
+    let action = '';
+    if (json && json.GenericType) {
+      action = getDisplayName(json.GenericType);
+    }
+
+    let content =  {
+      type: 'link',
+      display: 'Xem chi tiết...'
+    };
+    //...
+    if (!json.GenericType && json.Content) {
+      let parsedContent = JSON.parse(json.Content);
+      console.log(parsedContent);
+      if (parsedContent.question && parsedContent.answer) {
+        console.log(TRACKED_EVENTS.QuestionOfTheDay_Answered);
+        action = TRACKED_EVENTS.QuestionOfTheDay_Answered.displayName;
+        content =  {
+          type: 'text',
+          display: parsedContent.question
+        };
+      }
+    }
+
+    return {
+      creationTime: formatISODateWithHMS(log.creationTime),
+      action: action,
+      content: content
+    }
+  })
+})
 
 onMounted(() => {
   const ctx = moodChart.value.getContext("2d");
@@ -154,9 +205,11 @@ body {
   margin: 20px;
   background: #f5f5f5;
 }
+
 #title {
   margin-bottom: 20px;
 }
+
 .container {
   max-width: 900px;
   margin: auto;
@@ -165,31 +218,38 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .section {
   margin-bottom: 20px;
 }
+
 .highlight {
   font-weight: bold;
   color: #4caf50;
 }
+
 .alert {
   color: red;
   font-weight: bold;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
+
 th,
 td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
   text-align: left;
 }
+
 th {
   background: #f9f9f9;
 }
+
 canvas {
   max-width: 100%;
   margin-top: 20px;

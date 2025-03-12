@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onBeforeMount, computed } from 'vue'
 import { SurveyOptions } from "@/scripts/types/SurveyOptions";
 import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/scripts/types/dtos';
 import { useRouter } from 'vue-router';
@@ -43,7 +43,7 @@ const currentSurveyRef = ref();
 const currentQuestionIndex = ref(0);
 const router = useRouter();
 
-onMounted(async () => {
+onBeforeMount(async () => {
   // filter
   surveys.value = (await getPagedSurveys()).items
     .filter(item => item.name.includes("DASS-21") || item.name.includes("GAD-7"))

@@ -264,11 +264,11 @@ export default {
 }
 
 .flippingright {
-  transform: rotateY(-180deg);
+  transform: rotateY(-90deg);
 }
 
 .flippingleft {
-  transform: rotateY(180deg);
-  transform-origin: 100% center;
+  transform: rotateY(90deg);
+  transform-origin: right;
 }
 </style>

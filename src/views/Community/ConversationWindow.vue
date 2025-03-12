@@ -57,7 +57,7 @@
 
 <script>
 import { register } from 'vue-advanced-chat'
-import { getUserAuthData } from '@/scripts/api/services/authService';
+import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODate, reactionMap } from '@/scripts/logic/common';
 import { getUsers } from '@/scripts/api/services/userService';
 import { getPagedConversations } from '@/scripts/api/services/conversationService';
@@ -84,10 +84,13 @@ export default {
             .vac-message-wrapper .vac-offset-current {
                 margin-left: 20% !important;
             }
+            code {
+                overflow: scroll;
+            }
             `
         );
 
-        this.currentUser = await getUserAuthData();
+        this.currentUser = await getUserProfile();
         this.isPartnerChat = this.singleRoom;
 
         if (this.isPartnerChat) {

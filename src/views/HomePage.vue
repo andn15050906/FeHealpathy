@@ -97,7 +97,7 @@ import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import json from '../scripts/data/data.json'
 import router from '@/scripts/router';
-import { getUserAuthData, setUserAuthData } from '@/scripts/api/services/authService';
+import { getUserProfile, setUserAuthData, clearUserAuthData } from '@/scripts/api/services/authService';
 import { Noti } from '@/scripts/types/models';
 import PersonalRoadmap from '@/components/RoadmapComponents/PersonalRoadmap.vue'
 
@@ -149,17 +149,17 @@ export default {
 
             this.$router.replace({ path: '/', query: {} });
         }
-        this.user = getUserAuthData();
+        this.user = getUserProfile();
 
         if (!this.user)
             return;
 
         this.isLoggedIn = true;
-        /*if (this.user.preferences && this.user.preferences.length == 0) {
+        if (!this.user.roadmapId) {
             this.$router.push({ name: 'SettingUp' });
-        }*/
+        }
         // handle setting up
-        if (this.user.settings && this.user.settings.length == 0) {
+        if (this.user.preferences && this.user.preferences.length == 0) {
             let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
             noti.callback = () => this.navigateToSettingUp(noti.id);
             this.$emit('addNotification', noti);

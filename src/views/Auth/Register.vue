@@ -43,6 +43,9 @@
 <script>
 import { inject } from 'vue';
 import { register } from '@/scripts/api/services/authService';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 export default {
   data() {
@@ -80,10 +83,12 @@ export default {
     validateRetypePassword() {
       if (this.passwordError) {
         this.retypePasswordError = "";
+        this.generalError = "";
         return true;
       }
       if (this.password !== this.retypePassword) {
         this.retypePasswordError = "Passwords do not match.";
+        this.generalError = "";
         return false;
       }
       return true;
@@ -96,11 +101,20 @@ export default {
         try {
           this.loadingSpinner.showSpinner();
           await register(this.username, this.email, this.password);
+          this.retypePasswordError = "";
           this.generalError = 'Registration successful! Please check your email to verify your account.';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
-          console.error('Registration error:', error);
-          this.generalError = 'Registration failed. Please try again.';
+          let errors = error.response.data.errors;
+          console.log(errors);
+          for (let key in errors) {
+            if (errors[key][0].startsWith('400')) {
+              this.retypePasswordError = "";
+              this.generalError = errors[key][0].substring(5);
+              break;
+            }
+          }
+          //this.generalError = 'Registration failed. Please try again.';
         }
         finally {
 				  this.loadingSpinner.hideSpinner();
