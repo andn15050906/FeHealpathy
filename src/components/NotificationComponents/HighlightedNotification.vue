@@ -31,7 +31,7 @@ export default {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 1000;
-    max-width: 380px;
+    max-width: 340px;
     animation: slideIn 0.5s ease-out;
     margin-bottom: 10px;
 }

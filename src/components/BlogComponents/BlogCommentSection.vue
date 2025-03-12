@@ -1,162 +1,244 @@
 <template>
     <div class="container">
         <div class="content-wrapper">
-            <div class="pagination">
-                <button class="page-dot active" aria-label="Page 1"></button>
-                <button class="page-dot" aria-label="Page 2"></button>
-                <button class="page-dot" aria-label="Page 3"></button>
-            </div>
-
             <section class="comments-section">
                 <h3 class="section-title">Bình luận</h3>
                 <form class="comment-form" @submit.prevent="submitComment">
                     <label for="commentInput" class="visually-hidden">
                         Hãy chia sẻ cảm nghĩ của bạn về bài viết
                     </label>
-                    <textarea id="commentInput" class="comment-input"
+                    <textarea v-model="newComment" id="commentInput" class="comment-input"
                         placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết"
                         aria-label="Hãy chia sẻ cảm nghĩ của bạn về bài viết"></textarea>
-                    <button type="submit" class="submit-button">Gửi</button>
+                    <button type="submit" class="submit-button" :disabled="loading">Gửi</button>
                 </form>
-
-                <div class="comment-filters">
+                <!-- <div class="comment-filters">
                     <button class="filter-button active">Hot nhất</button>
                     <button class="filter-button">Mới nhất</button>
+                </div> -->
+                <div v-if="comments.length > 0" class="comments-list">
+    <article v-for="(comment, index) in comments" :key="index" class="comment-item">
+        <img :src="comment.avatar" :alt="comment.author" class="avatar" />
+        <div class="comment-content">
+            <div class="comment-header">
+                <div class="comment-author">{{ comment.author }}</div>
+                <div class="comment-date">{{ formatDate(comment.creationTime) }}</div>
+            </div>
+
+<div v-if="editingCommentId === comment.id" class="edit-comment">
+    <textarea
+        v-model="editingContent"
+        class="comment-input"
+        :key="editingCommentId"
+    ></textarea>
+    <div class="edit-actions">
+        <button class="submit-button" @click="updateComment(comment.id)">Lưu</button>
+        <button class="cancel-button" @click="editingCommentId = null">Hủy</button>
+    </div>
+</div>
+
+
+            <div v-else class="comment-top-row">
+                <p class="comment-text">{{ comment.content }}</p>
+                <div class="comment-actions">
+                    <button class="action-button" @click="toggleEditComment(comment)">✏️</button>
+                    <button class="action-button" @click="confirmDeleteComment(comment.id)">🗑️</button>
+
+                </div>
+            </div>
+
+            <div class="comment-bottom-row">
+                <button class="action-button">
+                    👍 <span>{{ comment.likes }}</span>
+                </button>
+                <button class="action-button">💬 Trả lời</button>
+            </div>
+        </div>
+    </article>
+</div>
+
+                <div v-else class="no-comments">
+                    <p>Chưa có bình luận nào, hãy là người đầu tiên bình luận!</p>
                 </div>
 
-                <div class="comments-list">
-                    <article v-for="(comment, index) in comments" :key="index" class="comment-item">
-                        <img :src="comment.avatar" :alt="`${comment.author}'s avatar`" class="avatar" />
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <div class="comment-author">{{ comment.author }}</div>
-                                <div class="comment-date">{{ comment.date }}</div>
-                            </div>
-                            <p class="comment-text">{{ comment.text }}</p>
-                            <div class="comment-actions">
-                                <button class="action-button">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/057be5174069cee3fb8d890121c15bd5d66134b62a2ef8be669c9feb57993a77?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="action-icon" />
-                                    <span>{{ comment.likes }}</span>
-                                </button>
-                                <button class="action-button">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/38ca355c5629335bed6368fdd17b30ced0048e325b22e960be2b58778feb36f6?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="action-icon" />
-                                    <span>Trả lời</span>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-
-                <button class="load-more">Tải thêm bình luận</button>
+                <button v-if="comments.length > 0 && page < totalPages" class="load-more" @click="loadMoreComments">
+                    Tải thêm bình luận
+                </button>
             </section>
         </div>
     </div>
+    <DeleteConfirmPopup 
+    :message="'Bạn có chắc chắn muốn xóa bình luận này?'"
+    :isVisible="isDeletePopupVisible"
+    :url="deleteUrl"
+    @confirmDelete="handleDeleteConfirmed"
+    @update:isVisible="isDeletePopupVisible = $event"
+/>
+
 </template>
 
 <script>
+import { getPagedComments, createComment, updateComment, deleteComment } from "@/scripts/api/services/commentService";
+import dayjs from "dayjs";
+import { getUserById } from "@/scripts/api/services/userService";
+import DeleteConfirmPopup from "../Common/Popup/DeleteConfirmPopup.vue";
+
 export default {
-    name: 'BlogCommentSection',
+    name: "BlogCommentSection",
+    components: {
+        DeleteConfirmPopup
+    },
+    props: ["blogId"],
+    computed: {
+    deleteUrl() {
+        return this.commentToDelete ? `/api/Comments/${this.commentToDelete}` : "";
+    }
+},
     data() {
         return {
-            relatedArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            authorArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            comments: [
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                }
-            ]
-        }
+            comments: [],
+            newComment: "",
+            loading: false,
+            page: 1,
+            pageSize: 5,
+            totalPages: 1,
+            editingCommentId: null, 
+            editingContent: "", 
+            isDeletePopupVisible: false, 
+            commentToDelete: null,
+        };
+    },
+    async mounted() {
+        await this.fetchComments();
     },
     methods: {
-        submitComment() {
-            // Handle comment submission
+        async fetchComments() {
+    try {
+        const response = await getPagedComments(this.blogId, this.page, this.pageSize);
+
+        if (response.items && Array.isArray(response.items)) {
+            const newComments = await Promise.all(
+                response.items.map(async (comment) => {
+                    try {
+                        const userInfo = await getUserById(comment.creatorId);
+                        return {
+                            ...comment,
+                            author: userInfo.fullName || "Người dùng ẩn danh",
+                            avatar: userInfo.avatarUrl || "default-avatar.jpg",
+                        };
+                    } catch (error) {
+                        console.error("🚨 Lỗi khi lấy thông tin người dùng:", error);
+                        return {
+                            ...comment,
+                            author: "Người dùng ẩn danh",
+                            avatar: "default-avatar.jpg",
+                        };
+                    }
+                })
+            );
+
+            this.comments = this.page === 1 ? newComments : [...this.comments, ...newComments];
+
+            this.totalPages = response.totalPages || 1;
         }
+    } catch (error) {
+        console.error("🚨 Lỗi khi tải bình luận:", error);
     }
 }
+,
+
+        toggleEditComment(comment) {
+            this.editingCommentId = comment.id;
+            this.editingContent = comment.content;
+        },
+
+        async updateComment(commentId) {
+    if (!this.editingContent || typeof this.editingContent !== "string" || !this.editingContent.trim()) {
+        console.error("🚨 Lỗi: Nội dung bình luận không hợp lệ!");
+        alert("Nội dung bình luận không được để trống.");
+        return;
+    }
+
+    try {
+        console.log("📡 Gửi cập nhật bình luận:", this.editingContent);
+
+        await updateComment(commentId, this.editingContent.trim());
+
+        this.comments = this.comments.map(comment =>
+            comment.id === commentId ? { ...comment, content: this.editingContent } : comment
+        );
+
+        this.editingCommentId = null;
+        this.editingContent = "";
+    } catch (error) {
+        console.error("🚨 Lỗi khi cập nhật bình luận:", error.response?.data || error.message);
+        alert("Không thể cập nhật bình luận. Vui lòng thử lại!");
+    }
+}
+
+
+
+,
+
+        confirmDeleteComment(commentId) {
+    this.commentToDelete = commentId;
+    this.isDeletePopupVisible = true;
+}
+,
+
+        async handleDeleteConfirmed(confirm) {
+            if (confirm && this.commentToDelete) {
+                try {
+                    await deleteComment(this.commentToDelete);
+
+                    this.comments = this.comments.filter(comment => comment.id !== this.commentToDelete);
+                } catch (error) {
+                    console.error("🚨 Lỗi khi xóa bình luận:", error);
+                }
+            }
+            this.isDeletePopupVisible = false;
+        },
+
+        async submitComment() {
+            if (!this.newComment.trim()) return;
+
+            this.loading = true;
+
+            try {
+                const formData = new FormData();
+                formData.append("SourceId", this.blogId);
+                formData.append("content", this.newComment);
+
+                console.log("📡 Gửi dữ liệu:", Object.fromEntries(formData));
+
+                const response = await createComment(formData);
+                console.log("✅ Phản hồi từ API:", response);
+
+                this.newComment = "";
+                this.page = 1;
+                await this.fetchComments();
+            } catch (error) {
+                console.error("🚨 Lỗi khi gửi bình luận:", error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async loadMoreComments() {
+    if (this.page >= this.totalPages) return;
+
+    this.page += 1;
+    await this.fetchComments();
+}
+,
+
+        formatDate(dateString) {
+            return dayjs(dateString).format("DD/MM/YYYY");
+        }
+    }
+};
 </script>
+
 
 <style scoped>
 .container {
@@ -166,6 +248,80 @@ export default {
     align-items: center;
 }
 
+
+.comment-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.comment-text {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+.comment-bottom-row {
+    display: flex;
+    gap: 10px;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    color: #666;
+}
+
+.action-button:hover {
+    color: #007aff;
+}
+
+.edit-comment {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+/* .submit-button, .cancel-button {
+    background: #007aff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+} */
+
+/* .cancel-button {
+    background: #ddd;
+    color: #333;
+} */
+
+/* .submit-button:hover {
+    background: #005ecb;
+} */
+
+/* .cancel-button:hover {
+    background: #bbb;
+} */
+/* test */
 .content-wrapper {
     width: 1110px;
     max-width: 100%;
@@ -295,13 +451,13 @@ export default {
     resize: vertical;
 }
 
-.submit-button {
-    padding: 4px 8px;
+.submit-button, .cancel-button {
+    /* padding: 4px 8px;
     border-radius: 5px;
     border: none;
     background: none;
     color: #161616;
-    font: 400 14px/2 'Noto Sans', sans-serif;
+    font: 400 14px/2 'Noto Sans', sans-serif; */
     cursor: pointer;
 }
 
@@ -362,20 +518,19 @@ export default {
 }
 
 .comment-text {
-    margin: 24px 0;
     font: 400 14px/22px 'Noto Sans', sans-serif;
     color: #161616;
+    margin-bottom: 0;
 }
 
 .comment-actions {
     display: flex;
-    gap: 8px;
+    gap: 1px;
 }
 
 .action-button {
     display: flex;
     align-items: center;
-    gap: 4px;
     background: none;
     border: none;
     padding: 0;
@@ -412,6 +567,13 @@ export default {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+.no-comments {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    margin-top: 10px;
 }
 
 @media (max-width: 991px) {

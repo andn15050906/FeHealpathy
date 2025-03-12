@@ -1,79 +1,132 @@
 <template>
   <h4>Course Catalog</h4>
 
-  <div class="row">
-    <div v-for="course in courses" :key="course.id" class="col-md-3 col-sm-6 col-xs-12 form-group">
-      <a :href="getCourseDetailPage(course.id)" class="course-box-slider pop" :title="course.title"
-        style="height: 236px; max-height: unset">
-        <span v-if="isOnDiscount(course)" class="sale-off">
-          -{{ course.discount * 100 }}%
-        </span>
-        <div class="img-course">
-          <img class="img-responsive" :src="course.thumbUrl" alt="thumb" loading="lazy" />
-        </div>
-        <div class="content-course">
-          <h3 class="title-course">
-            <span>{{ course.title }}</span>
-          </h3>
-          <div class="name-gv">
-            <b>{{ course.creator.fullName }}</b>
-            <div class="rate-combo">
-              <p>
-                <span class="star-rate">
-                  <i v-for="n in Math.ceil(course.averageRating)" :key="n" class="fa fa-star co-or"
-                    aria-hidden="true"></i>
-                  <span v-if="course.ratingCount > 0">
-                    ({{ course.ratingCount }})
-                  </span>
-                  <span v-else>No rating yet</span>
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="price-course" style="clear: both; top: -40px;">
-          <span class="price-b" v-if="isOnDiscount(course)">
-            {{ formatPrice(course.price) }}<sup>đ</sup>
-          </span>
-          <span class="price-a">
-            {{ formatPrice(course.discountedPrice || course.price) }}<sup>đ</sup>
-          </span>
-        </div>
-      </a>
+  <!--<div class="filter-section">
+    <button v-for="filter in filters" :key="filter.value"
+      :class="['filter-btn', currentFilter === filter.value ? 'active' : '']" @click="applyFilter(filter.value)">
+      {{ filter.label }}
+    </button>
+  </div>-->
+
+  <div class="courses-container">
+    <div class="course-grid">
+      <CourseCard v-for="course in paginatedCourses" :key="course.id" :course="course" />
     </div>
+  </div>
+
+  <div class="pagination">
+    <button v-for="page in Math.ceil(courses.length / itemsPerPage)" :key="page"
+      :class="['page-btn', currentPage === page ? 'active' : '']"
+      @click="changePage(page)">
+      {{ page }}
+    </button>
   </div>
 </template>
 
-<script>
-import { getCourses } from "../../scripts/api/services/courseService.js";
+<script setup>
+import { ref, computed } from 'vue';
+import { getCourses } from "@/scripts/api/services/courseService.js";
+import CourseCard from '@/components/CourseComponents/CourseCard.vue';
+import { onMounted } from 'vue';
 
-export default {
-  data() {
-    return {
-      courses: [],
-    };
-  },
-  methods: {
-    async fetchCourses() {
-      try {
-        const response = await getCourses();
-        this.courses = response.data;
-      } catch (error) {
-        console.error("Failed to fetch courses", error);
+const itemsPerPage = 12;
+const courses = ref([]);
+const currentPage = ref(1);
+const paginatedCourses = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return courses.value.slice(start, end);
+})
+
+onMounted(async () => {
+  try {
+    courses.value = (await getCourses()).items.map(course => {
+      return {
+        ...course,
+        //...
+        instructor: 'SkyDiver7'
       }
-    },
-    getCourseDetailPage(courseId) {
-      return `/course/detail/${courseId}`;
-    },
-    isOnDiscount(course) {
-      return course.discount > 0 && new Date(course.discountExpiry) > new Date();
-    },
-    formatPrice(price) {
-      return price.toLocaleString();
-    },
-  },
-  mounted() {
-    this.fetchCourses();
-  },
-};
+    });
+  } catch (error) {
+    console.error("Failed to fetch courses", error);
+  }
+});
+
+function changePage(page) {
+  currentPage.value = page;
+}
 </script>
+
+<style scoped>
+.courses-container {
+  max-width: 1200px;
+  margin: 60px auto 40px;
+  padding: 0 20px;
+  position: relative;
+}
+
+.total-count {
+  position: absolute;
+  left: 20px;
+  top: -30px;
+  font-size: 16px;
+  color: #666;
+}
+
+.page-title {
+  font-size: 32px;
+  text-align: center;
+  margin: 40px 0;
+  color: #1b1b1b;
+}
+
+.filter-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background: #5488c7;
+  color: white;
+  border-color: #5488c7;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.page-btn {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #5488c7;
+  color: white;
+  border-color: #5488c7;
+}
+</style>

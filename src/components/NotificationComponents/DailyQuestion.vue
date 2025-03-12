@@ -14,7 +14,7 @@
             <div class="question-content">
                 <div class="question-header">
                     <i class="fas fa-comment-dots question-icon"></i>
-                    <h1 class="question-text">{{ question }}</h1>
+                    <h1 class="question-text">{{ notification.content }}</h1>
                 </div>
 
                 <div class="answer-section">
@@ -30,7 +30,7 @@
                     </button>
                     <button @click="saveAndClose" class="save-button">
                         <i class="fas fa-check"></i>
-                        <span>Save answer</span>
+                        <span>Answer</span>
                     </button>
                 </div>
             </div>
@@ -40,9 +40,8 @@
 
 <script>
 export default {
-    name: 'DailyQuestion',
     props: {
-        question: {
+        notification: {
             type: String,
             required: true
         }
@@ -63,7 +62,7 @@ export default {
             })
         },
         saveAndClose() {
-            this.$emit('close')
+            this.$emit('close', this.notification.content, this.answer);
         }
     }
 }

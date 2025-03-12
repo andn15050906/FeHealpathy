@@ -7,6 +7,7 @@
                     <th>Title</th>
                     <th>Artist</th>
                     <th>Description</th>
+                    <th>Type</th>
                     <th>Created At</th>
                     <th>Actions</th>
                 </tr>
@@ -17,9 +18,10 @@
                     <td>{{ file.title }}</td>
                     <td>{{ file.artist }}</td>
                     <td>{{ file.description }}</td>
+                    <td>{{ getTypeLabel(file.type) }}</td>
                     <td>{{ formatDate(file.creationTime) }}</td>
                     <td>
-                        <button class="btn btn-secondary btn-sm me-2" @click="$emit('edit-media', file, index)">
+                        <button class="btn btn-warning btn-sm me-2" @click="$emit('edit-media', file, index)">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-danger btn-sm" @click="$emit('delete-media', file.id, index)">
@@ -48,6 +50,13 @@ export default {
             const options = { year: "numeric", month: "short", day: "numeric" };
             return new Date(dateString).toLocaleDateString(undefined, options);
         },
+        getTypeLabel(type) {
+            const typeMap = {
+                1: "Music",
+                2: "Video"
+            };
+            return typeMap[type] || "Unknown";
+        }
     },
 };
 </script>
