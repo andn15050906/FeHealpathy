@@ -1,92 +1,113 @@
 <template>
   <div id="app" class="container">
-    <Calendar :events="habits" :initialDate="today" eventDotColor="#e74c3c" @save-event="handleSaveHabit"
-      @delete-event="handleDeleteHabit" />
-    <div class="habit-stats">
-      <h3>Habit Statistics for {{ formattedToday }}</h3>
-      <ul>
-        <li>Total habits: {{ habits.length }}</li>
-        <li>Completed: {{ stats.completed }}</li>
-        <li>Pending: {{ stats.pending }}</li>
-        <li>Closed (missed deadline): {{ stats.closed }}</li>
-      </ul>
-    </div>
+    <Calendar :events="habits" :initialDate="today" @save-event="handleSaveHabit" @delete-event="handleDeleteHabit" />
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
-import Calendar from "../../../components/Common/Misc/Calendar.vue";
+import { ref, onMounted } from "vue";
+import { getPagedRoutines, createRoutine, updateRoutine, deleteRoutine } from "../../../scripts/api/services/routinesService";
+import Calendar from "@/components/Common/Misc/Calendar.vue";
 
-const sampleHabits = [];
-const tags = ["#2ecc71", "#3498db", "#f1c40f", "#e67e22", "#e74c3c"];
-const tagLabels = ["Low", "Medium", "Moderate", "High", "Critical"];
-const additionalTimes = [2, 5, 10, 20, 30];
-const repeaterCodes = Array.from({ length: 20 }, () =>
-  Math.random().toString(36).substring(2, 15)
-);
-const now = new Date();
-for (let i = 1; i <= 20; i++) {
-  const startTime = new Date(now.getTime() + i * 3600000);
-  const endTime = new Date(startTime.getTime() + 3600000);
-  sampleHabits.push({
-    id: i,
-    title: `Habit ${i}`,
-    description: `This is description for Habit ${i}`,
-    objective: `Objective for Habit ${i}`,
-    tag: tags[i % tags.length],
-    additionalTime: additionalTimes[i % additionalTimes.length],
-    repeatercode: repeaterCodes[i - 1],
-    date: startTime.toISOString().split("T")[0],
-    startTime: startTime.toTimeString().slice(0, 5),
-    endTime: endTime.toTimeString().slice(0, 5),
-    createdate: now.toISOString().split("T")[0],
-    completed: false,
-    closed: false,
-    holding: false,
-    creationTime: startTime.toISOString()
-  });
-}
+const tagMapping = {
+  "#2ecc71": 0,
+  "#3498db": 1,
+  "#f1c40f": 2,
+  "#e67e22": 3,
+  "#e74c3c": 4
+};
 
 export default {
   name: "HabitTracker",
   components: { Calendar },
   setup() {
-    const habits = ref([...sampleHabits]);
+    const habits = ref([]);
     const today = new Date();
 
-    const stats = computed(() => {
-      const completed = habits.value.filter(h => h.completed).length;
-      const closed = habits.value.filter(h => h.closed).length;
-      const pending = habits.value.filter(h => !h.completed && !h.closed).length;
-      return { completed, closed, pending };
-    });
+    const loadRoutines = async () => {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const response = await getPagedRoutines({
+        From: firstDay.toISOString(),
+        To: lastDay.toISOString()
+      });
+      habits.value = response.items.map(item => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        objective: item.objective,
+        repeaterSequenceId: item.repeaterSequenceId || null,
+        date: new Date(item.startDate).toISOString().split("T")[0],
+        startTime: new Date(item.startDate).toTimeString().slice(0, 5),
+        endTime: new Date(item.endDate).toTimeString().slice(0, 5),
+        completed: item.isCompleted,
+        closed: item.isClosed,
+        tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
+      }));
+    };
 
-    const formattedToday = computed(() =>
-      today.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })
-    );
+    onMounted(() => { loadRoutines(); });
 
-    const handleSaveHabit = async (newHabit) => {
-      if (!newHabit.title) return;
-      const index = habits.value.findIndex(h => h.id === newHabit.id);
-      if (index !== -1) {
-        habits.value.splice(index, 1, { ...newHabit, date: newHabit.date || today.toISOString().split("T")[0] });
-      } else {
-        newHabit.id = Date.now();
-        newHabit.date = today.toISOString().split("T")[0];
-        habits.value.push(newHabit);
+    const createPayload = (habit, isUpdate = false) => {
+      const dateStr = typeof habit.date === 'string' ? habit.date :
+        new Date(habit.date).toISOString().split('T')[0];
+
+      console.log(dateStr);
+      console.log('habit.startTime', habit.startTime);
+      console.log('habit.endTime', habit.endTime);
+
+      const startDateTime = new Date(`${dateStr}T${habit.startTime}`);
+      const endDateTime = new Date(`${dateStr}T${habit.endTime}`);
+
+      const payload = {
+        title: habit.title,
+        description: habit.description || "",
+        objective: habit.objective || "",
+        repeater: 0,
+        repeaterSequenceId: habit.repeaterSequenceId || null,
+        startDate: startDateTime,
+        endDate: endDateTime,
+        isCompleted: habit.completed || false,
+        isClosed: habit.closed || false,
+        tag: tagMapping[habit.tag] || 0
+      };
+
+      if (isUpdate) {
+        payload.id = habit.id;
+      }
+
+      return payload;
+    };
+
+    const handleSaveHabit = async (habit) => {
+      try {
+        if (habit.isUpdate) {
+          const payload = createPayload(habit, true);
+          console.log(payload);
+          await updateRoutine(payload);
+        } else {
+          const payload = createPayload(habit, false);
+          console.log(payload);
+          await createRoutine(payload);
+        }
+        await loadRoutines();
+      } catch (error) {
+        console.error("Error saving habit:", error);
       }
     };
 
     const handleDeleteHabit = async (habitToDelete) => {
-      habits.value = habits.value.filter(h => h.id !== habitToDelete.id);
+      try {
+        await deleteRoutine(habitToDelete.id);
+        await loadRoutines();
+      } catch (error) {
+        console.error("Error deleting habit:", error);
+      }
     };
 
     return {
       habits,
       today,
-      formattedToday,
-      stats,
       handleSaveHabit,
       handleDeleteHabit
     };
@@ -100,30 +121,5 @@ export default {
   margin: 20px auto;
   padding: 0 10px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.habit-stats {
-  margin-top: 30px;
-  padding: 15px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.habit-stats h3 {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.habit-stats ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 1rem;
-}
-
-.habit-stats li {
-  margin-bottom: 8px;
-  text-align: center;
 }
 </style>

@@ -1,6 +1,6 @@
 import { get, post, patch, del } from  "@/scripts/api/apiClients";
 
-const API_BASE_URL = "/Routines";
+const API_BASE_URL = "/routines";
 
 export const getPagedRoutines = async (queryParams) => {
   return await get(`${API_BASE_URL}`, queryParams);
