@@ -76,6 +76,8 @@ import CreateCourse from '@/views/Profile/Advisor/Manage/CreateCourse.vue'
 import UpdateCourse from '@/views/Profile/Advisor/Manage/UpdateCourse.vue'
 import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
+import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
+
 /*import CreateAssignment from '@/views/Assignments_Old/Create.vue'
 import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
 import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
@@ -475,6 +477,11 @@ const router = createRouter({
       path: '/roadmap-builder',
       name: 'RoadmapBuilder',
       component: RoadmapBuilder
+    },
+    {
+      path: '/progress',
+      name: 'Progress',
+      component: RoadmapProgress
     },
 
 
