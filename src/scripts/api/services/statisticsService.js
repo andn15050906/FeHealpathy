@@ -1,0 +1,7 @@
+import { get } from  "@/scripts/api/apiClients";
+
+const API_BASE_URL = "/statistics";
+
+export const getProgress = async () => {
+  return await get(`${API_BASE_URL}/progress`);
+};

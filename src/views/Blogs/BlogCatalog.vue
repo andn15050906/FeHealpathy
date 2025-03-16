@@ -35,7 +35,7 @@
   </template>
   
 <script setup>
-import { ref, computed, defineEmits, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { getPagedArticles } from "@/scripts/api/services/blogService.js";
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 

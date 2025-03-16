@@ -46,11 +46,12 @@ import { register } from '@/scripts/api/services/authService';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const loadingSpinner = inject('loadingSpinner');
 
 export default {
   data() {
     return {
-			loadingSpinner: inject('loadingSpinner'),
+			loadingSpinner: loadingSpinner,
       username: "",
       email: "",
       password: "",

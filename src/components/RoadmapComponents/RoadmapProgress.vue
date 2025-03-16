@@ -2,7 +2,7 @@
     <v-container>
         <v-card>
             <v-card-title>
-                <h1>{{ roadmap.title }}</h1>
+                <h1>Your roadmap progress</h1>
             </v-card-title>
             <v-card-text>
                 <p>{{ roadmap.introText }}</p>
@@ -31,6 +31,7 @@
 
 <script>
 import { getRoadmaps } from '@/scripts/api/services/roadmapService';
+import { getProgress } from '@/scripts/api/services/statisticsService';
 
 export default {
     computed: {
@@ -39,7 +40,8 @@ export default {
                 { title: 'Milestone Title', value: 'title'},
                 { title: 'Event Name', value: 'eventName' },
                 { title: 'Repeat Times Required', value: 'repeatTimesRequired' },
-                { title: 'Time Spent Required', value: 'timeSpentRequired' }
+                { title: 'Time Spent Required', value: 'timeSpentRequired' },
+                { title: 'Progress', value: 'progress' }
             ];
         }
     },
@@ -50,10 +52,27 @@ export default {
         }
     },
     async beforeMount() {
-        this.roadmap = (await getRoadmaps()).items[0];
+        let tempRoadmap = (await getRoadmaps()).items[0];
+        let phasesProgress = await getProgress();
+        let completedMilestones = [];
+        for (let phaseProgress of phasesProgress) {
+            completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
+        }
+
+        console.log(completedMilestones);
+        for (let phase of tempRoadmap.phases) {
+            for (let milestone of phase.milestones) {
+                if (completedMilestones.includes(milestone.id)) {
+                    milestone.progress = 'Completed 📈';
+                    console.log(milestone);
+                }
+            }
+        }
+        this.roadmap = tempRoadmap
     },
     watch: {
         activeTab(newVal) {
+            console.log(newVal);
             this.scrollToPhase(newVal);
         },
     },
@@ -166,3 +185,37 @@ export default {
     text-align: center;
 }
 </style>
+
+<!--<template>
+    <div class="container">
+        <div class="red-flag"></div>
+        <div class="red-flag"></div>
+        <div class="red-flag"></div>
+        <div class="red-flag"></div>
+    </div>
+</template>
+
+<script setup>
+
+</script>
+
+<style>
+.container {
+    background-image: url("/assets/images/roadmap/Roadmap.jpg");
+    width: 100%;
+    height: 80vh;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
+}
+
+.red-flag {
+    width: 150px;
+    height: 100px;
+    background-image: url("/assets/images/roadmap/Flag_Red.png");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
+    /*background-attachment: fixed*/
+}
+</style>-->
