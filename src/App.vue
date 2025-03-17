@@ -117,7 +117,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("/assets/background/green-bg1.jpg");
+  background-image: url("assets/background/chill.png");
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center top;
