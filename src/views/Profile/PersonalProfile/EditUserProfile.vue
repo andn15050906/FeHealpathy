@@ -79,7 +79,7 @@
     </div>
     <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Are you sure you want to update your profile?"
       url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
-    <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Are you sure you want to cancel your changes?"
+    <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Are you sure to cancel your changes?"
       @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
   </div>
 </template>
