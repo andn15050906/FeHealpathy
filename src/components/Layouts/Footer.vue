@@ -38,7 +38,7 @@
       </div>
 
       <div class="text-secondary py-3">
-        © 2025 Healthpathy. All rights reserved.
+        © 2025 Healpathy. All rights reserved.
       </div>
     </div>
   </footer>
