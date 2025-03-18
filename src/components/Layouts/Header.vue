@@ -133,6 +133,7 @@ export default {
     async signOut() {
       try {
         await signOut();
+				this.$emit('authenticated', false);
         this.isLoggedIn = false;
         this.user = { name: '', role: '' };
         this.$router.push({ name: 'signIn' });

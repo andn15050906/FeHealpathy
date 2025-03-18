@@ -1,13 +1,11 @@
 <template>
-  <!--<Guider v-if="isAuthAndShown" ref="guiderRef" />-->
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <Header ref="headerRef" />
+    <Header ref="headerRef" @authenticated="handleAuthenticated" />
     <main>
       <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
       <div class="page-container">
-        <!--<RouterView class="left-sidebar" v-if="isAuthAndShown" name="roadmapProgress"></RouterView>-->
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
       </div>
@@ -54,7 +52,11 @@ provide('sweetAlert', {
 });
 
 provide('roadmapProgress', {
-  getPersonalRoadmap: () => roadmapProgress.value.getPersonalRoadmap()
+  getPersonalRoadmap: () => {
+    if (roadmapProgress.value)
+      return roadmapProgress.value.getPersonalRoadmap();
+    return null;
+  }
 })
 
 /*provide('guider', {
@@ -83,9 +85,11 @@ const isAuthAndShown = computed(() => {
 })
 
 const headerRef = ref(null);
-const handleAuthenticated = () => {
-  isAuthenticated.value = true;
-  headerRef.value.fetchUserProfile();
+const handleAuthenticated = (isAuth) => {
+  isAuth = isAuth ?? true;
+  isAuthenticated.value = isAuth;
+  if (isAuthenticated.value)
+    headerRef.value.fetchUserProfile();
 }
 
 const notificationRef = ref(null);

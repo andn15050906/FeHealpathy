@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getUserBearerToken } from '@/scripts/api/services/authService'
+import { getUserBearerToken, getRole } from '@/scripts/api/services/authService'
 
 import SignIn from '@/views/Auth/SignIn.vue';
 import Register from '@/views/Auth/Register.vue'
@@ -150,7 +150,7 @@ const router = createRouter({
       path: '/advisor/edit-profile',
       name: 'editAdvisor',
       component: EditAdvisor,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/profile/:id',
@@ -272,14 +272,15 @@ const router = createRouter({
     {
       path: '/media/manage',
       name: 'MediaControl',
-      component: MediaControl
+      component: MediaControl,
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     // Practice - Survey
     {
       path: '/surveys',
       name: 'Survey',
       component: ManageSurvey,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     // End of Practice
 
@@ -292,19 +293,20 @@ const router = createRouter({
     {
       path: '/blogs/manage',
       name: 'manageBlogs',
-      component: ManageBlog
+      component: ManageBlog,
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     {
       path: '/blogs/create',
       name: 'createBlog',
       component: CreateBlog,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     {
       path: '/blogs/edit-blog/:id',
       name: 'updateBlog',
       component: UpdateBlog,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       props: true
     },
     {
@@ -329,19 +331,19 @@ const router = createRouter({
       path: '/courses/manage',
       name: 'manageCourses',
       component: ManageCourse,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/create',
       name: 'createCourse',
       component: CreateCourse,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresAdvisor: true },
       props: true
     },
     {
@@ -444,11 +446,13 @@ const router = createRouter({
     {
       path: '/yogas/manage',
       name: 'ManageYoga',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: ManageYoga
     },
     {
       path: '/yoga/create',
       name: 'CreateYoga',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: CreateYogaLesson
     },
     {
@@ -476,6 +480,7 @@ const router = createRouter({
     {
       path: '/roadmap-builder',
       name: 'RoadmapBuilder',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: RoadmapBuilder
     },
     {
@@ -489,53 +494,68 @@ const router = createRouter({
     {
       path: '/advisor/moderate-advisors',
       name: 'ModerateAdvisors',
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: ModerateAdvisors,
     },
+
     // Admin
     {
       path: '/admin',
       name: 'AdminDashboard',
-      component: Dashboard,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: Dashboard
     },
     {
       path: '/admin/moderate-users',
       name: 'ModerateUsers',
-      component: ModerateUsers,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ModerateUsers
     },
     {
       path: '/admin/create-admin',
       name: 'CreateAdminAccounts',
-      component: CreateAdminAccounts,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: CreateAdminAccounts
     },
     {
       path: '/admin/moderate-content',
       name: 'ModerateUploadedContent',
-      component: ModerateUploadedContent,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ModerateUploadedContent
     },
     {
       path: '/admin/view-reports',
       name: 'ViewReports',
-      component: ViewReports,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ViewReports
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = getUserBearerToken();
-    if (!token) {
-      next('/sign-in');
-    } else {
-      next();
-    }
-  } else {
+  let hasRight = isAuthorized(to);
+  if (hasRight)
     next();
-  }
+  else
+    next('/sign-in');
 });
+
+const isAuthorized = (to) => {
+  if (!to.matched.some(record => record.meta.requiresAuth))
+    return true;
+
+  if (!getUserBearerToken())
+    return false;
+
+  let role = getRole();
+  if (to.matched.some(record => record.meta.requiresAdvisorOrAdmin && !['Advisor', 'Admin'].includes(role)))
+    return false;
+  if (to.matched.some(record => record.meta.requiresAdvisor) && role != 'Advisor')
+    return false;
+  if (to.matched.some(record => record.meta.requiresAdmin) && role != 'Admin')
+    return false
+  
+  return true;
+}
 
 export default router;

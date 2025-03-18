@@ -1,10 +1,15 @@
 <template>
-  <div class="container mt-5 stress-assessment">
+  <div class="container mt-5">
     <h2 class="mb-4 text-title">Tests</h2>
-    <div class="test-options">
+    <!--<div class="test-options">
       <div v-for="(item, index) in surveys" :key="item.id" class="test-option" @click="openTest(item.id)">
         <div class="test-option-image" :style="{ backgroundImage: 'url(' + item.icon + ')' }"></div>
-        <!--<span class="option-title">{{ item.name }}</span>-->
+      </div>
+    </div>-->
+
+    <div class="survey-container">
+      <div class="survey-grid">
+        <SurveyCard v-for="(item, index) in surveys" :key="item.id" :survey="item" @click="openTest(item.id)" />
       </div>
     </div>
 
@@ -31,6 +36,7 @@ import { useRouter } from 'vue-router';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
 import { createSubmission } from '@/scripts/api/services/submissionsService';
 import SingleSelectSurvey from '@/components/SurveyComponents/SingleSelectSurvey.vue';
+import SurveyCard from '@/components/SurveyComponents/SurveyCard.vue';
 
 const text = {
   //Please answer the following questions:
@@ -43,17 +49,36 @@ const currentSurveyRef = ref();
 const currentQuestionIndex = ref(0);
 const router = useRouter();
 
+const surveysMapping = {
+  "BSI": "Survey_BSI-18.jfif",
+  "CD-RISC": "Survey_CD-RISC-10.png",
+  "DASS": "Survey_DASS21.png",
+  "GAD": "Survey_GAD-7.png",
+  "RSE": "Survey_RSE.png",
+  "WHO-5": "Survey_WHO-5.png"
+}
+
 onBeforeMount(async () => {
-  // filter
+  //...
   surveys.value = (await getPagedSurveys()).items
-    .filter(item => item.name.includes("DASS-21") || item.name.includes("GAD-7"))
+    .filter(item => !item.name.includes("Wellness") && !item.name.includes("First"))
     .map(item => {
       return {
         ...item,
-        icon: item.name.includes("DASS-21")
-          ? "/assets/images/surveys/Survey_DASS21.png"
-          : "/assets/images/surveys/Survey_Enneagram.webp" }});
+        icon: getSurveyImage(item.name)
+      }
+    });
 })
+
+const getSurveyImage = (name) => {
+    for (let key in surveysMapping) {
+        if (name.includes(key)) {
+            return "/assets/images/surveys/" + surveysMapping[key];
+        }
+    }
+    return "/assets/images/surveys/Survey_Demographic.png";
+}
+
 const currentSurveyOptions = computed(() => new SurveyOptions(
   currentSurvey.value,
   '',
@@ -114,45 +139,12 @@ const submitGAD7 = async (questionsWithAnswer) => {
   gap: 20px;
 }
 
-.test-options {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  height: 50vh;
-}
-
-.test-option {
-  background-color: #4CAF50;
-  padding: 60px;
-  text-align: center;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  color: white;
-  flex: 1 1 calc(50% - 20px);
-  margin: 10px;
-}
-
-.test-option-image {
-  height: 90%;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-}
-
-.test-option:nth-child(1),
-.test-option:nth-child(2),
-.test-option:nth-child(3) {
-  flex: 1 1 calc(33.33% - 20px);
-}
-
-.test-option:nth-child(4),
-.test-option:nth-child(5) {
-  flex: 1 1 calc(50% - 20px);
-}
-
-.test-option:hover {
-  background-color: #45a049;
+.survey-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+  width: 100%;
 }
 
 .icon-container {

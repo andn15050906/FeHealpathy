@@ -68,8 +68,10 @@ export default {
             this.isTourActive = !this.isTourActive;
         },
         setRoadmap() {
+            if (!this.roadmapProgress || !this.roadmapProgress.getPersonalRoadmap)
+                return;
+
             let personalRoadmap = this.roadmapProgress.getPersonalRoadmap();
-            console.log(personalRoadmap);
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',

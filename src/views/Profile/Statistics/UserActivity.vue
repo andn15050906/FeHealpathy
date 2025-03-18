@@ -99,8 +99,6 @@ onBeforeMount(async () => {
       json = JSON.parse(log.content);
     } catch (e) { }
 
-    console.log(json);
-
     let action = '';
     if (json && json.GenericType) {
       action = getDisplayName(json.GenericType);
@@ -110,16 +108,30 @@ onBeforeMount(async () => {
       type: 'link',
       display: 'Xem chi tiết...'
     };
+
     //...
-    if (!json.GenericType && json.Content) {
+    if ((!json.GenericType || json.GenericType == 'General_Activity_Created') && json.Content) {
       let parsedContent = JSON.parse(json.Content);
+      try {
+        let nestedJson = JSON.parse(parsedContent.Content);
+        if (nestedJson)
+          parsedContent = nestedJson;
+      } catch (e) { }
+      
       console.log(parsedContent);
       if (parsedContent.question && parsedContent.answer) {
-        console.log(TRACKED_EVENTS.QuestionOfTheDay_Answered);
         action = TRACKED_EVENTS.QuestionOfTheDay_Answered.displayName;
         content =  {
           type: 'text',
           display: parsedContent.question
+        };
+      }
+      else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated.label) {
+        console.log(1);
+        action = TRACKED_EVENTS.Mood_Updated.displayName;
+        content =  {
+          type: 'text',
+          display: parsedContent.content
         };
       }
     }
