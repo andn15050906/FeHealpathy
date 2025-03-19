@@ -67,7 +67,7 @@ const submitWhatYouWantSurvey = async (selectedOptions) => {
     }
     spinner.hideSpinner();
 
-    await sweetAlert.showSuccess("Setting up successfully!");
+    await sweetAlert.showSuccess("Hold on while we set up a roadmap for you!");
     switchChild(true);
 }
 

@@ -59,23 +59,21 @@ export default {
         }
     },
     async mounted() {
-        setTimeout(() => {
-            this.setRoadmap();
-            if (this.enableTour) {
-                this.$tours['roadmap-tour'].start();
-            }
-        }, 500)
+        await this.setRoadmap();
+        if (this.enableTour) {
+            this.$tours['roadmap-tour'].start();
+        }
         /*this.guider.highlight(`roadmap-btn-${1}`);*/
     },
     methods: {
         toggleTour() {
             this.isTourActive = !this.isTourActive;
         },
-        setRoadmap() {
+        async setRoadmap() {
             if (!this.roadmapProgress || !this.roadmapProgress.getPersonalRoadmap)
                 return;
 
-            let personalRoadmap = this.roadmapProgress.getPersonalRoadmap();
+            let personalRoadmap = await this.roadmapProgress.getPersonalRoadmap();
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',

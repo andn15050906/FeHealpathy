@@ -7,11 +7,11 @@
             <v-card-text>
                 <p>{{ roadmap.introText }}</p>
                 <v-tabs v-model="activeTab">
-                    <v-tab v-for="phase in roadmap.phases" :key="phase.id" :value="phase.id">
+                    <v-tab v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :value="phase.id">
                         {{ phase.title }}
                     </v-tab>
                 </v-tabs>
-                <div v-for="phase in roadmap.phases" :key="phase.id" :ref="'phase-' + phase.id">
+                <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
                 <!--<v-tabs-items v-model="activeTab">
                     <v-tab-item v-for="phase in roadmap.phases" :key="phase.id">-->
                         <v-card>
@@ -30,8 +30,7 @@
 </template>
 
 <script>
-import { getRoadmaps } from '@/scripts/api/services/roadmapService';
-import { getProgress } from '@/scripts/api/services/statisticsService';
+import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
     computed: {
@@ -52,23 +51,7 @@ export default {
         }
     },
     async beforeMount() {
-        let tempRoadmap = (await getRoadmaps()).items[0];
-        let phasesProgress = await getProgress();
-        let completedMilestones = [];
-        for (let phaseProgress of phasesProgress) {
-            completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
-        }
-
-        console.log(completedMilestones);
-        for (let phase of tempRoadmap.phases) {
-            for (let milestone of phase.milestones) {
-                if (completedMilestones.includes(milestone.id)) {
-                    milestone.progress = 'Completed 📈';
-                    console.log(milestone);
-                }
-            }
-        }
-        this.roadmap = tempRoadmap
+        this.roadmap = await getCurrentRoadmapWithProgress();
     },
     watch: {
         activeTab(newVal) {
