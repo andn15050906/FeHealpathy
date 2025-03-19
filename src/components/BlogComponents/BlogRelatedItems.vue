@@ -5,196 +5,68 @@
             <div class="articles-grid">
                 <div class="articles-row">
                     <article v-for="(article, index) in relatedArticles" :key="index" class="article-card">
+                        
                         <div class="card-content">
+                            <RouterLink :to="`/blog/${article.id}`" @click="reloadPage">
+                            <div class="article-image-wrapper">
+                            <img :src="article.imageUrl" alt="Article Thumbnail" class="article-image">
+                        
+                        </div>
+                    </RouterLink>
                             <h4 class="article-title">{{ article.title }}</h4>
                             <span class="author-name">{{ article.author }}</span>
-                            <span class="read-time">{{ article.readTime }}</span>
-                            <div class="engagement-stats">
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/266277c58c37e13e9be72997ef7fa3fc4e5ea86973cb8c87c401c64e235f8ac8?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.views }}</span>
-                                </div>
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0067e72d268af722a4b2e61f78916f3d246163026a619eb5c34382a9cb9470ae?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.comments }}</span>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-item">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/855f2c2cdc4327bf727cb4300c9d9a7ac50cb37d836043f89a106ad3b460b873?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <span>{{ article.likes }}</span>
-                                    </div>
-                                    <div class="stat-icons">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/140b2b6620207c91290d4bed28d9445a84dae3d1d31b2a95ee834f02f82c6f9b?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/a06b59d3e1aa30b97d32443ca1852a963282113b8c36021fb6edb6f0478b02ed?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                    </div>
-                                    <span>{{ article.shares }}</span>
-                                </div>
-                            </div>
+                            <p class="article-date">{{ formatDate(article.creationTime) }}</p>
                         </div>
                     </article>
                 </div>
             </div>
 
-            <div class="pagination">
-                <button class="page-dot active" aria-label="Page 1"></button>
-                <button class="page-dot" aria-label="Page 2"></button>
-                <button class="page-dot" aria-label="Page 3"></button>
-            </div>
-
-            <h3 class="section-title">Bài viết khác từ Kevinbkdev</h3>
-            <div class="articles-grid">
-                <div class="articles-row">
-                    <article v-for="(article, index) in authorArticles" :key="index" class="article-card">
-                        <div class="card-content">
-                            <h4 class="article-title">{{ article.title }}</h4>
-                            <span class="author-name">{{ article.author }}</span>
-                            <span class="read-time">{{ article.readTime }}</span>
-                            <div class="engagement-stats">
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5fea4c65443495c6ef78f0148d755af0e7331037d59c22271be24da1aa3a72f?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.views }}</span>
-                                </div>
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/eca4d7b81f4efb92c840395ed360348a96cd306b9f4092aa3823194de0416310?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.comments }}</span>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-item">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/37d8c63261302945c42488c0ecac0a17170e06f8e179ea4c4300dc50c1f049d8?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <span>{{ article.likes }}</span>
-                                    </div>
-                                    <div class="stat-icons">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/c53aac672b5526ebd04e2d8647f9fa3170f71dfc3f2e018b7721eacf4d704b39?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/43a665e07267353445f833b64b87760c5668710054e9d86c129003f8a557df65?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                    </div>
-                                    <span>{{ article.shares }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <button class="page-dot active" aria-label="Page 1"></button>
-                <button class="page-dot" aria-label="Page 2"></button>
-                <button class="page-dot" aria-label="Page 3"></button>
-            </div>
         </div>
     </div>
 </template>
 
-<script>
-export default {
-    name: 'BlogRelatedItems',
-    data() {
-        return {
-            relatedArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            authorArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            comments: [
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                }
-            ]
+<script setup>
+import { ref, onMounted } from 'vue';
+import { getPagedArticles } from '@/scripts/api/services/blogService';
+import { useRoute } from 'vue-router';
+
+const props = defineProps({
+    blog: Object
+});
+
+const relatedArticles = ref([]);
+
+onMounted(async () => {
+    try {
+        const queryParams = { limit: 3, random: true };
+        const response = await getPagedArticles(queryParams);
+        if (response && response.items) {
+            relatedArticles.value = response.items.slice(0, 3).map(article => ({
+                id: article.id,
+                imageUrl: article.thumb.url,
+                title: article.title,
+                author: article.creator.fullName,
+                creationTime: article.creationTime
+            }));
         }
-    },
-    methods: {
-        submitComment() {
-            // Handle comment submission
-        }
+    } catch (error) {
+        console.error('Failed to fetch articles:', error);
     }
-}
+});
+
+const reloadPage = () => {
+    window.location.reload();
+};
+
+const formatDate = (dateString) => {
+    try {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
+        return new Date(dateString).toLocaleDateString('vi-VN', options);
+    } catch (error) {
+        console.error("Error formatting date:", error);
+        return dateString;
+    }
+};
 </script>
 
 <style scoped>
@@ -246,10 +118,10 @@ export default {
 }
 
 .author-name {
-    color: #5488c7;
     font: 400 14px/1.6 Roboto, sans-serif;
     display: block;
     margin-bottom: 4px;
+    text-align: center;
 }
 
 .read-time {
@@ -411,6 +283,10 @@ export default {
     gap: 8px;
 }
 
+.article-date{
+    color: black;
+    text-align: center;
+}
 .action-button {
     display: flex;
     align-items: center;
@@ -452,6 +328,25 @@ export default {
     white-space: nowrap;
     border: 0;
 }
+
+.article-image-wrapper {
+    width: 100%; 
+    padding-top: 56.25%;
+    position: relative;
+    background-color: #f0f0f0;
+    border-radius: 10%;
+}
+
+.article-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+}
+
 
 @media (max-width: 991px) {
     .container {
