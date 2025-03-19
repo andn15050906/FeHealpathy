@@ -85,7 +85,7 @@
           <option value="" disabled>Select level</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
+          <option value="All">All</option>
         </select>
       </div>
 

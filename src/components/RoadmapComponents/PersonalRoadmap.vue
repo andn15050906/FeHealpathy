@@ -1,5 +1,5 @@
 <template>
-    <v-tour name="roadmap-tour" v-if="isTourActive" :steps="roadmap?.tourSteps" :options="tourOptions" @end="isTourActive = false" />
+    <v-tour name="roadmap-tour" v-if="isTourActive" :steps="getRoadmapSteps" :options="tourOptions" @end="isTourActive = false" />
     <div class="roadmap-intro">
         <div v-for="introText in roadmap?.introTexts" class="roadmap-text">
             {{ introText }}
@@ -32,6 +32,11 @@ export default {
             required: false
         }
     },
+    computed: {
+        getRoadmapSteps() {
+            return this.roadmap?.steps;
+        }
+    },
     data() {
         return {
             text: {
@@ -54,13 +59,12 @@ export default {
         }
     },
     async mounted() {
-        if (this.enableTour) {
-            this.$tours['roadmap-tour'].start();
-        }
-
         setTimeout(() => {
             this.setRoadmap();
-        }, 5000)
+            if (this.enableTour) {
+                this.$tours['roadmap-tour'].start();
+            }
+        }, 500)
         /*this.guider.highlight(`roadmap-btn-${1}`);*/
     },
     methods: {
@@ -75,13 +79,14 @@ export default {
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',
-                steps: personalRoadmap.phases.sort((a, b) => a.index - b.index).map((_, index) => {
+                steps: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
-                        target: `#roadmap-step-${index}`,
-                        header: { title: `Step ${index}: ${_.title}` }
+                        target: `#roadmap-step-${index + 1}`,
+                        header: { title: `Step ${index + 1}: ${_.title}` },
+                        content: _.description
                     }
-                }),
-                timelineItems: personalRoadmap.phases.sort((a, b) => a.index - b.index).map((_, index) => {
+                }) ?? [],
+                timelineItems: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
                         color: index == 0 ? '#FF8A80' : index == 1 ? '#BA68C8' : index == 2 ? '#7986CB' : index == 3 ? '#81C784' : '#64B5F6',
                         icon: index == 0 ? 'mdi-account-heart': index == 1 ? 'mdi-bullseye' : index == 2 ? 'mdi-clock-outline' : index == 3 ? 'mdi-emoticon-happy' : 'mdi-rocket-launch',
@@ -89,7 +94,7 @@ export default {
                         content: _.description,
                         link: '/practice'
                     }
-                })
+                }) ?? []
             }
         }
     }

@@ -7,7 +7,7 @@
                 </RouterLink>
                 <span class="duration">{{ course.duration }}</span>
                 <!--<span class="level-badge">{{ course.level }}</span>-->
-                <span v-if="course.discount > 0" class="level-badge">-{{ course.discount * 100 }}%</span>
+                <span v-if="course.discount > 0" class="level-badge">-{{ course.discount }}%</span>
             </div>
             <p class="course-title">{{ course.title }}</p>
         </div>
