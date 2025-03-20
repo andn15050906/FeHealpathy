@@ -27,7 +27,9 @@
                                     <template v-slot:item="{ item }">
                                         <tr :class="getMilestoneClass(item)">
                                             <td class="text-center">{{ item.title }}</td>
-                                            <td class="text-center">{{ item.eventName }}</td>
+                                            <td class="text-center">
+                                                <router-link :to="getLinkByEvent(item.eventName)">{{ item.eventName }}</router-link>
+                                            </td>
                                             <td class="text-center">{{ item.repeatTimesRequired }}</td>
                                             <td class="text-center">{{ item.timeSpentRequired }}</td>
                                             <td class="text-center">
@@ -50,6 +52,7 @@
 <script>
 import { getRoadmaps } from '@/scripts/api/services/roadmapService';
 import { getProgress } from '@/scripts/api/services/statisticsService';
+import { getLinkByEvent } from '@/scripts/api/services/activityLogService';
 
 export default {
     computed: {
@@ -195,7 +198,8 @@ export default {
             } else {
                 return 'phase-header-locked';
             }
-        }
+        },
+        getLinkByEvent
     }
 };
 </script>
