@@ -1,9 +1,9 @@
 <template>
     <GlowingCard class="course-card" justify="unset" padding="10px">
-        <div style="flex-grow: 1;">
-            <div class="course-thumbnail">
+        <div style="flex-grow: 1; width: 100%;">
+            <div class="course-thumbnail" style="background-image: url(/assets/images/10.jpg);">
                 <RouterLink :to="`/courses/${course.id}`">
-                    <img :src="course.thumbUrl" :alt="course.title">
+                    <img :src="course.thumbUrl" alt="" :onError="(e) => e.target.style.display = 'none'">
                 </RouterLink>
                 <span class="duration">{{ course.duration }}</span>
                 <!--<span class="level-badge">{{ course.level }}</span>-->
@@ -12,7 +12,7 @@
             <p class="course-title">{{ course.title }}</p>
         </div>
         <div>
-            <span class="instructor">{{ course.creator.fullName }}</span>
+            <span class="instructor">{{ course.creator?.fullName }}</span>
             <p class="course-date">{{ formatDate(course.creationTime) }}</p>
             <span class="rating">
                 <i v-if="course.ratingCount > 0" :key="n" class="fa fa-star co-or"
@@ -26,7 +26,7 @@
                     <span v-else>No rating yet</span>
                 </span>
 
-                <!--<span v-for="n in 5" :key="n" class="star">★</span>
+                <!--<span v-for="n in Math.ceil(course.totalRating / course.ratingCount)" :key="n" class="star">★</span>
                 <span class="rating-count">({{ course.ratingCount }})</span>-->
             </span>
         </div>
@@ -43,8 +43,6 @@ const props = defineProps({
         type: Object
     }
 });
-
-console.log(props.course);
 
 const formatDate = (dateString) => {
   try {
@@ -77,6 +75,9 @@ function formatPrice(price) {
     position: relative;
     aspect-ratio: 16/9;
     width: 100%;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
 }
 
 .course-thumbnail img {
