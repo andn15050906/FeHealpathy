@@ -7,7 +7,7 @@
         <div class="highlighted-note">
             📌 Cognitive Behavioral Therapy (CBT) has been recognized by many professional associations, notably the 
             <strong>American Psychological Association (APA)</strong>, as one of the most effective psychological therapies. 
-            <a href="https://www.radiashealth.org/vi/tri-lieu-hanh-vi-nhan-thuc-la-gi/" target="_blank">Learn more</a>.
+            <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank">Learn more</a>.
         </div>
     </div>
     <Roadmap :timelineItems="roadmap?.timelineItems ?? []"></Roadmap>
