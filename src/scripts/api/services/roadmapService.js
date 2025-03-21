@@ -19,6 +19,7 @@ export const getCurrentRoadmapWithProgress = async () => {
     completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
   }
 
+  roadmap.phases = roadmap.phases?.sort((a, b) => a.index - b.index) ?? [];
   for (let phase of roadmap.phases) {
     let isPhaseCompleted = true;
     for (let milestone of phase.milestones) {
@@ -34,6 +35,7 @@ export const getCurrentRoadmapWithProgress = async () => {
       roadmap.currentPhase = phase;
   }
   
+  roadmap.currentPhase = roadmap.phases[2];
   console.log(roadmap);
   return roadmap;
 }

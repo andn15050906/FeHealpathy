@@ -21,9 +21,11 @@ import { getUserProfile, setUserProfile } from '@/scripts/api/services/authServi
 import SingleSelectSurvey from "@/components/SurveyComponents/SingleSelectSurvey.vue";
 import MultipleSelectSurvey from "@/components/SurveyComponents/MultipleSelectSurvey.vue";
 import PersonalRoadmap from '../../components/RoadmapComponents/PersonalRoadmap.vue';
+import { onBeforeMount } from 'vue';
 
 const sweetAlert = inject('sweetAlert');
 const spinner = inject('loadingSpinner');
+const roadmapProgress = inject('roadmapProgress');
 const childIndex = ref(-1);
 const firstEvaluationOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
 const wellnessSurveyOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
@@ -64,6 +66,7 @@ const submitWhatYouWantSurvey = async (selectedOptions) => {
         let user = getUserProfile();
         user.roadmapId = recommendedRoadmap;
         setUserProfile(user);
+        roadmapProgress.fetchPersonalRoadmap();
     }
     spinner.hideSpinner();
 
@@ -75,7 +78,7 @@ const switchChild = (isForward) => {
     childIndex.value = isForward ? childIndex.value + 1 : childIndex.value - 1;
 }
 
-(async () => {
+onBeforeMount(async () => {
     var surveys = await getPagedSurveys();
     var preferencesSurveys = await getAllPreferenceSurveys();
 
@@ -105,7 +108,7 @@ const switchChild = (isForward) => {
     );
 
     childIndex.value = 0;
-})()
+});
 </script>
 
 <style scoped>

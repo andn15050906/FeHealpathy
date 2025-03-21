@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineEmits, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { getCourses } from "@/scripts/api/services/courseService.js";
 import courseCard from '@/components/courseComponents/courseCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 

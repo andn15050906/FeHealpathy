@@ -1,13 +1,11 @@
 <template>
-    <v-stepper-vertical>
-        <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value > index"
+    <v-stepper-vertical v-model="currentPhaseIndex">
+        <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value > currentPhaseIndex"
             :subtitle="step.subtitle" :title="step.title" :value="step.value"
             :hide-actions="true">
             {{ step.content }}
             <v-btn @click="goTo(step.reference)">Follow step</v-btn>
-            <!--<v-stepper-vertical-actions>
-                <v-btn @click="goTo(step)">Follow step</v-btn>
-            </v-stepper-vertical-actions>-->
+            <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
     </v-stepper-vertical>
 </template>
@@ -19,38 +17,20 @@ import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapSer
 
 const router = useRouter();
 const personalRoadmap = ref({});
+const currentPhaseIndex = ref(0);
 const steps = ref([
-        {
-            value: '0',
-            title: '...',
-            reference: "..."
-        }
-    ])
+    {
+        value: `${currentPhaseIndex.value}`,
+        title: '...',
+        reference: "..."
+    }
+])
 
 onBeforeMount(async () => {
-    personalRoadmap.value = await getCurrentRoadmapWithProgress();
-    steps.value = personalRoadmap.value.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
-        return {
-            value: `${index}`,
-            title: _.title,
-            reference: "/practice"
-        }
-    });
-    
-    /*subtitle: 'Nhận diện vấn đề',
-    content: `Nhận thức về vấn đề của mình và xây dựng động lực thay đổi.`*/
-    /*subtitle: 'Ổn định tinh thần',
-    content: `Áp dụng các kỹ thuật thư giãn và Xây dựng thói quen kiểm soát cảm xúc.`*/
-    /*subtitle: 'Xây dựng hành vi tích cực',
-    content: `Thiết lập các thói quen nhỏ, tạo và duy trì mục tiêu tích cực.`*/
-    /*subtitle: 'Xây dựng kĩ năng',
-    content: `Phát triển kỹ năng mềm và xây dựng mối quan hệ lành mạnh.`*/
-    /*subtitle: 'Củng cố & duy trì',
-    content: `Định kỳ đánh giá tiến độ và duy trì động lực.`*/
+    await fetchPersonalRoadmap();
 })
 
 function goTo(reference) {
-    console.log(reference);
     router.push({ path: reference })
 }
 
@@ -66,6 +46,28 @@ function goToPreviousStep(index) {
     }
 }*/
 
+function goToStep(index) {
+    currentPhaseIndex.value = index;
+}
+
+async function fetchPersonalRoadmap() {
+    personalRoadmap.value = await getCurrentRoadmapWithProgress();
+    steps.value = personalRoadmap.value.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
+        if (personalRoadmap.value.currentPhase.id == _.id)
+            currentPhaseIndex.value = index;
+        return {
+            value: `${index}`,
+            title: _.title,
+            reference: getReference(_)
+        }
+    });
+    goToStep(currentPhaseIndex.value);
+}
+
+function getReference(phase) {
+    return "/practice";
+}
+
 function getPersonalRoadmap() {
     return new Promise((resolve) => {
         const attempt = () => {
@@ -79,7 +81,7 @@ function getPersonalRoadmap() {
     });
 }
 
-defineExpose({ getPersonalRoadmap })
+defineExpose({ getPersonalRoadmap, fetchPersonalRoadmap })
 </script>
 
 <style scoped>
@@ -92,5 +94,8 @@ defineExpose({ getPersonalRoadmap })
 }
 .v-expansion-panel-title {
     overflow: hidden;
+}
+.v-stepper-actions {
+    display: none;
 }
 </style>
