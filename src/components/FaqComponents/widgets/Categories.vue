@@ -18,62 +18,38 @@ const categories = ref(categoriesData)
 <style scoped>
 .categories-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .category-card {
-  background-color: #f9f9f9; 
-  border: 1px solid #ddd; 
-  border-radius: 8px; 
-  padding: 20px; 
-  text-align: center; 
-  transition: transform 0.2s; 
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .category-card:hover {
-  transform: scale(1.05); 
+  transform: scale(1.05);
 }
 
 .category-icon {
-  font-size: 40px; 
+  font-size: 40px;
   color: #154EC1;
 }
 
 .category-title {
-  font-size: 1.5rem; 
-  font-weight: bold; 
-  margin: 10px 0; 
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 10px 0;
 }
 
 .category-intro {
-  font-size: 1rem; 
-  color: #666; 
-}
-
-h2.va-h5 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #154EC1;
-}
-
-ul {
-  list-style-type: none; 
-  padding: 0;
-}
-
-li {
-  margin: 0.5rem 0;
-}
-
-.va-link {
-  text-decoration: none;
-  color: #007BFF;
-  transition: color 0.3s;
-}
-
-.va-link:hover {
-  color: #0056b3; 
+  font-size: 1rem;
+  color: #666;
 }
 </style>
