@@ -56,6 +56,11 @@ provide('roadmapProgress', {
     if (roadmapProgress.value)
       return roadmapProgress.value.getPersonalRoadmap();
     return null;
+  },
+  fetchPersonalRoadmap: () => {
+    if (roadmapProgress.value)
+      return roadmapProgress.value.fetchPersonalRoadmap();
+    return null;
   }
 })
 
@@ -66,13 +71,13 @@ provide('roadmapProgress', {
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
-    loadingSpinner.value.showSpinner();
+    loadingSpinner.value?.showSpinner();
     next();
   });
 
   router.afterEach(() => {
     setTimeout(() => {
-      loadingSpinner.value.hideSpinner();
+      loadingSpinner.value?.hideSpinner();
     }, 300);
   });
 
