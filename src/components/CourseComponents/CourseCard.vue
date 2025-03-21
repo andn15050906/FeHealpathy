@@ -1,20 +1,20 @@
 <template>
     <GlowingCard class="course-card" justify="unset" padding="10px">
-        <div style="flex-grow: 1;">
-            <div class="course-thumbnail">
+        <div style="flex-grow: 1; width: 100%;">
+            <div class="course-thumbnail" style="background-image: url(/assets/images/10.jpg);">
                 <RouterLink :to="`/courses/${course.id}`">
-                    <img :src="course.thumbUrl" :alt="course.title">
+                    <img :src="course.thumbUrl" alt="" :onError="(e) => e.target.style.display = 'none'">
                 </RouterLink>
                 <span class="duration">{{ course.duration }}</span>
                 <!--<span class="level-badge">{{ course.level }}</span>-->
-                <span v-if="course.discount > 0" class="level-badge">-{{ course.discount * 100 }}%</span>
+                <span v-if="course.discount > 0" class="level-badge">-{{ course.discount }}%</span>
             </div>
             <p class="course-title">{{ course.title }}</p>
         </div>
         <div>
-            <span class="instructor">{{ course.instructor }}</span>
+            <span class="instructor">{{ course.creator?.fullName }}</span>
+            <p class="course-date">{{ formatDate(course.creationTime) }}</p>
             <span class="rating">
-                
                 <i v-if="course.ratingCount > 0" :key="n" class="fa fa-star co-or"
                     v-for="n in Math.ceil(course.totalRating / course.ratingCount)"
                     aria-hidden="true"></i>
@@ -26,7 +26,7 @@
                     <span v-else>No rating yet</span>
                 </span>
 
-                <!--<span v-for="n in 5" :key="n" class="star">★</span>
+                <!--<span v-for="n in Math.ceil(course.totalRating / course.ratingCount)" :key="n" class="star">★</span>
                 <span class="rating-count">({{ course.ratingCount }})</span>-->
             </span>
         </div>
@@ -37,12 +37,22 @@
 <script setup>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 
+
 const props = defineProps({
     course: {
         type: Object
     }
 });
 
+const formatDate = (dateString) => {
+  try {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return dateString;
+  }
+};
 function isOnDiscount(course) {
     return course.discount > 0 && new Date(course.discountExpiry) > new Date();
 }
@@ -58,13 +68,16 @@ function formatPrice(price) {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    height: 280px;
+    height: 320px;
 }
 
 .course-thumbnail {
     position: relative;
     aspect-ratio: 16/9;
     width: 100%;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
 }
 
 .course-thumbnail img {
@@ -129,5 +142,15 @@ function formatPrice(price) {
 .rating-count {
     color: #666;
     font-size: 12px;
+}
+
+
+.instructor {
+    font-size: 14px;
+    color: #666;
+}
+.course-date {
+    font-size: 14px;
+    color: #666;
 }
 </style>

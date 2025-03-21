@@ -15,8 +15,7 @@
 <script setup>
 import { ref, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
-import { getRoadmaps } from '@/scripts/api/services/roadmapService';
-import { getUserProfile } from '@/scripts/api/services/authService';
+import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 const router = useRouter();
 const personalRoadmap = ref({});
@@ -29,10 +28,8 @@ const steps = ref([
     ])
 
 onBeforeMount(async () => {
-    let roadmaps = await getRoadmaps();
-    personalRoadmap.value = roadmaps.items.find(_ => _.id == getUserProfile().roadmapId);
-
-    steps.value = personalRoadmap.value.phases.map((_, index) => {
+    personalRoadmap.value = await getCurrentRoadmapWithProgress();
+    steps.value = personalRoadmap.value.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
         return {
             value: `${index}`,
             title: _.title,
@@ -70,7 +67,16 @@ function goToPreviousStep(index) {
 }*/
 
 function getPersonalRoadmap() {
-    return personalRoadmap.value;
+    return new Promise((resolve) => {
+        const attempt = () => {
+            if (personalRoadmap.value.phases)
+                resolve(personalRoadmap.value);
+            else
+                setTimeout(attempt, 100);
+        }
+
+        attempt();
+    });
 }
 
 defineExpose({ getPersonalRoadmap })

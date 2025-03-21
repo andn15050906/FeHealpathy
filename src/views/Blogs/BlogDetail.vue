@@ -38,7 +38,6 @@
 
     <div class="divider"></div>
 
-    <!-- 📌 Bài viết liên quan -->
     <BlogRelatedItems v-if="blog" :currentBlogId="blog.id" />
 
     <ScrollToTop />

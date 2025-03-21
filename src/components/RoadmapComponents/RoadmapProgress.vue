@@ -7,12 +7,12 @@
             <v-card-text>
                 <p>{{ roadmap.introText }}</p>
                 <v-tabs v-model="activeTab">
-                    <v-tab v-for="phase in roadmap.phases" :key="phase.id" :value="phase.id" :class="getPhaseTabClass(phase)">
+                    <v-tab v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :value="phase.id" :class="getPhaseTabClass(phase)">
                         <v-icon v-if="isPhaseCompleted(phase)" small class="mr-1">mdi-check-circle</v-icon>
                         {{ phase.title }}
                     </v-tab>
                 </v-tabs>
-                <div v-for="phase in roadmap.phases" :key="phase.id" :ref="'phase-' + phase.id">
+                <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
                 <!--<v-tabs-items v-model="activeTab">
                     <v-tab-item v-for="phase in roadmap.phases" :key="phase.id">-->
                         <v-card>
@@ -53,6 +53,7 @@
 import { getRoadmaps } from '@/scripts/api/services/roadmapService';
 import { getProgress } from '@/scripts/api/services/statisticsService';
 import { getLinkByEvent } from '@/scripts/api/services/activityLogService';
+import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
     computed: {
@@ -145,6 +146,8 @@ export default {
                 this.activeTab = tempRoadmap.phases[0].id;
             }
         }
+        
+        //this.roadmap = await getCurrentRoadmapWithProgress();
     },
     watch: {
         activeTab(newVal) {

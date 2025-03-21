@@ -13,7 +13,7 @@
       </button>
     </div>
   
-      <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
+      <select  v-model="sortOption" @change="sortBlogs" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
             <option value="name-desc">Name Z-A</option>
       </select>

@@ -1,10 +1,9 @@
 <template>
     <div class="container text-center">
         <SingleSelectSurvey v-if="childIndex == 0" :options="firstEvaluationOptions"></SingleSelectSurvey>
-        <PersonalRoadmap v-if="childIndex == 1" :nextScreenCallback="() => switchChild(true)" :enableTour="true" />
-        <SingleSelectSurvey v-if="childIndex == 2" :options="wellnessSurveyOptions"></SingleSelectSurvey>
-        <!--Additionally provided-->
-        <multiple-select-survey v-if="childIndex == 3" :options="whatYouWantSurveyOptions"></multiple-select-survey>
+        <SingleSelectSurvey v-if="childIndex == 1" :options="wellnessSurveyOptions"></SingleSelectSurvey>
+        <MultipleSelectSurvey v-if="childIndex == 2" :options="whatYouWantSurveyOptions"></MultipleSelectSurvey>
+        <PersonalRoadmap v-if="childIndex == 3" :nextScreenCallback="() => { router.push({ path: '/' }); }" :enableTour="true" />
     </div>
 </template>
 
@@ -68,7 +67,8 @@ const submitWhatYouWantSurvey = async (selectedOptions) => {
     }
     spinner.hideSpinner();
 
-    await sweetAlert.showSuccess("Setting up successfully!").then(() => { router.push({ path: '/' }); });
+    await sweetAlert.showSuccess("Hold on while we set up a roadmap for you!");
+    switchChild(true);
 }
 
 const switchChild = (isForward) => {
@@ -98,7 +98,7 @@ const switchChild = (isForward) => {
     whatYouWantSurveyOptions.value = new SurveyOptions(
         preferencesSurveys.find(survey => survey.title.includes("What you want us to help you")),
         "✨ What you want us to help you? ✨",
-        () => { },
+        null,
         submitWhatYouWantSurvey,
         false,
         false
