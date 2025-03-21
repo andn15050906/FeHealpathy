@@ -76,7 +76,7 @@ export default {
         }
     },
     async beforeMount() {
-        let tempRoadmap = (await getRoadmaps()).items[0];
+        let tempRoadmap = await getCurrentRoadmapWithProgress();
         let phasesProgress = await getProgress();
         let completedMilestones = [];
         for (let phaseProgress of phasesProgress) {
@@ -146,8 +146,6 @@ export default {
                 this.activeTab = tempRoadmap.phases[0].id;
             }
         }
-        
-        //this.roadmap = await getCurrentRoadmapWithProgress();
     },
     watch: {
         activeTab(newVal) {
