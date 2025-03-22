@@ -1,173 +1,140 @@
 <template>
-  <div class="course-creation">
-    <h1 class="title">✨ Update Course ✨</h1>
-    <form @submit.prevent="updateCourse" class="course-form">
-      <input type="hidden" v-model="course.id" />
-
-      <div class="form-group">
-        <label for="title">🖋️ Course Title</label>
-        <input
-          type="text"
-          id="title"
-          v-model="course.title"
-          placeholder="Insert course title"
-        />
+  <div class="container my-5">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white text-center py-3">
+        <h1 class="h4 mb-0">
+          <i class="fas fa-chalkboard-teacher me-2"></i>Update Course
+        </h1>
       </div>
-
-      <div class="form-group">
-        <label for="intro">📘 Course Intro</label>
-        <textarea
-          id="intro"
-          v-model="course.intro"
-          placeholder="Write a short intro for the course"
-          rows="3"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="description">📝 Course Description</label>
-        <textarea
-          id="description"
-          v-model="course.description"
-          placeholder="Detailed description of the course"
-          rows="4"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="image">🖼️ Course Thumbnail</label>
-        <input
-          type="file"
-          id="image"
-          @change="handleImageUpload"
-          accept="image/*"
-        />
-        <div v-if="previewImage" class="image-preview">
-          <img :src="previewImage" alt="Course Thumbnail" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="category">📂 Course Category</label>
-        <select
-          id="category"
-          v-model="course.leafCategoryId"
-          class="category-select"
-        >
-          <option value="" disabled>Choose a category</option>
-          <option
-            v-for="category in availableCategories"
-            :key="category.id"
-            :value="category.id"
-          >
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="price">💰 Course Price</label>
-        <input
-          type="number"
-          id="price"
-          v-model="course.price"
-          placeholder="Enter course price (in VND)"
-          min="0"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="discount">💵 Discount (%)</label>
-        <input
-          type="number"
-          id="discount"
-          v-model="course.discount"
-          placeholder="Enter discount percentage"
-          min="0"
-          max="100"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="discountExpiry">📅 Discount Expiry</label>
-        <input
-          type="date"
-          id="discountExpiry"
-          v-model="course.discountExpiry"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="level">📊 Course Level</label>
-        <select id="level" v-model="course.level">
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="status">📢 Course Status</label>
-        <select id="status" v-model="course.status">
-          <option value="Draft">Draft</option>
-          <option value="Ongoing">Ongoing</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="outcomes">🎯 Course Outcomes</label>
-        <textarea
-          id="outcomes"
-          v-model="course.outcomes"
-          placeholder="Expected outcomes for students"
-          rows="3"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="requirements">📌 Course Requirements</label>
-        <textarea
-          id="requirements"
-          v-model="course.requirements"
-          placeholder="Requirements for students"
-          rows="3"
-        ></textarea>
-      </div>
-
-      <div class="sections">
-        <h2>📚 Course Media</h2>
-        <div class="form-group">
-          <input
-            type="file"
-            @change="handleMediaUpload"
-            accept="image/*,video/*"
-            multiple
-          />
-        </div>
-        <div v-if="course.addedMedias.length > 0" class="media-preview">
-          <div
-            v-for="(media, index) in course.addedMedias"
-            :key="index"
-            class="single-media"
-          >
-            <template v-if="media.type === 'image'">
-              <img :src="media.preview" alt="Media Image" />
-            </template>
-            <template v-else-if="media.type === 'video'">
-              <video controls :src="media.preview" width="100%"></video>
-            </template>
-            <button type="button" class="btn remove" @click="removeMedia(index)"
-              >❌ Remove</button
-            >
+      <div class="card-body">
+        <form @submit.prevent="updateCourse">
+          <input type="hidden" v-model="course.id" />
+          <div class="mb-3">
+            <label for="title" class="form-label">
+              <i class="fas fa-pen-nib me-1"></i> Course Title
+            </label>
+            <input type="text" id="title" v-model="course.title" class="form-control" placeholder="Insert course title"
+              required />
           </div>
-        </div>
+          <div class="mb-3">
+            <label for="intro" class="form-label">
+              <i class="fas fa-book me-1"></i> Course Intro
+            </label>
+            <textarea id="intro" v-model="course.intro" class="form-control"
+              placeholder="Write a short intro for the course" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">
+              <i class="fas fa-align-left me-1"></i> Course Description
+            </label>
+            <textarea id="description" v-model="course.description" class="form-control"
+              placeholder="Detailed description of the course" rows="4" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">
+              <i class="fas fa-image me-1"></i> Course Thumbnail
+            </label>
+            <input type="file" id="image" @change="handleImageUpload" class="form-control" accept="image/*" />
+            <div v-if="previewImage" class="mt-2 text-center">
+              <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="category" class="form-label">
+              <i class="fas fa-folder-open me-1"></i> Course Category
+            </label>
+            <select id="category" v-model="course.leafCategoryId" class="form-select" required>
+              <option value="" disabled>Choose a category</option>
+              <option v-for="category in availableCategories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">
+              <i class="fas fa-dollar-sign me-1"></i> Course Price
+            </label>
+            <input type="number" id="price" v-model="course.price" class="form-control"
+              placeholder="Enter course price (in VND)" min="0" required />
+          </div>
+          <div class="mb-3">
+            <label for="discount" class="form-label">
+              <i class="fas fa-percent me-1"></i> Discount (%)
+            </label>
+            <input type="number" id="discount" v-model="course.discount" class="form-control"
+              placeholder="Enter discount percentage" min="0" max="100" />
+          </div>
+          <div class="mb-3">
+            <label for="discountExpiry" class="form-label">
+              <i class="fas fa-calendar-alt me-1"></i> Discount Expiry
+            </label>
+            <input type="date" id="discountExpiry" v-model="course.discountExpiry" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label for="level" class="form-label">
+              <i class="fas fa-signal me-1"></i> Course Level
+            </label>
+            <select id="level" v-model="course.level" class="form-select" required>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">
+              <i class="fas fa-info-circle me-1"></i> Course Status
+            </label>
+            <select id="status" v-model="course.status" class="form-select" required>
+              <option value="Draft">Draft</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="outcomes" class="form-label">
+              <i class="fas fa-bullseye me-1"></i> Course Outcomes
+            </label>
+            <textarea id="outcomes" v-model="course.outcomes" class="form-control"
+              placeholder="Expected outcomes for students" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="requirements" class="form-label">
+              <i class="fas fa-list-ul me-1"></i> Course Requirements
+            </label>
+            <textarea id="requirements" v-model="course.requirements" class="form-control"
+              placeholder="Requirements for students" rows="3"></textarea>
+          </div>
+          <div class="mb-4">
+            <h2 class="h5 mb-3">
+              <i class="fas fa-photo-video me-1"></i> Course Media
+            </h2>
+            <div class="mb-3">
+              <input type="file" @change="handleMediaUpload" class="form-control" accept="image/*,video/*" multiple />
+            </div>
+            <div v-if="course.addedMedias.length > 0" class="row g-3">
+              <div v-for="(media, index) in course.addedMedias" :key="index"
+                class="col-md-4 text-center position-relative">
+                <template v-if="media.type === 'image'">
+                  <img :src="media.preview" alt="Media Image" class="img-fluid rounded" />
+                </template>
+                <template v-else-if="media.type === 'video'">
+                  <video controls :src="media.preview" class="img-fluid rounded"></video>
+                </template>
+                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                  @click="removeMedia(index)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-check me-1"></i>Update Course
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn submit">✅ Update Course</button>
-      </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -177,7 +144,7 @@ export default {
   data() {
     return {
       course: {
-        id: "1234-abcd", // Hardcoded ID, should be replaced when integrated with API
+        id: "1234-abcd",
         title: "Advanced Meditation",
         intro: "Deepen your meditation practice with advanced techniques.",
         description: "",
@@ -233,49 +200,15 @@ export default {
     },
     updateCourse() {
       if (!this.course.title) {
-        alert("Vui lòng nhập tiêu đề course!");
         return;
       }
-      if (!this.course.category) {
-        alert("Vui lòng chọn danh mục cho course!");
+      if (!this.course.leafCategoryId) {
         return;
       }
       if (this.course.price <= 0) {
-        alert("Please insert price correctly!");
         return;
       }
-      alert("Course Updated Successfully!");
     },
-
-    // handleResourceUpload(event, sectionIndex) {
-    //     const files = Array.from(event.target.files);
-    //     files.forEach((file) => {
-    //       const fileType = file.type.startsWith("image") ? "image" : "video";
-    //       const reader = new FileReader();
-    //       reader.onload = (e) => {
-    //         this.course.sections[sectionIndex].resources.push({
-    //           type: fileType,
-    //           file: file,
-    //           preview: e.target.result,
-    //         });
-    //       };
-    //       reader.readAsDataURL(file);
-    //     });
-    //   },
-    //   removeResource(sectionIndex, resourceIndex) {
-    //     this.course.sections[sectionIndex].resources.splice(resourceIndex, 1);
-    //   },
-    //   handleImageUpload(event) {
-    //     const file = event.target.files[0];
-    //     if (file) {
-    //       this.course.image = file;
-    //       const reader = new FileReader();
-    //       reader.onload = (e) => {
-    //         this.previewImage = e.target.result;
-    //       };
-    //       reader.readAsDataURL(file);
-    //     }
-    //   },
   },
 };
 </script>
@@ -330,194 +263,12 @@ textarea {
   margin-top: 10px;
 }
 
-.sections {
-  margin-top: 20px;
+.mb-3,
+.mb-4 {
+  margin-bottom: 1rem !important;
 }
 
-.section {
-  background: #fafafa;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-.divider {
-  border-top: 1px dashed #ddd;
-  margin: 15px 0;
-}
-
-.btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.btn.add {
-  background: #007bff;
-  color: white;
-  display: block;
-  margin: 0 auto;
-}
-
-.btn.remove {
-  background: #ff6868;
-  color: white;
-}
-
-.btn.submit {
-  margin-top: 20px;
-  background: #28a745;
-  color: white;
-  width: 100%;
-  text-align: center;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-.multiselect {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: #fff;
-}
-
-.multiselect__tags {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-}
-
-.multiselect__input {
-  font-size: 1rem;
-  margin-left: 5px;
-  padding: 5px;
-  border: none;
-  outline: none;
-}
-
-.multiselect--active {
-  border-color: #007bff;
-}
-
-.multiselect__tag {
-  background: #007bff;
-  color: #fff;
-  border-radius: 3px;
-  padding: 3px 5px;
-  margin: 2px 5px 2px 0;
-}
-
-.multiselect__tag:hover {
-  background: #0056b3;
-}
-
-.multiselect__clear {
-  color: #007bff;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.multiselect__clear:hover {
-  color: #0056b3;
-}
-.resource-preview img {
-  width: 100%;
-  max-width: 200px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.resource-preview video {
-  border-radius: 10px;
-  margin-top: 10px;
-  max-width: 200px;
-}
-.single-resource img,
-.single-resource video {
-  width: 100%;
-  border-radius: 10px;
-}
-.single-resource .btn.remove {
-  top: 5px;
-  right: 5px;
-  background: #ff6868;
-  color: white;
-  transform: scale(0.7);
-  margin-left: 30px;
-}
-.quiz-preview {
-  margin-top: 10px;
-  padding: 10px;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.quiz-preview p {
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.btn.remove-quiz {
-  margin-top: 5px;
-  background: #ff6868;
-  color: white;
-  font-size: 0.8rem;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.category-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-/* Hide default checkbox */
-input[type="checkbox"] {
-  display: none;
-}
-
-/* Style the label for custom checkbox */
-.custom-checkbox {
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-  border-radius: 20px;
-  background: #ccc;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.custom-checkbox::after {
-  content: "";
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  transition: transform 0.3s;
-}
-
-/* Checked state */
-input[type="checkbox"]:checked + .custom-checkbox {
-  background: #007bff;
-}
-
-input[type="checkbox"]:checked + .custom-checkbox::after {
-  transform: translateX(20px);
+.d-grid {
+  display: grid;
 }
 </style>
