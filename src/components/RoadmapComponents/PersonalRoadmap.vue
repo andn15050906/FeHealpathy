@@ -74,6 +74,7 @@ export default {
                 return;
 
             let personalRoadmap = await this.roadmapProgress.getPersonalRoadmap();
+            let currentPhaseIndex = personalRoadmap.currentPhase.index;
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',
@@ -86,11 +87,11 @@ export default {
                 }) ?? [],
                 timelineItems: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
-                        color: index == 0 ? '#FF8A80' : index == 1 ? '#BA68C8' : index == 2 ? '#7986CB' : index == 3 ? '#81C784' : '#64B5F6',
+                        color: index < currentPhaseIndex ? '#0056b3' : index == currentPhaseIndex ? '#28a745' : '#6c757d',
                         icon: index == 0 ? 'mdi-account-heart': index == 1 ? 'mdi-bullseye' : index == 2 ? 'mdi-clock-outline' : index == 3 ? 'mdi-emoticon-happy' : 'mdi-rocket-launch',
                         title: _.title,
                         content: _.description,
-                        link: '/practice'
+                        link: '/progress'
                     }
                 }) ?? []
             }

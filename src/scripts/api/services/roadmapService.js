@@ -35,7 +35,6 @@ export const getCurrentRoadmapWithProgress = async () => {
       roadmap.currentPhase = phase;
   }
   
-  roadmap.currentPhase = roadmap.phases[2];
-  console.log(roadmap);
+  //roadmap.currentPhase = roadmap.phases[2];
   return roadmap;
 }

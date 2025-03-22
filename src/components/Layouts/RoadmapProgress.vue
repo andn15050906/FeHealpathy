@@ -1,13 +1,19 @@
 <template>
-    <v-stepper-vertical v-model="currentPhaseIndex">
+    <v-stepper-vertical v-if="steps.length" v-model="currentPhaseIndex">
         <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value > currentPhaseIndex"
             :subtitle="step.subtitle" :title="step.title" :value="step.value"
             :hide-actions="true">
             {{ step.content }}
-            <v-btn @click="goTo(step.reference)">Follow step</v-btn>
+            <v-btn @click="goTo(step.reference)">{{ text.FollowStep }}</v-btn>
             <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
     </v-stepper-vertical>
+    <v-card v-else>
+        <v-card-title class="d-flex align-center title-section">
+            <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
+            <span class="sidebar-title">{{ text.SetUpFirst }}</span>
+        </v-card-title>
+    </v-card>
 </template>
 
 <script setup>
@@ -18,13 +24,11 @@ import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapSer
 const router = useRouter();
 const personalRoadmap = ref({});
 const currentPhaseIndex = ref(0);
-const steps = ref([
-    {
-        value: `${currentPhaseIndex.value}`,
-        title: '...',
-        reference: "..."
-    }
-])
+const steps = ref([]);
+const text = {
+    FollowStep: "Follow step",
+    SetUpFirst: "You have no roadmap, please set up a roadmap first."
+}
 
 onBeforeMount(async () => {
     await fetchPersonalRoadmap();
@@ -65,7 +69,7 @@ async function fetchPersonalRoadmap() {
 }
 
 function getReference(phase) {
-    return "/practice";
+    return "/progress";
 }
 
 function getPersonalRoadmap() {
@@ -97,5 +101,12 @@ defineExpose({ getPersonalRoadmap, fetchPersonalRoadmap })
 }
 .v-stepper-actions {
     display: none;
+}
+.v-card {
+    margin: 0;
+}
+.sidebar-title {
+    text-wrap: auto;
+    padding: 4px;
 }
 </style>
