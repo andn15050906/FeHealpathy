@@ -494,7 +494,7 @@ const router = createRouter({
     {
       path: '/advisor/moderate-advisors',
       name: 'ModerateAdvisors',
-      meta: { requiresAuth: true, requiresAdmin: true },
+      //meta: { requiresAuth: true, requiresAdmin: true },
       component: ModerateAdvisors,
     },
 
@@ -502,31 +502,31 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'AdminDashboard',
-      //meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: Dashboard
     },
     {
       path: '/admin/moderate-users',
       name: 'ModerateUsers',
-      //meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: ModerateUsers
     },
     {
       path: '/admin/create-admin',
       name: 'CreateAdminAccounts',
-      //meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: CreateAdminAccounts
     },
     {
       path: '/admin/moderate-content',
       name: 'ModerateUploadedContent',
-      //meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: ModerateUploadedContent
     },
     {
       path: '/admin/view-reports',
       name: 'ViewReports',
-     // meta: { requiresAuth: true, requiresAdmin: true },
+      meta: { requiresAuth: true, requiresAdmin: true },
       component: ViewReports
     }
   ]
