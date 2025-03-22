@@ -19,17 +19,18 @@ export const deleteConversation = async (conversationId) => {
     return await del(`${API_BASE_URL}/${conversationId}`);
 };
 
-// Load danh sách users và conversations
+// Hàm load danh sách users và conversations
 export const loadUsersAndConversations = async () => {
     try {
+        // Lấy danh sách users từ API
         const usersResponse = await getUsers();
         // Chuyển đổi dữ liệu users 
         const users = usersResponse.items.map(user => ({
             userId: user.id,        
-            userName: user.fullName,
-            avatarUrl: user.avatarUrl
+            userName: user.fullName  
         }));
 
+        // Lấy danh sách conversations từ API
         const conversationsResponse = await getPagedConversations();
         // Chuyển đổi dữ liệu conversations
         const conversations = conversationsResponse.items.map(conv => ({
