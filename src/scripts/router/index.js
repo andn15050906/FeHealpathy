@@ -494,7 +494,7 @@ const router = createRouter({
     {
       path: '/advisor/moderate-advisors',
       name: 'ModerateAdvisors',
-      meta: { requiresAuth: true, requiresAdmin: true },
+      //meta: { requiresAuth: true, requiresAdmin: true },
       component: ModerateAdvisors,
     },
 

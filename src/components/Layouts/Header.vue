@@ -15,8 +15,8 @@
       </div>
       <div class="user-actions">
         <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
-          <img :src="user.avatarUrl" class="user-avatar" alt="User avatar"> //thêm avt vào template
           <span>Hi, {{ user.userName }}</span>
+          <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
             <hr class="menu-divider" />
@@ -309,7 +309,7 @@ ul {
   cursor: pointer;
   border-radius: 20px;
   background-color: #f3ef51;
-  padding: 5px 20px;
+  padding: 5px 15px 5px 20px;
   transition: background-color 0.3s;
 }
 
@@ -342,6 +342,7 @@ ul {
   height: 30px;
   border-radius: 50%;
   object-fit: cover;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {
