@@ -140,16 +140,26 @@ export default {
       if (!date) return '';
       return date.split('T')[0];
     };
+    //hàm xử lí url avt
     const getAvatarApiUrl = (avatarUrl) => {
-      if (avatarUrl && avatarUrl.startsWith('http')) {
-        return avatarUrl;
+      if (!avatarUrl) {
+        return 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg'; // Default avatar
       }
-      return 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg';
+      
+      if (avatarUrl.startsWith('http')) {
+        return avatarUrl; // url bên ngoài
+      }
+      
+      if (avatarUrl.startsWith('/')) {
+        return avatarUrl; // đương dẫn nội bộ
+      }
+      return `/${avatarUrl}`; // thêm dấu / nếu là đường dẫn tương đối
     };
+    //hàm xử lí khi user chọn ảnh mới
     const handleAvatarChange = (event) => {
       const file = event.target.files[0];
       if (file) {
-        form.value.avatar = file;
+        form.value.avatar = file; // lưu file ảnh
         form.value.avatarUrl = URL.createObjectURL(file);
       }
     };
@@ -157,6 +167,7 @@ export default {
       const avatarInput = document.querySelector('input[type="file"]');
       avatarInput.click();
     };
+    //hàm xác nhận cập nhật thông tin user
     const confirmChanges = async () => {
       try {
         loadingSpinner.showSpinner();
@@ -168,7 +179,9 @@ export default {
           formData.append('Avatar.File', form.value.avatar);
           formData.append('Avatar.Title', 'User Profile Picture');
         }
+        //gọi api cập nhật thông tin user
         const response = await updateUserProfile(formData);
+        //cập nhật url avt mới
         if (response) {
           form.value.avatarUrl = response.avatarUrl || form.value.avatarUrl;
         }
