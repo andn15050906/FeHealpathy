@@ -1,7 +1,7 @@
 <template>
     <div class="moderate-users">
       <h1 class="title">Advisor Moderation</h1>
-  
+
       <div class="tabs">
         <button 
           v-for="tab in tabs" 
@@ -19,6 +19,7 @@
         <div class="content-header">
           <h2>Your Courses</h2>
         </div>
+        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Course</button>
         <div class="content-header">
           <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
@@ -73,9 +74,13 @@
       
       <!-- Blogs -->
       <div v-if="currentTab === 'blogs'" class="tab-content">
+        <div v-if="!isEditingBlog">
         <div class="content-header">
-          <h2>Pending Blog Posts</h2>
+          <h2>Your Blogs</h2>
         </div>
+        <router-link to="/blogs/create">
+        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Blog</button>
+        </router-link>
         <div class="content-header">
           <select  v-model="sortOption" @change="sortBlogs()" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
@@ -98,7 +103,6 @@
             <tr v-for="item in filteredBlogs" :key="item.id">
               <td> <img v-if="item.thumb && item.thumb.url" :src="item.thumb.url" :alt="item.thumb.title" class="thumbnail-img"/> </td>
               <td>{{ item.title }}</td>
-              <!-- <td>{{ item.creator.fullName }}</td> -->
               <td>{{ item.tags.map(tag => tag.title).join(', ') }}</td>
               <td>
                 <span :class="['status-badge', item.status]">
@@ -106,7 +110,7 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="updateContent(item)">
+                <button class="btn btn-approve" @click="editBlog(item)">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-reject" @click="prepareDelete(item, 'blogs')">
@@ -117,12 +121,17 @@
           </tbody>
         </table>
       </div>
+      </div>
 
       <!-- Tab roadmaps -->
       <div v-if="currentTab === 'roadmaps'" class="tab-content">
+        <div v-if="!isEditingRoadmap">
         <div class="content-header">
           <h2>Roadmaps</h2>
         </div>
+        <router-link to="/roadmaps/create">
+        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Roadmap</button>
+      </router-link>
         <div class="content-header">
           <select  v-model="sortOption" @change="sortRoadmaps()" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
@@ -146,7 +155,7 @@
               <td>{{ item.introText }}</td>
               <td>{{ item.phases.length }}</td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="updateContent(item)">
+                <button class="btn btn-approve" @click="editRoadmap(item)">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-reject" @click="prepareDelete(item, 'roadmaps')">
@@ -157,12 +166,16 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </div></div>
+    <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog"
+            @blogUpdated="handleBlogUpdated" />
+    <UpdateRoadmap v-if="isEditingRoadmap" :roadmapData="selectedRoadmap"
+            @roadmapUpdated="handleRoadmapUpdated" />
     <DeleteConfirmPopup
-  :message="deleteMessage"
-  :isVisible="showDeletePopup"
-  @confirmDelete="confirmDelete"
-  @update:isVisible="showDeletePopup = $event"
+    :message="deleteMessage"
+    :isVisible="showDeletePopup"
+    @confirmDelete="confirmDelete"
+    @update:isVisible="showDeletePopup = $event"
 />
 
   </template>
@@ -172,20 +185,29 @@
   import { getCourses, deleteCourse } from '@/scripts/api/services/courseService';
   import { getRoadmaps, deleteRoadmap } from '@/scripts/api/services/roadmapService';
   import Pagination from '@/components/Common/Pagination.vue';
+  import UpdateBlog from './UpdateBlog.vue';
+  import UpdateRoadmap from '../Advisor/Manage/UpdateRoadmap.vue';
   import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
   export default {
     emits: ['authenticated', 'addNotification', 'removeNotification'],
-    components: { Pagination, DeleteConfirmPopup },
+    components: { Pagination, DeleteConfirmPopup, UpdateBlog, UpdateRoadmap },
     data() {
       return {
+        blogs: [],
+        isEditingBlog: false,
+        selectedBlog: null,
+        isEditingRoadmap: false,
+        selectedRoadmap: null,
+        isDeletePopupVisible: false,
+        blogToDelete: null,
         sortOption: 'name-asc',
         currentPage: 1,  
         totalPages: 1,   
         pageSize: 20, 
         showDeletePopup: false,
-    selectedItem: null,
-    selectedItemType: '',
-    deleteMessage: ''  ,
+        selectedItem: null,
+        selectedItemType: '',
+        deleteMessage: ''  ,
         searchQuery: {
             courses: '',
             blogs: '',
@@ -203,12 +225,40 @@
       };
     },
 methods: {
-  prepareDelete(item, type) {
+  editBlog(blog) {
+  if (blog) {
+    this.selectedBlog = blog;
+    this.isEditingBlog = true;
+  } else {
+    console.error("Error: blog data is undefined.");
+    this.isEditingBlog = false;
+  }
+}
+,
+editRoadmap(roadmap) {
+  if (roadmap) {
+    this.selectedRoadmap = roadmap;
+    this.isEditingRoadmap = true;
+  } else {
+    console.error("Error: blog data is undefined.");
+    this.isEditingRoadmap = false;
+  }
+},
+    handleBlogUpdated() {
+    this.isEditingBlog = false;
+    this.selectedBlog = null;
+    },
+    handleRoadmapUpdated() {
+    this.isEditingRoadmap = false;
+    this.selectedRoadmap = null;
+    this.fetchRoadmaps();
+    },
+    prepareDelete(item, type) {
     this.selectedItem = item;
     this.selectedItemType = type;
-    this.deleteMessage = `Are you sure you want to delete "${item.title}"?`; // Thiết lập thông điệp
+    this.deleteMessage = `Are you sure you want to delete "${item.title}"?`;
     this.showDeletePopup = true;
-  },
+    },
     changePage(page) {
     if (page >= 1 && page <= this.totalPages) {
         console.log("Changing to page:", page);
@@ -242,7 +292,7 @@ sortRoadmaps() {
     this.roadmaps.sort((a, b) => b.title.localeCompare(a.title));
   }
 },
-  async fetchBlogs() {
+async fetchBlogs() {
   try {
     const response = await getPagedArticles();
     this.blogs = Array.isArray(response.items) ? response.items : [];
@@ -260,31 +310,27 @@ sortRoadmaps() {
 async confirmDelete(confirm) {
     if (confirm) {
       try {
-        // Gọi API để xóa tùy thuộc vào loại item
         switch (this.selectedItemType) {
           case 'courses':
             await deleteCourse(this.selectedItem.id);
             break;
           case 'blogs':
-            await deleteBlog(this.selectedItem.id);
+            await deleteArticle(this.selectedItem.id);
             break;
           case 'roadmaps':
             await deleteRoadmap(this.selectedItem.id);
             break;
         }
         
-        // Cập nhật lại danh sách sau khi xóa
         this.fetchCourses();
         this.fetchBlogs();
         this.fetchRoadmaps();
-
-        alert('Deleted successfully!');
       } catch (error) {
         console.error('Error deleting content:', error);
         alert('Failed to delete the content.');
       }
     }
-    this.showDeletePopup = false;  // Đóng popup
+    this.showDeletePopup = false;
   },
 async fetchRoadmaps() {
   try {
@@ -362,6 +408,7 @@ async fetchCourses() {
   </script>
   
   <style scoped>
+  
   .moderate-users {
     padding: 20px;
   }
@@ -496,7 +543,7 @@ async fetchCourses() {
   }
 
   .thumbnail-img {
-  width: 100px; /* Điều chỉnh kích thước phù hợp */
+  width: 100px;
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -507,11 +554,12 @@ async fetchCourses() {
 .content-table td {
   padding: 12px;
   text-align: left;
-  vertical-align: top; /* Căn chữ lên trên */
+  vertical-align: top;
 }
 
 .content-table tr {
   border-bottom: 1px solid #eee;
 }
+
 
   </style>

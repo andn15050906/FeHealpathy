@@ -1,4 +1,4 @@
-import { get } from "@/scripts/api/apiClients";
+import { get, post, patch, del } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Roadmaps';
 
@@ -7,11 +7,11 @@ export const getRoadmaps = async (queryParams = {}) => {
 };
 
 export const createRoadmap = async (roadmapData) => {
-    return await postForm(`${API_BASE_URL}`, roadmapData);
+    return await post(`${API_BASE_URL}`, roadmapData);
 };
 
 export const updateRoadmap = async (roadmapData) => {
-    return await patchForm(`${API_BASE_URL}`, roadmapData);
+    return await patch(`${API_BASE_URL}`, roadmapData);
 };
 
 export const deleteRoadmap = async (roadmapId) => {
