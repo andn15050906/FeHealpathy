@@ -15,6 +15,7 @@
       </div>
       <div class="user-actions">
         <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+          <img :src="user.avatarUrl" class="user-avatar" alt="User avatar"> //thêm avt vào template
           <span>Hi, {{ user.userName }}</span>
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
@@ -79,8 +80,10 @@ export default {
       isLoggedIn: false,
       user: {
         userName: '',
-        role: ''
+        role: '',
+        avatarUrl: ''
       },
+      //cập nhật data vào methods
       // notifications: [],
       // showNotifications: false,
       showProfileMenu: false
@@ -110,6 +113,7 @@ export default {
           this.user = {
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
+            avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
           };
         }
         console.log("User role:", this.user.role);
@@ -135,7 +139,7 @@ export default {
         await signOut();
 				this.$emit('authenticated', false);
         this.isLoggedIn = false;
-        this.user = { name: '', role: '' };
+        this.user = { name: '', role: '', avatarUrl: '' };
         this.$router.push({ name: 'signIn' });
       } catch (error) {
         console.error('Error signing out:', error);
@@ -296,10 +300,10 @@ ul {
   border-bottom: 1px solid #ccc;
   margin: 5px 0;
 }
-
 .login-btn {
   display: flex;
   align-items: center;
+  gap: 10px; 
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -331,6 +335,13 @@ ul {
 .hovered-link:hover {
   opacity: 1;
   color: #3db83b;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 @media (max-width: 768px) {

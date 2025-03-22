@@ -51,7 +51,7 @@ export const getAllMinUsers = async () => {
   }
 };
 
-export const getUserAvatar = async (resourceId) => {
+export const getUserAvatar = async (resourceId) => { //lấy avt của user
   try {
     const response = await apiClient.get(`/Users/avatar/${resourceId}`, {
       responseType: "blob",
@@ -63,7 +63,7 @@ export const getUserAvatar = async (resourceId) => {
   }
 };
 
-export const updateUserProfile = async (formData) => {
+export const updateUserProfile = async (formData) => { //cập nhật thông tin user
   try {
     const response = await apiClient.put(`/Users`, formData, {
       headers: {
