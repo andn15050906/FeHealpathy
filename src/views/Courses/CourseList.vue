@@ -42,6 +42,7 @@ const courses = ref([]); // Danh sách tất cả các khóa học
 const currentPage = ref(1); // Trang hiện tại
 const filters = ref([]); // Danh sách các bộ lọc có sẵn
 const currentFilter = ref('all'); // Bộ lọc hiện tại đang được áp dụng
+const totalPages = ref(0);
 
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
 
@@ -75,11 +76,6 @@ const filteredcourses = computed(() => {
   return result;
 });
 
-// Tính tổng số trang dựa trên số lượng khóa học đã được lọc
-const totalPages = computed(() => {
-  return Math.ceil(filteredcourses.value.length / itemsPerPage);
-});
-
 // Lấy danh sách khóa học cho trang hiện tại
 const paginatedCourses = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
@@ -108,6 +104,7 @@ onMounted(async () => {
     // Lấy danh sách khóa học từ API
     const courseResponse = await getCourses();
     courses.value = courseResponse?.items?.map(course => ({ ...course })) || [];
+    totalPages.value = Math.ceil(courseResponse.totalCount / itemsPerPage);
     
     // Lấy danh sách tags từ API
     const tagResponse = await getPagedTags();
