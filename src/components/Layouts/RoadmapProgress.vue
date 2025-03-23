@@ -4,7 +4,9 @@
             :subtitle="step.subtitle" :title="step.title" :value="index + 1" :hide-actions="true"
             :class="step.value < currentPhaseIndex ? 'completed-step' : step.value == currentPhaseIndex ? 'current-step' : 'locked-step'">
             {{ step.content }}
-            <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference)">{{ text.FollowStep }}</v-btn>
+            <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference, index == steps.length)">
+                {{ index == steps.length ? text.FollowStep : text.NewRoadmap }}
+            </v-btn>
             <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
     </v-stepper-vertical>
@@ -28,6 +30,7 @@ const isFollowBtnGlowing = ref(false);
 const steps = ref([]);
 const text = {
     FollowStep: "Follow step",
+    NewRoadmap: 'Start a new journey',
     SetUpFirst: "You have no roadmap, please set up a roadmap first."
 }
 
@@ -41,8 +44,8 @@ watch(useRoute(), () => {
     isFollowBtnGlowing.value = router.currentRoute.value.path == '/';
 });
 
-function goTo(reference) {
-    router.push({ path: reference })
+function goTo(reference, isNewRoadmap) {
+    router.push({ path: isNewRoadmap ? reference : 'Setting-up' })
 }
 
 /*function goToNextStep(index) {

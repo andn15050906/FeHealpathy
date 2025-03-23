@@ -12,8 +12,8 @@
 </template>
 
 <script>
-//import { inject } from 'vue';
 import "vue3-tour/dist/vue3-tour.css";
+import Confetti from "vue-confetti/src/confetti.js";
 import Roadmap from "@/components/RoadmapComponents/Roadmap.vue";
 import GlowingButton from "@/components/Common/GlowingButton.vue";
 import { inject } from "vue";
@@ -54,7 +54,8 @@ export default {
                 }
             },
             roadmap: roadmaps["mental-roadmap"],
-            roadmapProgress: inject('roadmapProgress')
+            roadmapProgress: inject('roadmapProgress'),
+            confetti: new Confetti()
             //guider: inject('guider')
         }
     },
@@ -74,7 +75,6 @@ export default {
                 return;
 
             let personalRoadmap = await this.roadmapProgress.getPersonalRoadmap();
-            let currentPhaseIndex = personalRoadmap.currentPhase.index;
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',
@@ -87,13 +87,17 @@ export default {
                 }) ?? [],
                 timelineItems: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
-                        color: index < currentPhaseIndex ? '#0056b3' : index == currentPhaseIndex ? '#28a745' : '#6c757d',
+                        color: (!personalRoadmap.currentPhase || index < personalRoadmap.currentPhase.index) ? '#0056b3' : index == personalRoadmap.currentPhase.index ? '#28a745' : '#6c757d',
                         icon: index == 0 ? 'mdi-account-heart': index == 1 ? 'mdi-bullseye' : index == 2 ? 'mdi-clock-outline' : index == 3 ? 'mdi-emoticon-happy' : 'mdi-rocket-launch',
                         title: _.title,
                         content: _.description,
                         link: '/progress'
                     }
                 }) ?? []
+            }
+            if (personalRoadmap.isCompleted) {
+                this.confetti.start();
+                setTimeout(() => this.confetti.stop(), 5000);
             }
         }
     }
