@@ -204,11 +204,6 @@ export default {
         lectures: []
       },
       previewImage: null,
-      availableCategories: [
-        { id: "1", name: "Yoga" },
-        { id: "2", name: "Meditation" },
-        { id: "3", name: "Health & Wellness" }
-      ],
       showSavePopup: false
     };
   },
