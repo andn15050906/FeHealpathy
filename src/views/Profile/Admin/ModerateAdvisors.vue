@@ -19,7 +19,9 @@
         <div class="content-header">
           <h2>Your Courses</h2>
         </div>
-        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Course</button>
+        <router-link to="/courses/create">
+          <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Course</button>
+        </router-link>
         <div class="content-header">
           <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
