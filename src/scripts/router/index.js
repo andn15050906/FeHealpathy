@@ -67,6 +67,7 @@ import CreateYogaLesson from '@/views/Profile/Admin/CreateYoga.vue'
 
 import ViewAdvisor from '@/views/Profile/Advisor/ViewAdvisor.vue'
 import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
+import ScheduleMeeting from '@/views/Meetings/ScheduleMeeting.vue'
 import Payment from '@/views/Profile/Advisor/Payment.vue'
 import CreateBlog from '@/views/Profile/Advisor/Manage/CreateBlog.vue'
 import ManageBlog from '@/views/Profile/Advisor/Manage/ManageBlog.vue'
@@ -151,6 +152,12 @@ const router = createRouter({
       name: 'editAdvisor',
       component: EditAdvisor,
       meta: { requiresAuth: true, requiresAdvisor: true }
+    },
+    {
+      path: '/meetings/schedule',
+      name: 'ScheduleMeeting',
+      component: ScheduleMeeting,
+      //meta: {requiresAuth: true,title: 'Đặt lịch họp'}
     },
     {
       path: '/profile/:id',
@@ -559,3 +566,7 @@ const isAuthorized = (to) => {
 }
 
 export default router;
+
+
+
+
