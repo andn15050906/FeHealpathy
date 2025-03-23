@@ -136,7 +136,7 @@
                 </label>
                 <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
                   accept="image/*,video/*,application/pdf" multiple />
-                <div v-if="lecture.medias.length > 0" class="mt-2">
+                  <div v-if="lecture.medias && lecture.medias.length > 0" class="mt-2">
                   <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
                     class="d-flex align-items-center mb-2 p-2 border rounded">
                     <template v-if="media.type === 'image'">
@@ -186,6 +186,7 @@
 <script>
 import SaveConfirmPopUp from '../../../../components/Common/Popup/SaveConfirmPopUp.vue';
 import { getCourseById, updateCourse } from "@/scripts/api/services/courseService";
+import { getLectures } from "@/scripts/api/services/lectureService";
 
 export default {
   name: "UpdateCourse",
@@ -213,37 +214,46 @@ export default {
   },
   methods: {
     async fetchCourse() {
-      const courseId = this.$route.params.id;
-      try {
-        const data = await getCourseById(courseId);
-        this.course = {
-          ...data,
-          thumb: {
-            url: data.thumbUrl || '',
-            file: null,
-            title: ''
-          },
-          addedMedias: data.addedMedias || []
-        };
-        this.course.discountExpiry = data.discountExpiry.split('T')[0];
-        this.previewImage = data.thumbUrl || '';
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching course details:', error);
-      }
-    },
-    addLecture() {
-  if (!Array.isArray(this.course.lectures)) {
+  const courseId = this.$route.params.id;
+  try {
+    const [courseData, lectureResponse] = await Promise.all([
+      getCourseById(courseId),
+      getLectures({ courseId: courseId })
+    ]);
+
+    this.course = {
+      ...courseData,
+      thumb: {
+        url: courseData.thumbUrl || '',
+        file: null,
+        title: ''
+      },
+      lectures: lectureResponse.items.map(lecture => ({
+        title: lecture.title,
+        content: lecture.content,
+        contentSummary: lecture.contentSummary,
+        isPreviewable: lecture.isPreviewable,
+        medias: lecture.materials,
+        id: lecture.id,
+      }))
+    };
+    this.previewImage = courseData.thumbUrl || '';
+  } catch (error) {
+    console.error('Error fetching course details or lectures:', error);
     this.course.lectures = [];
   }
-  this.course.lectures.push({
-    title: "",
-    content: "",
-    contentSummary: "",
-    isPreviewable: false,
-    medias: []
-  });
-},
+}
+
+,
+    addLecture() {
+      this.course.lectures.push({
+        title: "",
+        content: "",
+        contentSummary: "",
+        isPreviewable: false,
+        medias: []
+      });
+    },
     removeLecture(index) {
       this.course.lectures.splice(index, 1);
     },
@@ -313,6 +323,7 @@ export default {
   },
 };
 </script>
+
 
 
 
