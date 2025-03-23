@@ -54,7 +54,7 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="approveContent(item)">
+                <button class="btn btn-approve" @click="editCourse(item.id)">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-reject" @click="rejectContent(item)">
@@ -200,6 +200,10 @@
       };
     },
 methods: {
+  editCourse(id) {
+  this.$router.push({ name: 'updateCourse', params: { id } }); // Đảm bảo tên và tham số phù hợp
+}
+,
     changePage(page) {
     if (page >= 1 && page <= this.totalPages) {
         console.log("Changing to page:", page);

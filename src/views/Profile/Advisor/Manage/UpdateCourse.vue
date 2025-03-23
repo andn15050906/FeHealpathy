@@ -111,7 +111,7 @@
             <div class="mb-3">
               <input type="file" @change="handleMediaUpload" class="form-control" accept="image/*,video/*" multiple />
             </div>
-            <div v-if="course.addedMedias.length > 0" class="row g-3">
+            <div v-if="course.addedMedias && course.addedMedias.length > 0" class="row g-3">
               <div v-for="(media, index) in course.addedMedias" :key="index"
                 class="col-md-4 text-center position-relative">
                 <template v-if="media.type === 'image'">
@@ -139,26 +139,27 @@
 </template>
 
 <script>
+import { getCourseById, updateCourse } from "@/scripts/api/services/courseService";
+
 export default {
   name: "UpdateCourse",
   data() {
     return {
       course: {
-        id: "1234-abcd",
-        title: "Advanced Meditation",
-        intro: "Deepen your meditation practice with advanced techniques.",
+        id: "",
+        title: "",
+        intro: "",
         description: "",
-        thumb: { url: "", file: null, title: "Course Thumbnail" },
-        price: 500000,
-        discount: 10,
-        discountExpiry: "",
-        level: "Intermediate",
-        status: "Ongoing",
+        thumb: { url: "", file: null, title: "" },
+        leafCategoryId: "",
+        price: 0,
+        level: "",
+        status: "",
         outcomes: "",
         requirements: "",
-        leafCategoryId: "",
+        discount: 0,
+        discountExpiry: "",
         addedMedias: [],
-        removedMedias: [],
       },
       previewImage: null,
       availableCategories: [
@@ -166,9 +167,21 @@ export default {
         { id: "2", name: "Mental Health" },
         { id: "3", name: "Meditation" },
       ],
+      isSubmitting: false,
     };
   },
   methods: {
+    async fetchCourse() {
+      const courseId = this.$route.params.id;
+      try {
+        const data = await getCourseById(courseId);
+        this.course = { ...data, thumb: data.thumb || { url: '', file: null, title: '' } };
+        this.course = { ...data, addedMedias: data.addedMedias || [] };
+        this.previewImage = data.thumb?.url; // Use optional chaining
+      } catch (error) {
+        console.error('Error fetching course details:', error);
+      }
+    },
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -198,20 +211,35 @@ export default {
     removeMedia(index) {
       this.course.addedMedias.splice(index, 1);
     },
-    updateCourse() {
-      if (!this.course.title) {
-        return;
+    validateCourse() {
+      if (!this.course.title || this.course.price <= 0 || !this.course.leafCategoryId) {
+        alert("Please fill out all required fields correctly.");
+        return false;
       }
-      if (!this.course.leafCategoryId) {
-        return;
-      }
-      if (this.course.price <= 0) {
-        return;
+      return true;
+    },
+    async updateCourse() {
+      if (this.validateCourse()) {
+        this.isSubmitting = true;
+        try {
+          const response = await updateCourse(this.course);
+          console.log('Course updated successfully:', response);
+          this.$router.push('/courses'); // Redirect or show success message
+        } catch (error) {
+          console.error('Failed to update course:', error);
+        } finally {
+          this.isSubmitting = false;
+        }
       }
     },
   },
+  mounted() {
+    this.fetchCourse();
+  },
 };
 </script>
+
+
 
 <style scoped>
 body {
