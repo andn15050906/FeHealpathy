@@ -15,6 +15,16 @@ export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   }
 };
 
+export const getCourseById = async (courseId) => {
+  try {
+    const response = await apiClient.get(`${API_BASE_URL}/${courseId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching course with ID ${courseId}:`, error);
+    throw error;
+  }
+};
+
 export const getCourseDetail = async (courseId) => {
   try {
     const response = await apiClient.get(`/courses/${courseId}`);

@@ -1,18 +1,17 @@
 <template>
-    <v-dialog v-model="localVisible" persistent max-width="400px" class="update-confirm-popup">
+    <v-dialog v-model="localVisible" persistent max-width="400px" class="save-confirm-popup" :scrim="false">
         <v-card>
             <v-card-title class="d-flex align-center title-section">
-                <i class="fas fa-info-circle text-primary mr-2"></i>
-                <span class="title">Confirm Update</span>
+                <i class="fas fa-save text-primary mr-2"></i>
+                <span class="title">Confirm Save</span>
             </v-card-title>
             <v-card-text class="d-flex align-center text-section">
                 <span>{{ message }}</span>
             </v-card-text>
-
             <v-card-actions class="justify-end action-section">
                 <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Cancel</v-btn>
-                <v-btn color="blue darken-1" class="update-btn" @click="handleClick(true)">
-                    <span class="update-text">Update</span>
+                <v-btn color="blue darken-1" class="save-btn" @click="handleClick(true)">
+                    <span class="save-text">Save</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -30,14 +29,10 @@ const props = defineProps({
     isVisible: {
         type: Boolean,
         required: true,
-    },
-    url: {
-        type: String,
-        required: true,
-    },
+    }
 });
 
-const emit = defineEmits(["confirmUpdate", "update:isVisible"]);
+const emit = defineEmits(["confirmSave", "update:isVisible"]);
 
 const localVisible = ref(props.isVisible);
 
@@ -49,7 +44,7 @@ watch(
 );
 
 function handleClick(confirm) {
-    emit("confirmUpdate", confirm);
+    emit("confirmSave", confirm);
     emit("update:isVisible", false);
 }
 </script>
@@ -96,30 +91,26 @@ function handleClick(confirm) {
     background-color: #f5f5f5;
 }
 
-.update-btn {
-    background-color: #1976D2;
+.save-btn {
+    background-color: #1976d2;
     color: white;
     font-weight: bold;
     position: relative;
     overflow: hidden;
 }
 
-.update-btn:hover {
-    background-color: #1565C0;
+.save-btn:hover {
+    background-color: #1565c0;
 }
 
-.update-btn .update-text {
+.save-btn .save-text {
     text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
     font-weight: 600;
     color: white;
 }
 
-.fas.fa-info-circle {
+.fas.fa-save {
     font-size: 24px;
-    color: #1976D2;
-}
-
-.text-primary {
-    color: #1976D2 !important;
+    color: #1976d2;
 }
 </style>

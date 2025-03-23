@@ -7,11 +7,11 @@
             <v-card-text>
                 <p>{{ roadmap.introText }}</p>
                 <v-tabs v-model="activeTab">
-                    <v-tab v-for="phase in roadmap.phases" :key="phase.id" :value="phase.id">
+                    <v-tab v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :value="phase.id">
                         {{ phase.title }}
                     </v-tab>
                 </v-tabs>
-                <div v-for="phase in roadmap.phases" :key="phase.id" :ref="'phase-' + phase.id">
+                <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
                 <!--<v-tabs-items v-model="activeTab">
                     <v-tab-item v-for="phase in roadmap.phases" :key="phase.id">-->
                         <v-card>

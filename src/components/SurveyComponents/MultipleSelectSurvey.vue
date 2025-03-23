@@ -12,8 +12,10 @@
             </div>
         </div>
         <div class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
-            <GlowingButton primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100"
-                @click="submitSelection">{{ submit }}</GlowingButton>
+            <GlowingButton @click="submitSelection"
+                primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ text.submit }}</GlowingButton>
+            <GlowingButton v-if="options.switchCallback" @click="options.switchCallback"
+                primaryColor="#bdc3c7" secondaryColor="#2c3e50" padding="4px 8px" class="w-100">{{ text.skipForNow }}</GlowingButton>
         </div>
     </div>
 </template>
@@ -32,7 +34,14 @@ export default {
     data() {
         return {
             selectedOptions: [],
-            submit: 'Submit'
+            text: {
+                result: "Kết Quả Test",
+                score: "Điểm của bạn:",
+                currentQuestion: "Câu hỏi",
+                submit: "Gửi kết quả",
+                next: "Câu kế tiếp",
+                skipForNow: "Bỏ qua"
+            }
         };
     },
     methods: {

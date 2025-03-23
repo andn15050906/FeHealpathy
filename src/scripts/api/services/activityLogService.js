@@ -19,11 +19,6 @@ export const logQuestionOfTheDay = async (question, answer) => {
   });
 }
 
-
-
-
-
-
 // Enums for events
 export const getDisplayName = (trackedEvent) => {
   return TRACKED_EVENTS[trackedEvent].displayName;
@@ -66,3 +61,42 @@ export const TRACKED_EVENTS = Object.freeze({
   CourseReview_Created: { value: 28, label: 'CourseReview_Created', displayName: 'Đánh giá về khóa học' },
   LectureComment_Created: { value: 29, label: 'LectureComment_Created', displayName: 'Bình luận về bài giảng' }
 });
+
+export const getLinkByEvent = (eventName) => {
+    const event = TRACKED_EVENTS[eventName];
+    if (event) {
+        switch (eventName) {
+            case 'Mood_Updated':
+                return '/mood-cart'; 
+            case 'Course_Completed':
+                return '/courses'; 
+            case 'Conversation_Joined':
+                return '/community'; 
+            case 'Yoga_Practiced':
+                return '/yoga'; 
+            case 'Media_Viewed':
+                return '/media-resources'; 
+            case 'Submission_Created':
+                return '/self-assessment'; 
+            case 'Routine_Created':
+                return '/habit-tracking'; 
+            case 'DiaryNote_Created':
+                return '/diary/diary-writing'; 
+            case 'Article_Created':
+                return '/blogs/create'; 
+            case 'Conversation_Created':
+                return '/community'; 
+            case 'ChatMessage_Created':
+                return '/chat'; 
+            case 'MessageReaction_Created':
+                return '/chat'; 
+            case 'Meeting_Created':
+                return '/meetings'; 
+            case 'Meeting_Joined':
+                return '/meetings'; 
+            default:
+                return '#'; 
+        }
+    }
+    return '#'; 
+};

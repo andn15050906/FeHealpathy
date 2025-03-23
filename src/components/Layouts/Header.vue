@@ -14,8 +14,9 @@
         </ul>
       </div>
       <div class="user-actions">
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
+          <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
             <hr class="menu-divider" />
@@ -79,8 +80,10 @@ export default {
       isLoggedIn: false,
       user: {
         userName: '',
-        role: ''
+        role: '',
+        avatarUrl: ''
       },
+      //cập nhật data vào methods
       // notifications: [],
       // showNotifications: false,
       showProfileMenu: false
@@ -110,6 +113,7 @@ export default {
           this.user = {
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
+            avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
           };
         }
         console.log("User role:", this.user.role);
@@ -135,7 +139,7 @@ export default {
         await signOut();
 				this.$emit('authenticated', false);
         this.isLoggedIn = false;
-        this.user = { name: '', role: '' };
+        this.user = { name: '', role: '', avatarUrl: '' };
         this.$router.push({ name: 'signIn' });
       } catch (error) {
         console.error('Error signing out:', error);
@@ -144,7 +148,7 @@ export default {
 
     handleClickOutside(event) {
       const dropdown = this.$el.querySelector('.dropdown-menu');
-      const profileMenu = this.$el.querySelector('.profile');
+      const profileMenu = this.$el.querySelector('.profile-menu');
 
       if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
         this.showProfileMenu = false;
@@ -242,7 +246,7 @@ ul {
 }
 
 .notification,
-.profile {
+.profile-menu {
   position: relative;
   margin-left: 10px;
   cursor: pointer;
@@ -258,7 +262,8 @@ ul {
   z-index: 1000;
   display: block;
   width: max-content;
-  left: -15px;
+  left: 0;
+  width: 100%;
 }
 
 .dropdown-menu li {
@@ -296,16 +301,16 @@ ul {
   border-bottom: 1px solid #ccc;
   margin: 5px 0;
 }
-
 .login-btn {
   display: flex;
   align-items: center;
+  gap: 10px; 
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   border-radius: 20px;
   background-color: #f3ef51;
-  padding: 5px 20px;
+  padding: 5px 15px 5px 20px;
   transition: background-color 0.3s;
 }
 
@@ -331,6 +336,14 @@ ul {
 .hovered-link:hover {
   opacity: 1;
   color: #3db83b;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {
