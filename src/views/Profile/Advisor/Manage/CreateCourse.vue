@@ -43,7 +43,7 @@
               <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
             </div>
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="category" class="form-label">
               <i class="fas fa-folder-open me-1 bold-icon"></i>
               <span class="bold-text">Course Category</span>
@@ -54,7 +54,8 @@
                 {{ category.name }}
               </option>
             </select>
-          </div>
+          </div> -->
+
           <div class="mb-3">
             <label for="price" class="form-label">
               <i class="fas fa-dollar-sign me-1 bold-icon"></i>
@@ -70,9 +71,9 @@
             </label>
             <select id="level" v-model="course.level" required class="form-select">
               <option value="" disabled>Select level</option>
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
+              <option value="1">Beginner</option>
+              <option value="2">Intermediate</option>
+              <option value="3">Advanced</option>
             </select>
           </div>
           <div class="mb-3">
@@ -110,6 +111,14 @@
                   <span class="bold-text">Lecture Content</span>
                 </label>
                 <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content" rows="4"
+                  required></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-align-left me-1 bold-icon"></i>
+                  <span class="bold-text">Content Summary</span>
+                </label>
+                <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture content" rows="4"
                   required></textarea>
               </div>
               <div class="form-check form-switch mb-3">
@@ -176,6 +185,7 @@
 
 <script>
 import SaveConfirmPopUp from '../../../../components/Common/Popup/SaveConfirmPopUp.vue';
+import { createCourse } from '@/scripts/api/services/courseService';
 export default {
   name: "CreateCourse",
   components: { SaveConfirmPopUp },
@@ -186,26 +196,21 @@ export default {
         intro: "",
         description: "",
         price: 0,
-        level: "",
+        level: 0,
         outcomes: "",
         requirements: "",
         thumb: { url: "", file: null, title: "" },
-        leafCategoryId: "",
+        leafCategoryId: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
         lectures: []
       },
       previewImage: null,
-      availableCategories: [
-        { id: "1", name: "Yoga" },
-        { id: "2", name: "Meditation" },
-        { id: "3", name: "Health & Wellness" }
-      ],
       showSavePopup: false
     };
   },
   methods: {
     handleImageUpload(event) {
       const file = event.target.files[0];
-      if (file) {
+      if (file) { 
         this.course.thumb.file = file;
         this.course.thumb.title = file.name;
         const reader = new FileReader();
@@ -240,6 +245,7 @@ export default {
       this.course.lectures.push({
         title: "",
         content: "",
+        contentSummary:"",
         isPreviewable: false,
         medias: []
       });
@@ -253,19 +259,55 @@ export default {
     openSavePopup() {
       this.showSavePopup = true;
     },
-    handleSave(confirm) {
-      if (confirm) {
-        console.log("Submitting course:", this.course);
-        this.resetForm();
+
+async handleSave(confirm) {
+  if (confirm) {
+    try {
+      const formData = new FormData();
+      formData.append('title', this.course.title);
+      formData.append('intro', this.course.intro);
+      formData.append('description', this.course.description);
+      formData.append('price', this.course.price);
+      formData.append('level', this.course.level);
+      formData.append('outcomes', this.course.outcomes);
+      formData.append('requirements', this.course.requirements);
+      formData.append('leafCategoryId', this.course.leafCategoryId);
+
+      if (this.course.thumb.file) {
+        formData.append('thumb', this.course.thumb.file, this.course.thumb.title);
       }
-    },
+
+      this.course.lectures.forEach((lecture, index) => {
+        formData.append(`lectures[${index}][title]`, lecture.title);
+        formData.append(`lectures[${index}][content]`, lecture.content);
+        formData.append(`lectures[${index}][contentSummary]`, lecture.contentSummary);
+        formData.append(`lectures[${index}][isPreviewable]`, lecture.isPreviewable);
+        lecture.medias.forEach((media, mediaIndex) => {
+          formData.append(`lectures[${index}][medias][${mediaIndex}][file]`, media.file, media.title);
+        });
+      });
+
+      for (let key of formData.keys()) {
+        console.log(`${key}:`, formData.getAll(key));
+      }
+
+      const response = await createCourse(formData);
+      console.log('Course created successfully:', response);
+      this.resetForm();
+    } catch (error) {
+      console.error('Failed to create course:', error);
+    }
+  }
+}
+
+,
     resetForm() {
       this.course = {
         title: "",
         intro: "",
         description: "",
         price: 0,
-        level: "",
+        level: 0,
         outcomes: "",
         requirements: "",
         thumb: { url: "", file: null, title: "" },
