@@ -12,8 +12,11 @@ export const getRoadmaps = async () => {
 
 
 export const getCurrentRoadmapWithProgress = async () => {
-  let roadmap = (await getRoadmaps()).items.find(_ => _.id == getUserProfile().roadmapId);
-  let phasesProgress = await getProgress();
+  let roadmapPromise = getRoadmaps();
+  let progressPromise = getProgress();
+  await Promise.all([roadmapPromise, progressPromise]);
+  let roadmap = (await roadmapPromise).items.find(_ => _.id == getUserProfile().roadmapId);
+  let phasesProgress = await progressPromise;
   let completedMilestones = [];
   for (let phaseProgress of phasesProgress) {
     completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
@@ -34,7 +37,9 @@ export const getCurrentRoadmapWithProgress = async () => {
     if (!isPhaseCompleted && !roadmap.currentPhase)
       roadmap.currentPhase = phase;
   }
+  if (!roadmap.currentPhase)
+    roadmap.isCompleted = true;
   
-  //roadmap.currentPhase = roadmap.phases[2];
+  //console.log(roadmap);
   return roadmap;
 }

@@ -1,10 +1,10 @@
 <template>
     <v-stepper-vertical v-if="steps.length" v-model="currentPhaseIndex">
-        <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value > currentPhaseIndex"
-            :subtitle="step.subtitle" :title="step.title" :value="step.value"
-            :hide-actions="true">
+        <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value < currentPhaseIndex"
+            :subtitle="step.subtitle" :title="step.title" :value="index + 1" :hide-actions="true"
+            :class="step.value < currentPhaseIndex ? 'completed-step' : step.value == currentPhaseIndex ? 'current-step' : 'locked-step'">
             {{ step.content }}
-            <v-btn @click="goTo(step.reference)">{{ text.FollowStep }}</v-btn>
+            <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference)">{{ text.FollowStep }}</v-btn>
             <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
     </v-stepper-vertical>
@@ -17,13 +17,14 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch, onBeforeMount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 const router = useRouter();
 const personalRoadmap = ref({});
-const currentPhaseIndex = ref(0);
+const currentPhaseIndex = ref(1);
+const isFollowBtnGlowing = ref(false);
 const steps = ref([]);
 const text = {
     FollowStep: "Follow step",
@@ -32,7 +33,13 @@ const text = {
 
 onBeforeMount(async () => {
     await fetchPersonalRoadmap();
+    if (router.currentRoute.value.path == '/')
+        isFollowBtnGlowing.value = true;
 })
+
+watch(useRoute(), () => {
+    isFollowBtnGlowing.value = router.currentRoute.value.path == '/';
+});
 
 function goTo(reference) {
     router.push({ path: reference })
@@ -57,14 +64,22 @@ function goToStep(index) {
 async function fetchPersonalRoadmap() {
     personalRoadmap.value = await getCurrentRoadmapWithProgress();
     steps.value = personalRoadmap.value.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
-        if (personalRoadmap.value.currentPhase.id == _.id)
-            currentPhaseIndex.value = index;
+        if (personalRoadmap.value.currentPhase?.id == _.id)
+            currentPhaseIndex.value = index + 1;
         return {
-            value: `${index}`,
+            value: `${index + 1}`,
             title: _.title,
             reference: getReference(_)
         }
     });
+    steps.value.push({
+        value: `${personalRoadmap.value.phases.length + 1}`,
+        title: 'End of roadmap',
+        reference: getReference()
+    })
+
+    if (personalRoadmap.value.isCompleted)
+        currentPhaseIndex.value = personalRoadmap.value.phases.length + 1;
     goToStep(currentPhaseIndex.value);
 }
 
@@ -93,8 +108,11 @@ defineExpose({ getPersonalRoadmap, fetchPersonalRoadmap })
     display: unset;
     z-index: unset;
 }
+.v-expansion-panels {
+    background-color: #ffffff;
+}
 .v-expansion-panel {
-    border-radius: 0;
+    background-color: unset;
 }
 .v-expansion-panel-title {
     overflow: hidden;
@@ -108,5 +126,32 @@ defineExpose({ getPersonalRoadmap, fetchPersonalRoadmap })
 .sidebar-title {
     text-wrap: auto;
     padding: 4px;
+}
+.completed-step {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+}
+.current-step {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+.glowing-btn {
+    animation: glow 1.5s infinite alternate, scale 1.5s infinite alternate;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(0, 123, 255, 1);
+    }
+}
+
+@keyframes scale {
+    0% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 </style>

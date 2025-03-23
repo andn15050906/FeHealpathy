@@ -88,25 +88,32 @@ export default {
         for (let phase of tempRoadmap.phases) {
             let completedCount = 0;
             phase.totalMilestones = phase.milestones.length;
-            
+
             for (let milestone of phase.milestones) {
-                if (phase.index < tempRoadmap.currentPhase.index) {
+                if (tempRoadmap.isCompleted) {
                     milestone.status = 'completed';
                     milestone.progress = 'Completed';
                     completedCount++;
                 }
-                else if (phase.index > tempRoadmap.currentPhase.index) {
-                    milestone.status = 'locked';
-                    milestone.progress = 'Not Started';
-                }
-                else {
-                    if (completedMilestones.includes(milestone.id)) {
+                else if (tempRoadmap.currentPhase) {
+                    if (phase.index < tempRoadmap.currentPhase.index) {
                         milestone.status = 'completed';
                         milestone.progress = 'Completed';
                         completedCount++;
-                    } else {
-                        milestone.status = 'current';
-                        milestone.progress = 'In Progress';
+                    }
+                    else if (phase.index > tempRoadmap.currentPhase.index) {
+                        milestone.status = 'locked';
+                        milestone.progress = 'Not Started';
+                    }
+                    else {
+                        if (completedMilestones.includes(milestone.id)) {
+                            milestone.status = 'completed';
+                            milestone.progress = 'Completed';
+                            completedCount++;
+                        } else {
+                            milestone.status = 'current';
+                            milestone.progress = 'In Progress';
+                        }
                     }
                 }
             }
@@ -114,7 +121,7 @@ export default {
             // Xác định trạng thái của phase
             this.phasesStatus[phase.id] = {
                 completed: completedCount === phase.totalMilestones,
-                inProgress: completedCount > 0 && completedCount < phase.totalMilestones,
+                inProgress: phase.id == tempRoadmap.currentPhase?.id,
                 completedCount: completedCount,
                 totalMilestones: phase.totalMilestones
             };
@@ -149,7 +156,6 @@ export default {
     },
     watch: {
         activeTab(newVal) {
-            console.log(newVal);
             this.scrollToPhase(newVal);
         },
     },

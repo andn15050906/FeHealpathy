@@ -71,21 +71,21 @@ export const getLinkByEvent = (eventName) => {
             case 'Course_Completed':
                 return '/courses'; 
             case 'Conversation_Joined':
-                return '/chat'; 
+                return '/community'; 
             case 'Yoga_Practiced':
                 return '/yoga'; 
             case 'Media_Viewed':
                 return '/media-resources'; 
             case 'Submission_Created':
-                return '/surveys'; 
+                return '/self-assessment'; 
             case 'Routine_Created':
-                return '/routine'; 
+                return '/habit-tracking'; 
             case 'DiaryNote_Created':
                 return '/diary/diary-writing'; 
             case 'Article_Created':
                 return '/blogs/create'; 
             case 'Conversation_Created':
-                return '/chat'; 
+                return '/community'; 
             case 'ChatMessage_Created':
                 return '/chat'; 
             case 'MessageReaction_Created':

@@ -14,7 +14,7 @@
         </ul>
       </div>
       <div class="user-actions">
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
@@ -148,7 +148,7 @@ export default {
 
     handleClickOutside(event) {
       const dropdown = this.$el.querySelector('.dropdown-menu');
-      const profileMenu = this.$el.querySelector('.profile');
+      const profileMenu = this.$el.querySelector('.profile-menu');
 
       if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
         this.showProfileMenu = false;
@@ -246,7 +246,7 @@ ul {
 }
 
 .notification,
-.profile {
+.profile-menu {
   position: relative;
   margin-left: 10px;
   cursor: pointer;
@@ -262,7 +262,8 @@ ul {
   z-index: 1000;
   display: block;
   width: max-content;
-  left: -15px;
+  left: 0;
+  width: 100%;
 }
 
 .dropdown-menu li {

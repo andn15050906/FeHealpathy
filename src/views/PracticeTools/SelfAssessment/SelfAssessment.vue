@@ -83,9 +83,7 @@ const currentSurveyOptions = computed(() => new SurveyOptions(
   currentSurvey.value,
   '',
   null,
-  currentSurvey.value.name.includes("DASS-21")
-    ? submitDASS21
-    : submitGAD7,
+  submitCallback,
   false,
   true
 ))
@@ -108,23 +106,11 @@ const submitSurvey = async (survey, questionsWithAnswer) => {
           return new CreateMcqChoiceDto(item.questionId, item.answerId)
       })
   );
-  //return
   return await createSubmission(data);
 }
-const submitDASS21 = async (questionsWithAnswer) => {
-  let survey = surveys.value.find(item => item.name.includes("DASS-21"));
+const submitCallback = async (questionsWithAnswer) => {
   try {
-    var response = await submitSurvey(survey, questionsWithAnswer);
-    router.push({ name: 'SubmissionReview', params: { id: response }});
-  }
-  catch (error) {
-    console.log(error);
-  }
-}
-const submitGAD7 = async (questionsWithAnswer) => {
-  let survey = surveys.value.find(item => item.name.includes("GAD-7"));
-  try {
-    var response = await submitSurvey(survey, questionsWithAnswer);
+    var response = await submitSurvey(currentSurvey.value, questionsWithAnswer);
     router.push({ name: 'SubmissionReview', params: { id: response }});
   }
   catch (error) {

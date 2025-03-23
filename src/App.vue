@@ -150,11 +150,12 @@ main {
 }
 
 .left-sidebar {
-  /*flex: 0.5;*/
   position: fixed;
-  top: 60px;
-  left: 0;
-  width: calc((100vw - 1200px)/2 - 8px);
+  top: 80px;
+  left: 20px;
+  border-radius: 15px;
+  /*width: calc((100vw - 1200px)/2 - 8px);*/
+  width: 320px;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
@@ -179,5 +180,8 @@ footer {
 }
 .v-tab__slider {
     display: none !important;
+}
+.v-expansion-panel__shadow {
+    display: none;
 }
 </style>
