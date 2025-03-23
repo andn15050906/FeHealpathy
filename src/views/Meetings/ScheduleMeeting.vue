@@ -6,34 +6,65 @@
     <div class="meeting-form">
       <div class="form-group">
         <label>Chọn ngày họp:</label>
-        <input type="date" v-model="meetingDate" :min="today" class="form-input" />
+        <input 
+          type="date" 
+          v-model="meetingDate" 
+          :min="today"
+          class="form-input" 
+        />
       </div>
 
       <div class="form-group">
         <label>Chọn giờ bắt đầu:</label>
-        <input type="time" v-model="startTime" class="form-input" />
+        <input 
+          type="time" 
+          v-model="startTime" 
+          class="form-input" 
+        />
+        <small class="form-text" v-if="startTime">
+          {{ new Date(`${meetingDate}T${startTime}`).toLocaleTimeString('vi-VN') }}
+        </small>
       </div>
 
       <div class="form-group">
         <label>Chọn giờ kết thúc:</label>
-        <input type="time" v-model="endTime" class="form-input" />
+        <input 
+          type="time" 
+          v-model="endTime" 
+          class="form-input" 
+        />
+        <small class="form-text" v-if="endTime">
+          {{ new Date(`${meetingDate}T${endTime}`).toLocaleTimeString('vi-VN') }}
+          <span v-if="endTime < startTime">(Ngày hôm sau)</span>
+        </small>
       </div>
 
       <div class="form-group">
         <label>Chọn Advisor:</label>
         <select v-model="selectedAdvisor" class="form-input">
+          <option value="">-- Chọn Advisor --</option>
           <option v-for="advisor in advisors" :key="advisor.id" :value="advisor.id">
-            {{ advisor.fullName }}
+            {{ advisor.fullName }} {{ advisor.email ? `(${advisor.email})` : '' }}
           </option>
         </select>
+        <small v-if="advisors.length === 0" class="form-text text-muted">
+          Đang tải danh sách advisor...
+        </small>
+        <small v-else class="form-text text-muted">
+          Có {{ advisors.length }} advisor
+        </small>
       </div>
 
       <div class="form-group">
         <label>Ghi chú:</label>
-        <textarea v-model="notes" class="form-input" rows="3"></textarea>
+        <textarea v-model="notes" class="form-input" rows="3" placeholder="Nhập ghi chú cho cuộc họp..."></textarea>
       </div>
 
-      <button @click="scheduleMeeting" class="btn btn-primary" :disabled="isLoading">
+      <div class="form-error" v-if="!isValidTime && startTime && endTime">
+        Thời gian kết thúc phải sau thời gian bắt đầu
+      </div>
+
+      <button @click="scheduleMeeting" class="btn btn-primary" :disabled="isLoading || !isValidTime">
         {{ isLoading ? 'Đang xử lý...' : 'Đặt lịch họp' }}
       </button>
     </div>
@@ -51,9 +82,12 @@
             <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
           </div>
           <div class="meeting-details">
-            <p><i class="fas fa-calendar"></i> {{ formatDate(meeting.date) }}</p>
-            <p><i class="fas fa-clock"></i> {{ meeting.startTime }} - {{ meeting.endTime }}</p>
-            <p v-if="meeting.notes"><i class="fas fa-sticky-note"></i> {{ meeting.notes }}</p>
+            <p><i class="fas fa-calendar"></i> {{ formatDate(meeting.startAfter) }}</p>
+            <p><i class="fas fa-clock"></i> 
+              {{ new Date(meeting.startAfter).toLocaleTimeString('vi-VN') }} - 
+              {{ new Date(meeting.endAfter).toLocaleTimeString('vi-VN') }}
+            </p>
+            <p v-if="meeting.description"><i class="fas fa-sticky-note"></i> {{ meeting.description }}</p>
           </div>
           <div class="meeting-actions">
             <button v-if="meeting.status === 'pending'" 
@@ -74,7 +108,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { createMeeting, getMeetings, deleteMeeting, joinMeeting as joinMeetingApi } from '@/scripts/api/services/meetingService';
 import { getUsers } from '@/scripts/api/services/userService';
 import { toast } from 'vue3-toastify';
@@ -90,12 +124,42 @@ const meetings = ref([]);
 const advisors = ref([]);
 const today = new Date().toISOString().split('T')[0];
 
+// Validate thời gian
+const isValidTime = computed(() => {
+  if (!startTime.value || !endTime.value || !meetingDate.value) return true;
+
+  const startDateTime = new Date(`${meetingDate.value}T${startTime.value}`);
+  const endDateTime = new Date(`${meetingDate.value}T${endTime.value}`);
+
+  // Nếu giờ kết thúc < giờ bắt đầu, tự động đẩy sang ngày hôm sau
+  if (endDateTime < startDateTime) {
+    endDateTime.setDate(endDateTime.getDate() + 1);
+  }
+
+  return startDateTime < endDateTime;
+});
+
 // Lấy danh sách advisors khi component được mount
 onMounted(async () => {
   try {
-    const response = await getUsers({ role: 'Advisor' });
-    advisors.value = response.items;
-    await loadMeetings();
+    // Gọi API với Role=2 để lấy danh sách advisor
+    const response = await getUsers({ 
+      Role: 2,
+      PageIndex: 0,
+      PageSize: 100 // Lấy tối đa 100 advisor
+    });
+    console.log('Users response:', response); // Debug log
+
+    if (response?.data?.items) {
+      advisors.value = response.data.items.map(advisor => ({
+        id: advisor.id,
+        fullName: advisor.fullName || advisor.userName || 'Unknown',
+        email: advisor.email
+      }));
+
+      console.log('Mapped advisors:', advisors.value); // Debug log
+      await loadMeetings();
+    }
   } catch (error) {
     console.error('Error loading advisors:', error);
     toast.error('Không thể tải danh sách advisor');
@@ -106,13 +170,18 @@ onMounted(async () => {
 const loadMeetings = async () => {
   try {
     const response = await getMeetings({
-      pageIndex: 0,
-      pageSize: 10
+      PageIndex: 0,
+      PageSize: 10
     });
-    meetings.value = (response.items || []).map(meeting => ({
-      ...meeting,
-      advisorName: advisors.value.find(a => a.id === meeting.advisorId)?.fullName || 'Unknown'
-    }));
+    
+    if (response?.data?.items) {
+      meetings.value = response.data.items.map(meeting => ({
+        ...meeting,
+        advisorName: advisors.value.find(a => a.id === meeting.advisorId)?.fullName || 'Unknown'
+      }));
+    } else {
+      meetings.value = [];
+    }
   } catch (error) {
     console.error('Error loading meetings:', error);
     toast.error('Không thể tải danh sách cuộc họp');
@@ -126,13 +195,22 @@ const scheduleMeeting = async () => {
     return;
   }
 
+  if (!isValidTime.value) {
+    toast.error('Thời gian không hợp lệ');
+    return;
+  }
+
   isLoading.value = true;
   try {
     const startDateTime = new Date(`${meetingDate.value}T${startTime.value}`);
     const endDateTime = new Date(`${meetingDate.value}T${endTime.value}`);
     
+    // Nếu giờ kết thúc < giờ bắt đầu, tự động đẩy sang ngày hôm sau
+    if (endDateTime < startDateTime) {
+      endDateTime.setDate(endDateTime.getDate() + 1);
+    }
+
     const dto = {
-      id: crypto.randomUUID(), // Generate new GUID
       title: 'Cuộc họp với Advisor',
       startAfter: startDateTime.toISOString(),
       endAfter: endDateTime.toISOString(),
@@ -141,18 +219,21 @@ const scheduleMeeting = async () => {
       description: notes.value || ''
     };
 
-    await createMeeting(dto);
-    toast.success('Đặt lịch họp thành công');
+    const response = await createMeeting(dto);
     
-    // Reset form
-    meetingDate.value = '';
-    startTime.value = '';
-    endTime.value = '';
-    selectedAdvisor.value = '';
-    notes.value = '';
-    
-    // Tải lại danh sách cuộc họp
-    await loadMeetings();
+    if (response?.data) {
+      toast.success('Đặt lịch họp thành công');
+      
+      // Reset form
+      meetingDate.value = '';
+      startTime.value = '';
+      endTime.value = '';
+      selectedAdvisor.value = '';
+      notes.value = '';
+      
+      // Tải lại danh sách cuộc họp
+      await loadMeetings();
+    }
   } catch (error) {
     console.error('Error scheduling meeting:', error);
     const errorMessage = error.response?.data?.message 
@@ -346,5 +427,35 @@ const formatDate = (date) => {
   padding: 20px;
   background: #f8f9fa;
   border-radius: 8px;
+}
+
+.form-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.form-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.form-group small {
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Thêm style cho Calendar component */
+.form-input[type="date"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
 }
 </style> 

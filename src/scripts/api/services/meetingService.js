@@ -1,4 +1,4 @@
-import { get, post, patch, del } from '@/scripts/api/apiClients';
+import { get, post, patch, del } from '../apiClients';
 
 const BASE_URL = '/api/Meetings';
 
@@ -7,14 +7,14 @@ const BASE_URL = '/api/Meetings';
  * @param {Object} queryParams - Các tham số truy vấn
  * @returns {Promise} Danh sách cuộc họp
  */
-export const getMeetings = async (queryParams = { pageIndex: 0, pageSize: 10 }) => {
+export const getMeetings = async (queryParams = { PageIndex: 0, PageSize: 10 }) => {
   try {
     const params = new URLSearchParams();
-    params.append('pageIndex', queryParams.pageIndex);
-    params.append('pageSize', queryParams.pageSize);
-    
+    Object.keys(queryParams).forEach(key => {
+      params.append(key, queryParams[key]);
+    });
     const response = await get(`${BASE_URL}?${params.toString()}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error getting meetings:', error);
     throw error;
@@ -29,13 +29,14 @@ export const getMeetings = async (queryParams = { pageIndex: 0, pageSize: 10 }) 
 export const createMeeting = async (dto) => {
   try {
     const response = await post(BASE_URL, {
-      ...dto,
-      startAfter: dto.startAfter,
-      endAfter: dto.endAfter,
-      maxParticipants: dto.maxParticipants || 2,
-      participants: Array.isArray(dto.participants) ? dto.participants : [dto.participants]
+      title: dto.Title,
+      startAfter: dto.StartAfter,
+      endAfter: dto.EndAfter,
+      maxParticipants: dto.MaxParticipants,
+      participants: dto.Participants,
+      description: dto.Description
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error creating meeting:', error);
     throw error;
@@ -50,7 +51,7 @@ export const createMeeting = async (dto) => {
 export const updateMeeting = async (dto) => {
   try {
     const response = await patch(BASE_URL, dto);
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error updating meeting:', error);
     throw error;
@@ -65,7 +66,7 @@ export const updateMeeting = async (dto) => {
 export const deleteMeeting = async (id) => {
   try {
     const response = await del(`${BASE_URL}/${id}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error deleting meeting:', error);
     throw error;
