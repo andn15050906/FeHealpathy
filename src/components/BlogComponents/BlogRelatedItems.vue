@@ -7,15 +7,14 @@
                     <article v-for="(article, index) in relatedArticles" :key="index" class="article-card">
                         
                         <div class="card-content">
-                            <RouterLink :to="`/blog/${article.id}`" @click="reloadPage">
-                            <div class="article-image-wrapper">
-                            <img :src="article.imageUrl" alt="Article Thumbnail" class="article-image">
-                        
-                        </div>
-                    </RouterLink>
-                            <h4 class="article-title">{{ article.title }}</h4>
-                            <span class="author-name">{{ article.author }}</span>
-                            <p class="article-date">{{ formatDate(article.creationTime) }}</p>
+                            <RouterLink :to="`/blog/${article.id}`" style="">
+                                <div class="article-image-wrapper">
+                                    <img :src="article.imageUrl" alt="Article Thumbnail" class="article-image">
+                                </div>
+                            </RouterLink>
+                                <h4 class="article-title">{{ article.title }}</h4>
+                                <span class="author-name">{{ article.author }}</span>
+                                <p class="article-date">{{ formatDate(article.creationTime) }}</p>
                         </div>
                     </article>
                 </div>
@@ -29,19 +28,19 @@
 import { ref, onMounted } from 'vue';
 import { getPagedArticles } from '@/scripts/api/services/blogService';
 import { useRoute } from 'vue-router';
-
-const props = defineProps({
-    blog: Object
-});
+import { watch } from 'vue';
 
 const relatedArticles = ref([]);
+const route = useRoute();
 
-onMounted(async () => {
+const fetchRelatedArticles = async () => {
     try {
-        const queryParams = { limit: 3, random: true };
+        const currentBlogId = route.params.id;  
+        const queryParams = { limit: 4, random: true };
         const response = await getPagedArticles(queryParams);
         if (response && response.items) {
-            relatedArticles.value = response.items.slice(0, 3).map(article => ({
+            const filteredArticles = response.items.filter(article => article.id !== currentBlogId);
+            relatedArticles.value = filteredArticles.slice(0, 3).map(article => ({
                 id: article.id,
                 imageUrl: article.thumb.url,
                 title: article.title,
@@ -52,11 +51,16 @@ onMounted(async () => {
     } catch (error) {
         console.error('Failed to fetch articles:', error);
     }
-});
-
-const reloadPage = () => {
-    window.location.reload();
 };
+
+onMounted(fetchRelatedArticles);
+
+watch(() => route.params.id, (newId, oldId) => {
+    if (newId !== oldId) {
+        fetchRelatedArticles();
+        reloadPage();
+    }
+});
 
 const formatDate = (dateString) => {
     try {
@@ -67,7 +71,14 @@ const formatDate = (dateString) => {
         return dateString;
     }
 };
+
+function reloadPage() {
+    window.location.reload();
+}
+
 </script>
+
+
 
 <style scoped>
 .container {
@@ -346,6 +357,20 @@ const formatDate = (dateString) => {
     object-fit: cover;
     
 }
+/* .router-link-active, .router-link-exact-active {
+    text-decoration: none;
+    color: inherit;
+}
+
+.article-card a {
+    text-decoration: none;
+    color: black;
+}
+
+.article-card a:hover {
+    text-decoration: underline;
+    color: darkblue;
+} */
 
 
 @media (max-width: 991px) {
