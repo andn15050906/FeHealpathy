@@ -337,7 +337,7 @@ const router = createRouter({
       path: '/courses/create',
       name: 'createCourse',
       component: CreateCourse,
-      meta: { requiresAuth: true, requiresAdvisor: true }
+      // meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/update/:id',
