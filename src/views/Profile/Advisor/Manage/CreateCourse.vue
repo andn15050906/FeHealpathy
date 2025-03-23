@@ -43,7 +43,7 @@
               <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
             </div>
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="category" class="form-label">
               <i class="fas fa-folder-open me-1 bold-icon"></i>
               <span class="bold-text">Course Category</span>
@@ -54,7 +54,8 @@
                 {{ category.name }}
               </option>
             </select>
-          </div>
+          </div> -->
+
           <div class="mb-3">
             <label for="price" class="form-label">
               <i class="fas fa-dollar-sign me-1 bold-icon"></i>
@@ -176,6 +177,7 @@
 
 <script>
 import SaveConfirmPopUp from '../../../../components/Common/Popup/SaveConfirmPopUp.vue';
+import { createCourse } from '@/scripts/api/services/courseService';
 export default {
   name: "CreateCourse",
   components: { SaveConfirmPopUp },
@@ -189,8 +191,8 @@ export default {
         level: "",
         outcomes: "",
         requirements: "",
-        thumb: { url: "", file: null, title: "" },
-        leafCategoryId: "",
+        thumb: { url: "", file: null, title: "null" },
+        leafCategoryId: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
         lectures: []
       },
       previewImage: null,
@@ -253,12 +255,34 @@ export default {
     openSavePopup() {
       this.showSavePopup = true;
     },
-    handleSave(confirm) {
-      if (confirm) {
-        console.log("Submitting course:", this.course);
-        this.resetForm();
+    async handleSave(confirm) {
+  if (confirm) {
+    try {
+      const formData = new FormData();
+      formData.append('title', this.course.title);
+      formData.append('intro', this.course.intro);
+      formData.append('description', this.course.description);
+      formData.append('price', this.course.price);
+      formData.append('level', this.course.level);
+      formData.append('outcomes', this.course.outcomes);
+      formData.append('requirements', this.course.requirements);
+      formData.append('leafCategoryId', this.course.leafCategoryId);
+
+      if (this.course.thumb.file) {
+        formData.append('thumb', this.course.thumb.file);
       }
-    },
+
+      const response = await createCourse(formData);
+      console.log('Course created successfully:', response);
+      console.log(response);
+      this.resetForm();
+    } catch (error) {
+      console.log(response);
+      console.error('Failed to create course:', error);
+    }
+  }
+}
+,
     resetForm() {
       this.course = {
         title: "",
