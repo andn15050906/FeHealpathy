@@ -13,12 +13,12 @@
 
   <div class="courses-container">
     <div class="course-grid">
-      <courseCard v-for="course in filteredcourses" :key="course.id" :course="course" />
+      <courseCard v-for="course in paginatedCourses" :key="course.id" :course="course" />
     </div>
   </div>
 
   <div class="pagination">
-    <button v-for="page in Math.ceil(courses.length / itemsPerPage)" :key="page"
+    <button v-for="page in totalPages" :key="page"
       :class="['page-btn', currentPage === page ? 'active' : '']"
       @click="changePage(page)">
       {{ page }}
@@ -33,88 +33,121 @@ import courseCard from '@/components/courseComponents/courseCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 
 import { onMounted } from 'vue';
 
-const selectedTags = ref([]);
-const searchQuery = ref('');
-const sortOption = ref('name-asc');
-const itemsPerPage = 20;
-const courses = ref([]);
-const currentPage = ref(1);
-const paginatedcourses = computed(() => {
-const start = (currentPage.value - 1) * itemsPerPage;
-const end = start + itemsPerPage;
-return courses.value.slice(start, end);
-});
-const filters = ref([]);
-const currentFilter = ref('all');
+// Khai báo các reactive states cho component
+const selectedTags = ref([]); // Danh sách các tag được chọn để lọc
+const searchQuery = ref(''); // Từ khóa tìm kiếm
+const sortOption = ref('name-asc'); // Tùy chọn sắp xếp (A-Z hoặc Z-A)
+const itemsPerPage = 20; // Số lượng khóa học hiển thị trên mỗi trang
+const courses = ref([]); // Danh sách tất cả các khóa học
+const currentPage = ref(1); // Trang hiện tại
+const filters = ref([]); // Danh sách các bộ lọc có sẵn
+const currentFilter = ref('all'); // Bộ lọc hiện tại đang được áp dụng
 
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
 
+// Hàm xử lý việc thêm/xóa tag khỏi danh sách lọc
 function toggleTag(tagId) {
-const index = selectedTags.value.indexOf(tagId);
-if (index === -1) {
-  selectedTags.value.push(tagId);
-} else {
-  selectedTags.value.splice(index, 1);
-}
+  const index = selectedTags.value.indexOf(tagId);
+  if (index === -1) {
+    selectedTags.value.push(tagId); // Thêm tag nếu chưa có
+  } else {
+    selectedTags.value.splice(index, 1); // Xóa tag nếu đã có
+  }
 }
 
+// Computed property để lọc khóa học theo tags và từ khóa tìm kiếm
 const filteredcourses = computed(() => {
-let result = courses.value;
-if (selectedTags.value.length > 0) {
-  result = result.filter(course => selectedTags.value.every(tagId =>
-    course.tags.some(tag => tag.id === tagId)
-  ));
-}
+  let result = courses.value;
+  
+  // Lọc theo tags nếu có tags được chọn
+  if (selectedTags.value.length > 0) {
+    result = result.filter(course => selectedTags.value.every(tagId =>
+      course.tags.some(tag => tag.id === tagId)
+    ));
+  }
 
-if (searchQuery.value) {
-  result = result.filter(course => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
-}
-return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
+  // Lọc theo từ khóa tìm kiếm
+  if (searchQuery.value) {
+    result = result.filter(course => 
+      course.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+  }
+  return result;
 });
 
+// Tính tổng số trang dựa trên số lượng khóa học đã được lọc
+const totalPages = computed(() => {
+  return Math.ceil(filteredcourses.value.length / itemsPerPage);
+});
+
+// Lấy danh sách khóa học cho trang hiện tại
+const paginatedCourses = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredcourses.value.slice(start, end);
+});
+
+// Hàm sắp xếp danh sách khóa học
 function sortcourses() {
-if (sortOption.value === 'name-asc') {
-  courses.value.sort((a, b) => a.title.localeCompare(b.title));
-} else if (sortOption.value === 'name-desc') {
-  courses.value.sort((a, b) => b.title.localeCompare(a.title));
-}
+  if (sortOption.value === 'name-asc') {
+    courses.value.sort((a, b) => a.title.localeCompare(b.title)); // Sắp xếp A-Z
+  } else if (sortOption.value === 'name-desc') {
+    courses.value.sort((a, b) => b.title.localeCompare(a.title)); // Sắp xếp Z-A
+  }
 }
 
+// Watch thay đổi của tùy chọn sắp xếp
 watch(sortOption, () => {
-sortcourses();
-changePage(1);
+  sortcourses(); // Sắp xếp lại danh sách
+  changePage(1); // Reset về trang 1
 });
 
-
+// Khởi tạo dữ liệu khi component được mount
 onMounted(async () => {
-try {
-  const courseResponse = await getCourses();
-  courses.value = courseResponse?.items?.map(course => ({ ...course })) || [];
-  const tagResponse = await getPagedTags();
-  sortcourses();
-  filters.value = tagResponse?.map(tag => ({
-    value: tag.id,
-    label: tag.title
-  })) || [];
-} catch (error) {
-  console.error("Failed to fetch courses or tags", error);
-}
+  try {
+    // Lấy danh sách khóa học từ API
+    const courseResponse = await getCourses();
+    courses.value = courseResponse?.items?.map(course => ({ ...course })) || [];
+    
+    // Lấy danh sách tags từ API
+    const tagResponse = await getPagedTags();
+    sortcourses();
+    
+    // Định dạng lại danh sách tags
+    filters.value = tagResponse?.map(tag => ({
+      value: tag.id,
+      label: tag.title
+    })) || [];
+  } catch (error) {
+    console.error("Failed to fetch courses or tags", error);
+  }
 });
 
-
+// Hàm chuyển trang
 function changePage(page) {
-currentPage.value = page;
+  currentPage.value = page;
 }
 
+// Hàm áp dụng bộ lọc
 function applyFilter(filterValue) {
-currentFilter.value = filterValue;
+  currentFilter.value = filterValue;
 
-if (filterValue === 'all') {
-  paginatedcourses.value = courses.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
-} else {
-  const filteredcourses = courses.value.filter(course => course.tags.some(tag => tag.id === filterValue));
-  paginatedcourses.value = filteredcourses.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
-}
+  if (filterValue === 'all') {
+    // Hiển thị tất cả khóa học nếu filter là 'all'
+    paginatedcourses.value = courses.value.slice(
+      (currentPage.value - 1) * itemsPerPage, 
+      currentPage.value * itemsPerPage
+    );
+  } else {
+    // Lọc khóa học theo tag được chọn
+    const filteredcourses = courses.value.filter(course => 
+      course.tags.some(tag => tag.id === filterValue)
+    );
+    paginatedcourses.value = filteredcourses.slice(
+      (currentPage.value - 1) * itemsPerPage, 
+      currentPage.value * itemsPerPage
+    );
+  }
 }
 
 </script>

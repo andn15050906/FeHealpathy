@@ -21,12 +21,12 @@
 
     <div class="blogs-container">
       <div class="blog-grid">
-        <blogCard v-for="blog in filteredBlogs" :key="blog.id" :blog="blog" />
+        <blogCard v-for="blog in paginatedBlogs" :key="blog.id" :blog="blog" />
       </div>
     </div>
   
     <div class="pagination">
-      <button v-for="page in Math.ceil(blogs.length / itemsPerPage)" :key="page"
+      <button v-for="page in totalPages" :key="page"
         :class="['page-btn', currentPage === page ? 'active' : '']"
         @click="changePage(page)">
         {{ page }}
@@ -41,64 +41,94 @@ import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 
 import { onMounted } from 'vue';
 
-const selectedTags = ref([]);
-const searchQuery = ref('');
-const sortOption = ref('name-asc');
-const itemsPerPage = 20;
-const blogs = ref([]);
-const currentPage = ref(1);
+// Khai báo các reactive states cho component
+const selectedTags = ref([]); // Danh sách các tag được chọn để lọc
+const searchQuery = ref(''); // Từ khóa tìm kiếm
+const sortOption = ref('name-asc'); // Tùy chọn sắp xếp (A-Z hoặc Z-A)
+const itemsPerPage = 20; // Số lượng bài viết hiển thị trên mỗi trang
+const blogs = ref([]); // Danh sách tất cả các bài viết
+const currentPage = ref(1); // Trang hiện tại
 const paginatedblogs = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return blogs.value.slice(start, end);
 });
-const filters = ref([]);
-const currentFilter = ref('all');
+const filters = ref([]); // Danh sách các bộ lọc có sẵn
+const currentFilter = ref('all'); // Bộ lọc hiện tại đang được áp dụng
 
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
 
+// Hàm xử lý việc thêm/xóa tag khỏi danh sách lọc
 function toggleTag(tagId) {
   const index = selectedTags.value.indexOf(tagId);
   if (index === -1) {
-    selectedTags.value.push(tagId);
+    selectedTags.value.push(tagId); // Thêm tag nếu chưa có
   } else {
-    selectedTags.value.splice(index, 1);
+    selectedTags.value.splice(index, 1); // Xóa tag nếu đã có
   }
 }
 
+// Computed property để lọc bài viết theo tags và từ khóa tìm kiếm
+// Lọc dữ liệu
 const filteredBlogs = computed(() => {
   let result = blogs.value;
+  
+  // Lọc theo tags nếu có tags được chọn
   if (selectedTags.value.length > 0) {
     result = result.filter(blog => selectedTags.value.every(tagId =>
       blog.tags.some(tag => tag.id === tagId)
     ));
   }
+
+  // Lọc theo từ khóa tìm kiếm nếu có
   if (searchQuery.value) {
-    result = result.filter(blog => blog.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+    result = result.filter(blog => 
+      blog.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
   }
-  return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
+  return result;
 });
 
+// Tính tổng số trang dựa trên số lượng bài viết đã được lọc
+const totalPages = computed(() => {
+  return Math.ceil(filteredBlogs.value.length / itemsPerPage);
+});
+
+// Lấy danh sách bài viết cho trang hiện tại
+// Phân trang trên dữ liệu đã lọc
+const paginatedBlogs = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredBlogs.value.slice(start, end);
+});
+
+// Hàm sắp xếp danh sách bài viết
 function sortBlogs() {
   if (sortOption.value === 'name-asc') {
-    blogs.value.sort((a, b) => a.title.localeCompare(b.title));
+    blogs.value.sort((a, b) => a.title.localeCompare(b.title)); // Sắp xếp A-Z
   } else if (sortOption.value === 'name-desc') {
-    blogs.value.sort((a, b) => b.title.localeCompare(a.title));
+    blogs.value.sort((a, b) => b.title.localeCompare(a.title)); // Sắp xếp Z-A
   }
 }
 
+// Watch thay đổi của tùy chọn sắp xếp
 watch(sortOption, () => {
-  sortBlogs();
-  changePage(1);
+  sortBlogs(); // Sắp xếp lại danh sách
+  changePage(1); // Reset về trang 1
 });
 
-
+// Khởi tạo dữ liệu khi component được mount
 onMounted(async () => {
   try {
+    // Lấy danh sách bài viết từ API
     const blogResponse = await getPagedArticles();
     blogs.value = blogResponse?.items?.map(blog => ({ ...blog })) || [];
+    
+    // Lấy danh sách tags từ API
     const tagResponse = await getPagedTags();
     sortBlogs();
+    
+    // Định dạng lại danh sách tags
     filters.value = tagResponse?.map(tag => ({
       value: tag.id,
       label: tag.title
@@ -108,19 +138,30 @@ onMounted(async () => {
   }
 });
 
-
+// Hàm chuyển trang
 function changePage(page) {
   currentPage.value = page;
 }
 
+// Hàm áp dụng bộ lọc
 function applyFilter(filterValue) {
   currentFilter.value = filterValue;
 
   if (filterValue === 'all') {
-    paginatedblogs.value = blogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
+    // Hiển thị tất cả bài viết nếu filter là 'all'
+    paginatedblogs.value = blogs.value.slice(
+      (currentPage.value - 1) * itemsPerPage, 
+      currentPage.value * itemsPerPage
+    );
   } else {
-    const filteredBlogs = blogs.value.filter(blog => blog.tags.some(tag => tag.id === filterValue));
-    paginatedblogs.value = filteredBlogs.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
+    // Lọc bài viết theo tag được chọn
+    const filteredBlogs = blogs.value.filter(blog => 
+      blog.tags.some(tag => tag.id === filterValue)
+    );
+    paginatedblogs.value = filteredBlogs.slice(
+      (currentPage.value - 1) * itemsPerPage, 
+      currentPage.value * itemsPerPage
+    );
   }
 }
 
