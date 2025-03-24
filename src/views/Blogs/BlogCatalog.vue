@@ -43,7 +43,7 @@ import { getPagedTags } from "@/scripts/api/services/tagService.js";
 const selectedTags = ref([]);
 const searchQuery = ref('');
 const sortOption = ref('name-asc');
-const itemsPerPage = 20;
+const itemsPerPage = 12;
 const blogs = ref([]);
 const currentPage = ref(1);
 const paginatedblogs = computed(() => {
