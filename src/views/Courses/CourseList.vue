@@ -36,7 +36,7 @@ import { onMounted } from 'vue';
 const selectedTags = ref([]);
 const searchQuery = ref('');
 const sortOption = ref('name-asc');
-const itemsPerPage = 20;
+const itemsPerPage = 12;
 const courses = ref([]);
 const currentPage = ref(1);
 const paginatedcourses = computed(() => {
