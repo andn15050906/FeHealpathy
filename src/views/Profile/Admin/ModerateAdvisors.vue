@@ -73,7 +73,7 @@
             :goToPage="changePage" 
         />
       </div>
-      
+
       <!-- Blogs -->
       <div v-if="currentTab === 'blogs'" class="tab-content">
         <div v-if="!isEditingBlog">
@@ -181,7 +181,7 @@
 />
 
   </template>
-  
+
   <script>
   import { getPagedArticles, deleteArticle } from '@/scripts/api/services/blogService';
   import { getCourses, deleteCourse } from '@/scripts/api/services/courseService';
@@ -226,127 +226,160 @@
         roadmaps: []
       };
     },
-    methods: {
-      editCourse(id) {
-        this.$router.push({ name: 'updateCourse', params: { id } }); // Đảm bảo tên và tham số phù hợp
-      },
-      changePage(page) {
-        if (page >= 1 && page <= this.totalPages) {
-            console.log("Changing to page:", page);
-            this.currentPage = page;
-            this.$nextTick(() => this.fetchCourses());
+methods: {
+  editBlog(blog) {
+    if (blog) {
+      this.selectedBlog = blog;
+      this.isEditingBlog = true;
+    } else {
+      console.error("Error: blog data is undefined.");
+      this.isEditingBlog = false;
+    }
+  },
+  editCourse(id) {
+    this.$router.push({ name: 'updateCourse', params: { id } });
+  },
+  editRoadmap(roadmap) {
+    if (roadmap) {
+      this.selectedRoadmap = roadmap;
+      this.isEditingRoadmap = true;
+    } else {
+      console.error("Error: blog data is undefined.");
+      this.isEditingRoadmap = false;
+    }
+  },
+  handleBlogUpdated() {
+    this.isEditingBlog = false;
+    this.selectedBlog = null;
+  },
+  handleRoadmapUpdated() {
+    this.isEditingRoadmap = false;
+    this.selectedRoadmap = null;
+    this.fetchRoadmaps();
+  },
+  prepareDelete(item, type) {
+    this.selectedItem = item;
+    this.selectedItemType = type;
+    this.deleteMessage = `Are you sure you want to delete "${item.title}"?`;
+    this.showDeletePopup = true;
+  },
+  changePage(page) {
+    if (page >= 1 && page <= this.totalPages) {
+        console.log("Changing to page:", page);
+        this.currentPage = page;
+        this.$nextTick(() => this.fetchCourses());
+    }
+},
+sortCourses() {
+    if (this.sortOption === 'name-asc') {
+      this.courses.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (this.sortOption === 'name-desc') {
+      this.courses.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (this.sortOption === 'price-asc') {
+      this.courses.sort((a, b) => a.price - b.price);
+    } else if (this.sortOption === 'price-desc') {
+      this.courses.sort((a, b) => b.price - a.price);
+    }
+  },
+sortBlogs() {
+  if (this.sortOption === 'name-asc') {
+    this.blogs.sort((a, b) => a.title.localeCompare(b.title)); 
+  } else if (this.sortOption === 'name-desc') {
+    this.blogs.sort((a, b) => b.title.localeCompare(a.title));
+  }
+}
+,
+sortRoadmaps() {
+  if (this.sortOption === 'name-asc') {
+    this.roadmaps.sort((a, b) => a.title.localeCompare(b.title)); 
+  } else if (this.sortOption === 'name-desc') {
+    this.roadmaps.sort((a, b) => b.title.localeCompare(a.title));
+  }
+},
+async fetchBlogs() {
+  try {
+    const response = await getPagedArticles();
+    this.blogs = Array.isArray(response.items) ? response.items : [];
+    const blogTab = this.tabs.find(tab => tab.id === 'blogs');
+    if (blogTab) {
+      blogTab.count = response.totalCount;
+    }
+    this.sortBlogs();
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    this.blogs = [];
+  }
+},
+async confirmDelete(confirm) {
+    if (confirm) {
+      try {
+        switch (this.selectedItemType) {
+          case 'courses':
+            await deleteCourse(this.selectedItem.id);
+            break;
+          case 'blogs':
+            await deleteArticle(this.selectedItem.id);
+            break;
+          case 'roadmaps':
+            await deleteRoadmap(this.selectedItem.id);
+            break;
         }
-      },
-      sortCourses() {
-          if (this.sortOption === 'name-asc') {
-            this.courses.sort((a, b) => a.title.localeCompare(b.title));
-          } else if (this.sortOption === 'name-desc') {
-            this.courses.sort((a, b) => b.title.localeCompare(a.title));
-          } else if (this.sortOption === 'price-asc') {
-            this.courses.sort((a, b) => a.price - b.price);
-          } else if (this.sortOption === 'price-desc') {
-            this.courses.sort((a, b) => b.price - a.price);
-          }
-        },
-      sortBlogs() {
-        if (this.sortOption === 'name-asc') {
-          this.blogs.sort((a, b) => a.title.localeCompare(b.title)); 
-        } else if (this.sortOption === 'name-desc') {
-          this.blogs.sort((a, b) => b.title.localeCompare(a.title));
-        }
+        
+        this.fetchCourses();
+        this.fetchBlogs();
+        this.fetchRoadmaps();
+      } catch (error) {
+        console.error('Error deleting content:', error);
+        alert('Failed to delete the content.');
       }
-      ,
-      sortRoadmaps() {
-        if (this.sortOption === 'name-asc') {
-          this.roadmaps.sort((a, b) => a.title.localeCompare(b.title)); 
-        } else if (this.sortOption === 'name-desc') {
-          this.roadmaps.sort((a, b) => b.title.localeCompare(a.title));
+    }
+    this.showDeletePopup = false;
+  },
+async fetchRoadmaps() {
+  try {
+    const response = await getRoadmaps();
+    this.roadmaps = Array.isArray(response.items) ? response.items : [];
+    const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
+    if (roadmapTab) {
+      roadmapTab.count = response.totalCount;
+    }
+    this.sortRoadmaps();
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching roadmaps:', error);
+    this.roadmaps = [];
+  }
+},
+async fetchCourses() {
+    try {
+        console.log("Fetching courses for page:", this.currentPage);
+
+        const params = {
+            pageIndex: this.currentPage - 1,
+            pageSize: this.pageSize
+        };
+
+        console.log("Request Params:", params);
+
+        const response = await getCourses(params);
+
+        console.log("API Response:", response);
+
+        this.courses = response.items || [];
+        this.totalPages = response.pageCount;
+
+        const courseTab = this.tabs.find(tab => tab.id === 'courses');
+        if (courseTab) {
+            courseTab.count = response.totalCount;
         }
-      },
-      async fetchBlogs() {
-        try {
-          const response = await getPagedArticles();
-          this.blogs = Array.isArray(response.items) ? response.items : [];
-          const blogTab = this.tabs.find(tab => tab.id === 'blogs');
-          if (blogTab) {
-            blogTab.count = response.totalCount;
-          }
-          this.sortBlogs();
-          console.log(response);
-        } catch (error) {
-          console.error('Error fetching blogs:', error);
-          this.blogs = [];
-        }
-      },
-      async confirmDelete(confirm) {
-          if (confirm) {
-            try {
-              switch (this.selectedItemType) {
-                case 'courses':
-                  await deleteCourse(this.selectedItem.id);
-                  break;
-                case 'blogs':
-                  await deleteArticle(this.selectedItem.id);
-                  break;
-                case 'roadmaps':
-                  await deleteRoadmap(this.selectedItem.id);
-                  break;
-              }
-
-              this.fetchCourses();
-              this.fetchBlogs();
-              this.fetchRoadmaps();
-            } catch (error) {
-              console.error('Error deleting content:', error);
-              alert('Failed to delete the content.');
-            }
-          }
-          this.showDeletePopup = false;
-        },
-      async fetchRoadmaps() {
-        try {
-          const response = await getRoadmaps();
-          this.roadmaps = Array.isArray(response.items) ? response.items : [];
-          const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
-          if (roadmapTab) {
-            roadmapTab.count = response.totalCount;
-          }
-          this.sortRoadmaps();
-          console.log(response);
-        } catch (error) {
-          console.error('Error fetching roadmaps:', error);
-          this.roadmaps = [];
-        }
-      },
-      async fetchCourses() {
-          try {
-              console.log("Fetching courses for page:", this.currentPage);
-
-              const params = {
-                  pageIndex: this.currentPage - 1,
-                  pageSize: this.pageSize
-              };
-
-              console.log("Request Params:", params);
-
-              const response = await getCourses(params);
-
-              console.log("API Response:", response);
-
-              this.courses = response.items || [];
-              this.totalPages = response.pageCount;
-
-              const courseTab = this.tabs.find(tab => tab.id === 'courses');
-              if (courseTab) {
-                  courseTab.count = response.totalCount;
-              }
-              this.sortCourses();
-          } catch (error) {
-              console.error('Error fetching courses:', error);
-              this.courses = [];
-          }
-      }
-      ,
+        this.sortCourses();
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        this.courses = [];
+    }
+  }
+  ,
     },
     computed: {
         filteredCourses() {
@@ -377,7 +410,7 @@
     }
   };
   </script>
-  
+
   <style scoped>
   
   .moderate-users {
@@ -533,4 +566,4 @@
 }
 
 
-  </style>
+</style>
