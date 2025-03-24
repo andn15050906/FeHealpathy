@@ -35,11 +35,10 @@
   </template>
   
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeMount } from 'vue';
 import { getPagedArticles } from "@/scripts/api/services/blogService.js";
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import { getPagedTags } from "@/scripts/api/services/tagService.js"; 
-import { onMounted } from 'vue';
 
 const selectedTags = ref([]);
 const searchQuery = ref('');
@@ -93,7 +92,7 @@ watch(sortOption, () => {
 });
 
 
-onMounted(async () => {
+onBeforeMount(async () => {
   try {
     const blogResponse = await getPagedArticles();
     blogs.value = blogResponse?.items?.map(blog => ({ ...blog })) || [];

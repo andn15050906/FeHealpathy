@@ -1,9 +1,9 @@
 <template>
   <GlowingCard class="blog-card" justify="unset" padding="10px">
-    <div style="flex-grow: 1;">
-        <div class="blog-thumbnail">
+    <div style="flex-grow: 1; width: 100%;">
+        <div class="blog-thumbnail" style="background-image: url(/assets/images/10.jpg);">
             <RouterLink :to="`/blog/${blog.id}`">
-                <img :src="blog.thumb.url" :alt="blog.title">
+                <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" :onError="(e) => e.target.style.display = 'none'">
             </RouterLink>
         </div>
         <p class="blog-title">{{ blog.title }}</p>
@@ -57,6 +57,9 @@ const formatDate = (dateString) => {
     position: relative;
     aspect-ratio: 16/9;
     width: 100%;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
 }
 
 .blog-thumbnail img {
