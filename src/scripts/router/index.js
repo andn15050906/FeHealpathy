@@ -566,7 +566,3 @@ const isAuthorized = (to) => {
 }
 
 export default router;
-
-
-
-
