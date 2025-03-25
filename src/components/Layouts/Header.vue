@@ -47,7 +47,7 @@
               <router-link to="/admin">Admin</router-link>
             </li>
             <li v-if="user.role === 2">
-              <router-link to="/advisor/moderate-advisors">Moderate Advisor</router-link>
+              <router-link to="/advisor/content">Moderate Advisor</router-link>
             </li>
             <li v-if="user.role === 2">
               <hr class="menu-divider" />

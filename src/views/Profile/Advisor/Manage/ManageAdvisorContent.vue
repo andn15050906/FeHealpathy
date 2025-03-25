@@ -188,7 +188,7 @@
   import { getRoadmaps, deleteRoadmap } from '@/scripts/api/services/roadmapService';
   import Pagination from '@/components/Common/Pagination.vue';
   import UpdateBlog from './UpdateBlog.vue';
-  import UpdateRoadmap from '../Advisor/Manage/UpdateRoadmap.vue';
+  import UpdateRoadmap from './UpdateRoadmap.vue';
   import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
   export default {
     emits: ['authenticated', 'addNotification', 'removeNotification'],

@@ -168,7 +168,7 @@ export default {
         console.log("Sending roadmap data:", this.roadmap);
         const response = await createRoadmap(this.roadmap);
         console.log('Roadmap created:', response);
-        this.$router.push("/advisor/moderate-advisors");
+        this.$router.push({ name: 'ManageAdvisorContent' });
       } catch (error) {
         console.error('Error creating roadmap:', error);
         alert('Có lỗi xảy ra khi tạo roadmap. Vui lòng thử lại.');

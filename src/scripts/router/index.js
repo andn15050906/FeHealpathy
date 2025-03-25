@@ -56,7 +56,6 @@ import EditGroup from '@/views/Community/EditGroup.vue'
 import ConversationWindow from '@/views/Community/ConversationWindow.vue'
 
 import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
-import ModerateAdvisors from '@/views/Profile/Admin/ModerateAdvisors.vue'
 import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Profile/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Profile/Admin/ModerateUploadedContent.vue'
@@ -65,6 +64,7 @@ import ManageSurvey from '@/views/Profile/Admin/ManageSurvey.vue'
 import ManageYoga from '@/views/Profile/Admin/ManageYoga.vue'
 import CreateYogaLesson from '@/views/Profile/Admin/CreateYoga.vue'
 
+import ManageAdvisorContent from '@/views/Profile/Advisor/Manage/ManageAdvisorContent.vue';
 import ViewAdvisor from '@/views/Profile/Advisor/ViewAdvisor.vue'
 import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
 import Payment from '@/views/Profile/Advisor/Payment.vue'
@@ -499,10 +499,10 @@ const router = createRouter({
 
     // Advisor
     {
-      path: '/advisor/moderate-advisors',
-      name: 'ModerateAdvisors',
-      //meta: { requiresAuth: true, requiresAdmin: true },
-      component: ModerateAdvisors,
+      path: '/advisor/content',
+      name: 'ManageAdvisorContent',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
+      component: ManageAdvisorContent,
     },
 
     // Admin

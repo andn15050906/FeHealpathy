@@ -1,45 +1,39 @@
 <template>
-    <div class="mx-8 pa-4 d-flex justify-space-between align-center">
-        <span class="font-weight-bold text-subtitle-1">
-            Joined Groups ({{ joinedGroups.length }})
-        </span>
-        <div>
-            <v-btn class="d-flex align-center text-subtitle-1 font-weight-bold" style="width: 100%;" color="primary"
-                :to="'/create-group'">
-                <span>Create your group</span>
+    <div class="community-container pa-6">
+        <div class="d-flex justify-space-between align-center mb-6">
+            <h2 class="text-h5 font-weight-bold">
+                Your Groups ({{ joinedGroups.length }})
+            </h2>
+            <v-btn color="primary" variant="elevated" :to="'/create-group'" prepend-icon="mdi-plus">
+                Create New Group
             </v-btn>
         </div>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
-        <GroupCard v-for="group in joinedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
-            :group-info="group" :to-link="'chat'/*'/group/' + group.id*/" />
-    </div>
-    <div class="mx-8 mt-4 pa-4">
-        <span class="font-weight-bold text-subtitle-1">
-            Groups you might like
-        </span>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr);">
-        <GroupCard v-for="group in recommendedGroups" :key="group.id" class="px-2 mb-4" style="overflow: auto;"
-            :group-info="group" :to-link="'chat'/*/group/' + group.id*/" />
-    </div>
-    <div class="d-flex flex-wrap mx-8" v-if="!isDataFetched">
-        <div v-for="i in 8" :key="i" class="px-2 mb-4">
-            <div class="pa-2">
-                <v-card>
-                    <v-skeleton-loader type="image" height="180px" width="100%" class="rounded-0" />
 
-                    <v-card-text class="pa-2">
-                        <v-skeleton-loader type="text" width="100%" class="mb-2" />
-                        <v-skeleton-loader type="text" width="100%" />
-                    </v-card-text>
+        <v-row>
+            <v-col v-for="group in joinedGroups" :key="group.id" cols="12" sm="6" md="4" lg="3">
+                <GroupCard :group-info="group" :to-link="'chat'/* + group.id*/" />
+            </v-col>
+        </v-row>
 
-                    <v-card-actions class="justify-center">
-                        <v-skeleton-loader type="button" width="97%" />
-                    </v-card-actions>
+        <h2 class="text-h5 font-weight-bold mt-8 mb-6">
+            Recommended Groups
+        </h2>
+
+        <v-row>
+            <v-col v-for="group in recommendedGroups" :key="group.id" cols="12" sm="6" md="4" lg="3">
+                <GroupCard :group-info="group" :to-link="'chat'/* + group.id*/" />
+            </v-col>
+        </v-row>
+
+        <v-row v-if="!isDataFetched">
+            <v-col v-for="i in 8" :key="i" cols="12" sm="6" md="4" lg="3">
+                <v-card class="pa-2">
+                    <v-skeleton-loader type="image" height="200" />
+                    <v-skeleton-loader type="text" class="mt-2" />
+                    <v-skeleton-loader type="text" width="60%" />
                 </v-card>
-            </div>
-        </div>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
@@ -58,3 +52,10 @@ onMounted(async () => {
     isDataFetched.value = true;
 })
 </script>
+
+<style scoped>
+.community-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+</style>
