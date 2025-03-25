@@ -7,45 +7,22 @@
     <div class="book">
       <div class="page cover">
         <h2 class="cover-title">📕 My Diary</h2>
-        <v-calendar
-          v-model="selectedDate"
-          @dayclick="goToNearestEntry"
-          :attributes="calendarAttributes"
-          class="custom-calendar"
-        />
+        <v-calendar v-model="selectedDate" @dayclick="goToNearestEntry" :attributes="calendarAttributes"
+          class="custom-calendar" />
         <div class="write-note-container">
           <div class="arrow-animation">➡️</div>
           <router-link to="/diary/diary-writing">
-            <button class="new-entry-button"
-              >Write a diary note for today</button
-            >
+            <button class="new-entry-button">Write a diary note for today</button>
           </router-link>
         </div>
       </div>
 
-      <div
-        class="page diary-page right"
-        :class="{ flippingright: isFlippingRight }"
-        @click.self="nextPage"
-      >
+      <div class="page diary-page right" :class="{ flippingright: isFlippingRight }" @click.self="nextPage">
         <div v-if="currentEntry">
-          <button
-            class="delete-button fixed"
-            @click.stop="confirmDelete(currentEntry.id)"
-            >🗑️</button
-          >
-          <input
-            type="text"
-            v-model="currentEntry.title"
-            @input="updateDiary"
-            class="entry-title"
-          />
+          <button class="delete-button fixed" @click.stop="confirmDelete(currentEntry.id)">🗑️</button>
+          <input type="text" v-model="currentEntry.title" @input="updateDiary" class="entry-title" />
           <p class="entry-date">{{ formatDate(currentEntry.creationTime) }}</p>
-          <textarea
-            v-model="currentEntry.content"
-            @input="updateDiary"
-            class="entry-content"
-          ></textarea>
+          <textarea v-model="currentEntry.content" @input="updateDiary" class="entry-content"></textarea>
         </div>
       </div>
     </div>
@@ -53,11 +30,8 @@
 </template>
 
 <script>
-import {
-  getPagedDiaryNotes,
-  deleteDiaryNote,
-  updateDiaryNote,
-} from "@/scripts/api/services/diaryNoteService";
+import { getPagedDiaryNotes, deleteDiaryNote, updateDiaryNote } from "@/scripts/api/services/diaryNoteService";
+import { getUserProfile } from '@/scripts/api/services/authService';
 import Swal from "sweetalert2";
 import { Calendar } from "v-calendar";
 import "v-calendar/style.css";
@@ -100,7 +74,8 @@ export default {
     },
     async fetchDiaryNotes() {
       try {
-        const data = await getPagedDiaryNotes();
+        var user = await getUserProfile();
+        const data = await getPagedDiaryNotes({ CreatorId: user.id });
         this.entries = data.items || [];
       } catch (error) {
         Swal.fire("Error", "Failed to fetch diary entries.", "error");
@@ -112,7 +87,7 @@ export default {
         setTimeout(() => {
           this.currentPageIndex++;
           this.isFlippingRight = false;
-        }, 400);
+        }, 700);
       }
     },
     goToNearestEntry(day) {
@@ -301,10 +276,12 @@ export default {
     transform: translateX(-20px);
     opacity: 0;
   }
+
   50% {
     transform: translateX(0);
     opacity: 1;
   }
+
   100% {
     transform: translateX(10px);
     opacity: 0;
