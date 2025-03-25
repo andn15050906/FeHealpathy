@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(file, index) in mediaFiles" :key="file.id" class="align-middle text-center">
+                <tr v-for="(file, index) in sortedMediaFiles" :key="file.id" class="align-middle text-center">
                     <td>{{ index + 1 }}</td>
                     <td>{{ file.title }}</td>
                     <td>{{ file.artist }}</td>
@@ -29,9 +29,10 @@
                         </button>
                     </td>
                 </tr>
-                <tr v-if="mediaFiles.length === 0">
-                    <td colspan="6" class="text-center text-muted">No media files available.</td>
+                <tr v-if="sortedMediaFiles.length === 0">
+                    <td colspan="7" class="text-center text-muted">No media files available.</td>
                 </tr>
+
             </tbody>
         </table>
     </div>
@@ -43,6 +44,11 @@ export default {
         mediaFiles: {
             type: Array,
             required: true,
+        },
+    },
+    computed: {
+        sortedMediaFiles() {
+            return [...this.mediaFiles].sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
         },
     },
     methods: {
