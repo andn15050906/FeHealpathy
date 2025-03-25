@@ -56,7 +56,6 @@ import EditGroup from '@/views/Community/EditGroup.vue'
 import ConversationWindow from '@/views/Community/ConversationWindow.vue'
 
 import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
-import ModerateAdvisors from '@/views/Profile/Admin/ModerateAdvisors.vue'
 import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Profile/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Profile/Admin/ModerateUploadedContent.vue'
@@ -65,6 +64,7 @@ import ManageSurvey from '@/views/Profile/Admin/ManageSurvey.vue'
 import ManageYoga from '@/views/Profile/Admin/ManageYoga.vue'
 import CreateYogaLesson from '@/views/Profile/Admin/CreateYoga.vue'
 
+import ManageAdvisorContent from '@/views/Profile/Advisor/Manage/ManageAdvisorContent.vue';
 import ViewAdvisor from '@/views/Profile/Advisor/ViewAdvisor.vue'
 import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
 import ScheduleMeeting from '@/views/Meetings/ScheduleMeeting.vue'
@@ -78,6 +78,7 @@ import UpdateCourse from '@/views/Profile/Advisor/Manage/UpdateCourse.vue'
 import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
+import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
 
 /*import CreateAssignment from '@/views/Assignments_Old/Create.vue'
 import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
@@ -249,9 +250,10 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/self-assessment',
+      path: '/self-assessment/:id?',
       name: 'SelfAssessment',
       component: SelfAssessment,
+      props: true,
       meta: { requiresAuth: true }
     },
     {
@@ -344,13 +346,13 @@ const router = createRouter({
       path: '/courses/create',
       name: 'createCourse',
       component: CreateCourse,
-      meta: { requiresAuth: true, requiresAdvisor: true }
+      // meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      meta: { requiresAuth: true, requiresAdvisor: true },
+      // meta: { requiresAuth: true, requiresAdvisor: true },
       props: true
     },
     {
@@ -495,14 +497,19 @@ const router = createRouter({
       name: 'Progress',
       component: RoadmapProgress
     },
+    {
+      path: '/roadmaps/create',
+      name: 'CreateRoadmap',
+      component: CreateRoadmap
+    },
 
 
     // Advisor
     {
-      path: '/advisor/moderate-advisors',
-      name: 'ModerateAdvisors',
-      //meta: { requiresAuth: true, requiresAdmin: true },
-      component: ModerateAdvisors,
+      path: '/advisor/content',
+      name: 'ManageAdvisorContent',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
+      component: ManageAdvisorContent,
     },
 
     // Admin

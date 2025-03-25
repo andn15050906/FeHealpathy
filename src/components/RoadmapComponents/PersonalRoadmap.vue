@@ -4,6 +4,11 @@
         <div v-for="introText in roadmap?.introTexts" class="roadmap-text">
             {{ introText }}
         </div>
+        <div class="highlighted-note">
+            📌 Cognitive Behavioral Therapy (CBT) has been recognized by many professional associations, notably the 
+            <strong>American Psychological Association (APA)</strong>, as one of the most effective psychological therapies. 
+            <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank">Learn more</a>.
+        </div>
     </div>
     <Roadmap :timelineItems="roadmap?.timelineItems ?? []"></Roadmap>
     <div v-if="nextScreenCallback" class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
@@ -12,8 +17,8 @@
 </template>
 
 <script>
-//import { inject } from 'vue';
 import "vue3-tour/dist/vue3-tour.css";
+import Confetti from "vue-confetti/src/confetti.js";
 import Roadmap from "@/components/RoadmapComponents/Roadmap.vue";
 import GlowingButton from "@/components/Common/GlowingButton.vue";
 import { inject } from "vue";
@@ -54,7 +59,8 @@ export default {
                 }
             },
             roadmap: roadmaps["mental-roadmap"],
-            roadmapProgress: inject('roadmapProgress')
+            roadmapProgress: inject('roadmapProgress'),
+            confetti: new Confetti()
             //guider: inject('guider')
         }
     },
@@ -74,6 +80,9 @@ export default {
                 return;
 
             let personalRoadmap = await this.roadmapProgress.getPersonalRoadmap();
+            if (!personalRoadmap) {
+                this.$router.push({ name: 'SettingUp' });
+            }
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',
@@ -86,13 +95,17 @@ export default {
                 }) ?? [],
                 timelineItems: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
-                        color: index == 0 ? '#FF8A80' : index == 1 ? '#BA68C8' : index == 2 ? '#7986CB' : index == 3 ? '#81C784' : '#64B5F6',
+                        color: (!personalRoadmap.currentPhase || index < personalRoadmap.currentPhase.index) ? '#0056b3' : index == personalRoadmap.currentPhase.index ? '#28a745' : '#6c757d',
                         icon: index == 0 ? 'mdi-account-heart': index == 1 ? 'mdi-bullseye' : index == 2 ? 'mdi-clock-outline' : index == 3 ? 'mdi-emoticon-happy' : 'mdi-rocket-launch',
                         title: _.title,
                         content: _.description,
-                        link: '/practice'
+                        link: '/progress'
                     }
                 }) ?? []
+            }
+            if (personalRoadmap.isCompleted) {
+                this.confetti.start();
+                setTimeout(() => this.confetti.stop(), 5000);
             }
         }
     }
@@ -193,4 +206,24 @@ html {
     margin-bottom: 24px; 
 }
 
+.highlighted-note {
+    font-size: 0.9rem;
+    color: #d35400;
+    background-color: #fdf2e9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.highlighted-note a {
+    color: #e67e22;
+    text-decoration: underline;
+    font-weight: normal;
+}
+
+.highlighted-note a:hover {
+    color: #d35400;
+}
 </style>

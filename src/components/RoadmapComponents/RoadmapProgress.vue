@@ -13,36 +13,33 @@
                     </v-tab>
                 </v-tabs>
                 <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
-                <!--<v-tabs-items v-model="activeTab">
-                    <v-tab-item v-for="phase in roadmap.phases" :key="phase.id">-->
-                        <v-card>
-                            <v-card-title :class="getPhaseHeaderClass(phase)">
-                                {{ phase.title }}
-                                <v-icon v-if="isPhaseCompleted(phase)" class="ml-2">mdi-check-circle</v-icon>
-                                <v-icon v-else-if="isPhaseInProgress(phase)" class="ml-2">mdi-progress-clock</v-icon>
-                            </v-card-title>
-                            <v-card-subtitle>{{ phase.description }}</v-card-subtitle>
-                            <v-card-text>
-                                <v-data-table :headers="getTableHeaders" :items="phase.milestones" item-class="milestone-row">
-                                    <template v-slot:item="{ item }">
-                                        <tr :class="getMilestoneClass(item)">
-                                            <td class="text-center">{{ item.title }}</td>
-                                            <td class="text-center">
-                                                <router-link :to="getLinkByEvent(item.eventName)">{{ item.eventName }}</router-link>
-                                            </td>
-                                            <td class="text-center">{{ item.repeatTimesRequired }}</td>
-                                            <td class="text-center">{{ item.timeSpentRequired }}</td>
-                                            <td class="text-center">
-                                                <span>{{ getProgressText(item) }}</span>
-                                                <v-icon small class="ml-1">{{ getProgressIcon(item) }}</v-icon>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </v-data-table>
-                            </v-card-text>
-                        </v-card>
-                    <!--</v-tab-item>
-                </v-tabs-items>-->
+                    <v-card>
+                        <v-card-title :class="getPhaseHeaderClass(phase)">
+                            {{ phase.title }}
+                            <v-icon v-if="isPhaseCompleted(phase)" class="ml-2">mdi-check-circle</v-icon>
+                            <v-icon v-else-if="isPhaseInProgress(phase)" class="ml-2">mdi-progress-clock</v-icon>
+                        </v-card-title>
+                        <v-card-subtitle>{{ phase.description }}</v-card-subtitle>
+                        <v-card-text>
+                            <v-data-table :headers="getTableHeaders" :items="phase.milestones" item-class="milestone-row">
+                                <template v-slot:item="{ item }">
+                                    <tr :class="getMilestoneClass(item)">
+                                        <td class="text-vertical-center">{{ item.title }}</td>
+                                        <td class="text-center">{{ item.repeatTimesRequired }}</td>
+                                        <!--<td class="text-center">{{ item.timeSpentRequired }}</td>-->
+                                        <td class="text-center">
+                                            <span>{{ getProgressText(item) }}</span>
+                                            <v-icon small class="ml-1">{{ getProgressIcon(item) }}</v-icon>
+                                        </td>
+                                        <td class="text-center">
+                                            <v-btn v-if="item.status == 'current'" class="navigate-btn"
+                                                @click="gotoLinkByEvent(item)">{{ text.Follow }}</v-btn>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
                 </div>
             </v-card-text>
         </v-card>
@@ -50,9 +47,8 @@
 </template>
 
 <script>
-import { getRoadmaps } from '@/scripts/api/services/roadmapService';
 import { getProgress } from '@/scripts/api/services/statisticsService';
-import { getLinkByEvent } from '@/scripts/api/services/activityLogService';
+import { getLinkByEventLabel, getLinkByRecommendation } from '@/scripts/api/services/activityLogService';
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
@@ -60,18 +56,20 @@ export default {
         getTableHeaders() {
             return [
                 { title: 'Milestone Title', value: 'title', align: 'center' },
-                { title: 'Event Name', value: 'eventName', align: 'center' },
                 { title: 'Repeat Times Required', value: 'repeatTimesRequired', align: 'center' },
-                { title: 'Time Spent Required', value: 'timeSpentRequired', align: 'center' },
-                { title: 'Progress', value: 'progress', align: 'center' }
+                /*{ title: 'Time Spent Required', value: 'timeSpentRequired', align: 'center' },*/
+                { title: 'Progress', value: 'progress', align: 'center' },
+                { title: 'Action', value: 'eventName', align: 'center' }
             ];
         }
     },
     data() {
         return {
+            text: {
+                Follow: 'Follow'
+            },
             activeTab: null,
             roadmap: {},
-            currentMilestoneId: null,
             phasesStatus: {} // Lưu trạng thái của từng phase
         }
     },
@@ -83,38 +81,43 @@ export default {
             completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
         }
 
-        console.log(completedMilestones);
-        
-        // Find current milestone (first non-completed one)
-        let foundCurrent = false;
-        
         for (let phase of tempRoadmap.phases) {
             let completedCount = 0;
             phase.totalMilestones = phase.milestones.length;
-            
+
             for (let milestone of phase.milestones) {
-                if (completedMilestones.includes(milestone.id)) {
+                if (tempRoadmap.isCompleted) {
                     milestone.status = 'completed';
                     milestone.progress = 'Completed';
                     completedCount++;
-                    console.log(milestone);
-                } else if (!foundCurrent) {
-                    // First non-completed milestone is the current one
-                    milestone.status = 'current';
-                    milestone.progress = 'In Progress';
-                    this.currentMilestoneId = milestone.id;
-                    foundCurrent = true;
-                } else {
-                    // All other non-completed milestones are locked
-                    milestone.status = 'locked';
-                    milestone.progress = 'Not Started';
+                }
+                else if (tempRoadmap.currentPhase) {
+                    if (phase.index < tempRoadmap.currentPhase.index) {
+                        milestone.status = 'completed';
+                        milestone.progress = 'Completed';
+                        completedCount++;
+                    }
+                    else if (phase.index > tempRoadmap.currentPhase.index) {
+                        milestone.status = 'locked';
+                        milestone.progress = 'Not Started';
+                    }
+                    else {
+                        if (completedMilestones.includes(milestone.id)) {
+                            milestone.status = 'completed';
+                            milestone.progress = 'Completed';
+                            completedCount++;
+                        } else {
+                            milestone.status = 'current';
+                            milestone.progress = 'In Progress';
+                        }
+                    }
                 }
             }
             
             // Xác định trạng thái của phase
             this.phasesStatus[phase.id] = {
                 completed: completedCount === phase.totalMilestones,
-                inProgress: completedCount > 0 && completedCount < phase.totalMilestones,
+                inProgress: phase.id == tempRoadmap.currentPhase?.id,
                 completedCount: completedCount,
                 totalMilestones: phase.totalMilestones
             };
@@ -149,7 +152,6 @@ export default {
     },
     watch: {
         activeTab(newVal) {
-            console.log(newVal);
             this.scrollToPhase(newVal);
         },
     },
@@ -200,7 +202,16 @@ export default {
                 return 'phase-header-locked';
             }
         },
-        getLinkByEvent
+        gotoLinkByEvent(milestone) {
+            if (milestone.recommendations?.length > 0) {
+                //console.log(milestone.eventName, milestone.recommendations[0].targetEntityId);
+                //console.log(getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId));
+                this.$router.push({ path: getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId) });
+            }
+            else {
+                this.$router.push({ path: getLinkByEventLabel(milestone.eventName) });
+            }
+        }
     }
 };
 </script>
@@ -341,6 +352,10 @@ export default {
     vertical-align: middle !important;
 }
 
+.text-vertical-center {
+    vertical-align: middle !important;
+}
+
 /* Phase tab styles */
 .phase-tab-completed {
     color: #0056b3 !important;
@@ -386,38 +401,8 @@ export default {
     color: #6c757d;
     border-bottom: 2px solid rgba(108, 117, 125, 0.2);
 }
+
+.navigate-btn {
+    color: #000000;
+}
 </style>
-
-<!--<template>
-    <div class="container">
-        <div class="red-flag"></div>
-        <div class="red-flag"></div>
-        <div class="red-flag"></div>
-        <div class="red-flag"></div>
-    </div>
-</template>
-
-<script setup>
-
-</script>
-
-<style>
-.container {
-    background-image: url("/assets/images/roadmap/Roadmap.jpg");
-    width: 100%;
-    height: 80vh;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    background-position: center top;
-}
-
-.red-flag {
-    width: 150px;
-    height: 100px;
-    background-image: url("/assets/images/roadmap/Flag_Red.png");
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    background-position: center top;
-    /*background-attachment: fixed*/
-}
-</style>-->

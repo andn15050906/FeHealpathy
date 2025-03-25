@@ -10,12 +10,6 @@
 <script>
 export default {
   name: 'DiaryButton',
-  props: {
-    moodType: {
-      type: String,
-      required: true
-    }
-  },
   methods: {
     navigateToDiary() {
       this.$router.push({ name: 'DiaryWriting' })

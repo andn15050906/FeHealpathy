@@ -1,7 +1,7 @@
 <template>
     <div class="moderate-users">
       <h1 class="title">Advisor Moderation</h1>
-  
+
       <div class="tabs">
         <button 
           v-for="tab in tabs" 
@@ -19,6 +19,9 @@
         <div class="content-header">
           <h2>Your Courses</h2>
         </div>
+        <router-link to="/courses/create">
+          <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Course</button>
+        </router-link>
         <div class="content-header">
           <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
@@ -54,10 +57,10 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="approveContent(item)">
+                <button class="btn btn-approve" @click="editCourse(item.id)">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-reject" @click="rejectContent(item)">
+                <button class="btn btn-reject" @click="prepareDelete(item, 'courses')">
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
@@ -70,14 +73,18 @@
             :goToPage="changePage" 
         />
       </div>
-      
+
       <!-- Blogs -->
       <div v-if="currentTab === 'blogs'" class="tab-content">
+        <div v-if="!isEditingBlog">
         <div class="content-header">
-          <h2>Pending Blog Posts</h2>
+          <h2>Your Blogs</h2>
         </div>
+        <router-link to="/blogs/create">
+        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Blog</button>
+        </router-link>
         <div class="content-header">
-          <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
+          <select  v-model="sortOption" @change="sortBlogs()" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
             <option value="name-desc">Name Z-A</option>
           </select>
@@ -89,7 +96,6 @@
             <tr>
               <th>Thumb</th>
               <th>Title</th>
-              <th>Author</th>
               <th>Tags</th>
               <th>Status</th>
               <th>Actions</th>
@@ -99,7 +105,6 @@
             <tr v-for="item in filteredBlogs" :key="item.id">
               <td> <img v-if="item.thumb && item.thumb.url" :src="item.thumb.url" :alt="item.thumb.title" class="thumbnail-img"/> </td>
               <td>{{ item.title }}</td>
-              <td>{{ item.creator.fullName }}</td>
               <td>{{ item.tags.map(tag => tag.title).join(', ') }}</td>
               <td>
                 <span :class="['status-badge', item.status]">
@@ -107,74 +112,104 @@
                 </span>
               </td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="approveContent(item)">
-                  <i class="fas fa-check"></i>
+                <button class="btn btn-approve" @click="editBlog(item)">
+                  <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-reject" @click="rejectContent(item)">
-                  <i class="fas fa-times"></i>
+                <button class="btn btn-reject" @click="prepareDelete(item, 'blogs')">
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+      </div>
 
       <!-- Tab roadmaps -->
       <div v-if="currentTab === 'roadmaps'" class="tab-content">
+        <div v-if="!isEditingRoadmap">
         <div class="content-header">
-          <h2>Pending Roadmaps</h2>
-          <input v-model="searchQuery[currentTab]" placeholder="Search..." class="search-input" />
+          <h2>Roadmaps</h2>
+        </div>
+        <router-link to="/roadmaps/create">
+        <button type="button" class="btn btn-primary" data-mdb-ripple-init style="width: 150px;height:50px;color: white; margin: auto;background-color: green;">Create A Roadmap</button>
+      </router-link>
+        <div class="content-header">
+          <select  v-model="sortOption" @change="sortRoadmaps()" class="form-select" style="width: 200px;">
+            <option selected value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+          </select>
 
+          <input v-model="searchQuery[currentTab]" placeholder="Search..." class="search-input" />
         </div>
         <table class="content-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Group Name</th>
-              <th>Creator</th>
-              <th>Members</th>
-              <th>Status</th>
+              <th>Title</th>
+              <th>Intro</th>
+              <th>Phase</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in filteredRoadmaps" :key="item.id">
-              <td>{{ item.id }}</td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.creator }}</td>
-              <td>{{ item.memberCount }}</td>
-              <td>
-                <span :class="['status-badge', item.status]">
-                  {{ item.status }}
-                </span>
-              </td>
+              <td>{{ item.title }}</td>
+              <td>{{ item.introText }}</td>
+              <td>{{ item.phases.length }}</td>
               <td class="action-buttons">
-                <button class="btn btn-approve" @click="approveContent(item)">
-                  <i class="fas fa-check"></i>
+                <button class="btn btn-approve" @click="editRoadmap(item)">
+                  <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-reject" @click="rejectContent(item)">
-                  <i class="fas fa-times"></i>
+                <button class="btn btn-reject" @click="prepareDelete(item, 'roadmaps')">
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </div></div>
+    <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog"
+            @blogUpdated="handleBlogUpdated" />
+    <UpdateRoadmap v-if="isEditingRoadmap" :roadmapData="selectedRoadmap"
+            @roadmapUpdated="handleRoadmapUpdated" />
+    <DeleteConfirmPopup
+    :message="deleteMessage"
+    :isVisible="showDeletePopup"
+    @confirmDelete="confirmDelete"
+    @update:isVisible="showDeletePopup = $event"
+/>
+
   </template>
-  
+
   <script>
-  import { getPagedArticles } from '@/scripts/api/services/blogService';
-  import { getCourses } from '@/scripts/api/services/courseService';
+  import { getPagedArticles, deleteArticle } from '@/scripts/api/services/blogService';
+  import { getCourses, deleteCourse } from '@/scripts/api/services/courseService';
+  import { getRoadmaps, deleteRoadmap } from '@/scripts/api/services/roadmapService';
   import Pagination from '@/components/Common/Pagination.vue';
+  import UpdateBlog from './UpdateBlog.vue';
+  import UpdateRoadmap from './UpdateRoadmap.vue';
+  import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
   export default {
-    components: { Pagination },
+    emits: ['authenticated', 'addNotification', 'removeNotification'],
+    components: { Pagination, DeleteConfirmPopup, UpdateBlog, UpdateRoadmap },
     data() {
       return {
+        blogs: [],
+        isEditingBlog: false,
+        selectedBlog: null,
+        isEditingRoadmap: false,
+        selectedRoadmap: null,
+        isDeletePopupVisible: false,
+        blogToDelete: null,
         sortOption: 'name-asc',
-        currentPage: 1,  // Trang hiện tại (bắt đầu từ 1)
-        totalPages: 1,   // Tổng số trang
-        pageSize: 20,    // Số khóa học mỗi trang
+        currentPage: 1,  
+        totalPages: 1,   
+        pageSize: 20, 
+        showDeletePopup: false,
+        selectedItem: null,
+        selectedItemType: '',
+        deleteMessage: ''  ,
         searchQuery: {
             courses: '',
             blogs: '',
@@ -188,19 +223,47 @@
         ],
         courses: [],
         blogs: [],
-        roadmaps: [
-          {
-            id: 1,
-            name: 'Sports Community',
-            creator: 'Jane Wilson',
-            memberCount: 150,
-            status: 'pending'
-          },
-        ]
+        roadmaps: []
       };
     },
 methods: {
-    changePage(page) {
+  editBlog(blog) {
+    if (blog) {
+      this.selectedBlog = blog;
+      this.isEditingBlog = true;
+    } else {
+      console.error("Error: blog data is undefined.");
+      this.isEditingBlog = false;
+    }
+  },
+  editCourse(id) {
+    this.$router.push({ name: 'updateCourse', params: { id } });
+  },
+  editRoadmap(roadmap) {
+    if (roadmap) {
+      this.selectedRoadmap = roadmap;
+      this.isEditingRoadmap = true;
+    } else {
+      console.error("Error: blog data is undefined.");
+      this.isEditingRoadmap = false;
+    }
+  },
+  handleBlogUpdated() {
+    this.isEditingBlog = false;
+    this.selectedBlog = null;
+  },
+  handleRoadmapUpdated() {
+    this.isEditingRoadmap = false;
+    this.selectedRoadmap = null;
+    this.fetchRoadmaps();
+  },
+  prepareDelete(item, type) {
+    this.selectedItem = item;
+    this.selectedItemType = type;
+    this.deleteMessage = `Are you sure you want to delete "${item.title}"?`;
+    this.showDeletePopup = true;
+  },
+  changePage(page) {
     if (page >= 1 && page <= this.totalPages) {
         console.log("Changing to page:", page);
         this.currentPage = page;
@@ -218,7 +281,7 @@ sortCourses() {
       this.courses.sort((a, b) => b.price - a.price);
     }
   },
-  sortBlogs() {
+sortBlogs() {
   if (this.sortOption === 'name-asc') {
     this.blogs.sort((a, b) => a.title.localeCompare(b.title)); 
   } else if (this.sortOption === 'name-desc') {
@@ -226,7 +289,14 @@ sortCourses() {
   }
 }
 ,
-  async fetchBlogs() {
+sortRoadmaps() {
+  if (this.sortOption === 'name-asc') {
+    this.roadmaps.sort((a, b) => a.title.localeCompare(b.title)); 
+  } else if (this.sortOption === 'name-desc') {
+    this.roadmaps.sort((a, b) => b.title.localeCompare(a.title));
+  }
+},
+async fetchBlogs() {
   try {
     const response = await getPagedArticles();
     this.blogs = Array.isArray(response.items) ? response.items : [];
@@ -234,14 +304,54 @@ sortCourses() {
     if (blogTab) {
       blogTab.count = response.totalCount;
     }
-    this.sortBlogs(); // Sắp xếp lại blog sau khi fetch
+    this.sortBlogs();
     console.log(response);
   } catch (error) {
     console.error('Error fetching blogs:', error);
     this.blogs = [];
   }
 },
-    async fetchCourses() {
+async confirmDelete(confirm) {
+    if (confirm) {
+      try {
+        switch (this.selectedItemType) {
+          case 'courses':
+            await deleteCourse(this.selectedItem.id);
+            break;
+          case 'blogs':
+            await deleteArticle(this.selectedItem.id);
+            break;
+          case 'roadmaps':
+            await deleteRoadmap(this.selectedItem.id);
+            break;
+        }
+        
+        this.fetchCourses();
+        this.fetchBlogs();
+        this.fetchRoadmaps();
+      } catch (error) {
+        console.error('Error deleting content:', error);
+        alert('Failed to delete the content.');
+      }
+    }
+    this.showDeletePopup = false;
+  },
+async fetchRoadmaps() {
+  try {
+    const response = await getRoadmaps();
+    this.roadmaps = Array.isArray(response.items) ? response.items : [];
+    const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
+    if (roadmapTab) {
+      roadmapTab.count = response.totalCount;
+    }
+    this.sortRoadmaps();
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching roadmaps:', error);
+    this.roadmaps = [];
+  }
+},
+async fetchCourses() {
     try {
         console.log("Fetching courses for page:", this.currentPage);
 
@@ -268,8 +378,8 @@ sortCourses() {
         console.error('Error fetching courses:', error);
         this.courses = [];
     }
-}
-,
+  }
+  ,
     },
     computed: {
         filteredCourses() {
@@ -284,7 +394,7 @@ sortCourses() {
     },
         filteredRoadmaps() {
             return this.roadmaps.filter(item => 
-            item.name.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase())
+            item.title.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase())
         );
     }
 },
@@ -296,11 +406,13 @@ sortCourses() {
       document.head.appendChild(link);
       this.fetchBlogs();
       this.fetchCourses();
+      this.fetchRoadmaps();
     }
   };
   </script>
-  
+
   <style scoped>
+  
   .moderate-users {
     padding: 20px;
   }
@@ -435,7 +547,7 @@ sortCourses() {
   }
 
   .thumbnail-img {
-  width: 100px; /* Điều chỉnh kích thước phù hợp */
+  width: 100px;
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -446,11 +558,12 @@ sortCourses() {
 .content-table td {
   padding: 12px;
   text-align: left;
-  vertical-align: top; /* Căn chữ lên trên */
+  vertical-align: top;
 }
 
 .content-table tr {
   border-bottom: 1px solid #eee;
 }
 
-  </style>
+
+</style>

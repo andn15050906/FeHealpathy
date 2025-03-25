@@ -49,43 +49,7 @@ import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
 import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
 
-const recentActivities = ref([
-  /*{
-    creationTime: "2024-03-02 08:30",
-    action: "Answered Question of the Day",
-    content: "✅ Positive response",
-  },
-  {
-    creationTime: "2024-03-03 14:00",
-    action: "Updated Mood",
-    content: "😔 Slightly negative mood ⚠️",
-  },
-  {
-    creationTime: "2024-03-04 20:00",
-    action: "Joined a chat group",
-    content: "💬 Sent 5 messages",
-  },
-  {
-    creationTime: "2024-03-05 16:45",
-    action: "Completed stress management exercise",
-    content: "✅ Success!",
-  },
-  {
-    creationTime: "2024-03-06 10:00",
-    action: "Completed 10 minutes of meditation",
-    content: "🧘‍♂️ Done",
-  },
-  {
-    creationTime: "2024-03-07 09:00",
-    action: "Filled out a survey",
-    content: "📝 Submitted feedback",
-  },
-  {
-    creationTime: "2024-03-07 17:00",
-    action: "Completed a course",
-    content: "🎓 Finished 'Stress Control' course",
-  },*/
-]);
+const recentActivities = ref([]);
 
 const moodChart = ref(null);
 

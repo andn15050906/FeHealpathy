@@ -17,17 +17,17 @@ export const mentalRoadmap = {
         // Prioritize issues to address based on their impact on your life.
         // Gain knowledge about your specific mental health concerns.
         // Discuss how CBT has helped others with similar issues.
-        { color: '#FF8A80', icon: 'mdi-account-heart', title: 'Identify the Problem', content: 'Utilize tools to define your emotions and issues clearly. This step is crucial for understanding the root causes of your feelings and behaviors, allowing for effective strategies to be developed.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-account-heart', title: 'Identify the Problem', content: 'Utilize tools to define your emotions and issues clearly. This step is crucial for understanding the root causes of your feelings and behaviors, allowing for effective strategies to be developed.', link: '/practice' },
         //Practice relaxation techniques such as deep breathing and mindfulness.
         //Identify activities that bring joy or a sense of accomplishment.
         //Gradually incorporate these activities into your routine to improve mood.
-        { color: '#BA68C8', icon: 'mdi-bullseye', title: 'Stabilize Your Mind', content: 'Learn techniques to reduce stress and prepare for change. This includes mindfulness practices and relaxation techniques that can help you regain control over your thoughts and emotions.', link: '/practice' },
-        { color: '#7986CB', icon: 'mdi-clock-outline', title: 'Build Positive Habits', content: 'Establish routines that support long-term mental health. This step focuses on creating daily habits that promote well-being and resilience, ensuring a healthier lifestyle.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-bullseye', title: 'Stabilize Your Mind', content: 'Learn techniques to reduce stress and prepare for change. This includes mindfulness practices and relaxation techniques that can help you regain control over your thoughts and emotions.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-clock-outline', title: 'Build Positive Habits', content: 'Establish routines that support long-term mental health. This step focuses on creating daily habits that promote well-being and resilience, ensuring a healthier lifestyle.', link: '/practice' },
         //Keep a journal to track negative thoughts and their triggers.
         //Challenge and reframe negative thoughts using evidence-based techniques.
         //Replace distorted thoughts with more balanced, realistic ones.
-        { color: '#81C784', icon: 'mdi-emoticon-happy', title: 'Manage Stress & Emotions', content: 'Develop skills to maintain a positive mindset and emotional balance. This involves learning coping strategies and emotional regulation techniques to handle life’s challenges effectively.', link: '/practice' },
-        { color: '#64B5F6', icon: 'mdi-rocket-launch', title: 'Evaluate & Continue Maintenance', content: 'Regularly assess your progress and adjust your strategies as needed. This step emphasizes the importance of reflection and adaptation in your mental health journey.', link: '/practice' }
+        { color: '#6c757d', icon: 'mdi-emoticon-happy', title: 'Manage Stress & Emotions', content: 'Develop skills to maintain a positive mindset and emotional balance. This involves learning coping strategies and emotional regulation techniques to handle life’s challenges effectively.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-rocket-launch', title: 'Evaluate & Continue Maintenance', content: 'Regularly assess your progress and adjust your strategies as needed. This step emphasizes the importance of reflection and adaptation in your mental health journey.', link: '/practice' }
     ]
 };
 

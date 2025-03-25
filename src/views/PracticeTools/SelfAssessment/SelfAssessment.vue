@@ -48,6 +48,12 @@ const currentSurvey = ref({});
 const currentSurveyRef = ref();
 const currentQuestionIndex = ref(0);
 const router = useRouter();
+const props = defineProps({
+  id: {
+    type: String,
+    required: false,
+  },
+});
 
 const surveysMapping = {
   "BSI": "Survey_BSI-18.jfif",
@@ -68,6 +74,10 @@ onBeforeMount(async () => {
         icon: getSurveyImage(item.name)
       }
     });
+  
+  if (props.id) {
+    openTest(props.id);
+  }
 })
 
 const getSurveyImage = (name) => {
@@ -83,9 +93,7 @@ const currentSurveyOptions = computed(() => new SurveyOptions(
   currentSurvey.value,
   '',
   null,
-  currentSurvey.value.name.includes("DASS-21")
-    ? submitDASS21
-    : submitGAD7,
+  submitCallback,
   false,
   true
 ))
@@ -93,7 +101,9 @@ const currentSurveyOptions = computed(() => new SurveyOptions(
 const openTest = (testId) => {
   currentSurvey.value = surveys.value.find(survey => survey.id === testId);
   currentQuestionIndex.value = 0;
-  showPopup.value = true;
+  if (currentSurvey.value) {
+    showPopup.value = true;
+  }
 }
 const closePopup = () => {
   showPopup.value = false;
@@ -108,23 +118,11 @@ const submitSurvey = async (survey, questionsWithAnswer) => {
           return new CreateMcqChoiceDto(item.questionId, item.answerId)
       })
   );
-  //return
   return await createSubmission(data);
 }
-const submitDASS21 = async (questionsWithAnswer) => {
-  let survey = surveys.value.find(item => item.name.includes("DASS-21"));
+const submitCallback = async (questionsWithAnswer) => {
   try {
-    var response = await submitSurvey(survey, questionsWithAnswer);
-    router.push({ name: 'SubmissionReview', params: { id: response }});
-  }
-  catch (error) {
-    console.log(error);
-  }
-}
-const submitGAD7 = async (questionsWithAnswer) => {
-  let survey = surveys.value.find(item => item.name.includes("GAD-7"));
-  try {
-    var response = await submitSurvey(survey, questionsWithAnswer);
+    var response = await submitSurvey(currentSurvey.value, questionsWithAnswer);
     router.push({ name: 'SubmissionReview', params: { id: response }});
   }
   catch (error) {

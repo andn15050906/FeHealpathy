@@ -1,19 +1,17 @@
 <template>
-    <v-dialog v-model="localVisible" persistent max-width="400px" class="delete-confirm-popup" :scrim="false">
-
+    <v-dialog v-model="localVisible" persistent max-width="400px" class="save-confirm-popup" :scrim="false">
         <v-card>
             <v-card-title class="d-flex align-center title-section">
-                <i class="fas fa-exclamation-circle text-danger mr-2"></i>
-                <span class="title">Confirm Delete</span>
+                <i class="fas fa-save text-primary mr-2"></i>
+                <span class="title">Confirm Save</span>
             </v-card-title>
             <v-card-text class="d-flex align-center text-section">
                 <span>{{ message }}</span>
             </v-card-text>
-
             <v-card-actions class="justify-end action-section">
                 <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Cancel</v-btn>
-                <v-btn color="red darken-1" class="delete-btn" @click="handleClick(true)">
-                    <span class="delete-text">Delete</span>
+                <v-btn color="blue darken-1" class="save-btn" @click="handleClick(true)">
+                    <span class="save-text">Save</span>
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -31,14 +29,10 @@ const props = defineProps({
     isVisible: {
         type: Boolean,
         required: true,
-    },
-    url: {
-        type: String,
-        required: false
-    },
+    }
 });
 
-const emit = defineEmits(["confirmDelete", "update:isVisible"]);
+const emit = defineEmits(["confirmSave", "update:isVisible"]);
 
 const localVisible = ref(props.isVisible);
 
@@ -50,7 +44,7 @@ watch(
 );
 
 function handleClick(confirm) {
-    emit("confirmDelete", confirm);
+    emit("confirmSave", confirm);
     emit("update:isVisible", false);
 }
 </script>
@@ -97,30 +91,26 @@ function handleClick(confirm) {
     background-color: #f5f5f5;
 }
 
-.delete-btn {
-    background-color: #f44336;
+.save-btn {
+    background-color: #1976d2;
     color: white;
     font-weight: bold;
     position: relative;
     overflow: hidden;
 }
 
-.delete-btn:hover {
-    background-color: #d32f2f;
+.save-btn:hover {
+    background-color: #1565c0;
 }
 
-.delete-btn .delete-text {
+.save-btn .save-text {
     text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
     font-weight: 600;
     color: white;
 }
 
-.fas.fa-exclamation-circle {
+.fas.fa-save {
     font-size: 24px;
-    color: #f44336;
-}
-
-.text-danger {
-    color: #f44336 !important;
+    color: #1976d2;
 }
 </style>
