@@ -1,6 +1,6 @@
 <template>
     <h4 class="page-title">Blog Catalog</h4>
-  
+
     <div class="search-section">
       <input type="text" placeholder="Search blogs..." v-model="searchQuery" class="search-input"/>
     </div>
@@ -12,7 +12,7 @@
         {{ filter.label }}
       </button>
     </div>
-  
+
       <select  v-model="sortOption" @change="sortBlogs" class="form-select" style="width: 200px;">
             <option selected value="name-asc">Name A-Z</option>
             <option value="name-desc">Name Z-A</option>
@@ -24,7 +24,7 @@
         <blogCard v-for="blog in filteredBlogs" :key="blog.id" :blog="blog" />
       </div>
     </div>
-  
+
     <div class="pagination">
       <button v-for="page in Math.ceil(blogs.length / itemsPerPage)" :key="page"
         :class="['page-btn', currentPage === page ? 'active' : '']"
@@ -33,7 +33,7 @@
       </button>
     </div>
   </template>
-  
+
 <script setup>
 import { ref, computed, watch, onBeforeMount } from 'vue';
 import { getPagedArticles } from "@/scripts/api/services/blogService.js";
@@ -53,9 +53,7 @@ const paginatedblogs = computed(() => {
 });
 const filters = ref([]);
 const currentFilter = ref('all');
-
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
-
 function toggleTag(tagId) {
   const index = selectedTags.value.indexOf(tagId);
   if (index === -1) {
@@ -64,7 +62,6 @@ function toggleTag(tagId) {
     selectedTags.value.splice(index, 1);
   }
 }
-
 const filteredBlogs = computed(() => {
   let result = blogs.value;
   if (selectedTags.value.length > 0) {
@@ -77,7 +74,6 @@ const filteredBlogs = computed(() => {
   }
   return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
 });
-
 function sortBlogs() {
   if (sortOption.value === 'name-asc') {
     blogs.value.sort((a, b) => a.title.localeCompare(b.title));
@@ -85,12 +81,10 @@ function sortBlogs() {
     blogs.value.sort((a, b) => b.title.localeCompare(a.title));
   }
 }
-
 watch(sortOption, () => {
   sortBlogs();
   changePage(1);
 });
-
 
 onBeforeMount(async () => {
   try {
@@ -106,15 +100,11 @@ onBeforeMount(async () => {
     console.error("Failed to fetch blogs or tags", error);
   }
 });
-
-
 function changePage(page) {
   currentPage.value = page;
 }
-
 function applyFilter(filterValue) {
   currentFilter.value = filterValue;
-
   if (filterValue === 'all') {
     paginatedblogs.value = blogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
   } else {
@@ -122,9 +112,7 @@ function applyFilter(filterValue) {
     paginatedblogs.value = filteredBlogs.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
   }
 }
-
 </script>
-
   
   <style scoped>
   .blogs-container {
@@ -200,20 +188,17 @@ function applyFilter(filterValue) {
     color: white;
     border-color: #5488c7;
   }
-
   .page-title {
   font-size: 32px;
   text-align: center;
   margin: 40px 0;
   color: #1b1b1b;
 }
-
 .search-section {
   margin: 20px 0;
   display: flex;
   justify-content: center;
 }
-
 .search-input {
   width: 100%;
   max-width: 800px;
@@ -224,7 +209,6 @@ function applyFilter(filterValue) {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   transition: border-color 0.3s;
 }
-
 .search-input:focus {
   border-color: #007BFF;
   outline: none;
