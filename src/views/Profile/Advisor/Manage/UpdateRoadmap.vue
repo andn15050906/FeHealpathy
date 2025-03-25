@@ -14,7 +14,7 @@
   
         <div class="phases">
           <h2>📈 Các Giai Đoạn</h2>
-          <div class="phase" v-for="(phase, index) in roadmap.phases" :key="index">
+          <div class="phase" v-for="(phase, index) in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="index">
             <div class="form-group">
               <label>🏷️ Tiêu đề Giai Đoạn</label>
               <input type="text" v-model="phase.title" placeholder="Nhập tiêu đề giai đoạn" required />
@@ -37,7 +37,11 @@
                 </div>
                 <div class="form-group">
                   <label>📅 Sự Kiện</label>
-                  <input type="text" v-model="milestone.eventName" placeholder="Tên sự kiện liên quan" required />
+                  <select v-model="milestone.eventName" class="form-select">
+                    <option v-for="eventType in TRACKED_EVENTS" :key="eventType.value" :value="eventType.label" @change="updateEventList(index, msIndex, milestone.eventName)">
+                      {{ eventType.displayName.length > 0 ? eventType.displayName : 'General' }}
+                    </option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label>🔁 Lần lặp lại yêu cầu</label>
@@ -47,22 +51,21 @@
                   <label>⏱ Thời gian cần thiết (phút)</label>
                   <input type="number" v-model="milestone.timeSpentRequired" placeholder="Thời gian cần thiết để hoàn thành mốc" required />
                 </div>
-                <div class="recommendations" v-if="milestone.recommendations">
-                  <h4>📘 Khuyến Nghị</h4>
-                  <div class="recommendation" v-for="(recommendation, recIndex) in milestone.recommendations" :key="recIndex">
-                    <!-- <div class="form-group">
-                      <label>🆔 ID Đối Tượng</label>
-                      <input type="text" v-model="recommendation.targetEntityId" placeholder="Nhập ID đối tượng" required />
-                    </div> -->
-                    <div class="form-group">
-                      <label>📄 Loại Đối Tượng</label>
-                      <input type="text" v-model="recommendation.entityType" placeholder="Nhập loại đối tượng" required />
-                    </div>
-                    <!-- <div class="form-group">
-                      <label>🔖 ID Mốc</label>
-                      <input type="text" v-model="recommendation.milestoneId" placeholder="Nhập ID mốc" required />
-                    </div> -->
-                    <div class="form-group">
+                <div class="recommendations" v-if="isRecommendationAvailable(milestone.eventName) && milestone.recommendations">
+                <h4>📘 Khuyến Nghị</h4>
+                <div class="recommendation" v-for="(recommendation, recIndex) in milestone.recommendations" :key="recIndex">
+                  <select v-model="recommendation.entityType" class="hidden">
+                    <option :key="milestone.eventName" :value="milestone.eventName"></option>
+                  </select>
+                  <div class="form-group">
+                    <label>🆔 Nội dung khuyến nghị</label>
+                    <select v-model="recommendation.targetEntityId" class="form-select">
+                      <option v-for="content in getAvailableContents(index, msIndex, recIndex, milestone.eventName)" :key="content.id" :value="content.id">
+                        {{ content.name ?? content.title }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group">
                       <label>🏷️ Đặc Tính</label>
                       <input type="text" v-model="recommendation.trait" placeholder="Nhập đặc tính" required />
                     </div>
@@ -71,9 +74,9 @@
                       <textarea v-model="recommendation.traitDescription" placeholder="Mô tả đặc tính" rows="2" required></textarea>
                     </div>
                     <button type="button" class="btn remove" @click="removeRecommendation(index, msIndex, recIndex)" style="margin-top: 5px;">❌ Xóa Khuyến Nghị</button>
-                  </div>
-                  <button type="button" class="btn add" @click="addRecommendation(index, msIndex)">➕ Thêm Khuyến Nghị</button>
                 </div>
+                <button type="button" class="btn add" @click="addRecommendation(index, msIndex)">➕ Thêm Khuyến Nghị</button>
+              </div>
                 <button type="button" class="btn remove" @click="removeMilestone(index, msIndex)" style="margin-top: 5px;">❌ Xóa Mốc</button>
               </div>
               <button type="button" class="btn add" @click="addMilestone(index)">➕ Thêm Mốc</button>
@@ -92,18 +95,29 @@
     </div>
   </template>
   
-  <script setup>
-  import { useRouter } from 'vue-router';
+<script setup>
+  import { getCourses } from "@/scripts/api/services/courseService.js";
+  import { getPagedMediaResources } from "@/scripts/api/services/mediaResourcesService";
+  import { getPagedArticles } from '@/scripts/api/services/blogService';
+  import { getPagedConversations } from '@/scripts/api/services/conversationService';
+  import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+  import { TRACKED_EVENTS, ENTITY_TYPES, getEntityTypeByEventLabel } from '@/scripts/api/services/activityLogService';
   import { updateRoadmap } from '@/scripts/api/services/roadmapService';
   import { ref } from 'vue';
+  import { onMounted } from "vue";
   
-  const router = useRouter();
   const props = defineProps({
     roadmapData: {
       type: Object,
       required: true,
     },
   });
+
+  const allCourses = ref([]);
+  const allMediaResources = ref([]);
+  const allArticles = ref([]);
+  const allConversations = ref([]);
+  const allSurveys = ref([]);
 
   console.log("Roadmap Data:", props.roadmapData);
   const roadmap = ref({
@@ -125,63 +139,97 @@
   function removePhase(index) {
     roadmap.value.phases.splice(index, 1);
   }
-  
-function removeMilestone(phaseIndex, milestoneIndex) {
-      this.roadmap.phases[phaseIndex].milestones.splice(milestoneIndex, 1);
-    }
+    
+  function removeMilestone(phaseIndex, milestoneIndex) {
+    this.roadmap.phases[phaseIndex].milestones.splice(milestoneIndex, 1);
+  }
 
-function addMilestone(phaseIndex) {
-  const newMilestone = {
-    title: "",
-    eventName: "",
-    repeatTimesRequired: 0,
-    timeSpentRequired: 0,
-    recommendations: []
-  };
-  roadmap.value.phases[phaseIndex].milestones.push(newMilestone);
-}
-
-function addRecommendation(phaseIndex, milestoneIndex) {
-  const phase = roadmap.value.phases[phaseIndex];
-  const milestone = phase && phase.milestones[milestoneIndex];
-  if (milestone) {
-    const newRecommendation = {
-      targetEntityId: "00000000-0000-0000-0000-000000000000",
-      entityType: "",
-      milestoneId: "00000000-0000-0000-0000-000000000000",
-      trait: "",
-      traitDescription: ""
+  function addMilestone(phaseIndex) {
+    const newMilestone = {
+      title: "",
+      eventName: "",
+      repeatTimesRequired: 0,
+      timeSpentRequired: 0,
+      recommendations: []
     };
-    if (!milestone.recommendations) {
-      milestone.recommendations = [];
+    roadmap.value.phases[phaseIndex].milestones.push(newMilestone);
+  }
+
+  function addRecommendation(phaseIndex, milestoneIndex) {
+    const phase = roadmap.value.phases[phaseIndex];
+    const milestone = phase && phase.milestones[milestoneIndex];
+    if (milestone) {
+      const newRecommendation = {
+        targetEntityId: "00000000-0000-0000-0000-000000000000",
+        entityType: "",
+        milestoneId: "00000000-0000-0000-0000-000000000000",
+        trait: "",
+        traitDescription: ""
+      };
+      if (!milestone.recommendations) {
+        milestone.recommendations = [];
+      }
+      milestone.recommendations.push(newRecommendation);
+    } else {
+      console.error("Invalid phaseIndex or milestoneIndex");
     }
-    milestone.recommendations.push(newRecommendation);
-  } else {
-    console.error("Invalid phaseIndex or milestoneIndex");
   }
-}
-function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
-    this.roadmap.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
-}
 
-  
-async function submitRoadmap() {
-  try {
-    console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
-    
-    await updateRoadmap(roadmap.value); 
-    // router.go(0);
-  } catch (error) {
-    console.error('Error updating roadmap:', error);
+  function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
+      this.roadmap.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
   }
-}
-
-
-
-  </script>
-
   
-    
+  async function submitRoadmap() {
+    try {
+      console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
+      
+      await updateRoadmap(roadmap.value); 
+    } catch (error) {
+      console.error('Error updating roadmap:', error);
+    }
+  }
+
+  function isRecommendationAvailable(eventLabel) {
+    switch(getEntityTypeByEventLabel(eventLabel)) {
+      case ENTITY_TYPES.Course.en: return true;
+      case ENTITY_TYPES.MediaResource.en: return true;
+      case ENTITY_TYPES.Article.en: return true;
+      case ENTITY_TYPES.Conversation.en: return true;
+      case ENTITY_TYPES.Survey.en: return true;
+    }
+    return false;
+  }
+
+  function getPreloadedEntities(eventLabel) {
+    switch(eventLabel) {
+      case ENTITY_TYPES.Course.en: return allCourses.value;
+      case ENTITY_TYPES.MediaResource.en: return allMediaResources.value;
+      case ENTITY_TYPES.Article.en: return allArticles.value;
+      case ENTITY_TYPES.Conversation.en: return allConversations.value;
+      case ENTITY_TYPES.Survey.en: return allSurveys.value;
+    }
+    return [];
+  }
+
+  function updateEventList(phaseIndex, milestoneIndex) {
+    const milestone = roadmap.value.phases[phaseIndex].milestones[milestoneIndex];
+    milestone.entityType = getEntityTypeByEventLabel(milestone.eventName);
+  }
+  
+  function getAvailableContents(phaseIndex, milestoneIndex, recIndex, eventLabel) {
+    //const recommendation = roadmap.value.phases[phaseIndex].milestones[milestoneIndex].recommendations[recIndex];
+    return getPreloadedEntities(getEntityTypeByEventLabel(eventLabel));
+  }
+  
+  onMounted(async () => {
+    getCourses({ pageIndex: 0, pageSize: 10 }).then(res => allCourses.value = res.items);
+    getPagedMediaResources({ pageIndex: 0, pageSize: 10 }).then(res => allMediaResources.value = res.items);
+    getPagedArticles({ pageIndex: 0, pageSize: 10 }).then(res => allArticles.value = res.items);
+    getPagedConversations({ pageIndex: 0, pageSize: 10 }).then(res => allConversations.value = res.items);
+    getPagedSurveys({ pageIndex: 0, pageSize: 10 }).then(res => allSurveys.value = res.items);
+  })
+</script>
+
 <style scoped>
 body {
     font-family: 'Arial', sans-serif;

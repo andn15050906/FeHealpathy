@@ -30,6 +30,8 @@ export const getCurrentRoadmapWithProgress = async () => {
   let progressPromise = getProgress();
   await Promise.all([roadmapPromise, progressPromise]);
   let roadmap = (await roadmapPromise).items.find(_ => _.id == getUserProfile().roadmapId);
+  if (!roadmap)
+    return null;
   let phasesProgress = await progressPromise;
   let completedMilestones = [];
   for (let phaseProgress of phasesProgress) {

@@ -20,7 +20,8 @@ import { ref, reactive, onMounted, onUnmounted } from "vue";
 import MediaPlayer from "./MediaPlayer.vue";
 import MediaDisplay from "./MediaDisplay.vue";
 import MediaLibrary from "./MediaLibrary.vue";
-import { getPagedMediaResources } from "../../../scripts/api/services/mediaResourcesService";
+import { getPagedMediaResources } from "@/scripts/api/services/mediaResourcesService";
+
 export default {
     name: "MusicControl",
     components: { MediaPlayer, MediaDisplay, MediaLibrary },

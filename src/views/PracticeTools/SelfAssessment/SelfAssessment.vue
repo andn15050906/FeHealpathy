@@ -48,6 +48,12 @@ const currentSurvey = ref({});
 const currentSurveyRef = ref();
 const currentQuestionIndex = ref(0);
 const router = useRouter();
+const props = defineProps({
+  id: {
+    type: String,
+    required: false,
+  },
+});
 
 const surveysMapping = {
   "BSI": "Survey_BSI-18.jfif",
@@ -68,6 +74,10 @@ onBeforeMount(async () => {
         icon: getSurveyImage(item.name)
       }
     });
+  
+  if (props.id) {
+    openTest(props.id);
+  }
 })
 
 const getSurveyImage = (name) => {
@@ -91,7 +101,9 @@ const currentSurveyOptions = computed(() => new SurveyOptions(
 const openTest = (testId) => {
   currentSurvey.value = surveys.value.find(survey => survey.id === testId);
   currentQuestionIndex.value = 0;
-  showPopup.value = true;
+  if (currentSurvey.value) {
+    showPopup.value = true;
+  }
 }
 const closePopup = () => {
   showPopup.value = false;

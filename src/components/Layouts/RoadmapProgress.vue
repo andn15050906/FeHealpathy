@@ -4,8 +4,8 @@
             :subtitle="step.subtitle" :title="step.title" :value="index + 1" :hide-actions="true"
             :class="step.value < currentPhaseIndex ? 'completed-step' : step.value == currentPhaseIndex ? 'current-step' : 'locked-step'">
             {{ step.content }}
-            <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference, index == steps.length)">
-                {{ index == steps.length ? text.FollowStep : text.NewRoadmap }}
+            <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference, index == steps.length - 1)">
+                {{ index != steps.length - 1 ? text.FollowStep : text.NewRoadmap }}
             </v-btn>
             <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
@@ -45,7 +45,7 @@ watch(useRoute(), () => {
 });
 
 function goTo(reference, isNewRoadmap) {
-    router.push({ path: isNewRoadmap ? reference : 'Setting-up' })
+    router.push({ path: isNewRoadmap ? 'Setting-up' : reference })
 }
 
 /*function goToNextStep(index) {
@@ -66,7 +66,7 @@ function goToStep(index) {
 
 async function fetchPersonalRoadmap() {
     personalRoadmap.value = await getCurrentRoadmapWithProgress();
-    steps.value = personalRoadmap.value.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
+    steps.value = personalRoadmap.value?.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
         if (personalRoadmap.value.currentPhase?.id == _.id)
             currentPhaseIndex.value = index + 1;
         return {
@@ -74,14 +74,17 @@ async function fetchPersonalRoadmap() {
             title: _.title,
             reference: getReference(_)
         }
-    });
-    steps.value.push({
-        value: `${personalRoadmap.value.phases.length + 1}`,
-        title: 'End of roadmap',
-        reference: getReference()
-    })
+    }) ?? [];
 
-    if (personalRoadmap.value.isCompleted)
+    if (steps.value.length > 0) {
+        steps.value.push({
+            value: `${personalRoadmap.value.phases.length + 1}`,
+            title: 'End of roadmap',
+            reference: getReference()
+        })
+    }
+
+    if (personalRoadmap.value?.isCompleted)
         currentPhaseIndex.value = personalRoadmap.value.phases.length + 1;
     goToStep(currentPhaseIndex.value);
 }

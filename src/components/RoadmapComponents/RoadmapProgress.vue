@@ -13,37 +13,33 @@
                     </v-tab>
                 </v-tabs>
                 <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
-                <!--<v-tabs-items v-model="activeTab">
-                    <v-tab-item v-for="phase in roadmap.phases" :key="phase.id">-->
-                        <v-card>
-                            <v-card-title :class="getPhaseHeaderClass(phase)">
-                                {{ phase.title }}
-                                <v-icon v-if="isPhaseCompleted(phase)" class="ml-2">mdi-check-circle</v-icon>
-                                <v-icon v-else-if="isPhaseInProgress(phase)" class="ml-2">mdi-progress-clock</v-icon>
-                            </v-card-title>
-                            <v-card-subtitle>{{ phase.description }}</v-card-subtitle>
-                            <v-card-text>
-                                <v-data-table :headers="getTableHeaders" :items="phase.milestones" item-class="milestone-row">
-                                    <template v-slot:item="{ item }">
-                                        <tr :class="getMilestoneClass(item)">
-                                            <td class="text-vertical-center">{{ item.title }}</td>
-                                            <td class="text-center">{{ item.repeatTimesRequired }}</td>
-                                            <!--<td class="text-center">{{ item.timeSpentRequired }}</td>-->
-                                            <td class="text-center">
-                                                <span>{{ getProgressText(item) }}</span>
-                                                <v-icon small class="ml-1">{{ getProgressIcon(item) }}</v-icon>
-                                            </td>
-                                            <td class="text-center">
-                                                <v-btn v-if="item.status == 'current'" class="navigate-btn"
-                                                    @click="gotoLinkByEvent(item.eventName)">{{ text.Follow }}</v-btn>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </v-data-table>
-                            </v-card-text>
-                        </v-card>
-                    <!--</v-tab-item>
-                </v-tabs-items>-->
+                    <v-card>
+                        <v-card-title :class="getPhaseHeaderClass(phase)">
+                            {{ phase.title }}
+                            <v-icon v-if="isPhaseCompleted(phase)" class="ml-2">mdi-check-circle</v-icon>
+                            <v-icon v-else-if="isPhaseInProgress(phase)" class="ml-2">mdi-progress-clock</v-icon>
+                        </v-card-title>
+                        <v-card-subtitle>{{ phase.description }}</v-card-subtitle>
+                        <v-card-text>
+                            <v-data-table :headers="getTableHeaders" :items="phase.milestones" item-class="milestone-row">
+                                <template v-slot:item="{ item }">
+                                    <tr :class="getMilestoneClass(item)">
+                                        <td class="text-vertical-center">{{ item.title }}</td>
+                                        <td class="text-center">{{ item.repeatTimesRequired }}</td>
+                                        <!--<td class="text-center">{{ item.timeSpentRequired }}</td>-->
+                                        <td class="text-center">
+                                            <span>{{ getProgressText(item) }}</span>
+                                            <v-icon small class="ml-1">{{ getProgressIcon(item) }}</v-icon>
+                                        </td>
+                                        <td class="text-center">
+                                            <v-btn v-if="item.status == 'current'" class="navigate-btn"
+                                                @click="gotoLinkByEvent(item)">{{ text.Follow }}</v-btn>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
                 </div>
             </v-card-text>
         </v-card>
@@ -52,7 +48,7 @@
 
 <script>
 import { getProgress } from '@/scripts/api/services/statisticsService';
-import { getLinkByEvent } from '@/scripts/api/services/activityLogService';
+import { getLinkByEventLabel, getLinkByRecommendation } from '@/scripts/api/services/activityLogService';
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
@@ -206,8 +202,15 @@ export default {
                 return 'phase-header-locked';
             }
         },
-        gotoLinkByEvent(eventName) {
-            this.$router.push({ path: getLinkByEvent(eventName) });
+        gotoLinkByEvent(milestone) {
+            if (milestone.recommendations?.length > 0) {
+                //console.log(milestone.eventName, milestone.recommendations[0].targetEntityId);
+                //console.log(getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId));
+                this.$router.push({ path: getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId) });
+            }
+            else {
+                this.$router.push({ path: getLinkByEventLabel(milestone.eventName) });
+            }
         }
     }
 };

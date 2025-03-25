@@ -75,6 +75,9 @@ export default {
                 return;
 
             let personalRoadmap = await this.roadmapProgress.getPersonalRoadmap();
+            if (!personalRoadmap) {
+                this.$router.push({ name: 'SettingUp' });
+            }
             this.roadmap = {
                 name: personalRoadmap.title,
                 introTexts: personalRoadmap.introText?.split('.') || '',

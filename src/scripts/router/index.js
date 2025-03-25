@@ -243,9 +243,10 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/self-assessment',
+      path: '/self-assessment/:id?',
       name: 'SelfAssessment',
       component: SelfAssessment,
+      props: true,
       meta: { requiresAuth: true }
     },
     {
