@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="handleEditMedia" class="edit-media p-4 border rounded bg-white">
+    <div @submit.prevent="handleEditMedia" class="edit-media p-4 border rounded bg-white">
         <h3 class="mb-4 text-primary">Edit Media</h3>
 
         <div class="dropzone p-5 text-center border border-dashed rounded mb-4" @dragover.prevent
@@ -39,14 +39,14 @@
         </div>
 
         <div class="d-flex justify-content-between">
-            <button class="btn btn-danger" @click="$emit('cancel')">
+            <button type="button" class="btn btn-danger" @click="$emit('cancel')">
                 <i class="fas fa-times me-2"></i>Cancel
             </button>
-            <button class="btn btn-success" :disabled="loading">
+            <button @click="handleEditMedia" class="btn btn-success" :disabled="loading">
                 <i class="fas fa-save me-2"></i>Save Changes
             </button>
         </div>
-    </form>
+    </div>
 </template>
 
 <script>
@@ -105,27 +105,22 @@ export default {
                 return;
             }
 
-            if (!this.editedMedia.file && !this.editedMedia.url) {
-                this.error = "Please upload a file or provide a valid URL.";
-                return;
-            }
-
             this.loading = true;
             this.error = null;
 
             try {
                 const formData = new FormData();
                 formData.append("Id", this.editedMedia.id);
-                formData.append("Title", this.editedMedia.title);
+                formData.append("ReplacedMedia.Title", this.editedMedia.title);
                 formData.append("Description", this.editedMedia.description);
                 formData.append("Artist", this.editedMedia.artist);
 
                 if (this.editedMedia.file) {
-                    formData.append("File", this.editedMedia.file);
+                    formData.append("ReplacedMedia.File", this.editedMedia.file);
                 }
 
                 if (this.editedMedia.url) {
-                    formData.append("Url", this.editedMedia.url);
+                    formData.append("ReplacedMedia.Url", this.editedMedia.url);
                 }
 
                 this.$emit("edit-media", formData);
