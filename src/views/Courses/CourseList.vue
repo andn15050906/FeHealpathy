@@ -43,8 +43,26 @@ const currentPage = ref(1); // Trang hiện tại
 const filters = ref([]); // Danh sách các bộ lọc có sẵn
 const currentFilter = ref('all'); // Bộ lọc hiện tại đang được áp dụng
 const totalPages = ref(0);
+const isLoading = ref(false); // Thêm state để track loading
 
 defineEmits(['authenticated', 'addNotification', 'removeNotification']);
+
+// Hàm fetch dữ liệu khóa học
+async function fetchCourses(page = 1) {
+  try {
+    isLoading.value = true;
+    const courseResponse = await getCourses({
+      PageIndex: page - 1,
+      PageSize: itemsPerPage
+    });
+    courses.value = courseResponse?.items?.map(course => ({ ...course })) || [];
+    totalPages.value = Math.ceil(courseResponse.totalCount / itemsPerPage);
+  } catch (error) {
+    console.error("Failed to fetch courses", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 // Hàm xử lý việc thêm/xóa tag khỏi danh sách lọc
 function toggleTag(tagId) {
@@ -54,6 +72,8 @@ function toggleTag(tagId) {
   } else {
     selectedTags.value.splice(index, 1); // Xóa tag nếu đã có
   }
+  currentPage.value = 1; // Reset về trang 1 khi thay đổi filter
+  fetchCourses(1); // Fetch lại dữ liệu
 }
 
 // Computed property để lọc khóa học theo tags và từ khóa tìm kiếm
@@ -78,9 +98,7 @@ const filteredcourses = computed(() => {
 
 // Lấy danh sách khóa học cho trang hiện tại
 const paginatedCourses = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredcourses.value.slice(start, end);
+  return filteredcourses.value;
 });
 
 // Hàm sắp xếp danh sách khóa học
@@ -94,57 +112,45 @@ function sortcourses() {
 
 // Watch thay đổi của tùy chọn sắp xếp
 watch(sortOption, () => {
-  sortcourses(); // Sắp xếp lại danh sách
-  changePage(1); // Reset về trang 1
+  currentPage.value = 1; // Reset về trang 1
+  fetchCourses(1); // Fetch lại dữ liệu
+});
+
+// Watch thay đổi của search query
+watch(searchQuery, () => {
+  currentPage.value = 1; // Reset về trang 1
+  fetchCourses(1); // Fetch lại dữ liệu
 });
 
 // Khởi tạo dữ liệu khi component được mount
 onMounted(async () => {
   try {
-    // Lấy danh sách khóa học từ API
-    const courseResponse = await getCourses();
-    courses.value = courseResponse?.items?.map(course => ({ ...course })) || [];
-    totalPages.value = Math.ceil(courseResponse.totalCount / itemsPerPage);
-    
     // Lấy danh sách tags từ API
     const tagResponse = await getPagedTags();
-    sortcourses();
-    
     // Định dạng lại danh sách tags
     filters.value = tagResponse?.map(tag => ({
       value: tag.id,
       label: tag.title
     })) || [];
+    
+    // Fetch dữ liệu khóa học ban đầu
+    await fetchCourses(1);
   } catch (error) {
-    console.error("Failed to fetch courses or tags", error);
+    console.error("Failed to fetch initial data", error);
   }
 });
 
 // Hàm chuyển trang
-function changePage(page) {
+async function changePage(page) {
   currentPage.value = page;
+  await fetchCourses(page);
 }
 
 // Hàm áp dụng bộ lọc
-function applyFilter(filterValue) {
+async function applyFilter(filterValue) {
   currentFilter.value = filterValue;
-
-  if (filterValue === 'all') {
-    // Hiển thị tất cả khóa học nếu filter là 'all'
-    paginatedcourses.value = courses.value.slice(
-      (currentPage.value - 1) * itemsPerPage, 
-      currentPage.value * itemsPerPage
-    );
-  } else {
-    // Lọc khóa học theo tag được chọn
-    const filteredcourses = courses.value.filter(course => 
-      course.tags.some(tag => tag.id === filterValue)
-    );
-    paginatedcourses.value = filteredcourses.slice(
-      (currentPage.value - 1) * itemsPerPage, 
-      currentPage.value * itemsPerPage
-    );
-  }
+  currentPage.value = 1; // Reset về trang 1
+  await fetchCourses(1);
 }
 
 </script>
