@@ -1,5 +1,5 @@
 <template>
-  <div class="course-detail-container">
+  <div class="course-detail-container" v-if="course">
     <div class="course-header">
       <img :src="course.thumbUrl" alt="Course Thumbnail" class="course-thumb" />
       <div class="course-info">
@@ -16,6 +16,7 @@
             <strong>${{ discountedPrice.toFixed(2) }}</strong>
           </span>
           <span class="price" v-else>${{ course.price.toFixed(2) }}</span>
+          <button class="btn-buy" @click="handlePurchase">💰 Mua khóa học</button>
         </div>
       </div>
     </div>
@@ -45,30 +46,29 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <p>⏳ Đang tải thông tin khóa học...</p>
+  </div>
 </template>
 
+
 <script>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import {
+  purchaseCourse as purchaseCourseAPI,
+  getCourseById,
+} from "@/scripts/api/services/CourseService";
 
 export default {
   name: "CourseDetail",
   setup() {
     const router = useRouter();
+    const route = useRoute();
+    const courseId = route.params.id;
 
-    const course = ref({
-      title: "Mastering Vue.js",
-      thumbUrl:
-        "https://images.viblo.asia/94f4ac67-bebd-4d2e-9a39-2562525e74c3.jpeg",
-      intro: "Learn Vue.js from beginner to advanced level.",
-      description: "This course covers Vue 3, Vuex, Vue Router, and more.",
-      price: 100,
-      discount: 20,
-      learnerCount: 3500,
-      ratingCount: 200,
-      totalRating: 900,
-      instructorId: "12345",
-    });
+    const course = ref(null);
+    const instructorName = ref("Đang tải...");
 
     const lectures = ref([
       {
@@ -127,27 +127,78 @@ export default {
         thumbUrl:
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ92FLxyclItwi4Ydx0BPndu9WAJNNaWM_9ikVo-JQXy61loR8Y86AGRGTCcuNi7pTNGe4&usqp=CAU",
       },
+      // Giữ nguyên danh sách lecture như bạn có
     ]);
 
-    const instructorName = ref("Diem Hang");
+    const getCourseDetail = async () => {
+      try {
+        const data = await getCourseById(courseId);
+        if (data) {
+          course.value = {
+            id: data.id,
+            title: data.title,
+            thumbUrl: data.thumbUrl,
+            intro: data.intro,
+            description: data.description,
+            price: data.price,
+            discount: data.discount,
+            learnerCount: data.learnerCount,
+            ratingCount: data.ratingCount,
+            totalRating: data.totalRating,
+            instructorId: data.instructorId,
+          };
+
+          instructorName.value = "Instructor Name";
+        } else {
+          alert("Không tìm thấy thông tin khóa học.");
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin khóa học:", error);
+      }
+    };
 
     const discountedPrice = computed(() => {
-      if (course.value.discount > 0) {
-        return course.value.price * (1 - course.value.discount / 100);
-      }
-      return course.value.price;
+      if (!course.value) return 0;
+      return course.value.discount > 0
+        ? course.value.price * (1 - course.value.discount / 100)
+        : course.value.price;
     });
 
     const averageRating = computed(() => {
+      if (!course.value) return "N/A";
       return course.value.ratingCount > 0
         ? (course.value.totalRating / course.value.ratingCount).toFixed(1)
         : "N/A";
     });
 
-    //Fix tạm UI, khi implement cần sửa lại để view lecture by id
+    const handlePurchase = async () => {
+      try {
+        const id = course.value?.id || courseId;
+
+        if (!id) {
+          alert("Không xác định được khóa học.");
+          return;
+        }
+
+        const data = await purchaseCourseAPI(id);
+        if (!data?.url) {
+          alert("Không nhận được URL thanh toán.");
+          return;
+        }
+
+        window.location.href = data.url;
+      } catch (error) {
+        console.error("Purchase error", error);
+      }
+    };
+
     const viewLecture = () => {
       router.push("/lectures-detail");
     };
+
+    onMounted(() => {
+      getCourseDetail();
+    });
 
     return {
       course,
@@ -156,10 +207,12 @@ export default {
       discountedPrice,
       averageRating,
       viewLecture,
+      handlePurchase,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .course-detail-container {

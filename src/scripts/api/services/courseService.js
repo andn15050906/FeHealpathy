@@ -1,5 +1,5 @@
 import apiClient from '@/scripts/api/apiClients';
-import {get, postForm, patchForm, del } from '@/scripts/api/apiClients';
+import {get, post, postForm, patchForm, del } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Courses';
 
@@ -55,4 +55,9 @@ export const updateCourse = async (courseData) => {
 
 export const deleteCourse = async (courseId) => {
   return await del(`${API_BASE_URL}/${courseId}`);
+};
+
+
+export const purchaseCourse = async (courseId) => {
+  return await post(`/courses/${courseId}/purchase`);
 };
