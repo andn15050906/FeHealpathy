@@ -46,7 +46,7 @@ export default {
             selectedMedia: null,
             selectedMediaIndex: null,
             showDeletePopup: false,
-            mediaToDelete: null
+            mediaToDelete: null,
         };
     },
     methods: {
@@ -90,10 +90,11 @@ export default {
         async updateMedia(updatedMediaFormData) {
             try {
                 await updateMediaResource(updatedMediaFormData);
-                this.showEditMedia = false;
-                this.selectedMedia = null;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media updated successfully!");
+                this.showEditMedia = false;
+                this.selectedMedia = null;
+                
             } catch (error) {
                 toast.error("Failed to update media.");
             }
