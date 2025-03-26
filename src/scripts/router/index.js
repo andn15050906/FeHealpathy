@@ -124,13 +124,6 @@ const router = createRouter({
       name: 'register',
       component: Register
     },
-    // Moved to EditUserProfile
-    /*{
-      path: '/change-password',
-      name: 'changePassword',
-      component: ChangePassword,
-      meta: { requiresAuth: true }
-    },*/
     {
       path: '/forgot-password',
       name: 'forgotPassword',
