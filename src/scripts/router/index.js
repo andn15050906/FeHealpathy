@@ -13,8 +13,6 @@ import NotFound from '@/views/404.vue'
 import ViewUserProfile from '@/views/Profile/PersonalProfile/ViewUserProfile.vue'
 import EditUserProfile from '@/views/Profile/PersonalProfile/EditUserProfile.vue'
 import RequestToBeAdvisor from '@/views/Profile/PersonalProfile/RequestToBeAdvisor.vue'
-import ChangePassword from '@/views/Profile/PersonalProfile/ChangePassword.vue';
-import TestEditAdvisor from '@/views/Profile/Advisor/TestEditAdvisor.vue';
 import Settings from '@/views/Profile/Settings.vue'
 import SettingUp from '@/views/Profile/SettingUp.vue'
 import UserActivity from '@/views/Profile/Statistics/UserActivity.vue'
@@ -125,13 +123,6 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register
-    },
-    // Moved to EditUserProfile
-    {
-      path: '/change-password',
-      name: 'changePassword',
-      component: ChangePassword,
-      meta: { requiresAuth: true }
     },
     {
       path: '/forgot-password',

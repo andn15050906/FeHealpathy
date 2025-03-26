@@ -8,7 +8,6 @@ export const signIn = async (identifier, password) => {
     };
 
     const response = await apiClient.post('/Auth/SignIn', requestBody);
-    console.log(response);
     return response.data;
   } catch (error) {
     console.error('Login failed:', error.response ? error.response.data : error.message);
