@@ -1,6 +1,5 @@
 <template>
   <div class="content">
-    <SweetAlert ref="sweetAlert" />
     <div class="profile-container">
       <div class="profile-card">
         <div class="profile-image-section">
@@ -64,9 +63,7 @@
             </div>
             <div class="form-buttons">
               <button type="submit" class="btn btn-save">SAVE</button>
-              <button type="button" class="btn btn-cancel" @click="openCancelPopup">
-                CANCEL
-              </button>
+              <button type="button" class="btn btn-cancel" @click="openCancelPopup">CANCEL</button>
             </div>
           </form>
         </div>
@@ -75,6 +72,9 @@
         <button class="btn btn-warning white-text">
           <RouterLink :to="'change-password'">Change Password</RouterLink>
         </button>
+      </div>
+      <div class="premium-upgrade">
+        <AccountUpgrade></AccountUpgrade>
       </div>
     </div>
     <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Are you sure you want to update your profile?"
@@ -89,11 +89,12 @@ import { inject, ref, onBeforeMount } from 'vue';
 import dict from '@/scripts/data/dictionary.json';
 import { updateUserProfile, getUserById } from '@/scripts/api/services/userService.js';
 import { getUserProfile, setUserProfile } from '@/scripts/api/services/authService';
-import UpdateConfirmPopup from '../../../components/Common/Popup/UpdateConfirmPopup.vue';
-import CancelConfirmPopup from '../../../components/Common/Popup/CancelConfirmPopup.vue';
+import UpdateConfirmPopup from '@/components/Common/Popup/UpdateConfirmPopup.vue';
+import CancelConfirmPopup from '@/components/Common/Popup/CancelConfirmPopup.vue';
+import AccountUpgrade from '@/components/PaymentComponents/AccountUpgrade.vue';
 
 export default {
-  components: { UpdateConfirmPopup, CancelConfirmPopup },
+  components: { UpdateConfirmPopup, CancelConfirmPopup, AccountUpgrade },
   setup() {
     const form = ref({
       fullName: '',
@@ -395,11 +396,19 @@ textarea.form-control {
   justify-content: flex-end;
 }
 
+.password-change-btn a {
+  text-decoration: none;
+}
+
 .white-text {
   color: #fff;
 }
 
 .white-text a {
   color: whitesmoke;
+}
+
+.premium-upgrade {
+  margin-top: 40px;
 }
 </style>

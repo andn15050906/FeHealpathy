@@ -46,12 +46,11 @@ import { register } from '@/scripts/api/services/authService';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const loadingSpinner = inject('loadingSpinner');
 
 export default {
   data() {
     return {
-			loadingSpinner: loadingSpinner,
+			loadingSpinner: inject('loadingSpinner'),
       username: "",
       email: "",
       password: "",
@@ -104,7 +103,7 @@ export default {
           await register(this.username, this.email, this.password);
           this.retypePasswordError = "";
           this.generalError = 'Registration successful! Please check your email to verify your account.';
-          setTimeout(() => router.push({ name: 'signIn' }), 2000);
+          setTimeout(() => this.$router.push({ name: 'signIn' }), 2000);
         } catch (error) {
           let errors = error.response.data.errors;
           console.log(errors);
