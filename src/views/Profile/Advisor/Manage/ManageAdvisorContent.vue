@@ -68,9 +68,9 @@
           </tbody>
         </table>
         <Pagination 
-            :currentPage="currentPage" 
-            :totalPages="totalPages" 
-            :goToPage="changePage" 
+            :currentPage="currentPageCourses" 
+            :totalPages="totalPagesCourses" 
+            :goToPage="changePageCourse" 
         />
       </div>
 
@@ -122,8 +122,14 @@
             </tr>
           </tbody>
         </table>
+        <Pagination 
+  :currentPage="currentPageBlogs" 
+  :totalPages="totalPagesBlogs" 
+  :goToPage="changePageBlog" 
+/>
+</div>
       </div>
-      </div>
+      
 
       <!-- Tab roadmaps -->
       <div v-if="currentTab === 'roadmaps'" class="tab-content">
@@ -168,7 +174,14 @@
           </tbody>
         </table>
       </div>
-    </div></div>
+      <Pagination 
+  :currentPage="currentPageRoadmaps" 
+  :totalPages="totalPagesRoadmaps" 
+  :goToPage="changePageRoadmap" 
+/>
+    </div>
+    
+    </div>
     <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog"
             @blogUpdated="handleBlogUpdated" />
     <UpdateRoadmap v-if="isEditingRoadmap" :roadmapData="selectedRoadmap"
@@ -179,8 +192,7 @@
     @confirmDelete="confirmDelete"
     @update:isVisible="showDeletePopup = $event"
 />
-
-  </template>
+</template>
 
   <script>
   import { getPagedArticles, deleteArticle } from '@/scripts/api/services/blogService';
@@ -203,9 +215,6 @@
         isDeletePopupVisible: false,
         blogToDelete: null,
         sortOption: 'name-asc',
-        currentPage: 1,  
-        totalPages: 1,   
-        pageSize: 20, 
         showDeletePopup: false,
         selectedItem: null,
         selectedItemType: '',
@@ -223,7 +232,18 @@
         ],
         courses: [],
         blogs: [],
-        roadmaps: []
+        roadmaps: [],
+        //pagination
+        currentPageCourses: 1,
+        totalPagesCourses: 1,
+
+        currentPageBlogs: 1,
+        totalPagesBlogs: 1,
+
+        currentPageRoadmaps: 1,
+        totalPagesRoadmaps: 1,
+
+    pageSize: 20,
       };
     },
 methods: {
@@ -263,12 +283,24 @@ methods: {
     this.deleteMessage = `Are you sure you want to delete "${item.title}"?`;
     this.showDeletePopup = true;
   },
-  changePage(page) {
-    if (page >= 1 && page <= this.totalPages) {
-        console.log("Changing to page:", page);
-        this.currentPage = page;
+  changePageCourse(page) {
+    if (page >= 1 && page <= this.totalPagesCourses) {
+        this.currentPageCourses = page;
         this.$nextTick(() => this.fetchCourses());
     }
+},
+changePageBlog(page) {
+  if (page >= 1 && page <= this.totalPagesBlogs) {
+    this.currentPageBlogs = page;
+    this.$nextTick(() => this.fetchBlogs());
+  }
+},
+
+changePageRoadmap(page) {
+  if (page >= 1 && page <= this.totalPagesRoadmaps) {
+    this.currentPageRoadmaps = page;
+    this.$nextTick(() => this.fetchRoadmaps());
+  }
 },
 sortCourses() {
     if (this.sortOption === 'name-asc') {
@@ -298,8 +330,13 @@ sortRoadmaps() {
 },
 async fetchBlogs() {
   try {
-    const response = await getPagedArticles();
+    const params = {
+      pageIndex: this.currentPageBlogs - 1,
+      pageSize: this.pageSize
+    };
+    const response = await getPagedArticles(params);
     this.blogs = Array.isArray(response.items) ? response.items : [];
+    this.totalPagesBlogs = response.pageCount;
     const blogTab = this.tabs.find(tab => tab.id === 'blogs');
     if (blogTab) {
       blogTab.count = response.totalCount;
@@ -338,8 +375,13 @@ async confirmDelete(confirm) {
   },
 async fetchRoadmaps() {
   try {
-    const response = await getRoadmaps();
+    const params = {
+      pageIndex: this.currentPageRoadmaps - 1,
+      pageSize: this.pageSize
+    };
+    const response = await getRoadmaps(params);
     this.roadmaps = Array.isArray(response.items) ? response.items : [];
+    this.totalPagesRoadmaps = response.pageCount;
     const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
     if (roadmapTab) {
       roadmapTab.count = response.totalCount;
@@ -356,7 +398,7 @@ async fetchCourses() {
         console.log("Fetching courses for page:", this.currentPage);
 
         const params = {
-            pageIndex: this.currentPage - 1,
+            pageIndex: this.currentPageCourses - 1,
             pageSize: this.pageSize
         };
 
@@ -367,7 +409,7 @@ async fetchCourses() {
         console.log("API Response:", response);
 
         this.courses = response.items || [];
-        this.totalPages = response.pageCount;
+        this.totalPagesCourses = response.pageCount;
 
         const courseTab = this.tabs.find(tab => tab.id === 'courses');
         if (courseTab) {
