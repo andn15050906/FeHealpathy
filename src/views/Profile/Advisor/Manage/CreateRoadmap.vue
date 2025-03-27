@@ -35,10 +35,19 @@
                 <label>🏷️ Tiêu đề Mốc</label>
                 <input type="text" v-model="milestone.title" placeholder="Nhập tiêu đề mốc" required />
               </div>
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label>📅 Sự Kiện</label>
                 <input type="text" v-model="milestone.eventName" placeholder="Tên sự kiện liên quan" required />
-              </div>
+              </div> -->
+              <div class="form-group">
+                  <label>📅 Sự Kiện</label>
+                  <select v-model="milestone.eventName" class="form-select" @change="updateEventList(index, msIndex)">
+                    <option v-for="eventType in TRACKED_EVENTS" :key="eventType.value" :value="eventType.label">
+                    {{ eventType.displayName.length > 0 ? eventType.displayName : 'General' }}
+                     </option>
+                  </select>
+
+                </div>
               <div class="form-group">
                 <label>🔁 Lần lặp lại yêu cầu</label>
                 <input type="number" v-model="milestone.repeatTimesRequired" placeholder="Số lần lặp lại sự kiện" required />
@@ -47,33 +56,37 @@
                 <label>⏱ Thời gian cần thiết (phút)</label>
                 <input type="number" v-model="milestone.timeSpentRequired" placeholder="Thời gian cần thiết để hoàn thành mốc" required />
               </div>
-              <div class="recommendations" v-if="milestone.recommendations">
-                <h4>📘 Khuyến Nghị</h4>
-                <div class="recommendation" v-for="(recommendation, recIndex) in milestone.recommendations" :key="recIndex">
-                  <!-- <div class="form-group">
-                    <label>🆔 ID Đối Tượng</label>
-                    <input type="text" v-model="recommendation.targetEntityId" placeholder="Nhập ID đối tượng" required />
-                  </div> -->
-                  <div class="form-group">
-                    <label>📄 Loại Đối Tượng</label>
-                    <input type="text" v-model="recommendation.entityType" placeholder="Nhập loại đối tượng" required />
-                  </div>
-                  <!-- <div class="form-group">
-                    <label>🔖 ID Mốc</label>
-                    <input type="text" v-model="recommendation.milestoneId" placeholder="Nhập ID mốc" required />
-                  </div> -->
-                  <div class="form-group">
-                    <label>🏷️ Đặc Tính</label>
-                    <input type="text" v-model="recommendation.trait" placeholder="Nhập đặc tính" required />
-                  </div>
-                  <div class="form-group">
-                    <label>📝 Mô Tả Đặc Tính</label>
-                    <textarea v-model="recommendation.traitDescription" placeholder="Mô tả đặc tính" rows="2" required></textarea>
-                  </div>
-                  <button type="button" class="btn remove" @click="removeRecommendation(index, msIndex, recIndex)" style="margin-top: 5px;">❌ Xóa Khuyến Nghị</button>
-                </div>
-                <button type="button" class="btn add" @click="addRecommendation(index, msIndex)">➕ Thêm Khuyến Nghị</button>
-              </div>
+              <div class="recommendations" v-if="isRecommendationAvailable(milestone.eventName) && milestone.recommendations">
+  <h4>📘 Khuyến Nghị</h4>
+  <div class="recommendation" v-for="(recommendation, recIndex) in milestone.recommendations" :key="recIndex">
+    <select v-model="recommendation.entityType" class="hidden">
+      <option :key="milestone.eventName" :value="milestone.eventName"></option>
+    </select>
+
+    <div class="form-group">
+      <label>🆔 Nội dung khuyến nghị</label>
+      <select v-model="recommendation.targetEntityId" class="form-select">
+        <option v-for="content in getAvailableContents(milestone.eventName)" :key="content.id" :value="content.id">
+          {{ content.name ?? content.title }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>🏷️ Đặc Tính</label>
+      <input type="text" v-model="recommendation.trait" placeholder="Nhập đặc tính" required />
+    </div>
+
+    <div class="form-group">
+      <label>📝 Mô Tả Đặc Tính</label>
+      <textarea v-model="recommendation.traitDescription" placeholder="Mô tả đặc tính" rows="2" required></textarea>
+    </div>
+
+    <button type="button" class="btn remove" @click="removeRecommendation(index, msIndex, recIndex)">❌ Xóa Khuyến Nghị</button>
+  </div>
+  <button type="button" class="btn add" @click="addRecommendation(index, msIndex)">➕ Thêm Khuyến Nghị</button>
+</div>
+
               <button type="button" class="btn remove" @click="removeMilestone(index, msIndex)" style="margin-top: 5px;">❌ Xóa Mốc</button>
             </div>
             <button type="button" class="btn add" @click="addMilestone(index)">➕ Thêm Mốc</button>
@@ -94,8 +107,19 @@
 
 
 <script>
+import { getCourses } from "@/scripts/api/services/courseService.js";
+import { getPagedMediaResources } from "@/scripts/api/services/mediaResourcesService";
+import { getPagedArticles } from '@/scripts/api/services/blogService';
+import { getPagedConversations } from '@/scripts/api/services/conversationService';
+import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import { toast } from "vue3-toastify";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
+import {
+  TRACKED_EVENTS,
+  ENTITY_TYPES,
+  getEntityTypeByEventLabel
+} from '@/scripts/api/services/activityLogService';
 import { createRoadmap } from "@/scripts/api/services/roadmapService";
 
 export default {
@@ -107,10 +131,21 @@ export default {
         title: "",
         introText: "",
         phases: []
-      }
+      },
+      allCourses: [],
+      allMediaResources: [],
+      allArticles: [],
+      allConversations: [],
+      allSurveys: [],
+      TRACKED_EVENTS // expose to template
     };
   },
   methods: {
+    updateEventList(phaseIndex, milestoneIndex) {
+      const milestone = this.roadmap.phases[phaseIndex].milestones[milestoneIndex];
+      milestone.entityType = getEntityTypeByEventLabel(milestone.eventName);
+    },
+
     addPhase() {
       this.roadmap.phases.push({
         title: "",
@@ -119,64 +154,105 @@ export default {
         milestones: []
       });
     },
+
     addMilestone(phaseIndex) {
-  if (!this.roadmap.phases[phaseIndex].milestones) {
-    this.$set(this.roadmap.phases[phaseIndex], 'milestones', []);
-  }
-  const newMilestone = {
-    title: "",
-    eventName: "",
-    repeatTimesRequired: 0,
-    timeSpentRequired: 0,
-    recommendations: []
-  };
-  this.roadmap.phases[phaseIndex].milestones.push(newMilestone);
-},
+      if (!this.roadmap.phases[phaseIndex].milestones) {
+        this.$set(this.roadmap.phases[phaseIndex], 'milestones', []);
+      }
+      const newMilestone = {
+        title: "",
+        eventName: "",
+        repeatTimesRequired: 0,
+        timeSpentRequired: 0,
+        recommendations: []
+      };
+      this.roadmap.phases[phaseIndex].milestones.push(newMilestone);
+    },
 
     removePhase(index) {
       this.roadmap.phases.splice(index, 1);
     },
+
     removeMilestone(phaseIndex, milestoneIndex) {
       this.roadmap.phases[phaseIndex].milestones.splice(milestoneIndex, 1);
     },
-    addRecommendation(phaseIndex, milestoneIndex) {
-  const phase = this.roadmap.phases[phaseIndex];
-  const milestone = phase && phase.milestones[milestoneIndex];
-  if (milestone) {
-    const newRecommendation = {
-      targetEntityId: "00000000-0000-0000-0000-000000000000",
-      entityType: "",
-      milestoneId: "00000000-0000-0000-0000-000000000000",
-      trait: "",
-      traitDescription: ""
-    };
-    if (!milestone.recommendations) {
-      this.$set(milestone, 'recommendations', []);
-    }
-    milestone.recommendations.push(newRecommendation);
-  } else {
-    console.error("Invalid phaseIndex or milestoneIndex");
-  }
-}
-,
 
-  removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
-    this.roadmap.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
-  },
+    addRecommendation(phaseIndex, milestoneIndex) {
+      const phase = this.roadmap.phases[phaseIndex];
+      const milestone = phase && phase.milestones[milestoneIndex];
+      if (milestone) {
+        const newRecommendation = {
+          targetEntityId: "00000000-0000-0000-0000-000000000000",
+          entityType: getEntityTypeByEventLabel(milestone.eventName),
+          milestoneId: "00000000-0000-0000-0000-000000000000",
+          trait: "",
+          traitDescription: ""
+        };
+        if (!milestone.recommendations) {
+          this.$set(milestone, 'recommendations', []);
+        }
+        milestone.recommendations.push(newRecommendation);
+      } else {
+        console.error("Invalid phaseIndex or milestoneIndex");
+      }
+    },
+
+    removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
+      this.roadmap.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
+    },
+
+    isRecommendationAvailable(eventLabel) {
+      switch (getEntityTypeByEventLabel(eventLabel)) {
+        case ENTITY_TYPES.Course.en:
+        case ENTITY_TYPES.MediaResource.en:
+        case ENTITY_TYPES.Article.en:
+        case ENTITY_TYPES.Conversation.en:
+        case ENTITY_TYPES.Survey.en:
+          return true;
+        default:
+          return false;
+      }
+    },
+
+    getAvailableContents(eventLabel) {
+      switch (getEntityTypeByEventLabel(eventLabel)) {
+        case ENTITY_TYPES.Course.en:
+          return this.allCourses;
+        case ENTITY_TYPES.MediaResource.en:
+          return this.allMediaResources;
+        case ENTITY_TYPES.Article.en:
+          return this.allArticles;
+        case ENTITY_TYPES.Conversation.en:
+          return this.allConversations;
+        case ENTITY_TYPES.Survey.en:
+          return this.allSurveys;
+        default:
+          return [];
+      }
+    },
+
     async submitRoadmap() {
       try {
         console.log("Sending roadmap data:", this.roadmap);
-        const response = await createRoadmap(this.roadmap);
-        console.log('Roadmap created:', response);
+        await createRoadmap(this.roadmap);
+        toast.success("Tạo roadmap thành công!");
         this.$router.push({ name: 'ManageAdvisorContent' });
       } catch (error) {
-        console.error('Error creating roadmap:', error);
-        alert('Có lỗi xảy ra khi tạo roadmap. Vui lòng thử lại.');
+        console.error(error);
+        toast.error("Tạo roadmap thất bại!");
       }
     }
+  },
+  mounted() {
+    getCourses({ pageIndex: 0, pageSize: 10 }).then(res => this.allCourses = res.items);
+    getPagedMediaResources({ pageIndex: 0, pageSize: 10 }).then(res => this.allMediaResources = res.items);
+    getPagedArticles({ pageIndex: 0, pageSize: 10 }).then(res => this.allArticles = res.items);
+    getPagedConversations({ pageIndex: 0, pageSize: 10 }).then(res => this.allConversations = res.items);
+    getPagedSurveys({ pageIndex: 0, pageSize: 10 }).then(res => this.allSurveys = res.items);
   }
 };
 </script>
+
 
   
 <style scoped>
