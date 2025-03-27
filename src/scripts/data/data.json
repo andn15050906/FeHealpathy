@@ -46,15 +46,15 @@
             "Title": "Start your free trial of Healpathy Premium.",
             "Yearly": {
                 "Text": "Yearly",
-                "Price": "$100/yr."
+                "Price": "300.000 VND/yr."
             },
             "Trial": {
-                "Text": "14-Day Free Trial",
-                "Price": "Free."
+                "Text": "On Discount",
+                "Price": "240.000 VND/yr."
             },
             "Monthly": {
                 "Text": "Monthly",
-                "Price": "$10/mo."
+                "Price": "25.000 VND/mo."
             },
             "Terms": {
                 "Text": "",

@@ -10,7 +10,7 @@
             <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank">Learn more</a>.
         </div>
     </div>
-    <Roadmap :timelineItems="roadmap?.timelineItems ?? []"></Roadmap>
+    <Roadmap :timelineItems="roadmap?.timelineItems ?? []" :interactive="true"></Roadmap>
     <div v-if="nextScreenCallback" class="mt-4" style="display: flex; justify-content: space-around; margin: 10px;">
         <GlowingButton @click="nextScreenCallback" primaryColor="#00ffbb" secondaryColor="#32cd32" padding="4px 8px" class="w-100">{{ text.nextScreen }}</GlowingButton>
     </div>

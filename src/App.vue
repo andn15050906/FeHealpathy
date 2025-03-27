@@ -8,6 +8,7 @@
       <div class="page-container">
         <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
+        <RouterView name="premiumBlocker"></RouterView>
       </div>
       <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
       <div class="partner-chat" v-if="isAuthAndShown">

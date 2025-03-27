@@ -12,6 +12,7 @@ import NotFound from '@/views/404.vue'
 
 import ViewUserProfile from '@/views/Profile/PersonalProfile/ViewUserProfile.vue'
 import EditUserProfile from '@/views/Profile/PersonalProfile/EditUserProfile.vue'
+import ChangePassword from '@/views/Profile/PersonalProfile/ChangePassword.vue'
 import RequestToBeAdvisor from '@/views/Profile/PersonalProfile/RequestToBeAdvisor.vue'
 import Settings from '@/views/Profile/Settings.vue'
 import SettingUp from '@/views/Profile/SettingUp.vue'
@@ -79,12 +80,7 @@ import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
 import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
-
-/*import CreateAssignment from '@/views/Assignments_Old/Create.vue'
-import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
-import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
-import ReviewAssignment from '@/views/Assignments_Old/Review.vue'
-import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'*/
+import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -128,6 +124,11 @@ const router = createRouter({
       path: '/forgot-password',
       name: 'forgotPassword',
       component: ForgotPassword
+    },
+    {
+      path: '/change-password',
+      name: 'ChangePassword',
+      component: ChangePassword
     },
     {
       path: '/reset-password/:email/:resetToken',
@@ -259,7 +260,10 @@ const router = createRouter({
     {
       path: '/media-resources',
       name: 'MediaResources',
-      component: MediaResources
+      component:{
+        default: MediaResources,
+        premiumBlocker: PremiumBlocker
+      }
     },
     {
       path: '/music-library',
@@ -536,6 +540,8 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true },
       component: ViewReports
     }
+
+    //
   ]
 })
 

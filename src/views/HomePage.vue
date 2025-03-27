@@ -58,33 +58,7 @@
                     </GlowingCard>
                 </div>
             </section>
-
-            <section class="pricing-section">
-                <h2 class="section-title">{{ HomePage.Pricing.Title }}</h2>
-                <div class="pricing-options">
-                    <button class="pricing-option active">
-                        <div class="pricing-header">
-                            <span class="plan-name">{{ HomePage.Pricing.Yearly.Text }}</span>
-                            <span class="plan-price">{{ HomePage.Pricing.Yearly.Price }}</span>
-                        </div>
-                        <div class="pricing-details">
-                            <span class="trial-text">{{ HomePage.Pricing.Trial.Text }}</span>
-                            <span class="monthly-price">{{ HomePage.Pricing.Trial.Price }}</span>
-                        </div>
-                    </button>
-
-                    <button class="pricing-option">
-                        <div class="pricing-header">
-                            <span class="plan-name">{{ HomePage.Pricing.Monthly.Text }}</span>
-                            <span class="plan-price">{{ HomePage.Pricing.Monthly.Text }}</span>
-                        </div>
-                    </button>
-                </div>
-                <p class="pricing-terms">{{ HomePage.Pricing.Terms.Text }}
-                    <a href="#terms" class="terms-link">{{ HomePage.Pricing.Terms.Title }}</a> |
-                    <a href="#cancel" class="terms-link">{{ HomePage.Pricing.Terms.CancelText }}</a>
-                </p>
-            </section>
+            <AccountUpgrade></AccountUpgrade>
         </main>
         <main v-if="isLoggedIn" class="main-content home-background">
             <PersonalRoadmap></PersonalRoadmap>
@@ -93,13 +67,14 @@
 </template>
 
 <script>
+import router from '@/scripts/router';
+import json from '@/scripts/data/data.json'
+import { Noti } from '@/scripts/types/models';
+import { getUserProfile, setUserAuthData } from '@/scripts/api/services/authService';
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
-import json from '../scripts/data/data.json'
-import router from '@/scripts/router';
-import { getUserProfile, setUserAuthData, clearUserAuthData } from '@/scripts/api/services/authService';
-import { Noti } from '@/scripts/types/models';
-import PersonalRoadmap from '@/components/RoadmapComponents/PersonalRoadmap.vue'
+import PersonalRoadmap from '@/components/RoadmapComponents/PersonalRoadmap.vue';
+import AccountUpgrade from '@/components/PaymentComponents/AccountUpgrade.vue';
 
 export default {
     name: 'HomePage',
@@ -122,7 +97,8 @@ export default {
     components: {
         GlowingButton,
         GlowingCard,
-        PersonalRoadmap
+        PersonalRoadmap,
+        AccountUpgrade
     },
     mounted() {
         // handle auth
@@ -176,19 +152,6 @@ export default {
 .home-background {
     background-image: radial-gradient(circle 369px at -2.9% 12.9%, rgba(247, 234, 163, 1) 0%, rgba(236, 180, 238, 0.56) 46.4%, rgba(163, 203, 247, 1) 100.7%);
     padding: 40px 80px !important;
-}
-
-.main-header {
-    background: linear-gradient(rgb(23, 98, 147) 0%, rgba(23, 98, 147, 0.337) 71%, rgba(23, 98, 147, 0) 100%);
-    padding: 20px 40px;
-}
-
-.nav-menu {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
 .logo {
@@ -352,146 +315,9 @@ export default {
     height: 24px;
 }
 
-.pricing-section {
-    text-align: center;
-    margin-bottom: 100px;
-}
-
-.pricing-options {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin: 32px 0;
-}
-
-.pricing-option {
-    flex: 1;
-    max-width: 300px;
-    padding: 20px;
-    border: 2px solid #e2e2e2;
-    border-radius: 10px;
-    background: #fff;
-    cursor: pointer;
-    text-align: left;
-}
-
-.pricing-option.active {
-    border-color: #1a3e6f;
-}
-
-.plan-name {
-    font-size: 17px;
-    font-weight: 700;
-    color: rgba(0, 0, 0, 0.8);
-}
-
-.plan-price {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.8);
-}
-
-.trial-text {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 10px;
-    background: #1a3e6f;
-    color: #fff;
-    font-size: 13px;
-}
-
-.monthly-price {
-    font-size: 17px;
-    color: rgba(0, 0, 0, 0.8);
-}
-
-.pricing-terms {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 13px;
-    margin-bottom: 24px;
-}
-
-.terms-link {
-    color: #000;
-    text-decoration: underline;
-}
-
-.main-footer {
-    background: #1b2250;
-    padding: 48px 80px;
-    color: #fff;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-links {
-    display: flex;
-    gap: 48px;
-    flex-wrap: wrap;
-    margin-bottom: 48px;
-}
-
-.footer-column {
-    flex: 1;
-    min-width: 240px;
-}
-
-.footer-title {
-    font-size: 17px;
-    font-weight: 500;
-    margin-bottom: 20px;
-}
-
-.footer-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.footer-link {
-    color: #fff;
-    text-decoration: none;
-    font-size: 15px;
-}
-
-.privacy-choices {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.privacy-icon {
-    width: 40px;
-    height: 14px;
-}
-
-.copyright {
-    text-align: center;
-    font-size: 14px;
-}
-
 @media (max-width: 991px) {
-    .main-header {
-        padding: 20px;
-    }
-
-    .nav-menu {
-        flex-direction: column;
-        gap: 20px;
-    }
-
     .hero-title {
         font-size: 40px;
-    }
-
-    .main-footer {
-        padding: 48px 20px;
-    }
-
-    .footer-links {
-        gap: 40px;
     }
 }
 </style>
