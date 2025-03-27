@@ -60,6 +60,7 @@
 </template>
 
 <script setup>
+import { toast } from "vue3-toastify";
 import { ref, onMounted } from 'vue';
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
@@ -166,9 +167,51 @@ const removeSection = (index) => {
   blog.value.sections.splice(index, 1);
 };
 
+const validateForm = () => {
+  if (!blog.value.title.trim()) {
+    toast.error("Vui lòng nhập tiêu đề blog.");
+    return false;
+  }
 
+  if (!blog.value.thumb && !previewImage.value) {
+    toast.error("Vui lòng chọn hoặc giữ lại hình ảnh đại diện.");
+    return false;
+  }
+
+  if (!blog.value.selectedKeywords || blog.value.selectedKeywords.length === 0) {
+    toast.error("Vui lòng chọn ít nhất một từ khóa.");
+    return false;
+  }
+
+  if (!blog.value.sections || blog.value.sections.length === 0) {
+    toast.error("Vui lòng thêm ít nhất một phần nội dung.");
+    return false;
+  }
+
+  for (let i = 0; i < blog.value.sections.length; i++) {
+    const section = blog.value.sections[i];
+
+    if (!section.header || !section.header.trim()) {
+      toast.error(`Phần ${i + 1} thiếu tiêu đề.`);
+      return false;
+    }
+
+    if (!section.content || !section.content.trim()) {
+      toast.error(`Phần ${i + 1} thiếu nội dung.`);
+      return false;
+    }
+
+    if (!section.thumb && !section.previewImage) {
+      toast.error(`Phần ${i + 1} thiếu hình ảnh.`);
+      return false;
+    }
+  }
+
+  return true;
+};
 
 const submitBlog = async () => {
+  if (!validateForm()) return;
     try {
         const formData = new FormData();
 
@@ -215,9 +258,10 @@ const submitBlog = async () => {
         console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
 
         const response = await updateArticle(formData);
+        toast.success("Cập nhật blog thành công!");
         router.go(0);
     } catch (error) {
-        console.error("❌ Lỗi cập nhật blog:", error);
+        toast.error("Cập nhật blog thất bại!");
     }
 };
 </script>
@@ -231,15 +275,7 @@ const submitBlog = async () => {
     margin: 0;
     padding: 0;
   }
-  
-  .blog-creation {
-    max-width: 800px;
-    margin: 20px auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-  }
+
   
   .title {
     text-align: center;
