@@ -2,7 +2,7 @@ import apiClient from '@/scripts/api/apiClients';
 
 export const getNotifications = async (receiverId) => {
   try {
-    const response = await apiClient.get(`/notifications`, {
+    const response = await apiClient.get(`/Notifications`, {
       params: { ReceiverId: receiverId }
     });
     return response.data;
@@ -14,7 +14,7 @@ export const getNotifications = async (receiverId) => {
 
 export const updateNotification = async (notificationId, status) => {
   try {
-    const response = await apiClient.patch(`/notifications`, {
+    const response = await apiClient.patch(`/Notifications`, {
       Id: notificationId,
       Status: status
     });
@@ -33,7 +33,6 @@ export const submitAdvisorRequest = async (cvFile, introduction, experience, cer
     formData.append("Introduction", introduction);
     formData.append("Experience", experience);
 
-    // ✅ Gửi file PDF trực tiếp vào "Certificates" thay vì JSON
     certificates.forEach((cert, index) => {
       if (cert instanceof File) {
         formData.append(`Certificates[${index}].File`, cert);
@@ -41,18 +40,70 @@ export const submitAdvisorRequest = async (cvFile, introduction, experience, cer
       }
     });
 
-    // 🚀 Log dữ liệu FormData để kiểm tra trước khi gửi
-    console.log("🚀 FormData Entries Before Sending:");
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
     const response = await apiClient.postForm("/Notifications/Advisor", formData);
-
-    console.log("✅ API Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ Error submitting advisor request:", error);
+    console.error("Error submitting advisor request:", error);
+    throw error;
+  }
+};
+
+export const submitWithdrawalRequest = async (withdrawalData) => {
+  try {
+    const response = await apiClient.postForm("/Notifications/Withdrawal", withdrawalData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting withdrawal request:", error);
+    throw error;
+  }
+};
+
+export const submitAdminMessage = async (adminMessageData) => {
+  try {
+    const response = await apiClient.post("/Notifications/AdminMessage", adminMessageData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting admin message:", error);
+    throw error;
+  }
+};
+
+export const submitInviteMember = async (invitationData) => {
+  try {
+    const response = await apiClient.post("/Notifications/InviteMember", invitationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting invitation:", error);
+    throw error;
+  }
+};
+
+export const submitUserReport = async (reportData) => {
+  try {
+    const response = await apiClient.post("/Notifications/ReportUser", reportData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting user report:", error);
+    throw error;
+  }
+};
+
+export const submitUserBanned = async (bannedData) => {
+  try {
+    const response = await apiClient.post("/Notifications/UserBanned", bannedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting user banned notification:", error);
+    throw error;
+  }
+};
+
+export const submitContentDisapproved = async (disapprovedData) => {
+  try {
+    const response = await apiClient.post("/Notifications/ContentDisapproved", disapprovedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting content disapproved notification:", error);
     throw error;
   }
 };
