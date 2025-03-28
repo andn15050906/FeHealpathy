@@ -14,6 +14,7 @@
         </ul>
       </div>
       <div class="user-actions">
+        <NotificationBell id="bell" ref="notificationBell" :isAuthenticated="isAuthenticated" />
         <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
@@ -73,6 +74,7 @@
 import { getUserProfile, signOut } from '@/scripts/api/services/authService';
 import Logo from '@/components/Common/Misc/Logo.vue';
 // import { getNotifications, updateNotification } from '@/scripts/api/services/notificationService';
+import NotificationBell from "@/components/NotificationComponents/NotificationBell.vue";
 
 export default {
   data() {
@@ -91,7 +93,8 @@ export default {
   },
 
   components: {
-    Logo
+    Logo,
+    NotificationBell
   },
 
   async mounted() {
@@ -184,8 +187,14 @@ export default {
     //     console.error('Error marking notifications as read:', error);
     //   }
     // },
-  }
+  },
 
+  props: {
+    isAuthenticated: {
+      type: Boolean,
+      required: true,
+    },
+  },
   
 };
 
@@ -230,6 +239,7 @@ ul {
 
 .menu ul {
   display: flex;
+  margin-left: 45px;
 }
 
 .menu ul li {
@@ -238,6 +248,11 @@ ul {
   font-size: 16px;
   font-weight: 600;
   line-height: 60px;
+}
+
+#bell {
+  margin-right: 10px;
+  margin-top: 3px;
 }
 
 .user-actions {
