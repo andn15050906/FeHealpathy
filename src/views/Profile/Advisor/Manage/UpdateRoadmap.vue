@@ -105,7 +105,11 @@
   import { updateRoadmap } from '@/scripts/api/services/roadmapService';
   import { ref } from 'vue';
   import { onMounted } from "vue";
+  import { toast } from "vue3-toastify";
+  import { useRouter } from 'vue-router';
   
+  const router = useRouter();
+
   const props = defineProps({
     roadmapData: {
       type: Object,
@@ -184,7 +188,10 @@
       console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
       
       await updateRoadmap(roadmap.value); 
+      toast.success("Cập nhật roadmap thành công");
+      router.go(0);
     } catch (error) {
+      toast.error("Cập nhật roadmap thất bại");
       console.error('Error updating roadmap:', error);
     }
   }

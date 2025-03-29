@@ -334,15 +334,18 @@ async fetchBlogs() {
       pageIndex: this.currentPageBlogs - 1,
       pageSize: this.pageSize
     };
+
     const response = await getPagedArticles(params);
-    this.blogs = Array.isArray(response.items) ? response.items : [];
-    this.totalPagesBlogs = response.pageCount;
+
+    this.blogs = (response.items || []).filter(blog => blog.creatorId === this.currentUserId);
+    this.totalPagesBlogs = Math.ceil(this.blogs.length / this.pageSize);
+
     const blogTab = this.tabs.find(tab => tab.id === 'blogs');
     if (blogTab) {
-      blogTab.count = response.totalCount;
+      blogTab.count = this.blogs.length;
     }
+
     this.sortBlogs();
-    console.log(response);
   } catch (error) {
     console.error('Error fetching blogs:', error);
     this.blogs = [];
@@ -373,57 +376,57 @@ async confirmDelete(confirm) {
     }
     this.showDeletePopup = false;
   },
-async fetchRoadmaps() {
+  async fetchRoadmaps() {
   try {
     const params = {
       pageIndex: this.currentPageRoadmaps - 1,
       pageSize: this.pageSize
     };
     const response = await getRoadmaps(params);
-    this.roadmaps = Array.isArray(response.items) ? response.items : [];
-    this.totalPagesRoadmaps = response.pageCount;
+
+    this.roadmaps = (response.items || []).filter(roadmap => roadmap.creatorId === this.currentUserId);
+    this.totalPagesRoadmaps = Math.ceil(this.roadmaps.length / this.pageSize);
+
     const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
     if (roadmapTab) {
-      roadmapTab.count = response.totalCount;
+      roadmapTab.count = this.roadmaps.length;
     }
+
     this.sortRoadmaps();
-    console.log(response);
   } catch (error) {
     console.error('Error fetching roadmaps:', error);
     this.roadmaps = [];
   }
 },
+
 async fetchCourses() {
-    try {
-        console.log("Fetching courses for page:", this.currentPage);
+  try {
+    const params = {
+      pageIndex: this.currentPageCourses - 1,
+      pageSize: this.pageSize
+    };
 
-        const params = {
-            pageIndex: this.currentPageCourses - 1,
-            pageSize: this.pageSize
-        };
+    const response = await getCourses(params);
 
-        console.log("Request Params:", params);
+    this.courses = (response.items || []).filter(course => course.creatorId === this.currentUserId);
+    this.totalPagesCourses = Math.ceil(this.courses.length / this.pageSize);
 
-        const response = await getCourses(params);
-
-        console.log("API Response:", response);
-
-        this.courses = response.items || [];
-        this.totalPagesCourses = response.pageCount;
-
-        const courseTab = this.tabs.find(tab => tab.id === 'courses');
-        if (courseTab) {
-            courseTab.count = response.totalCount;
-        }
-        this.sortCourses();
-    } catch (error) {
-        console.error('Error fetching courses:', error);
-        this.courses = [];
+    const courseTab = this.tabs.find(tab => tab.id === 'courses');
+    if (courseTab) {
+      courseTab.count = this.courses.length;
     }
+
+    this.sortCourses();
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    this.courses = [];
   }
-  ,
+},
     },
     computed: {
+      currentUserId() {
+    return JSON.parse(localStorage.getItem('userProfile'))?.id;
+  },
         filteredCourses() {
             return this.courses.filter(item => 
             item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase())

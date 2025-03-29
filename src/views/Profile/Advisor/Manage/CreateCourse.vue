@@ -260,45 +260,55 @@ export default {
       this.showSavePopup = true;
     },
 
-async handleSave(confirm) {
-  if (confirm) {
-    try {
-      const formData = new FormData();
-      formData.append('title', this.course.title);
-      formData.append('intro', this.course.intro);
-      formData.append('description', this.course.description);
-      formData.append('price', this.course.price);
-      formData.append('level', this.course.level);
-      formData.append('outcomes', this.course.outcomes);
-      formData.append('requirements', this.course.requirements);
-      formData.append('leafCategoryId', this.course.leafCategoryId);
+    async handleSave(confirm) {
+  if (!confirm) return;
 
-      if (this.course.thumb.file) {
-        formData.append('thumb', this.course.thumb.file, this.course.thumb.title);
-      }
+  try {
+    const formData = new FormData();
 
-      this.course.lectures.forEach((lecture, index) => {
-        formData.append(`lectures[${index}][title]`, lecture.title);
-        formData.append(`lectures[${index}][content]`, lecture.content);
-        formData.append(`lectures[${index}][contentSummary]`, lecture.contentSummary);
-        formData.append(`lectures[${index}][isPreviewable]`, lecture.isPreviewable);
-        lecture.medias.forEach((media, mediaIndex) => {
-          formData.append(`lectures[${index}][medias][${mediaIndex}][file]`, media.file, media.title);
-        });
-      });
+    formData.append('Title', this.course.title);
+    formData.append('Intro', this.course.intro);
+    formData.append('Description', this.course.description);
+    formData.append('Price', this.course.price);
+    formData.append('Level', this.course.level);
+    formData.append('Outcomes', this.course.outcomes);
+    formData.append('Requirements', this.course.requirements);
+    formData.append('LeafCategoryId', this.course.leafCategoryId);
 
-      for (let key of formData.keys()) {
-        console.log(`${key}:`, formData.getAll(key));
-      }
-
-      const response = await createCourse(formData);
-      console.log('Course created successfully:', response);
-      this.resetForm();
-    } catch (error) {
-      console.error('Failed to create course:', error);
+    // Thumb
+    if (this.course.thumb.file) {
+      formData.append('Thumb.File', this.course.thumb.file, this.course.thumb.title);
+      formData.append('Thumb.Title', this.course.thumb.title || 'thumbnail');
     }
+
+    if (this.course.thumb.url) {
+      formData.append('Thumb.Url', this.course.thumb.url);
+    }
+
+    // Lectures
+    this.course.lectures.forEach((lecture, index) => {
+      formData.append(`Lectures[${index}].Title`, lecture.title);
+      formData.append(`Lectures[${index}].Content`, lecture.content);
+      formData.append(`Lectures[${index}].ContentSummary`, lecture.contentSummary);
+      formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
+
+      lecture.medias.forEach((media, mediaIndex) => {
+        formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
+      });
+    });
+
+    for (let key of formData.keys()) {
+      console.log(`${key}:`, formData.getAll(key));
+    }
+
+    const response = await createCourse(formData);
+    console.log('Course created successfully:', response);
+    this.resetForm();
+  } catch (error) {
+    console.error('Failed to create course:', error);
   }
 }
+
 
 ,
     resetForm() {
