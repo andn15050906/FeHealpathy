@@ -99,10 +99,14 @@
                     class="img-fluid rounded" style="max-width: 100px;" />
                 </td>
                 <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
-                <td class="col-tags fixed-col" :title="item.tags.map(tag => tag.title).join(', ')">
-                  {{item.tags.map(tag => tag.title).join(', ')}}
+                <td class="col-tags fixed-col">
+                  <div class="d-flex flex-wrap gap-1">
+                    <span v-for="tag in item.tags" :key="tag.id" class="badge bg-info text-dark">
+                      {{ tag.title }}
+                    </span>
+                  </div>
                 </td>
-                <td class="col-status fixed-col" :title="item.status">
+                <td class="col-status fixed-col text-center" :title="item.status">
                   <span :class="['badge', getStatusClass(item.status)]">{{ item.status }}</span>
                 </td>
                 <td class="col-actions fixed-col text-center">
