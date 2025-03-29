@@ -3,13 +3,27 @@
     <h1>User Management</h1>
     <data-table :data="users" :columns="columns">
       <template v-slot:actions="{ row }">
-        <button class="icon-button" @click="openUserDetail(row)" title="View Details">
+        <button
+          class="icon-button"
+          @click="openUserDetail(row)"
+          title="View Details"
+        >
           <i class="fas fa-eye"></i>
         </button>
-        <button class="icon-button" v-if="row.role !== 2" @click="openUpgradeAdmin(row)" title="Upgrade to Admin">
+        <button
+          class="icon-button"
+          v-if="row.role !== 2"
+          @click="openUpgradeAdmin(row)"
+          title="Upgrade to Admin"
+        >
           <i class="fas fa-user-shield"></i>
         </button>
-        <button class="icon-button ban" v-if="row.role !== 2" @click="handleBanUser(row)" title="Ban User">
+        <button
+          class="icon-button ban"
+          v-if="row.role !== 2"
+          @click="handleBanUser(row)"
+          title="Ban User"
+        >
           <i class="fas fa-ban"></i>
         </button>
       </template>
@@ -31,10 +45,11 @@
 </template>
 
 <script>
-import DataTable from '@/views/Profile/Admin/DataTable.vue';
-import UserDetailPopup from '@/views/Profile/Admin/UserDetailPopup.vue';
-import UpgradeAdminPopup from '@/views/Profile/Admin/UpgradeAdminPopup.vue';
-import { getUsers } from '@/scripts/api/services/userService';
+import DataTable from "@/views/Profile/Admin/DataTable.vue";
+import UserDetailPopup from "@/views/Profile/Admin/UserDetailPopup.vue";
+import UpgradeAdminPopup from "@/views/Profile/Admin/UpgradeAdminPopup.vue";
+import { getUsers } from "@/scripts/api/services/userService";
+import { submitUserBanned } from "@/scripts/api/services/notificationService";
 
 export default {
   components: {
@@ -49,10 +64,10 @@ export default {
       selectedUser: null,
       users: [],
       columns: [
-        { title: 'User ID', key: 'id' },
-        { title: 'Name', key: 'fullName' },
-        { title: 'Email', key: 'email' },
-        { title: 'Role', key: 'role' },
+        { title: "User ID", key: "id" },
+        { title: "Name", key: "fullName" },
+        { title: "Email", key: "email" },
+        { title: "Role", key: "role" },
       ],
     };
   },
@@ -61,16 +76,16 @@ export default {
     async fetchUsers() {
       try {
         const response = await getUsers();
-        console.log('Users data:', response.items);
+        console.log("Users data:", response.items);
         this.users = response.items;
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error("Error fetching users:", error);
       }
     },
 
     // Mở popup hiển thị chi tiết thông tin user
     openUserDetail(user) {
-      console.log('Selected user:', user);
+      console.log("Selected user:", user);
       this.selectedUser = user;
       this.showUserDetail = true;
     },
@@ -83,30 +98,45 @@ export default {
 
     // Xử lý khi xác nhận nâng cấp user lên Admin
     handleUpgradeConfirm(data) {
-      console.log('Upgrading user with data:', data);
-      const userIndex = this.users.findIndex(u => u.id === data.userId);
+      console.log("Upgrading user with data:", data);
+      const userIndex = this.users.findIndex((u) => u.id === data.userId);
       if (userIndex !== -1) {
-        this.users[userIndex].role = 'Admin';
+        this.users[userIndex].role = "Admin";
       }
     },
 
     // Xử lý khi click nút ban user
-    handleBanUser(user) {
+    async handleBanUser(user) {
       if (confirm(`Are you sure you want to ban user ${user.fullName}?`)) {
-        // TODO: Gọi API ban user
-        // 1. Gọi API ban user với user ID
-        // 2. Cập nhật trạng thái user trong danh sách
-        // 3. Hiển thị thông báo thành công/thất bại
-        console.log('Banning user:', user);
+        try {
+          // TODO: Gọi API ban user
+          // 1. Gọi API ban user với user ID
+          // 2. Cập nhật trạng thái user trong danh sách
+          // const userIndex = this.users.findIndex((u) => u.id === user.id);
+          // if (userIndex !== -1) {
+          //   this.users[userIndex].role = "Banned";
+          // }
+          // 3. Hiển thị thông báo thành công/thất bại
+          console.log("Banning user:", user);
+
+          // Send notification ban user
+          await submitUserBanned({
+            userId: user.id,
+            message: "You have been banned due to a violation of our policies.",
+          });
+        } catch (error) {
+          console.error("Error banning user or sending notification:", error);
+        }
       }
-    }
+    },
   },
   mounted() {
     this.fetchUsers();
     if (!document.querySelector('link[href*="font-awesome"]')) {
-      const link = document.createElement('link');
-      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
-      link.rel = 'stylesheet';
+      const link = document.createElement("link");
+      link.href =
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+      link.rel = "stylesheet";
       document.head.appendChild(link);
     }
   },

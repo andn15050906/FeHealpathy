@@ -1,109 +1,55 @@
-import apiClient from '@/scripts/api/apiClients';
+import { get, post, postForm, patchForm } from "@/scripts/api/apiClients";
 
-export const getNotifications = async (receiverId) => {
-  try {
-    const response = await apiClient.get(`/Notifications`, {
-      params: { ReceiverId: receiverId }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-    throw error;
-  }
+const API_BASE_URL = "/Notifications";
+
+export const getNotifications = async (queryParams = {}) => {
+  return await get(`${API_BASE_URL}`, queryParams);
 };
 
-export const updateNotification = async (notificationId, status) => {
-  try {
-    const response = await apiClient.patch(`/Notifications`, {
-      Id: notificationId,
-      Status: status
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error updating notification:', error);
-    throw error;
-  }
+export const updateNotification = async (notification) => {
+  return await patchForm(`${API_BASE_URL}`, notification);
 };
 
-export const submitAdvisorRequest = async (cvFile, introduction, experience, certificates) => {
-  try {
-    const formData = new FormData();
-    formData.append("CV.File", cvFile);
-    formData.append("CV.Title", cvFile.name);
-    formData.append("Introduction", introduction);
-    formData.append("Experience", experience);
+export const submitAdvisorRequest = async ({ cvFile, introduction, experience, certificates }) => {
+  const formData = new FormData();
+  formData.append("CV.File", cvFile);
+  formData.append("CV.Title", cvFile.name);
+  formData.append("Introduction", introduction);
+  formData.append("Experience", experience);
 
-    certificates.forEach((cert, index) => {
-      if (cert instanceof File) {
-        formData.append(`Certificates[${index}].File`, cert);
-        formData.append(`Certificates[${index}].Title`, cert.name);
-      }
-    });
+  certificates.forEach((cert, index) => {
+    if (cert instanceof File) {
+      formData.append(`Certificates[${index}].File`, cert);
+      formData.append(`Certificates[${index}].Title`, cert.name);
+    }
+  });
 
-    const response = await apiClient.postForm("/Notifications/Advisor", formData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting advisor request:", error);
-    throw error;
-  }
+  return await postForm(`${API_BASE_URL}/Advisor`, formData);
 };
 
-export const submitWithdrawalRequest = async (withdrawalData) => {
-  try {
-    const response = await apiClient.postForm("/Notifications/Withdrawal", withdrawalData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting withdrawal request:", error);
-    throw error;
-  }
+export const submitWithdrawalRequest = async (formData) => {
+  return await postForm(`${API_BASE_URL}/Withdrawal`, formData);
 };
 
-export const submitAdminMessage = async (adminMessageData) => {
-  try {
-    const response = await apiClient.post("/Notifications/AdminMessage", adminMessageData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting admin message:", error);
-    throw error;
-  }
+export const submitAdminMessage = async ({ title, content, recipients }) => {
+  return await post(`${API_BASE_URL}/AdminMessage`, { title, content, recipients });
 };
 
-export const submitInviteMember = async (invitationData) => {
-  try {
-    const response = await apiClient.post("/Notifications/InviteMember", invitationData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting invitation:", error);
-    throw error;
-  }
+export const submitInviteMember = async ({ email, message }) => {
+  return await post(`${API_BASE_URL}/InviteMember`, { email, message });
 };
 
-export const submitUserReport = async (reportData) => {
-  try {
-    const response = await apiClient.post("/Notifications/ReportUser", reportData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting user report:", error);
-    throw error;
-  }
+export const submitUserReport = async ({ reportedUserId, reason }) => {
+  return await post(`${API_BASE_URL}/ReportUser`, { reportedUserId, reason });
 };
 
-export const submitUserBanned = async (bannedData) => {
-  try {
-    const response = await apiClient.post("/Notifications/UserBanned", bannedData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting user banned notification:", error);
-    throw error;
-  }
+export const submitUserBanned = async ({ userId, message }) => {
+  return await post(`${API_BASE_URL}/UserBanned`, {
+    userId,
+    message: message || "You have been banned due to a violation of our policies.",
+  });
 };
 
-export const submitContentDisapproved = async (disapprovedData) => {
-  try {
-    const response = await apiClient.post("/Notifications/ContentDisapproved", disapprovedData);
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting content disapproved notification:", error);
-    throw error;
-  }
+export const submitContentDisapproved = async ({ contentId, reason }) => {
+  return await post(`${API_BASE_URL}/ContentDisapproved`, { contentId, reason });
 };

@@ -2,7 +2,9 @@
   <div v-if="isAuthenticated" class="notification-bell-container">
     <div class="bell-icon" @click="toggleDropdown">
       <i class="fas fa-bell"></i>
-      <span v-if="unreadCount > 0" class="notification-count">{{ unreadCount }}</span>
+      <span v-if="unreadCount > 0" class="notification-count">{{
+        unreadCount
+      }}</span>
     </div>
     <transition name="fade">
       <div v-if="isDropdownVisible" class="notification-dropdown">
@@ -32,26 +34,29 @@
 </template>
 
 <script>
+import { getNotifications } from "@/scripts/api/services/notificationService";
+
 export default {
   props: {
     isAuthenticated: {
       type: Boolean,
       required: true,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      notifications: [
-        { content: "You have a new message from John.", read: false },
-        { content: "Your daily goal has been achieved!", read: false },
-        { content: "Reminder: Drink water and stay hydrated.", read: true }
-      ],
+      notifications: [],
       isDropdownVisible: false,
     };
   },
   computed: {
     unreadCount() {
-      return this.notifications.filter((notification) => !notification.read).length;
+      return this.notifications.filter((notification) => !notification.read)
+        .length;
     },
   },
   methods: {
@@ -59,10 +64,38 @@ export default {
       this.isDropdownVisible = !this.isDropdownVisible;
     },
     markAsRead(index) {
-      this.notifications[index].read = true; 
+      this.notifications[index].read = true; // Đánh dấu thông báo là đã đọc
     },
-    addNotification(content) {
-      this.notifications.unshift({ content, read: false });
+    async fetchNotifications() {
+      try {
+        const response = await getNotifications({ CreatorId: this.userId });
+        this.notifications = (response.items || response).map(
+          (notification) => ({
+            content: notification.message,
+            read: notification.read,
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    },
+  },
+  mounted() {
+    if (this.isAuthenticated) {
+      this.fetchNotifications(); // Fetch thông báo khi user đã đăng nhập
+    }
+  },
+
+  watch: {
+    isAuthenticated(newVal) {
+      if (newVal && this.userId) {
+        this.fetchNotifications();
+      }
+    },
+    userId(newVal) {
+      if (newVal && this.isAuthenticated) {
+        this.fetchNotifications();
+      }
     },
   },
 };
@@ -140,7 +173,7 @@ export default {
 }
 
 .notification-content {
-    margin-bottom: -5px;
+  margin-bottom: -5px;
   font-size: 0.9rem;
   color: #333;
   flex: 1;

@@ -14,7 +14,7 @@
         </ul>
       </div>
       <div class="user-actions">
-        <NotificationBell id="bell" ref="notificationBell" :isAuthenticated="isAuthenticated" />
+        <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
         <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
@@ -114,6 +114,7 @@ export default {
         if (clientData) {
           this.isLoggedIn = true;
           this.user = {
+            id: clientData.id,
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
             avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
