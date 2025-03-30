@@ -13,7 +13,7 @@
     <v-card v-else>
         <v-card-title class="d-flex align-center title-section">
             <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
-            <span class="sidebar-title">{{ text.SetUpFirst }}</span>
+            <span class="sidebar-title" @click="goTo('', true)">{{ text.SetUpFirst }}</span>
         </v-card-title>
     </v-card>
 </template>
@@ -132,6 +132,7 @@ defineExpose({ getPersonalRoadmap, fetchPersonalRoadmap })
 .sidebar-title {
     text-wrap: auto;
     padding: 4px;
+    cursor: pointer;
 }
 .completed-step {
     background-color: rgba(0, 123, 255, 0.15) !important;

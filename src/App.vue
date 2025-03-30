@@ -6,9 +6,11 @@
     <main>
       <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
       <div class="page-container">
-        <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
+        <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
+          <PremiumBlocker></PremiumBlocker>
+        </div>
+        <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
           @removeNotification="removeNotification" />
-        <RouterView name="premiumBlocker"></RouterView>
       </div>
       <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
       <div class="partner-chat" v-if="isAuthAndShown">
@@ -22,22 +24,23 @@
 <script setup>
 import { ref, provide, onMounted, computed } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
-import { getUserProfile } from '@/scripts/api/services/authService';
+import { getUserProfile, isPremium } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
-//import Guider from '@/components/PracticeComponents/Guider.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 import ConversationWindow from './views/Community/ConversationWindow.vue';
-import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
+import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
 const router = useRouter();
 const isAuthenticated = ref(false);
 const roadmapProgress = ref(null);
-//const guiderRef = ref(null);
+const isPremiumUser = ref(isPremium());
+console.log("Is Premium:" + isPremiumUser.value);
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -96,6 +99,7 @@ const handleAuthenticated = (isAuth) => {
   isAuthenticated.value = isAuth;
   if (isAuthenticated.value)
     headerRef.value.fetchUserProfile();
+  isPremiumUser.value = isPremium();
 }
 
 const notificationRef = ref(null);

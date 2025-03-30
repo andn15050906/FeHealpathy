@@ -80,7 +80,6 @@ import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
 import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
-import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -260,10 +259,8 @@ const router = createRouter({
     {
       path: '/media-resources',
       name: 'MediaResources',
-      component:{
-        default: MediaResources,
-        premiumBlocker: PremiumBlocker
-      }
+      component: MediaResources,
+      meta: { requiresPremium : true }
     },
     {
       path: '/music-library',
