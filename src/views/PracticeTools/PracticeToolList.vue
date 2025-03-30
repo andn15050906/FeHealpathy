@@ -4,7 +4,7 @@
       <GlowingCard class="tool-card" primaryColor="#4facfe" secondaryColor="#00f2fe">
         <h2>YOGA</h2>
         <p>Discover balance and relaxation through yoga exercises</p>
-        <RouterLink :to="'yoga'" class="arrow-btn">→</RouterLink>
+        <RouterLink :to="'options/yoga'" class="arrow-btn">→</RouterLink>
       </GlowingCard>
     </div>
     <div class="tool-card-container">

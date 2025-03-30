@@ -38,6 +38,9 @@ import MediaControl from '@/views/PracticeTools/MediaResource/MediaControl.vue'
 import YogaView from '@/views/PracticeTools/Yoga/YogaCatalog.vue'
 import YogaExerciseDetail from '@/views/PracticeTools/Yoga/YogaExerciseDetail.vue'
 import YogaPractice from '@/views/PracticeTools/Yoga/YogaPractice.vue'
+import YogaOptions from '@/views/PracticeTools/Yoga/YogaOptions.vue';
+import YogaPoses from '@/views/PracticeTools/Yoga/YogaPoses.vue';
+import YogaPoseDetails from '@/views/PracticeTools/Yoga/YogaPoseDetails.vue';
 import HabitTracking from '@/views/PracticeTools/HabitTracking/HabitTracking.vue'
 
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
@@ -183,6 +186,21 @@ const router = createRouter({
       path: '/yoga',
       name: 'yogaView',
       component: YogaView
+    },
+    {
+      path: '/options/yoga',
+      name: 'YogaOptions',
+      component: YogaOptions
+    },
+    {
+      path: '/yoga/poses',
+      name: 'YogaPoses',
+      component: YogaPoses
+    },
+    {
+      path: '/yoga/details',
+      name: 'YogaPoseDetails',
+      component: YogaPoseDetails
     },
     {
       path: '/yoga/:id',
