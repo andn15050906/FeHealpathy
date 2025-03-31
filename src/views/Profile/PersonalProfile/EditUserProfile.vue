@@ -200,7 +200,12 @@ export default {
       const birthDate = new Date(form.value.dateOfBirth);
       const today = new Date();
       const minAge = new Date();
+      const maxAge = new Date();
+      
+      // Giới hạn tuổi tối thiểu 12 tuổi
       minAge.setFullYear(today.getFullYear() - 12);
+      // Giới hạn tuổi tối đa 100 tuổi
+      maxAge.setFullYear(today.getFullYear() - 100);
 
       if (birthDate > today) {
         errors.value.dateOfBirth = 'Date of birth cannot be in the future';
@@ -209,6 +214,11 @@ export default {
 
       if (birthDate > minAge) {
         errors.value.dateOfBirth = 'You must be at least 12 years old';
+        return false;
+      }
+
+      if (birthDate < maxAge) {
+        errors.value.dateOfBirth = 'Age cannot exceed 100 years';
         return false;
       }
 
