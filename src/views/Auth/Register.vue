@@ -41,105 +41,120 @@
 </template>
 
 <script>
-import { inject } from 'vue';
-import { register } from '@/scripts/api/services/authService';
+import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
+import { register } from '@/scripts/api/services/authService';
 
 export default {
   setup() {
     const router = useRouter();
     const loadingSpinner = inject('loadingSpinner');
-    return { router, loadingSpinner };
-  },
-  data() {
-    return {
-      username: "",
-      email: "",
-      password: "",
-      retypePassword: "",
-      passwordError: "",
-      retypePasswordError: "",
-      generalError: ""
-    };
-  },
-  methods: {
-    validatePassword() {
-      const minLength = 6;
-      const hasUpperCase = /[A-Z]/.test(this.password);
-      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
 
-      if (this.password.length < minLength) {
-        this.passwordError = "Password must be at least 6 characters long.";
+    const username = ref("");
+    const email = ref("");
+    const password = ref("");
+    const retypePassword = ref("");
+    const passwordError = ref("");
+    const retypePasswordError = ref("");
+    const generalError = ref("");
+
+    const validatePassword = () => {
+      const minLength = 6;
+      const hasUpperCase = /[A-Z]/.test(password.value);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password.value);
+
+      if (password.value.length < minLength) {
+        passwordError.value = "Password must be at least 6 characters long.";
         return false;
       } else if (!hasUpperCase) {
-        this.passwordError = "Password must include at least one uppercase letter.";
+        passwordError.value = "Password must include at least one uppercase letter.";
         return false;
       } else if (!hasSpecialChar) {
-        this.passwordError = "Password must include at least one special character.";
+        passwordError.value = "Password must include at least one special character.";
         return false;
       } else {
-        this.passwordError = "";
+        passwordError.value = "";
         return true;
       }
-    },
-    validateRetypePassword() {
-      if (this.passwordError) {
-        this.retypePasswordError = "";
-        this.generalError = "";
+    };
+
+    const validateRetypePassword = () => {
+      if (passwordError.value) {
+        retypePasswordError.value = "";
+        generalError.value = "";
         return true;
       }
-      if (this.password !== this.retypePassword) {
-        this.retypePasswordError = "Passwords do not match.";
-        this.generalError = "";
+      if (password.value !== retypePassword.value) {
+        retypePasswordError.value = "Passwords do not match.";
+        generalError.value = "";
         return false;
       }
       return true;
-    },
-    validateEmail() {
+    };
+
+    const validateEmail = () => {
       const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
-      if (!emailPattern.test(this.email)) {
-        this.generalError = "Email must end with .com";
+      if (!emailPattern.test(email.value)) {
+        generalError.value = "Email must end with .com";
         return false;
       }
-      this.generalError = "";
+      generalError.value = "";
       return true;
-    },
-    async handleRegister() {
-      const isPasswordValid = this.validatePassword();
-      const isRetypePasswordValid = this.validateRetypePassword();
-      const isEmailValid = this.validateEmail();
+    };
+
+    const handleRegister = async () => {
+      const isPasswordValid = validatePassword();
+      const isRetypePasswordValid = validateRetypePassword();
+      const isEmailValid = validateEmail();
 
       if (isPasswordValid && isRetypePasswordValid && isEmailValid) {
         try {
-          if (this.loadingSpinner) {
-            this.loadingSpinner.showSpinner();
+          if (loadingSpinner) {
+            loadingSpinner.showSpinner();
           }
-          await register(this.username, this.email, this.password);
-          this.retypePasswordError = "";
-          this.generalError = 'Registration successful! Redirecting to login...';
-          setTimeout(() => this.router.push({ name: 'signIn' }), 2000);
+          await register(username.value, email.value, password.value);
+          retypePasswordError.value = "";
+          generalError.value = 'Registration successful! Redirecting to login...';
+          setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
-          console.error('Registration error:', error);
-          if (error.response && error.response.data && error.response.data.errors) {
+          if (error.response?.status === 409) {
+            const errorMessage = error.response?.data?.message || error.response?.data;
+            if (errorMessage?.toLowerCase().includes('email')) {
+              generalError.value = "This email has already been registered";
+            } else {
+              generalError.value = "This username has already been taken";
+            }
+          } else if (error.response?.data?.errors) {
             let errors = error.response.data.errors;
             for (let key in errors) {
               if (errors[key][0].startsWith('400')) {
-                this.retypePasswordError = "";
-                this.generalError = errors[key][0].substring(5);
+                retypePasswordError.value = "";
+                generalError.value = errors[key][0].substring(5);
                 break;
               }
             }
           } else {
-            this.generalError = 'Network error. Please check your connection and try again.';
+            generalError.value = 'Network error. Please check your connection and try again.';
           }
         } finally {
-          if (this.loadingSpinner) {
-            this.loadingSpinner.hideSpinner();
+          if (loadingSpinner) {
+            loadingSpinner.hideSpinner();
           }
         }
       }
-    },
-  },
+    };
+
+    return {
+      username,
+      email,
+      password,
+      retypePassword,
+      passwordError,
+      retypePasswordError,
+      generalError,
+      handleRegister
+    };
+  }
 };
 </script>
 
@@ -240,3 +255,4 @@ h2 {
   text-decoration: underline;
 }
 </style>
+
