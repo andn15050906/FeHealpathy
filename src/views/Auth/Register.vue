@@ -114,7 +114,7 @@ export default {
           }
           await register(username.value, email.value, password.value);
           retypePasswordError.value = "";
-          generalError.value = 'Registration successful! Redirecting to login...';
+          generalError.value = 'Registration successful';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
           if (error.response?.status === 409) {
