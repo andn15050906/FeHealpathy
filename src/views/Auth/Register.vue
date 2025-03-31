@@ -45,13 +45,14 @@ import { inject } from 'vue';
 import { register } from '@/scripts/api/services/authService';
 import { useRouter } from 'vue-router';
 
-const router = useRouter();
-const loadingSpinner = inject('loadingSpinner');
-
 export default {
+  setup() {
+    const router = useRouter();
+    const loadingSpinner = inject('loadingSpinner');
+    return { router, loadingSpinner };
+  },
   data() {
     return {
-			loadingSpinner: loadingSpinner,
       username: "",
       email: "",
       password: "",
@@ -94,31 +95,47 @@ export default {
       }
       return true;
     },
+    validateEmail() {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
+      if (!emailPattern.test(this.email)) {
+        this.generalError = "Email must end with .com";
+        return false;
+      }
+      this.generalError = "";
+      return true;
+    },
     async handleRegister() {
       const isPasswordValid = this.validatePassword();
       const isRetypePasswordValid = this.validateRetypePassword();
+      const isEmailValid = this.validateEmail();
 
-      if (isPasswordValid && isRetypePasswordValid) {
+      if (isPasswordValid && isRetypePasswordValid && isEmailValid) {
         try {
-          this.loadingSpinner.showSpinner();
+          if (this.loadingSpinner) {
+            this.loadingSpinner.showSpinner();
+          }
           await register(this.username, this.email, this.password);
           this.retypePasswordError = "";
-          this.generalError = 'Registration successful! Please check your email to verify your account.';
-          setTimeout(() => router.push({ name: 'signIn' }), 2000);
+          this.generalError = 'Registration successful! Redirecting to login...';
+          setTimeout(() => this.router.push({ name: 'signIn' }), 2000);
         } catch (error) {
-          let errors = error.response.data.errors;
-          console.log(errors);
-          for (let key in errors) {
-            if (errors[key][0].startsWith('400')) {
-              this.retypePasswordError = "";
-              this.generalError = errors[key][0].substring(5);
-              break;
+          console.error('Registration error:', error);
+          if (error.response && error.response.data && error.response.data.errors) {
+            let errors = error.response.data.errors;
+            for (let key in errors) {
+              if (errors[key][0].startsWith('400')) {
+                this.retypePasswordError = "";
+                this.generalError = errors[key][0].substring(5);
+                break;
+              }
             }
+          } else {
+            this.generalError = 'Network error. Please check your connection and try again.';
           }
-          //this.generalError = 'Registration failed. Please try again.';
-        }
-        finally {
-				  this.loadingSpinner.hideSpinner();
+        } finally {
+          if (this.loadingSpinner) {
+            this.loadingSpinner.hideSpinner();
+          }
         }
       }
     },
