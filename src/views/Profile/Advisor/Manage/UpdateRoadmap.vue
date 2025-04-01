@@ -237,15 +237,7 @@ body {
     margin: 0;
     padding: 0;
 }
-  
-.roadmap-creation {
-    max-width: 800px;
-    margin: 20px auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-  }
+
   
 .title {
     text-align: center;
