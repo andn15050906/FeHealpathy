@@ -387,10 +387,16 @@ export default {
     }
   },
   computed: {
-    currentUserId() => JSON.parse(localStorage.getItem('userProfile'))?.id,
-    filteredCourses = () => this.courses.filter(item => item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase())),
-    filteredBlogs = () => this.blogs.filter(item => item.title.toLowerCase().includes(this.searchQuery.blogs.toLowerCase())),
-    filteredRoadmaps = () => this.roadmaps.filter(item => item.title.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase()))
+    currentUserId: () => JSON.parse(localStorage.getItem('userProfile'))?.id,
+    filteredCourses() {
+      return this.courses.filter(item => item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase()))
+    },
+    filteredBlogs() {
+      return this.blogs.filter(item => item.title.toLowerCase().includes(this.searchQuery.blogs.toLowerCase()))
+    },
+    filteredRoadmaps() {
+      return this.roadmaps.filter(item => item.title.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase()))
+    }
   },
   mounted() {
     const link = document.createElement('link')

@@ -602,6 +602,7 @@ textarea.form-control {
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
   
 .premium-upgrade {
   margin-top: 40px;
