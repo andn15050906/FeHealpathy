@@ -2,15 +2,15 @@
     <nav aria-label="Page navigation" class="pagination-nav">
         <ul class="pagination">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                <a @click.prevent="goToPage(currentPage - 1)" class="page-link" aria-label="Previous">
+                <a @click.prevent="$emit('go-to-page', currentPage - 1)" class="page-link" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li v-for="page in totalPagesArray" :key="page" class="page-item" :class="{ active: currentPage === page }">
-                <a @click.prevent="goToPage(page)" class="page-link">{{ page }}</a>
+                <a @click.prevent="$emit('go-to-page', page)" class="page-link">{{ page }}</a>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                <a @click.prevent="goToPage(currentPage + 1)" class="page-link" aria-label="Next">
+                <a @click.prevent="$emit('go-to-page', currentPage + 1)" class="page-link" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -30,11 +30,8 @@ export default {
             type: Number,
             required: true,
         },
-        goToPage: {
-            type: Function,
-            required: true,
-        },
     },
+    emits: ['go-to-page'],
     computed: {
         totalPagesArray() {
             return Array.from({ length: this.totalPages }, (_, i) => i + 1);
