@@ -31,7 +31,7 @@
                 <p>No surveys found.</p>
             </div>
             <div class="d-flex justify-content-center align-items-center mt-3">
-                <Pagination :currentPage="currentPage" :totalPages="totalPages" @go-to-page="goToPage" />
+                <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="goToPage" />
             </div>
         </div>
 

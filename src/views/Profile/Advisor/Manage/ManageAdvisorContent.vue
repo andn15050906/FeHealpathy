@@ -62,7 +62,7 @@
           </tbody>
         </table>
       </div>
-      <Pagination :currentPage="currentPageCourses" :totalPages="totalPagesCourses" :goToPage="changePageCourse" />
+      <Pagination :currentPage="currentPageCourses" :totalPages="totalPagesCourses" @GoToPage="changePageCourse" />
     </div>
     <!-- Blogs Tab -->
     <div v-if="currentTab === 'blogs'" class="tab-pane fade show active">
@@ -121,7 +121,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageBlogs" :totalPages="totalPagesBlogs" :goToPage="changePageBlog" />
+        <Pagination :currentPage="currentPageBlogs" :totalPages="totalPagesBlogs" @GoToPage="changePageBlog" />
       </div>
     </div>
     <!-- Roadmaps Tab -->
@@ -168,7 +168,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageRoadmaps" :totalPages="totalPagesRoadmaps" :goToPage="changePageRoadmap" />
+        <Pagination :currentPage="currentPageRoadmaps" :totalPages="totalPagesRoadmaps" @GoToPage="changePageRoadmap" />
       </div>
     </div>
     <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog" @blogUpdated="handleBlogUpdated" />
@@ -216,7 +216,7 @@ export default {
       totalPagesBlogs: 1,
       currentPageRoadmaps: 1,
       totalPagesRoadmaps: 1,
-      pageSize: 20,
+      pageSize: 10,
     }
   },
   methods: {
@@ -321,16 +321,15 @@ export default {
     },
     async fetchBlogs() {
       try {
-        const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize };
+        const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getPagedArticles(params);
 
-        this.blogs = (response.items || []).filter(blog => blog.creatorId === this.currentUserId);
-          //... double check
-        this.totalPagesBlogs = Math.ceil(this.blogs.length / this.pageSize);
+        this.blogs = response.items || [];
+        this.totalPagesBlogs = Math.ceil(response.totalCount / this.pageSize);
 
         const blogTab = this.tabs.find(tab => tab.id === 'blogs');
         if (blogTab) {
-          blogTab.count = this.blogs.length;
+          blogTab.count = response.totalCount;
         }
 
         this.sortBlogs();
@@ -341,16 +340,15 @@ export default {
     },
     async fetchRoadmaps() {
       try {
-        const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize };
+        const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getRoadmaps(params);
 
-        this.roadmaps = (response.items || []).filter(roadmap => roadmap.creatorId === this.currentUserId);
-        //... double check
-        this.totalPagesRoadmaps = Math.ceil(this.roadmaps.length / this.pageSize);
+        this.roadmaps = response.items || [];
+        this.totalPagesRoadmaps = Math.ceil(response.totalCount / this.pageSize);
 
         const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
         if (roadmapTab) {
-          roadmapTab.count = this.roadmaps.length;
+          roadmapTab.count = response.totalCount;
         }
 
         this.sortRoadmaps();
@@ -361,16 +359,15 @@ export default {
     },
     async fetchCourses() {
       try {
-        const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize };
+        const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getCourses(params);
 
-        this.courses = (response.items || []).filter(course => course.creatorId === this.currentUserId);
-        //... double check
-        this.totalPagesCourses = Math.ceil(this.courses.length / this.pageSize);
+        this.courses = response.items || [];
+        this.totalPagesCourses = Math.ceil(response.totalCount / this.pageSize);
 
         const courseTab = this.tabs.find(tab => tab.id === 'courses');
         if (courseTab) {
-          courseTab.count = this.courses.length;
+          courseTab.count = response.totalCount;
         }
 
         this.sortCourses();
