@@ -11,7 +11,9 @@
             <input type="email" id="email" v-model="email" placeholder="Enter your email address" required />
           </div>
 
-          <button type="submit" class="forgot-password-button">Send Password Reset Email.</button>
+          <button type="submit" class="forgot-password-button" :disabled="loading">
+            {{ loading ? 'Sending...' : 'Send Password Reset Email' }}
+          </button>
           <div v-if="message" :class="{ 'error-message': !isSuccess, 'success-message': isSuccess }">
             {{ message }}
           </div>
@@ -22,24 +24,70 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
-import { forgotPassword } from '@/scripts/api/services/userService.js';
+import { forgotPassword, checkEmailExists } from '@/scripts/api/services/userService.js';
 
 const email = ref('');
 const message = ref('');
+const generalError = ref('');
 const isSuccess = ref(false);
+const loading = ref(false);
 const router = useRouter();
+const loadingSpinner = inject('loadingSpinner');
+const sweetAlert = inject('sweetAlert');
+
+// Hàm kiểm tra định dạng email Gmail
+const validateEmail = (email) => {
+  // Regex pattern để kiểm tra:
+  // ^ - bắt đầu chuỗi
+  // [a-zA-Z0-9._%+-]+ - cho phép các ký tự chữ cái, số và một số ký tự đặc biệt
+  // @gmail\.com$ - phải kết thúc bằng @gmail.com
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  return gmailRegex.test(email);
+};
 
 const handleForgotPassword = async () => {
   try {
+    // Reset error messages
+    message.value = '';
+    generalError.value = '';
+
+    // Kiểm tra định dạng email
+    if (!validateEmail(email.value)) {
+      generalError.value = 'Please enter a valid Gmail address (e.g., example@gmail.com)';
+      return;
+    }
+
+    loading.value = true;
+    if (loadingSpinner) loadingSpinner.showSpinner();
+
+    // Kiểm tra email có tồn tại trong hệ thống không
+    const emailExists = await checkEmailExists(email.value);
+    
+    if (!emailExists) {
+      generalError.value = 'This email is not registered in our system.';
+      return;
+    }
+    
+    // Gửi yêu cầu reset password
     await forgotPassword(email.value);
-    message.value = 'Password reset email sent!';
-    isSuccess.value = true;
+    
+    // Hiển thị thông báo thành công
+    await sweetAlert.showSuccess('Password reset email has been sent to your email!');
     setTimeout(() => router.push({ name: 'signIn' }), 2000);
   } catch (error) {
-    message.value = 'Failed to send password reset email. Please try again.';
-    isSuccess.value = false;
+    console.error('Error in forgot password:', error);
+    if (error.response?.status === 404) {
+      generalError.value = 'This email is not registered in our system.';
+    } else if (error.response?.data?.message) {
+      generalError.value = error.response.data.message;
+    } else {
+      generalError.value = 'Failed to process your request. Please try again.';
+    }
+  } finally {
+    loading.value = false;
+    if (loadingSpinner) loadingSpinner.hideSpinner();
   }
 };
 </script>
@@ -112,6 +160,24 @@ h2 {
   margin-top: 0.5rem;
 }
 
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  margin-top: 1rem;
+}
+
 .forgot-password-button {
   width: 100%;
   padding: 0.7rem;
@@ -123,7 +189,12 @@ h2 {
   cursor: pointer;
 }
 
-.forgot-password-button:hover {
+.forgot-password-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.forgot-password-button:not(:disabled):hover {
   background-color: #e65c00;
 }
 </style>

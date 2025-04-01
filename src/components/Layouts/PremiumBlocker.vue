@@ -1,59 +1,44 @@
 <template>
-    <div>
-      <div v-if="!isPremium" class="overlay">
-        <div class="overlay-content">
-          <h2>Premium Content Only</h2>
-          <p>You need a premium account to access this content.</p>
-          <button @click="redirectToUpgrade">Upgrade to Premium</button>
-        </div>
-      </div>
+  <div v-if="!isPremium">
+    <div class="premium-alert">
+      <h2 class="hero-title">Premium Content Only</h2>
+      <p>You need a premium account to access this content.</p>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'PremiumContentBlocker',
-    props: {
-      isPremium: {
-        type: Boolean,
-        required: false
-      }
-    },
-    methods: {
-      redirectToUpgrade() {
-        this.$router.push('/upgrade');
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  .overlay-content {
-    text-align: center;
-  }
-  .button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    background-color: #ff5722;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  .button:hover {
-    background-color: #e64a19;
-  }
-  </style>
+    <AccountUpgrade></AccountUpgrade>
+  </div>
+</template>
+
+<script>
+import AccountUpgrade from '@/components/PaymentComponents/AccountUpgrade.vue';
+
+export default {
+  props: {
+    isPremium: {
+      type: Boolean,
+      required: false
+    }
+  },
+  components: {
+    AccountUpgrade
+  },
+  methods: {
+    redirectToUpgrade() {
+      this.$router.push('/profile');
+    }
+  },
+};
+</script>
+
+<style scoped>
+.premium-alert {
+  text-align: center;
+  margin-bottom: 120px;
+}
+
+.hero-title {
+  color: #1a3e6f;
+  font-size: 47px;
+  line-height: 2;
+  margin-bottom: 16px;
+}
+</style>
