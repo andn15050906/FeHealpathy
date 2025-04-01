@@ -62,7 +62,7 @@
           </tbody>
         </table>
       </div>
-      <Pagination :currentPage="currentPageCourses" :totalPages="totalPagesCourses" :goToPage="changePageCourse" />
+      <Pagination :currentPage="currentPageCourses" :totalPages="totalPagesCourses" @GoToPage="changePageCourse" />
     </div>
     <!-- Blogs Tab -->
     <div v-if="currentTab === 'blogs'" class="tab-pane fade show active">
@@ -121,7 +121,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageBlogs" :totalPages="totalPagesBlogs" :goToPage="changePageBlog" />
+        <Pagination :currentPage="currentPageBlogs" :totalPages="totalPagesBlogs" @GoToPage="changePageBlog" />
       </div>
     </div>
     <!-- Roadmaps Tab -->
@@ -168,7 +168,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageRoadmaps" :totalPages="totalPagesRoadmaps" :goToPage="changePageRoadmap" />
+        <Pagination :currentPage="currentPageRoadmaps" :totalPages="totalPagesRoadmaps" @GoToPage="changePageRoadmap" />
       </div>
     </div>
     <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog" @blogUpdated="handleBlogUpdated" />
@@ -216,7 +216,7 @@ export default {
       totalPagesBlogs: 1,
       currentPageRoadmaps: 1,
       totalPagesRoadmaps: 1,
-      pageSize: 20,
+      pageSize: 10,
     }
   },
   methods: {
@@ -293,70 +293,87 @@ export default {
         this.roadmaps.sort((a, b) => b.title.localeCompare(a.title))
       }
     },
-    async fetchBlogs() {
-      try {
-        const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize }
-        const response = await getPagedArticles(params)
-        this.blogs = Array.isArray(response.items) ? response.items : []
-        this.totalPagesBlogs = response.pageCount
-        const blogTab = this.tabs.find(tab => tab.id === 'blogs')
-        if (blogTab) blogTab.count = response.totalCount
-        this.sortBlogs()
-      } catch (error) {
-        console.error('Error fetching blogs:', error)
-        this.blogs = []
-      }
-    },
     async confirmDelete(confirm) {
       if (confirm) {
         try {
           switch (this.selectedItemType) {
             case 'courses':
-              await deleteCourse(this.selectedItem.id)
-              break
+              await deleteCourse(this.selectedItem.id);
+              break;
             case 'blogs':
-              await deleteArticle(this.selectedItem.id)
-              break
+              await deleteArticle(this.selectedItem.id);
+              break;
             case 'roadmaps':
-              await deleteRoadmap(this.selectedItem.id)
-              break
+              await deleteRoadmap(this.selectedItem.id);
+              break;
           }
-          this.fetchCourses()
-          this.fetchBlogs()
-          this.fetchRoadmaps()
+          
+          this.fetchCourses();
+          this.fetchBlogs();
+          this.fetchRoadmaps();
         } catch (error) {
           console.error('Error deleting content:', error)
+          //... other alert
           alert('Failed to delete the content.')
         }
       }
       this.showDeletePopup = false
     },
+    async fetchBlogs() {
+      try {
+        const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
+        const response = await getPagedArticles(params);
+
+        this.blogs = response.items || [];
+        this.totalPagesBlogs = Math.ceil(response.totalCount / this.pageSize);
+
+        const blogTab = this.tabs.find(tab => tab.id === 'blogs');
+        if (blogTab) {
+          blogTab.count = response.totalCount;
+        }
+
+        this.sortBlogs();
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+        this.blogs = [];
+      }
+    },
     async fetchRoadmaps() {
       try {
-        const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize }
-        const response = await getRoadmaps(params)
-        this.roadmaps = Array.isArray(response.items) ? response.items : []
-        this.totalPagesRoadmaps = response.pageCount
-        const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps')
-        if (roadmapTab) roadmapTab.count = response.totalCount
-        this.sortRoadmaps()
+        const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
+        const response = await getRoadmaps(params);
+
+        this.roadmaps = response.items || [];
+        this.totalPagesRoadmaps = Math.ceil(response.totalCount / this.pageSize);
+
+        const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
+        if (roadmapTab) {
+          roadmapTab.count = response.totalCount;
+        }
+
+        this.sortRoadmaps();
       } catch (error) {
-        console.error('Error fetching roadmaps:', error)
-        this.roadmaps = []
+        console.error('Error fetching roadmaps:', error);
+        this.roadmaps = [];
       }
     },
     async fetchCourses() {
       try {
-        const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize }
-        const response = await getCourses(params)
-        this.courses = response.items || []
-        this.totalPagesCourses = response.pageCount
-        const courseTab = this.tabs.find(tab => tab.id === 'courses')
-        if (courseTab) courseTab.count = response.totalCount
-        this.sortCourses()
+        const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
+        const response = await getCourses(params);
+
+        this.courses = response.items || [];
+        this.totalPagesCourses = Math.ceil(response.totalCount / this.pageSize);
+
+        const courseTab = this.tabs.find(tab => tab.id === 'courses');
+        if (courseTab) {
+          courseTab.count = response.totalCount;
+        }
+
+        this.sortCourses();
       } catch (error) {
-        console.error('Error fetching courses:', error)
-        this.courses = []
+        console.error('Error fetching courses:', error);
+        this.courses = [];
       }
     },
     getStatusClass(status) {
@@ -367,20 +384,15 @@ export default {
     }
   },
   computed: {
+    currentUserId: () => JSON.parse(localStorage.getItem('userProfile'))?.id,
     filteredCourses() {
-      return this.courses.filter(item =>
-        item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase())
-      )
+      return this.courses.filter(item => item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase()))
     },
     filteredBlogs() {
-      return this.blogs.filter(item =>
-        item.title.toLowerCase().includes(this.searchQuery.blogs.toLowerCase())
-      )
+      return this.blogs.filter(item => item.title.toLowerCase().includes(this.searchQuery.blogs.toLowerCase()))
     },
     filteredRoadmaps() {
-      return this.roadmaps.filter(item =>
-        item.title.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase())
-      )
+      return this.roadmaps.filter(item => item.title.toLowerCase().includes(this.searchQuery.roadmaps.toLowerCase()))
     }
   },
   mounted() {
