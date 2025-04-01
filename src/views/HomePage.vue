@@ -100,7 +100,7 @@ export default {
         PersonalRoadmap,
         AccountUpgrade
     },
-    mounted() {
+    beforeMount() {
         // handle auth
         if (router.currentRoute.value.query) {
             var externalUser = router.currentRoute.value.query['external_redirect'];

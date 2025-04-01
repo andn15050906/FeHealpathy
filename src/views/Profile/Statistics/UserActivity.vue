@@ -35,6 +35,11 @@
       <h2>📈 Mood & Activity Trends</h2>
       <canvas ref="moodChart"></canvas>
     </div>
+
+    <div class="section">
+      <h2>📈 Mood & Activity Trends</h2>
+      <Line :data="sentimentChartData" :options="sentimentChartOptions" />
+    </div>
   </div>
 </template>
 
@@ -43,20 +48,26 @@ import { ref, onMounted, onBeforeMount } from "vue";
 import Chart from "chart.js/auto";
 import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
 import { formatISODateWithHMS, formatISODate } from '@/scripts/logic/common';
-import { calcSurveyResult } from '@/scripts/logic/utils';
 import { getUserProfile } from '@/scripts/api/services/authService';
-import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
-import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import { getSentimentAnalysis } from '@/scripts/api/services/statisticsService';
 import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
+import { Line } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js';
 
 const recentActivities = ref([]);
-
 const moodChart = ref(null);
+const sentimentChartData = ref({
+  labels: [],
+  datasets: []
+});
+const sentimentChartOptions = ref({
+  /*responsive: true,
+  maintainAspectRatio: false*/
+});
 
 onBeforeMount(async () => {
   let userId = (await getUserProfile()).id;
-  var activityLogs = (await getActivityLogs()).filter(_ => _.creatorId == userId);
-  console.log(activityLogs);
+  var activityLogs = (await getActivityLogs({ pageSize: 10 })).filter(_ => _.creatorId == userId);
   recentActivities.value = activityLogs.map(log => {
     let json = undefined;
     try {
@@ -82,7 +93,6 @@ onBeforeMount(async () => {
           parsedContent = nestedJson;
       } catch (e) { }
       
-      console.log(parsedContent);
       if (parsedContent.question && parsedContent.answer) {
         action = TRACKED_EVENTS.QuestionOfTheDay_Answered.displayName;
         content =  {
@@ -91,7 +101,6 @@ onBeforeMount(async () => {
         };
       }
       else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated.label) {
-        console.log(1);
         action = TRACKED_EVENTS.Mood_Updated.displayName;
         content =  {
           type: 'text',
@@ -107,6 +116,39 @@ onBeforeMount(async () => {
     }
   })
 })
+
+onBeforeMount(async () => {
+  var sentimentDataTask = getSentimentAnalysis();
+
+  ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
+
+  const rawData = await sentimentDataTask;
+  let labels = [];
+  let scores = [];
+  let lastScore = null;
+
+  for (let date in rawData) {
+    labels.push(formatISODate(date));
+    const prediction = rawData[date].prediction;
+    if (prediction && prediction.score !== undefined) {
+      lastScore = prediction.score;
+    }
+    scores.push(lastScore);
+  }
+
+  sentimentChartData.value = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Your sentiment analysis',
+        data: scores,
+        borderColor: '#42A5F5',
+        backgroundColor: 'rgba(66, 165, 245, 0.2)',
+        fill: true,
+      },
+    ],
+  };
+});
 
 onMounted(() => {
   const ctx = moodChart.value.getContext("2d");
@@ -154,25 +196,19 @@ onMounted(() => {
           position: "left",
           beginAtZero: true,
           max: 100,
-          title: {
-            display: true,
-            text: "Mood Score (%)",
-          },
+          title: { display: true, text: "Mood Score (%)" },
           ticks: { callback: (value) => value + "%" },
         },
         "y-activity": {
           type: "linear",
           position: "right",
           beginAtZero: true,
-          title: {
-            display: true,
-            text: "Activity Count",
-          },
+          title: { display: true, text: "Activity Count" },
         },
       },
     },
   });
-});
+})
 </script>
 
 <style scoped>
