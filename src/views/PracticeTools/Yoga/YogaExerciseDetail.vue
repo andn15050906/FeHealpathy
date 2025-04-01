@@ -1,8 +1,11 @@
 <template>
-  <div class="yoga-detail">
-    <button class="back-button" @click="goBack">← Quay lại</button>
+  <div class="container yoga-detail">
+    <button class="btn btn-outline-secondary back-button" @click="goBack">
+      <i class="fas fa-arrow-left"></i> Quay lại
+    </button>
     <h1 class="title">Yoga For Beginners | Day 01 | Hye Yoga</h1>
     <p class="category">Cơ Bản</p>
+
     <div class="video-container">
       <iframe class="video" src="https://www.youtube.com/embed/iSS4asEmIfE"
         title="Yoga For Beginners | Day 01 | Hye Yoga" frameborder="0"
@@ -10,36 +13,38 @@
         allowfullscreen></iframe>
     </div>
 
-    <div class="actions">
-      <button @click="likeExercise" class="btn like">Like</button>
-      <button @click="shareExercise" class="btn share">Share</button>
+    <div class="actions text-center">
+      <button @click="likeExercise" class="btn btn-danger me-2">
+        <i class="fas fa-heart"></i> Like
+      </button>
+      <button @click="shareExercise" class="btn btn-primary">
+        <i class="fas fa-share-alt"></i> Share
+      </button>
     </div>
-    <div class="divider"></div>
-    <div class="description">
-      <h2>Mô tả bài tập</h2>
+
+    <div class="divider my-4"></div>
+
+    <div class="card shadow-sm p-3 mb-4">
+      <h2 class="h4">Mô tả bài tập</h2>
       <p>
         Yoga mang lại nhiều lợi ích cho sức khỏe thể chất, tinh thần và sức khỏe toàn diện.
         Các bài tập yoga giúp tăng cường sự linh hoạt, giảm căng thẳng và cải thiện chất lượng cuộc sống.
       </p>
     </div>
-    <div class="divider"></div>
-    <div class="equipment">
-      <h2>Thiết bị cần chuẩn bị</h2>
-      <ul>
-        <li>Không yêu cầu thiết bị</li>
+
+    <div class="card shadow-sm p-3 mb-4">
+      <h2 class="h4">Thiết bị cần chuẩn bị</h2>
+      <ul class="list-unstyled mb-0">
+        <li><i class="fas fa-check-circle text-success"></i> Không yêu cầu thiết bị</li>
       </ul>
     </div>
-    <div class="divider"></div>
+
     <div class="related-exercises">
-      <h2>Bài tập liên quan</h2>
-      <div class="exercise-list">
-
-        <YogaExerciseCard v-for="excercise in relatedExercises" :key="excercise.id" :excercise="excercise" />
-
-        <!--<div class="exercise-item" v-for="exercise in relatedExercises" :key="exercise.id">
-          <img :src="exercise.thumbnail" :alt="exercise.title" />
-          <p>{{ exercise.title }}</p>
-        </div>-->
+      <h2 class="h4 text-center mb-3">Bài tập liên quan</h2>
+      <div class="row">
+        <div class="col-md-3" v-for="exercise in relatedExercises" :key="exercise.id">
+          <YogaExerciseCard :excercise="exercise" />
+        </div>
       </div>
     </div>
   </div>
@@ -60,6 +65,12 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
+    likeExercise() {
+      console.log("Liked!");
+    },
+    shareExercise() {
+      console.log("Shared!");
+    }
   },
   components: {
     YogaExerciseCard
@@ -70,131 +81,52 @@ export default {
 <style scoped>
 .yoga-detail {
   font-family: "Poppins", Arial, sans-serif;
-  line-height: 1.8;
-  margin: 60px auto;
-  max-width: 900px;
   color: #333;
+  max-width: 100%;
+  margin: 10px auto;
 }
 
 .title {
-  font-size: 2.5em;
-  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: bold;
   text-align: center;
-  color: #4caf50;
+  color: #28a745;
+  margin-bottom: 10px;
 }
 
 .category {
-  color: #777;
-  margin-bottom: 20px;
+  color: #6c757d;
   text-align: center;
   font-style: italic;
+  margin-bottom: 20px;
 }
 
 .video-container {
-  margin-bottom: 20px;
-  border-radius: 10px;
+  position: relative;
   overflow: hidden;
+  border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .video {
   width: 100%;
-  height: 400px;
+  height: 450px;
 }
 
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.btn {
-  padding: 10px 25px;
-  border: none;
-  border-radius: 25px;
+.actions .btn {
+  font-size: 1rem;
   font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.like {
-  background-color: #ff6868;
-  color: white;
-}
-
-.like:hover {
-  background-color: #ff4d4d;
-}
-
-.share {
-  background-color: #68a0ff;
-  color: white;
-}
-
-.share:hover {
-  background-color: #4d8cff;
+  padding: 10px 20px;
 }
 
 .divider {
   border-top: 1px solid #ddd;
-  margin: 30px 0;
 }
 
-.description,
-.equipment {
+.card {
+  border: none;
   background-color: #f9f9f9;
-  padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.equipment ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.equipment li {
-  margin: 5px 0;
-}
-
-
-.related-exercises {
-  margin-top: 20px;
-}
-
-.exercise-list {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.exercise-item {
-  text-align: center;
-  flex: 1;
-  transition: transform 0.3s;
-  cursor: pointer;
-}
-
-.exercise-item img {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.exercise-item:hover {
-  transform: scale(1.05);
-}
-
-.exercise-item p {
-  font-size: 1em;
-  color: #333;
 }
 </style>

@@ -103,3 +103,10 @@ export const getRole = () => {
   let payload = parseJwt(token);
   return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 }
+
+export const isPremium = () => {
+  let profile = getUserProfile();
+  if (!profile)
+    return false;
+  return profile.role == 1 || profile.role == 2 || profile.isPremium;
+}

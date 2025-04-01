@@ -56,8 +56,3 @@ export const updateCourse = async (courseData) => {
 export const deleteCourse = async (courseId) => {
   return await del(`${API_BASE_URL}/${courseId}`);
 };
-
-
-export const purchaseCourse = async (courseId) => {
-  return await post(`/courses/${courseId}/purchase`);
-};

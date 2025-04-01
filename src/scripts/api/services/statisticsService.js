@@ -5,3 +5,7 @@ const API_BASE_URL = "/statistics";
 export const getProgress = async () => {
   return await get(`${API_BASE_URL}/progress`);
 };
+
+export const getSentimentAnalysis = async () => {
+  return await get(`${API_BASE_URL}/sentiment`);
+}

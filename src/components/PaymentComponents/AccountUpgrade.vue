@@ -1,22 +1,22 @@
 <template>
-    <section class="pricing-section">
+    <section v-if="!isPremiumUser" class="pricing-section">
         <h2 class="section-title">{{ HomePage.Pricing.Title }}</h2>
         <div class="pricing-options">
-            <button class="pricing-option active">
+            <button class="pricing-option active" @click="handlePurchase(PaymentOptions.Yearly)">
                 <div class="pricing-header">
                     <span class="plan-name">{{ HomePage.Pricing.Yearly.Text }}</span>
                     <span class="plan-price">{{ HomePage.Pricing.Yearly.Price }}</span>
                 </div>
                 <div class="pricing-details">
-                    <span class="trial-text">{{ HomePage.Pricing.Trial.Text }}</span>
-                    <span class="monthly-price">{{ HomePage.Pricing.Trial.Price }}</span>
+                    <span class="discounted-text">{{ HomePage.Pricing.Trial.Text }}</span>
+                    <span class="discounted-price">{{ HomePage.Pricing.Trial.Price }}</span>
                 </div>
             </button>
 
-            <button class="pricing-option">
+            <button class="pricing-option" @click="handlePurchase(PaymentOptions.Monthly)">
                 <div class="pricing-header">
                     <span class="plan-name">{{ HomePage.Pricing.Monthly.Text }}</span>
-                    <span class="plan-price">{{ HomePage.Pricing.Monthly.Text }}</span>
+                    <span class="plan-price">{{ HomePage.Pricing.Monthly.Price }}</span>
                 </div>
             </button>
         </div>
@@ -27,17 +27,41 @@
     </section>
 </template>
 
-<script>
+<script setup>
 import json from '@/scripts/data/data.json';
+import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
+import { toast } from "vue3-toastify";
+import { purchasePremium } from "@/scripts/api/services/paymentService";
+import { isPremium } from '@/scripts/api/services/authService';
 
-export default {
-    name: 'AccountUpgrade',
-    data() {
-        return {
-            HomePage: json.HomePage
-        }
-    }
+const isPremiumUser = ref(isPremium());
+const HomePage = json.HomePage;
+const PaymentOptions = {
+    Yearly: 0,
+    Monthly: 1
 }
+
+const handlePurchase = async (paymentOptions) => {
+    try {
+        const response = await purchasePremium(paymentOptions);
+        if (!response?.url) {
+            toast.error(
+                "Không nhận được URL thanh toán.",
+                { duration: 150, position: "bottom-center" }
+            );
+            return;
+        }
+
+        toast.success(
+            "Thanh toán thành công.",
+            { duration: 150, position: "bottom-center" }
+        );
+        window.location.href = response.url;
+    } catch (error) {
+        console.error("Purchase error", error);
+    }
+};
 </script>
 
 <style scoped>
@@ -83,16 +107,17 @@ export default {
     color: rgba(0, 0, 0, 0.8);
 }
 
-.trial-text {
+.discounted-text {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 10px;
     background: #1a3e6f;
     color: #fff;
     font-size: 13px;
+    margin-right: 8px;
 }
 
-.monthly-price {
+.discounted-price {
     font-size: 17px;
     color: rgba(0, 0, 0, 0.8);
 }

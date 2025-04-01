@@ -55,10 +55,8 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import {
-  purchaseCourse as purchaseCourseAPI,
-  getCourseById,
-} from "@/scripts/api/services/CourseService";
+import { getCourseById } from "@/scripts/api/services/CourseService";
+import { purchaseCourse as purchaseCourseAPI } from "@/scripts/api/services/paymentService";
 
 export default {
   name: "CourseDetail",
