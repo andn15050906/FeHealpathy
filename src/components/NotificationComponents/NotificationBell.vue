@@ -64,11 +64,24 @@ export default {
       this.isDropdownVisible = !this.isDropdownVisible;
     },
     markAsRead(index) {
-      this.notifications[index].read = true;
+      const notification = this.notifications[index];
+      notification.read = true;
+
+      const readIds = JSON.parse(
+        localStorage.getItem("readNotifications") || "[]"
+      );
+      readIds.push(notification.id);
+      localStorage.setItem(
+        "readNotifications",
+        JSON.stringify([...new Set(readIds)])
+      );
     },
+
     async fetchNotifications() {
       try {
         const response = await getNotifications({ ReceiverId: this.userId });
+        const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
+
         const notifications = response.items || response;
 
         this.notifications = notifications.map((notification) => {
@@ -81,8 +94,9 @@ export default {
           }
 
           return {
+            id: notification.id,
             content,
-            read: notification.read,
+            read: readIds.includes(notification.id),
           };
         });
       } catch (error) {
