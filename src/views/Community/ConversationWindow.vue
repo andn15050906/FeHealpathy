@@ -63,6 +63,7 @@ import { getUsers } from '@/scripts/api/services/userService';
 import { getPagedConversations } from '@/scripts/api/services/conversationService';
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
+import { submitInviteMember } from "@/scripts/api/services/notificationService";
 
 register();
 
@@ -744,6 +745,13 @@ export default {
         
             await firestoreService.addRoomUser(this.inviteRoomId, id)*/
 
+            const payload = {
+                conversationId: this.inviteRoomId,
+                userIds: [invitedUser._id]
+            };
+
+            await submitInviteMember(payload);
+            
             this.inviteRoomId = null
             this.invitedUsername = ''
             this.fetchRooms()
