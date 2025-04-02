@@ -199,7 +199,7 @@ const router = createRouter({
       component: YogaPoses
     },
     {
-      path: '/yoga/details',
+      path: '/yoga/poses/:id',
       name: 'YogaPoseDetails',
       component: YogaPoseDetails
     },
