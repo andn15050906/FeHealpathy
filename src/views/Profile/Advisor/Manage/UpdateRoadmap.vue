@@ -102,20 +102,14 @@
   import { getPagedConversations } from '@/scripts/api/services/conversationService';
   import { getPagedSurveys } from '@/scripts/api/services/surveysService';
   import { TRACKED_EVENTS, ENTITY_TYPES, getEntityTypeByEventLabel } from '@/scripts/api/services/activityLogService';
-  import { updateRoadmap } from '@/scripts/api/services/roadmapService';
+  import { updateRoadmap, getRoadmapById } from '@/scripts/api/services/roadmapService';
   import { ref } from 'vue';
   import { onMounted } from "vue";
   import { toast } from "vue3-toastify";
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   
   const router = useRouter();
-
-  const props = defineProps({
-    roadmapData: {
-      type: Object,
-      required: true,
-    },
-  });
+  const route = useRoute();
 
   const allCourses = ref([]);
   const allMediaResources = ref([]);
@@ -123,14 +117,30 @@
   const allConversations = ref([]);
   const allSurveys = ref([]);
 
-  console.log("Roadmap Data:", props.roadmapData);
   const roadmap = ref({
-    id: props.roadmapData?.id || "",
-    title: props.roadmapData?.title || "",
-    introText: props.roadmapData?.introText || "",
-    phases: props.roadmapData?.phases || [],
+    id: "",
+    title: "",
+    introText: "",
+    phases: [],
   });
   
+  async function fetchRoadmapData() {
+    try {
+      const roadmapId = route.params.id;
+      const response = await getRoadmapById(roadmapId);
+      roadmap.value = {
+        id: response.id,
+        title: response.title,
+        introText: response.introText,
+        phases: response.phases || [],
+      };
+      console.log("Roadmap Data:", roadmap.value);
+    } catch (error) {
+      console.error("Error fetching roadmap:", error);
+      toast.error("Không thể tải dữ liệu roadmap");
+    }
+  }
+
   function addPhase() {
     roadmap.value.phases.push({
       title: "",
@@ -189,7 +199,7 @@
       
       await updateRoadmap(roadmap.value); 
       toast.success("Cập nhật roadmap thành công");
-      router.go(0);
+      router.push('/advisor/content');
     } catch (error) {
       toast.error("Cập nhật roadmap thất bại");
       console.error('Error updating roadmap:', error);
@@ -229,6 +239,8 @@
   }
   
   onMounted(async () => {
+    await fetchRoadmapData();
+    
     getCourses({ pageIndex: 0, pageSize: 10 }).then(res => allCourses.value = res.items);
     getPagedMediaResources({ pageIndex: 0, pageSize: 10 }).then(res => allMediaResources.value = res.items);
     getPagedArticles({ pageIndex: 0, pageSize: 10 }).then(res => allArticles.value = res.items);

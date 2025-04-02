@@ -1,6 +1,10 @@
 <template>
   <div class="container mt-5 p-4 bg-white shadow rounded" style="max-width: 600px;">
-    <div v-if="status === 'pending'">
+    <div v-if="isLoading" class="text-center">
+      <LoadingSpinner />
+      <div class="mt-2">Đang kiểm tra trạng thái... {{ loadingProgress }}%</div>
+    </div>
+    <div v-else-if="status === 'pending'">
       <h1 class="text-center text-success">Đang đợi phê duyệt...</h1>
     </div>
     <div v-else>
@@ -37,14 +41,21 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { submitAdvisorRequest, getNotifications } from "@/scripts/api/services/notificationService";
+import { toast } from "vue3-toastify";
+import LoadingSpinner from '@/components/common/popup/LoadingSpinner.vue';
 
 export default {
+  components: {
+    LoadingSpinner
+  },
   setup() {
     const introduction = ref('');
     const experience = ref('');
     const cvFile = ref(null);
     const certificates = ref([]);
     const status = ref('');
+    const isLoading = ref(true);
+    const loadingProgress = ref(0);
 
     const handleCVUpload = (event) => {
       const file = event.target.files[0];
@@ -59,47 +70,75 @@ export default {
     };
 
     const submitRequest = async () => {
-  if (!cvFile.value || !introduction.value.trim() || !experience.value.trim()) {
-    alert("Please upload CV, provide an introduction, and describe your experience.");
-    return;
-  }
+      if (!cvFile.value || !introduction.value.trim() || !experience.value.trim()) {
+        toast.error("Please upload CV, provide an introduction, and describe your experience.");
+        return;
+      }
 
-  console.log("Submitting data before sending:", {
-    cv: cvFile.value ? cvFile.value.name : null,
-    introduction: introduction.value,
-    experience: experience.value,
-    certificates: certificates.value.map(cert => cert.name)
-  });
-
-  try {
-    await submitAdvisorRequest(cvFile.value, introduction.value.trim(), experience.value.trim(), certificates.value);
-    status.value = 'pending';
-    localStorage.setItem('advisor_request_status', 'pending');
-  } catch (error) {
-    console.error("Error submitting request:", error);
-    alert("Error submitting request. Please try again.");
-  }
-};
-
+      try {
+        await submitAdvisorRequest({
+          cvFile: cvFile.value,
+          introduction: introduction.value.trim(),
+          experience: experience.value.trim(),
+          certificates: certificates.value
+        });
+        status.value = 'pending';
+        localStorage.setItem('advisor_request_status', 'pending');
+        toast.success("Your request has been submitted successfully! Please wait for approval.");
+      } catch (error) {
+        console.error("Error submitting request:", error);
+        toast.error("Error submitting request. Please try again.");
+      }
+    };
 
     const checkRequestStatus = async () => {
       try {
-        const notifications = await getNotifications();
-        console.log("API Response for notifications:", notifications);
-        
-        if (notifications && Array.isArray(notifications.items)) {
-          const advisorRequest = notifications.items.find(n => n.type === 2 && n.status === 0);
-          if (advisorRequest) {
-            status.value = 'pending';
-            localStorage.setItem('advisor_request_status', 'pending');
-          } else {
-            localStorage.removeItem('advisor_request_status');
+        const currentUserId = JSON.parse(localStorage.getItem('userProfile'))?.id;
+        if (!currentUserId) {
+          isLoading.value = false;
+          return;
+        }
+
+        // Load tất cả các trang
+        const allItems = [];
+        let pageIndex = 0;
+        const pageSize = 20;
+        let pageCount = 1;
+
+        do {
+          const response = await getNotifications({ 
+            pageIndex, 
+            pageSize,
+            creatorId: currentUserId
+          });
+          
+          if (response?.items?.length) {
+            allItems.push(...response.items);
+            pageCount = response.pageCount;
           }
+          
+          // Cập nhật progress
+          loadingProgress.value = Math.min(Math.round((pageIndex + 1) / pageCount * 100), 100);
+          pageIndex++;
+        } while (pageIndex < pageCount);
+
+        const advisorRequest = allItems.find(n =>
+          n.type === 2 &&
+          n.status === 0 &&
+          n.creatorId === currentUserId
+        );
+
+        if (advisorRequest) {
+          status.value = 'pending';
+          localStorage.setItem('advisor_request_status', 'pending');
         } else {
-          console.warn("Unexpected response format for notifications:", notifications);
+          localStorage.removeItem('advisor_request_status');
         }
       } catch (error) {
         console.error("Error checking advisor request status:", error);
+      } finally {
+        isLoading.value = false;
+        loadingProgress.value = 0;
       }
     };
 
@@ -107,6 +146,7 @@ export default {
       const savedStatus = localStorage.getItem('advisor_request_status');
       if (savedStatus) {
         status.value = savedStatus;
+        isLoading.value = false;
       } else {
         await checkRequestStatus();
       }
@@ -118,6 +158,8 @@ export default {
       cvFile,
       certificates,
       status,
+      isLoading,
+      loadingProgress,
       handleCVUpload,
       handleCertificateUpload,
       submitRequest,

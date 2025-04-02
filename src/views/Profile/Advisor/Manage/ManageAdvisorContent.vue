@@ -9,6 +9,7 @@
         </button>
       </li>
     </ul>
+  <!-- Courses Tab -->
     <div v-if="currentTab === 'courses'" class="tab-pane fade show active">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4">Your Courses</h2>
@@ -41,8 +42,9 @@
           <tbody>
             <tr v-for="item in filteredCourses" :key="item.id">
               <td class="text-center">
-                <img v-if="item.thumbUrl" :src="item.thumbUrl" :alt="item.title" class="img-fluid rounded"
-                  style="max-width: 100px;" />
+                  <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
+                    <img :src="item.thumbUrl" :alt="item.title" @error="setDefaultImage" />
+                  </div>
               </td>
               <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
               <td class="col-level fixed-col text-center" :title="item.level">{{ item.level }}</td>
@@ -94,10 +96,11 @@
             </thead>
             <tbody>
               <tr v-for="item in filteredBlogs" :key="item.id">
-                <td class="text-center">
-                  <img v-if="item.thumb && item.thumb.url" :src="item.thumb.url" :alt="item.thumb.title"
-                    class="img-fluid rounded" style="max-width: 100px;" />
-                </td>
+              <td class="text-center">
+                  <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
+                    <img :src="item.thumb?.url || 'https://placehold.co/160x90'" :alt="item.thumb?.title || 'Default image'" class="img-fluid rounded" @error="setDefaultImage"/>
+                  </div>
+              </td>
                 <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
                 <td class="col-tags fixed-col">
                   <div class="d-flex flex-wrap gap-1">
@@ -220,19 +223,29 @@ export default {
     }
   },
   methods: {
+    setDefaultImage(event) {
+  const fallbackUrl = 'https://placehold.co/160x90';
+  if (event.target.src !== fallbackUrl) {
+    event.target.src = fallbackUrl;
+  }
+},
     editBlog(blog) {
-      if (blog) {
-        this.selectedBlog = blog
-        this.isEditingBlog = true
+      if (blog && blog.id) {
+        this.$router.push({ 
+          name: 'updateBlog', 
+          params: { id: blog.id }
+        });
       }
     },
     editCourse(id) {
       this.$router.push({ name: 'updateCourse', params: { id } })
     },
     editRoadmap(roadmap) {
-      if (roadmap) {
-        this.selectedRoadmap = roadmap
-        this.isEditingRoadmap = true
+      if (roadmap && roadmap.id) {
+        this.$router.push({ 
+          name: 'updateRoadmap', 
+          params: { id: roadmap.id }
+        });
       }
     },
     handleBlogUpdated() {
@@ -363,6 +376,7 @@ export default {
         const response = await getCourses(params);
 
         this.courses = response.items || [];
+
         this.totalPagesCourses = Math.ceil(response.totalCount / this.pageSize);
 
         const courseTab = this.tabs.find(tab => tab.id === 'courses');
@@ -455,5 +469,23 @@ export default {
 .col-phase {
   width: 80px;
   text-align: center;
+}
+
+.ratio-16x9 {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 ratio */
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #f0f0f0;
+}
+
+.ratio-16x9 img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>
