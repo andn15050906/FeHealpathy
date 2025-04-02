@@ -17,7 +17,10 @@
             </div>
             <div class="info-item">
               <div class="info-label">User name:</div>
-              <div class="info-value">{{ form.userName }}</div>
+              <div class="info-value username-container">
+                {{ form.userName }}
+                <i class="fas fa-info-circle info-icon" title="Username cannot be changed"></i>
+              </div>
             </div>
             <div class="info-item">
               <div class="info-label">Email:</div>
@@ -34,35 +37,70 @@
           </div>
         </div>
         <div class="profile-form-section">
-          <form @submit.prevent="handleSubmit">
+          <form @submit.prevent="handleSubmit" novalidate>
             <div class="form-row">
               <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" v-model="form.fullName" maxlength="50" class="form-control" />
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  id="fullName" 
+                  v-model="form.fullName" 
+                  maxlength="50" 
+                  class="form-control"
+                  :class="{ 'error': errors.fullName }"
+                  @blur="validateFullName"
+                />
+                <span class="error-message" v-if="errors.fullName">{{ errors.fullName }}</span>
               </div>
               <div class="form-group">
                 <label for="userName">User Name</label>
                 <input type="text" id="userName" v-model="form.userName" maxlength="50" readonly class="form-control" />
+                <span class="info-text">Username cannot be changed</span>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" v-model="form.email" maxlength="50" class="form-control" />
+                <input 
+                  type="email" 
+                  id="email" 
+                  v-model="form.email" 
+                  maxlength="50" 
+                  class="form-control"
+                  :class="{ 'error': errors.email }"
+                  @blur="validateEmail"
+                />
+                <span class="error-message" v-if="errors.email">{{ errors.email }}</span>
               </div>
               <div class="form-group">
-                <label for="dateOfBirth">Date of Birth</label>
-                <input type="date" id="dateOfBirth" v-model="form.dateOfBirth" class="form-control" />
+                <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+                <input 
+                  type="date" 
+                  id="dateOfBirth" 
+                  v-model="form.dateOfBirth" 
+                  class="form-control"
+                  :class="{ 'error': errors.dateOfBirth }"
+                  @blur="validateDateOfBirth"
+                  :max="maxDate"
+                />
+                <span class="error-message" v-if="errors.dateOfBirth">{{ errors.dateOfBirth }}</span>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group full-width">
-                <label for="bio">About Me</label>
-                <textarea id="bio" v-model="form.bio" maxlength="1000" class="form-control"></textarea>
+                <label for="bio">About Me <span class="optional">(optional)</span></label>
+                <textarea 
+                  id="bio" 
+                  v-model="form.bio" 
+                  maxlength="1000" 
+                  class="form-control"
+                  placeholder="Tell us about yourself..."
+                ></textarea>
+                <span class="char-count">{{ form.bio ? form.bio.length : 0 }}/1000</span>
               </div>
             </div>
             <div class="form-buttons">
-              <button type="submit" class="btn btn-save">SAVE</button>
+              <button type="submit" class="btn btn-save" :disabled="!isFormValid">SAVE</button>
               <button type="button" class="btn btn-cancel" @click="openCancelPopup">CANCEL</button>
             </div>
           </form>
@@ -77,15 +115,24 @@
         <AccountUpgrade></AccountUpgrade>
       </div>
     </div>
-    <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Are you sure you want to update your profile?"
-      url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
-    <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Are you sure to cancel your changes?"
-      @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
+    <UpdateConfirmPopup 
+      :isVisible="confirmDialogVisible" 
+      message="Are you sure you want to update your profile?"
+      url="dummyUrl" 
+      @confirmUpdate="handleConfirmUpdate" 
+      @update:isVisible="confirmDialogVisible = $event" 
+    />
+    <CancelConfirmPopup 
+      :isVisible="cancelDialogVisible" 
+      message="Are you sure to cancel your changes?"
+      @confirmCancel="handleConfirmCancel" 
+      @update:isVisible="cancelDialogVisible = $event" 
+    />
   </div>
 </template>
 
 <script>
-import { inject, ref, onBeforeMount } from 'vue';
+import { inject, ref, onBeforeMount, computed } from 'vue';
 import dict from '@/scripts/data/dictionary.json';
 import { updateUserProfile, getUserById } from '@/scripts/api/services/userService.js';
 import { getUserProfile, setUserProfile } from '@/scripts/api/services/authService';
@@ -108,6 +155,87 @@ export default {
       role: '',
       creationTime: ''
     });
+
+    const errors = ref({
+      fullName: '',
+      email: '',
+      dateOfBirth: ''
+    });
+
+    // Tính toán ngày tối đa cho date of birth (12 tuổi trở lên)
+    const maxDate = computed(() => {
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - 12);
+      return date.toISOString().split('T')[0];
+    });
+
+    // Validate fullname
+    const validateFullName = () => {
+      if (!form.value.fullName.trim()) {
+        errors.value.fullName = 'Full name is required';
+        return false;
+      }
+      errors.value.fullName = '';
+      return true;
+    };
+
+    // Validate email
+    const validateEmail = () => {
+      if (!form.value.email) return true; // Email is optional in edit
+      const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!gmailRegex.test(form.value.email)) {
+        errors.value.email = 'Please enter a valid Gmail address';
+        return false;
+      }
+      errors.value.email = '';
+      return true;
+    };
+
+    // Validate date of birth
+    const validateDateOfBirth = () => {
+      if (!form.value.dateOfBirth) {
+        errors.value.dateOfBirth = 'Date of birth is required';
+        return false;
+      }
+      
+      const birthDate = new Date(form.value.dateOfBirth);
+      const today = new Date();
+      const minAge = new Date();
+      const maxAge = new Date();
+      
+      // Giới hạn tuổi tối thiểu 12 tuổi
+      minAge.setFullYear(today.getFullYear() - 12);
+      // Giới hạn tuổi tối đa 100 tuổi
+      maxAge.setFullYear(today.getFullYear() - 100);
+
+      if (birthDate > today) {
+        errors.value.dateOfBirth = 'Date of birth cannot be in the future';
+        return false;
+      }
+
+      if (birthDate > minAge) {
+        errors.value.dateOfBirth = 'You must be at least 12 years old';
+        return false;
+      }
+
+      if (birthDate < maxAge) {
+        errors.value.dateOfBirth = 'Age cannot exceed 100 years';
+        return false;
+      }
+
+      errors.value.dateOfBirth = '';
+      return true;
+    };
+
+    // Kiểm tra form có hợp lệ không
+    const isFormValid = computed(() => {
+      return !errors.value.fullName && 
+             !errors.value.email && 
+             !errors.value.dateOfBirth &&
+             form.value.fullName.trim() !== '' &&
+             form.value.dateOfBirth !== '';
+    });
+
     const originalForm = ref({});
     const confirmDialogVisible = ref(false);
     const cancelDialogVisible = ref(false);
@@ -205,6 +333,15 @@ export default {
       }
     };
     const handleSubmit = () => {
+      // Validate all fields before submission
+      const isFullNameValid = validateFullName();
+      const isEmailValid = validateEmail();
+      const isDateValid = validateDateOfBirth();
+
+      if (!isFullNameValid || !isEmailValid || !isDateValid) {
+        return;
+      }
+
       confirmDialogVisible.value = true;
     };
     const handleConfirmUpdate = (confirm) => {
@@ -226,6 +363,12 @@ export default {
     return {
       form,
       text,
+      errors,
+      maxDate,
+      isFormValid,
+      validateFullName,
+      validateEmail,
+      validateDateOfBirth,
       handleAvatarChange,
       triggerAvatarUpload,
       handleSubmit,
@@ -408,6 +551,59 @@ textarea.form-control {
   color: whitesmoke;
 }
 
+.required {
+  color: red;
+  margin-left: 2px;
+}
+
+.optional {
+  color: #666;
+  font-size: 0.8em;
+  margin-left: 4px;
+}
+
+.error {
+  border-color: red !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 4px;
+  display: block;
+}
+
+.info-text {
+  color: #666;
+  font-size: 0.8em;
+  margin-top: 4px;
+  display: block;
+}
+
+.char-count {
+  color: #666;
+  font-size: 0.8em;
+  text-align: right;
+  display: block;
+  margin-top: 4px;
+}
+
+.username-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-icon {
+  color: #666;
+  cursor: help;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+  
 .premium-upgrade {
   margin-top: 40px;
 }

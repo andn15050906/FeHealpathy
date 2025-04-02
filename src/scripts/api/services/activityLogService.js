@@ -2,8 +2,8 @@ import { get, post } from "@/scripts/api/apiClients";
 
 const API_BASE_URL = "/ActivityLogs";
 
-export const getActivityLogs = async () => {
-  return await get(`${API_BASE_URL}`);
+export const getActivityLogs = async (queryParams = {}) => {
+  return await get(`${API_BASE_URL}`, queryParams);
 };
 
 const addSingleLog = async (content) => {

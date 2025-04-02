@@ -1,0 +1,53 @@
+#app-mount {
+    top: 0;
+    left: 0;
+}
+
+._custom-text-inp {
+    color: white;
+    background: inherit;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    padding-top: 15px;
+}
+
+.media-engine-video {
+    transform: scaleX(-1);
+}
+
+
+
+
+
+
+
+.root-22AK9z.idle-39sGPO {
+    cursor: unset !important;
+}
+
+#_video-row {
+    height: 100%;
+}
+
+#_video-row>div {
+    width: 100%;
+}
+
+.media-engine-video {
+    transform: unset;
+}
+
+.buttons-3dF5Kd {
+    opacity: unset;
+}
+
+.listItems-6eZzQ1 {
+    top: 48px !important;
+}
+
+/*tileSizer-4EltaN*/
+.outer-VAWfYQ {
+    padding-top: 50% !important;
+}

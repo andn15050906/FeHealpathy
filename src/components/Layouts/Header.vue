@@ -14,6 +14,7 @@
         </ul>
       </div>
       <div class="user-actions">
+        <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
         <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
@@ -73,6 +74,7 @@
 import { getUserProfile, signOut } from '@/scripts/api/services/authService';
 import Logo from '@/components/Common/Misc/Logo.vue';
 // import { getNotifications, updateNotification } from '@/scripts/api/services/notificationService';
+import NotificationBell from "@/components/NotificationComponents/NotificationBell.vue";
 
 export default {
   data() {
@@ -91,7 +93,8 @@ export default {
   },
 
   components: {
-    Logo
+    Logo,
+    NotificationBell
   },
 
   async mounted() {
@@ -111,6 +114,7 @@ export default {
         if (clientData) {
           this.isLoggedIn = true;
           this.user = {
+            id: clientData.id,
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
             avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
@@ -184,8 +188,14 @@ export default {
     //     console.error('Error marking notifications as read:', error);
     //   }
     // },
-  }
+  },
 
+  props: {
+    isAuthenticated: {
+      type: Boolean,
+      required: true,
+    },
+  },
   
 };
 
@@ -230,6 +240,7 @@ ul {
 
 .menu ul {
   display: flex;
+  margin-left: 45px;
 }
 
 .menu ul li {
@@ -238,6 +249,11 @@ ul {
   font-size: 16px;
   font-weight: 600;
   line-height: 60px;
+}
+
+#bell {
+  margin-right: 10px;
+  margin-top: 3px;
 }
 
 .user-actions {

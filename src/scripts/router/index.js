@@ -58,6 +58,7 @@ import ViewGroup from '@/views/Community/ViewGroup.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ConversationWindow from '@/views/Community/ConversationWindow.vue'
+import CallWindow from '@/components/CommunityComponents/CallWindow.vue'
 
 import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
 import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
@@ -419,6 +420,12 @@ const router = createRouter({
       name: 'chat',
       component: ConversationWindow,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/call',
+      name: 'call',
+      component: CallWindow,
+      meta: { isAppMode: true, requiresAuth: true }
     },
 
     // Assignment - Old

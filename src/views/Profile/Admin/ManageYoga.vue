@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <Pagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="changePage" />
+    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="changePage" />
   </div>
 
   <UpdateYoga v-if="isEditingYoga" :yogaData="selectedYoga" @yogaUpdated="handleYogaUpdated" />
