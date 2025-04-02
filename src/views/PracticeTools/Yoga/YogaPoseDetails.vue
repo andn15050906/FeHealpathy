@@ -1,11 +1,13 @@
 <template>
-    <div class="container pose-details mt-5">
+    <div class="container pose-details" v-if="pose">
         <div class="mb-3">
             <router-link to="/yoga/poses" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Poses
             </router-link>
         </div>
-        <h2 class="text-center mb-4" style="font-weight: bold;">{{ poseName }}</h2>
+        <h2 class="text-center mb-2" style="font-weight: bold;">{{ pose.name }}</h2>
+        <p class="text-center mute mb-4">{{ pose.level }}</p>
+
         <div class="text-center mb-4">
             <button class="btn btn-outline-secondary mr-2" :class="{ active: selectedOption === 'model' }"
                 @click="selectOption('model')">
@@ -20,42 +22,67 @@
             <iframe class="embed-responsive-item" :src="currentEmbedUrl" frameborder="0"
                 allow="autoplay; fullscreen; vr" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
         </div>
-        <div class="card shadow-sm p-3 mb-4">
-            <h4 style="font-weight: 600;">Exercise Description</h4>
-            <p>
-                Yoga offers many benefits for physical, mental, and overall health. Yoga exercises help improve
-                flexibility, reduce stress, and enhance quality of life.
-            </p>
+        <div class="pose-details-info d-flex flex-column gap-3">
+            <div class="card shadow p-4">
+                <h4 class="text-dark fw-bold mb-3">Exercise Description</h4>
+                <p class="text-muted">{{ pose.description }}</p>
+            </div>
+            <div class="card shadow p-4">
+                <h4 class="text-dark fw-bold mb-3">Equipment Required</h4>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span class="text-muted">{{ pose.equipmentRequirement }}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="card shadow-sm p-3 mb-4">
-            <h4 style="font-weight: 600;">Equipment Required</h4>
-            <ul class="list-unstyled mb-0">
-                <li><i class="fas fa-check-circle text-success"></i> No equipment required</li>
-            </ul>
-        </div>
+    </div>
+    <div v-else class="text-center mt-5">
+        <p>Loading pose details...</p>
     </div>
 </template>
 
 <script>
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { getPagedYogaPoses } from "../../../scripts/api/services/yogaService";
+
 export default {
     name: "YogaPoseDetails",
-    data() {
-        return {
-            poseName: "Downward Dog",
-            modelEmbedUrl: "https://sketchfab.com/models/47ec52a6f51a4a81852c26d063ab67e1/embed",
-            videoEmbedUrl: "https://www.youtube.com/embed/v7AYKMP6rOE",
-            selectedOption: "model"
+    setup() {
+        const route = useRoute();
+        const pose = ref(null);
+        const selectedOption = ref("model");
+
+        const currentEmbedUrl = computed(() => {
+            if (!pose.value) return "";
+            return selectedOption.value === "model" ? pose.value.embeddedUrl : pose.value.videoUrl;
+        });
+
+        const selectOption = (option) => {
+            selectedOption.value = option;
         };
-    },
-    computed: {
-        currentEmbedUrl() {
-            return this.selectedOption === "model" ? this.modelEmbedUrl : this.videoEmbedUrl;
-        }
-    },
-    methods: {
-        selectOption(option) {
-            this.selectedOption = option;
-        }
+
+        const loadPoseDetails = async () => {
+            try {
+                const id = route.params.id;
+                console.log("Pose ID:", id);
+                const response = await getPagedYogaPoses({ Id: id });
+                console.log("Pose Details Response:", response.items);
+                if (response.items && response.items.length > 0) {
+                    pose.value = response.items[0];
+                }
+            } catch (error) {
+                console.error("Error loading pose details:", error);
+            }
+        };
+
+        onMounted(() => {
+            loadPoseDetails();
+        });
+
+        return { pose, selectedOption, currentEmbedUrl, selectOption };
     }
 };
 </script>
@@ -87,5 +114,24 @@ iframe {
 
 .mr-2 {
     margin-right: 0.5rem;
+}
+
+.pose-details-info {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.fw-bold {
+    font-weight: bold;
+}
+
+.text-muted {
+    font-size: 1rem;
+    line-height: 1.6;
 }
 </style>
