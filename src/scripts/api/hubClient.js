@@ -293,7 +293,7 @@ class RTCHandler {
         this.#hubConnection.sendRoom(roomId, new StreamMessage(STREAM_EVENTS.RoomMessageReceived, message));
     }
     sendRoomVideoOff = (roomId) => {
-        this.#hubConnection.sendRoom(roomId, new StreamMessage(STREAM_EVENTS.VideoOff));
+        this.#hubConnection.sendRoom(roomId, new StreamMessage(STREAM_EVENTS.VideoOff, null));
     }
 
 

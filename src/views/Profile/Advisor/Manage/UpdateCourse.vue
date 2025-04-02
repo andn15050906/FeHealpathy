@@ -216,10 +216,7 @@ export default {
     async fetchCourse() {
   const courseId = this.$route.params.id;
   try {
-    const [courseData, lectureResponse] = await Promise.all([
-      getCourseById(courseId),
-      getLectures({ courseId: courseId })
-    ]);
+    const courseData = await getCourseById(courseId);
 
     this.course = {
       ...courseData,
@@ -228,21 +225,37 @@ export default {
         file: null,
         title: ''
       },
-      lectures: lectureResponse.items.map(lecture => ({
+      lectures: []
+    };
+
+    this.previewImage = courseData.thumbUrl || '';
+
+    // Gọi getLectures riêng biệt
+    try {
+      const lectureResponse = await getLectures({ courseId });
+      this.course.lectures = lectureResponse.items.map(lecture => ({
         title: lecture.title,
         content: lecture.content,
         contentSummary: lecture.contentSummary,
         isPreviewable: lecture.isPreviewable,
         medias: lecture.materials,
         id: lecture.id,
-      }))
-    };
-    this.previewImage = courseData.thumbUrl || '';
+      }));
+    } catch (lectureError) {
+      if (lectureError.response?.status === 404) {
+        console.warn("📭 Không có lecture cho khóa học này.");
+        this.course.lectures = [];
+      } else {
+        throw lectureError;
+      }
+    }
+
   } catch (error) {
-    console.error('Error fetching course details or lectures:', error);
-    this.course.lectures = [];
+    console.error("❌ Error fetching course details or lectures:", error);
   }
 }
+
+
 
 ,
     addLecture() {

@@ -26,9 +26,13 @@
 <script>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 import YogaExerciseCard from '@/components/YogaComponents/YogaExerciseCard.vue';
-import data from '@/scripts/data/data.json';
+import { getCourses } from '@/scripts/api/services/courseService';
+
 
 export default {
+  async created() {
+    await this.fetchYogaCourses();
+  },
   data() {
     return {
       currentPage: 1,
@@ -40,10 +44,13 @@ export default {
         { label: 'Rating', value: 'rating' },
         { label: 'Title', value: 'title' }
       ],
-      yogaLessons: data.YogaCatalog.Lessons
+      allLessons: []
     }
   },
   computed: {
+    yogaLessons() {
+      return this.allLessons.filter(course => course.leafCategoryId === '4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac');
+    },
     totalLessons() {
       return this.yogaLessons.length;
     },
@@ -72,6 +79,14 @@ export default {
     }
   },
   methods: {
+    async fetchYogaCourses() {
+      try {
+        const response = await getCourses({ pageIndex: 0, pageSize: 100 }); // hoặc lớn hơn nếu cần
+        this.allLessons = response.items || [];
+      } catch (error) {
+        console.error('⚠️ Lỗi khi lấy course yoga:', error);
+      }
+    },
     applyFilter(filterValue) {
       this.currentFilter = filterValue;
       this.currentPage = 1;

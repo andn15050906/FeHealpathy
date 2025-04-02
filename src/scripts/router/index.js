@@ -38,6 +38,9 @@ import MediaControl from '@/views/PracticeTools/MediaResource/MediaControl.vue'
 import YogaView from '@/views/PracticeTools/Yoga/YogaCatalog.vue'
 import YogaExerciseDetail from '@/views/PracticeTools/Yoga/YogaExerciseDetail.vue'
 import YogaPractice from '@/views/PracticeTools/Yoga/YogaPractice.vue'
+import YogaOptions from '@/views/PracticeTools/Yoga/YogaOptions.vue';
+import YogaPoses from '@/views/PracticeTools/Yoga/YogaPoses.vue';
+import YogaPoseDetails from '@/views/PracticeTools/Yoga/YogaPoseDetails.vue';
 import HabitTracking from '@/views/PracticeTools/HabitTracking/HabitTracking.vue'
 
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
@@ -55,6 +58,7 @@ import ViewGroup from '@/views/Community/ViewGroup.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ConversationWindow from '@/views/Community/ConversationWindow.vue'
+import CallWindow from '@/components/CommunityComponents/CallWindow.vue'
 
 import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
 import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
@@ -80,7 +84,6 @@ import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
 
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
 import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
-import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -186,6 +189,21 @@ const router = createRouter({
       component: YogaView
     },
     {
+      path: '/options/yoga',
+      name: 'YogaOptions',
+      component: YogaOptions
+    },
+    {
+      path: '/yoga/poses',
+      name: 'YogaPoses',
+      component: YogaPoses
+    },
+    {
+      path: '/yoga/details',
+      name: 'YogaPoseDetails',
+      component: YogaPoseDetails
+    },
+    {
       path: '/yoga/:id',
       name: 'YogaExerciseDetail',
       component: YogaExerciseDetail
@@ -260,10 +278,8 @@ const router = createRouter({
     {
       path: '/media-resources',
       name: 'MediaResources',
-      component:{
-        default: MediaResources,
-        premiumBlocker: PremiumBlocker
-      }
+      component: MediaResources,
+      meta: { requiresPremium : true }
     },
     {
       path: '/music-library',
@@ -404,6 +420,12 @@ const router = createRouter({
       name: 'chat',
       component: ConversationWindow,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/call',
+      name: 'call',
+      component: CallWindow,
+      meta: { isAppMode: true, requiresAuth: true }
     },
 
     // Assignment - Old

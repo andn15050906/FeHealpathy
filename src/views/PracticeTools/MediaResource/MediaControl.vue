@@ -12,7 +12,7 @@
                 <button class="btn btn-primary" @click="toggleAddMedia">
                     <i class="fas fa-plus me-1"></i> Add Media
                 </button>
-                <Pagination :currentPage="currentPage" :totalPages="totalPages" @go-to-page="fetchMediaResources" />
+                <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="fetchMediaResources" />
             </div>
         </div>
         <DeleteConfirmPopup v-model:isVisible="showDeletePopup" message="Are you sure you want to delete this media?"

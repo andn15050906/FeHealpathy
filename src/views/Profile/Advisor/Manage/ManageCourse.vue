@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages" :goToPage="changePage" />
+    <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages" @GoToPage="changePage" />
     <UpdateCourse v-if="isEditingcourse" :courseData="selectedcourse" @courseUpdated="handlecourseUpdated" />
     <DeleteConfirmPopup message="Delete this course?" :isVisible="isDeletePopupVisible"
       @confirmDelete="handleDeleteConfirm" @update:isVisible="isDeletePopupVisible = $event" />
