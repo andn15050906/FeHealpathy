@@ -64,17 +64,27 @@ export default {
       this.isDropdownVisible = !this.isDropdownVisible;
     },
     markAsRead(index) {
-      this.notifications[index].read = true; // Đánh dấu thông báo là đã đọc
+      this.notifications[index].read = true;
     },
     async fetchNotifications() {
       try {
-        const response = await getNotifications({ CreatorId: this.userId });
-        this.notifications = (response.items || response).map(
-          (notification) => ({
-            content: notification.message,
+        const response = await getNotifications({ ReceiverId: this.userId });
+        const notifications = response.items || response;
+
+        this.notifications = notifications.map((notification) => {
+          let content = "";
+          try {
+            const parsed = JSON.parse(notification.message);
+            content = parsed.Message || "No message";
+          } catch (e) {
+            content = notification.message;
+          }
+
+          return {
+            content,
             read: notification.read,
-          })
-        );
+          };
+        });
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -82,21 +92,8 @@ export default {
   },
   mounted() {
     if (this.isAuthenticated) {
-      this.fetchNotifications(); // Fetch thông báo khi user đã đăng nhập
+      this.fetchNotifications();
     }
-  },
-
-  watch: {
-    isAuthenticated(newVal) {
-      if (newVal && this.userId) {
-        this.fetchNotifications();
-      }
-    },
-    userId(newVal) {
-      if (newVal && this.isAuthenticated) {
-        this.fetchNotifications();
-      }
-    },
   },
 };
 </script>
