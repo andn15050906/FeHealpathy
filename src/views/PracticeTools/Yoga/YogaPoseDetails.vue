@@ -37,6 +37,11 @@
                 </ul>
             </div>
         </div>
+        <!-- Disclaimer section with warning icon and italicized text -->
+        <div class="text-center mt-4 disclaimer">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            <i>Disclaimer: We do not own any of the resources provided on this page.</i>
+        </div>
     </div>
     <div v-else class="text-center mt-5">
         <p>Loading pose details...</p>
@@ -67,9 +72,7 @@ export default {
         const loadPoseDetails = async () => {
             try {
                 const id = route.params.id;
-                console.log("Pose ID:", id);
                 const response = await getPagedYogaPoses({ Id: id });
-                console.log("Pose Details Response:", response.items);
                 if (response.items && response.items.length > 0) {
                     pose.value = response.items[0];
                 }
@@ -133,5 +136,10 @@ iframe {
 .text-muted {
     font-size: 1rem;
     line-height: 1.6;
+}
+
+.disclaimer {
+    font-style: italic;
+    font-size: 0.9rem;
 }
 </style>
