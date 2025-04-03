@@ -486,7 +486,8 @@ const router = createRouter({
     {
       path: '/request-advisor',
       name: 'Request',
-      component: RequestToBeAdvisor
+      component: RequestToBeAdvisor,
+      meta: { requiresAuth: true, requiresMember: true }
     },
     {
       path: '/submissions-review/:id',
@@ -592,7 +593,9 @@ const isAuthorized = (to) => {
   if (to.matched.some(record => record.meta.requiresAdvisor) && role != 'Advisor')
     return false;
   if (to.matched.some(record => record.meta.requiresAdmin) && role != 'Admin')
-    return false
+    return false;
+  if (to.matched.some(record => record.meta.requiresMember) && role != 'Member')
+    return false;
   
   return true;
 }

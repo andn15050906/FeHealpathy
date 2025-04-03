@@ -1,10 +1,7 @@
 <template>
   <div class="container mt-5 p-4 bg-white shadow rounded" style="max-width: 600px;">
-    <div v-if="isLoading" class="text-center">
-      <LoadingSpinner />
-      <div class="mt-2">Đang kiểm tra trạng thái... {{ loadingProgress }}%</div>
-    </div>
-    <div v-else-if="status === 'pending'">
+    <LoadingSpinner ref="loadingSpinner" />
+    <div v-if="status === 'pending'">
       <h1 class="text-center text-success">Đang đợi phê duyệt...</h1>
     </div>
     <div v-else>
@@ -49,13 +46,12 @@ export default {
     LoadingSpinner
   },
   setup() {
+    const loadingSpinner = ref(null);
     const introduction = ref('');
     const experience = ref('');
     const cvFile = ref(null);
     const certificates = ref([]);
     const status = ref('');
-    const isLoading = ref(true);
-    const loadingProgress = ref(0);
 
     const handleCVUpload = (event) => {
       const file = event.target.files[0];
@@ -93,9 +89,10 @@ export default {
 
     const checkRequestStatus = async () => {
       try {
+        loadingSpinner.value.showSpinner();
+
         const currentUserId = JSON.parse(localStorage.getItem('userProfile'))?.id;
         if (!currentUserId) {
-          isLoading.value = false;
           return;
         }
 
@@ -117,8 +114,6 @@ export default {
             pageCount = response.pageCount;
           }
           
-          // Cập nhật progress
-          loadingProgress.value = Math.min(Math.round((pageIndex + 1) / pageCount * 100), 100);
           pageIndex++;
         } while (pageIndex < pageCount);
 
@@ -135,10 +130,9 @@ export default {
           localStorage.removeItem('advisor_request_status');
         }
       } catch (error) {
-        console.error("Error checking advisor request status:", error);
+        
       } finally {
-        isLoading.value = false;
-        loadingProgress.value = 0;
+        loadingSpinner.value.hideSpinner();
       }
     };
 
@@ -146,7 +140,6 @@ export default {
       const savedStatus = localStorage.getItem('advisor_request_status');
       if (savedStatus) {
         status.value = savedStatus;
-        isLoading.value = false;
       } else {
         await checkRequestStatus();
       }
@@ -158,8 +151,7 @@ export default {
       cvFile,
       certificates,
       status,
-      isLoading,
-      loadingProgress,
+      loadingSpinner,
       handleCVUpload,
       handleCertificateUpload,
       submitRequest,
