@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <LoadingSpinner ref="loadingSpinner" />
     <div class="card shadow custom-card">
       <div class="card-header bg-primary text-white text-center py-3">
         <h1 class="h3 mb-0">
@@ -10,7 +11,7 @@
       <div class="card-body">
         <form @submit.prevent="openSavePopup">
           <div class="mb-3">
-            <label for="title" class="form-label">
+            <label for="title" class="form-label required">
               <i class="fas fa-pen-nib me-1 bold-icon"></i>
               <span class="bold-text">Course Title</span>
             </label>
@@ -18,7 +19,7 @@
               required />
           </div>
           <div class="mb-3">
-            <label for="intro" class="form-label">
+            <label for="intro" class="form-label required">
               <i class="fas fa-book me-1 bold-icon"></i>
               <span class="bold-text">Course Intro</span>
             </label>
@@ -26,7 +27,7 @@
               placeholder="Write a short intro for the course" rows="3" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="description" class="form-label">
+            <label for="description" class="form-label required">
               <i class="fas fa-align-left me-1 bold-icon"></i>
               <span class="bold-text">Course Description</span>
             </label>
@@ -34,7 +35,7 @@
               placeholder="Detailed course description" rows="5" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="thumb" class="form-label">
+            <label for="thumb" class="form-label required">
               <i class="fas fa-image me-1 bold-icon"></i>
               <span class="bold-text">Course Thumbnail</span>
             </label>
@@ -57,15 +58,15 @@
           </div> -->
 
           <div class="mb-3">
-            <label for="price" class="form-label">
+            <label for="price" class="form-label required">
               <i class="fas fa-dollar-sign me-1 bold-icon"></i>
               <span class="bold-text">Course Price</span>
             </label>
             <input type="number" id="price" v-model="course.price" class="form-control" placeholder="Enter price (VND)"
-              min="0" required />
+              min="10000" required />
           </div>
           <div class="mb-3">
-            <label for="level" class="form-label">
+            <label for="level" class="form-label required">
               <i class="fas fa-signal me-1 bold-icon"></i>
               <span class="bold-text">Course Level</span>
             </label>
@@ -77,7 +78,7 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="outcomes" class="form-label">
+            <label for="outcomes" class="form-label required">
               <i class="fas fa-award me-1 bold-icon"></i>
               <span class="bold-text">Course Outcomes</span>
             </label>
@@ -85,7 +86,7 @@
               placeholder="Expected learning outcomes" rows="3"></textarea>
           </div>
           <div class="mb-3">
-            <label for="requirements" class="form-label">
+            <label for="requirements" class="form-label required">
               <i class="fas fa-info-circle me-1 bold-icon"></i>
               <span class="bold-text">Course Requirements</span>
             </label>
@@ -103,23 +104,21 @@
                   <i class="fas fa-sticky-note me-1 bold-icon"></i>
                   <span class="bold-text">Lecture Title {{ index + 1 }}</span>
                 </label>
-                <input type="text" v-model="lecture.title" class="form-control" placeholder="Lecture title" required />
+                <input type="text" v-model="lecture.title" class="form-control" placeholder="Lecture title" />
               </div>
               <div class="mb-3">
                 <label class="form-label">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
                   <span class="bold-text">Lecture Content</span>
                 </label>
-                <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content" rows="4"
-                  required></textarea>
+                <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content" rows="4"></textarea>
               </div>
               <div class="mb-3">
                 <label class="form-label">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
                   <span class="bold-text">Content Summary</span>
                 </label>
-                <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture content" rows="4"
-                  required></textarea>
+                <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture content" rows="4"></textarea>
               </div>
               <div class="form-check form-switch mb-3">
                 <input type="checkbox" class="form-check-input" v-model="lecture.isPreviewable"
@@ -187,10 +186,16 @@
 import SaveConfirmPopUp from '../../../../components/Common/Popup/SaveConfirmPopUp.vue';
 import { getCourseById, updateCourse } from "@/scripts/api/services/courseService";
 import { getLectures } from "@/scripts/api/services/lectureService";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 export default {
   name: "UpdateCourse",
-  components: { SaveConfirmPopUp },
+  components: { 
+    SaveConfirmPopUp,
+    LoadingSpinner 
+  },
   data() {
     return {
       course: {
@@ -214,50 +219,46 @@ export default {
   },
   methods: {
     async fetchCourse() {
-  const courseId = this.$route.params.id;
-  try {
-    const courseData = await getCourseById(courseId);
+      const courseId = this.$route.params.id;
+      try {
+        const courseData = await getCourseById(courseId);
 
-    this.course = {
-      ...courseData,
-      thumb: {
-        url: courseData.thumbUrl || '',
-        file: null,
-        title: ''
-      },
-      lectures: []
-    };
+        this.course = {
+          ...courseData,
+          thumb: {
+            url: courseData.thumbUrl || '',
+            file: null,
+            title: ''
+          },
+          lectures: []
+        };
 
-    this.previewImage = courseData.thumbUrl || '';
+        this.previewImage = courseData.thumbUrl || '';
 
-    // Gọi getLectures riêng biệt
-    try {
-      const lectureResponse = await getLectures({ courseId });
-      this.course.lectures = lectureResponse.items.map(lecture => ({
-        title: lecture.title,
-        content: lecture.content,
-        contentSummary: lecture.contentSummary,
-        isPreviewable: lecture.isPreviewable,
-        medias: lecture.materials,
-        id: lecture.id,
-      }));
-    } catch (lectureError) {
-      if (lectureError.response?.status === 404) {
-        console.warn("📭 Không có lecture cho khóa học này.");
-        this.course.lectures = [];
-      } else {
-        throw lectureError;
+        // Gọi getLectures riêng biệt
+        try {
+          const lectureResponse = await getLectures({ courseId });
+          this.course.lectures = lectureResponse.items.map(lecture => ({
+            title: lecture.title,
+            content: lecture.content,
+            contentSummary: lecture.contentSummary,
+            isPreviewable: lecture.isPreviewable,
+            medias: lecture.materials,
+            id: lecture.id,
+          }));
+        } catch (lectureError) {
+          if (lectureError.response?.status === 404) {
+            console.warn("📭 Không có lecture cho khóa học này.");
+            this.course.lectures = [];
+          } else {
+            throw lectureError;
+          }
+        }
+
+      } catch (error) {
+        console.error("❌ Error fetching course details or lectures:", error);
       }
-    }
-
-  } catch (error) {
-    console.error("❌ Error fetching course details or lectures:", error);
-  }
-}
-
-
-
-,
+    },
     addLecture() {
       this.course.lectures.push({
         title: "",
@@ -310,24 +311,150 @@ export default {
       });
     },
     async handleSave(confirm) {
-      if (this.validateCourse() && confirm) {
-        this.isSubmitting = true;
-        try {
-          const response = await updateCourse(this.course);
-          console.log('Course updated successfully:', response);
-          this.$router.push('/courses');
-        } catch (error) {
-          console.error('Failed to update course:', error);
-        } finally {
-          this.isSubmitting = false;
+      if (!confirm) return;
+      
+      if (!this.validateForm()) {
+        return;
+      }
+
+      this.$refs.loadingSpinner.showSpinner();
+
+      try {
+        const formData = new FormData();
+
+        formData.append('Id', this.course.id);
+        formData.append('Title', this.course.title);
+        formData.append('Intro', this.course.intro);
+        formData.append('Description', this.course.description);
+        formData.append('Price', this.course.price);
+        formData.append('Level', this.course.level);
+        formData.append('Outcomes', this.course.outcomes);
+        formData.append('Requirements', this.course.requirements);
+        formData.append('LeafCategoryId', this.course.leafCategoryId);
+
+        // Thumb
+        if (this.course.thumb.file) {
+          formData.append('Thumb.File', this.course.thumb.file, this.course.thumb.title);
+          formData.append('Thumb.Title', this.course.thumb.title || 'thumbnail');
         }
+
+        if (this.course.thumb.url) {
+          formData.append('Thumb.Url', this.course.thumb.url);
+        }
+
+        // Lectures
+        this.course.lectures.forEach((lecture, index) => {
+          formData.append(`Lectures[${index}].Id`, lecture.id || '');
+          formData.append(`Lectures[${index}].Title`, lecture.title);
+          formData.append(`Lectures[${index}].Content`, lecture.content);
+          formData.append(`Lectures[${index}].ContentSummary`, lecture.contentSummary);
+          formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
+
+          lecture.medias.forEach((media, mediaIndex) => {
+            if (media.file) {
+              formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
+            }
+          });
+        });
+
+        const response = await updateCourse(formData);
+        console.log('Course updated successfully:', response);
+        
+        toast.success("Cập nhật khóa học thành công!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+
+        // Chuyển hướng về trang advisor/content
+        this.$router.push({
+          path: '/advisor/content',
+          query: {
+            updateSuccess: true,
+            message: 'Cập nhật khóa học thành công!'
+          }
+        });
+
+      } catch (error) {
+        console.error('Failed to update course:', error);
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật khóa học. Vui lòng thử lại!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
     },
-    validateCourse() {
-      if (!this.course.title || this.course.price <= 0 || !this.course.leafCategoryId) {
-        alert("Please fill out all required fields correctly.");
+    validateForm() {
+      // Validate title
+      if (!this.course.title.trim()) {
+        toast.error("Vui lòng nhập tiêu đề khóa học");
         return false;
       }
+
+      // Validate intro
+      if (!this.course.intro.trim()) {
+        toast.error("Vui lòng nhập giới thiệu khóa học");
+        return false;
+      }
+
+      // Validate description
+      if (!this.course.description.trim()) {
+        toast.error("Vui lòng nhập mô tả chi tiết khóa học");
+        return false;
+      }
+
+      // Validate thumbnail
+      if (!this.course.thumb.file && !this.course.thumb.url) {
+        toast.error("Vui lòng chọn hình ảnh cho khóa học");
+        return false;
+      }
+
+      // Validate price
+      if (!this.course.price || this.course.price < 10000) {
+        toast.error("Giá khóa học phải từ 10,000 VND trở lên");
+        return false;
+      }
+
+      // Validate level
+      if (!this.course.level) {
+        toast.error("Vui lòng chọn cấp độ khóa học");
+        return false;
+      }
+
+      // Validate outcomes
+      if (!this.course.outcomes.trim()) {
+        toast.error("Vui lòng nhập kết quả học tập mong đợi");
+        return false;
+      }
+
+      // Validate requirements
+      if (!this.course.requirements.trim()) {
+        toast.error("Vui lòng nhập yêu cầu tiên quyết của khóa học");
+        return false;
+      }
+
+      // Validate lectures if they exist
+      if (this.course.lectures.length > 0) {
+        for (let i = 0; i < this.course.lectures.length; i++) {
+          const lecture = this.course.lectures[i];
+          
+          if (!lecture.title.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập tiêu đề hoặc xóa bài giảng này`);
+            return false;
+          }
+
+          if (!lecture.content.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập nội dung hoặc xóa bài giảng này`);
+            return false;
+          }
+
+          if (!lecture.contentSummary.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập tóm tắt nội dung hoặc xóa bài giảng này`);
+            return false;
+          }
+        }
+      }
+
       return true;
     },
   },
@@ -336,10 +463,6 @@ export default {
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 body {
@@ -412,5 +535,15 @@ body {
 
 .shadow {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.form-label.required::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
+}
+
+:deep(.loading-spinner) {
+  z-index: 9999;
 }
 </style>

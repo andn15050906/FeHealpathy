@@ -27,7 +27,7 @@
             <hr class="menu-divider" />
             <li><router-link to="/enrolled-course">Enrolled courses</router-link></li>
 
-            <li v-if="user.role == 0">
+            <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
               <router-link to="/request-advisor">Request to be an advisor</router-link>
             </li>

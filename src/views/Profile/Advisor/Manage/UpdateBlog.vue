@@ -1,5 +1,6 @@
 <template>
   <div class="blog-creation">
+    <LoadingSpinner ref="loadingSpinner" />
     <h1 class="title">✨ Cập Nhật Blog ✨</h1>
 
     <form @submit.prevent="submitBlog" class="blog-form">
@@ -67,6 +68,7 @@ import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/scripts/api/services/tagService";
 import { updateArticle, getBlogById } from "@/scripts/api/services/blogService";
 import { useRouter, useRoute } from 'vue-router';
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -82,43 +84,41 @@ const blog = ref({
 
 const availableKeywords = ref([]);
 const previewImage = ref(null);
+const loadingSpinner = ref(null);
 
 onMounted(async () => {
+  loadingSpinner.value.showSpinner();
+  
   try {
     const blogId = route.params.id;
     const response = await getBlogById(blogId);
     blogData.value = response;
 
-    // Log response từ API
     console.log("API Response:", response);
 
-    // Khởi tạo dữ liệu blog
     blog.value = {
       title: blogData.value.title,
-      thumb: null, // Sẽ được cập nhật khi upload file mới
+      thumb: null, 
       selectedKeywords: blogData.value.tags.map(tag => ({
         id: tag.id,
         name: tag.title
       })),
       sections: blogData.value.sections.map(section => ({
         id: section.id,
-        header: section.header || section.title, // Hỗ trợ cả 2 trường hợp
+        header: section.header || section.title, 
         content: section.content,
-        thumb: null, // Sẽ được cập nhật khi upload file mới
+        thumb: null, 
         previewImage: section.media?.url || section.thumb?.url,
         thumbTitle: section.media?.title || section.thumb?.title
       }))
     };
 
-    // Set preview image cho thumbnail chính
     if (blogData.value.thumb?.url) {
       previewImage.value = blogData.value.thumb.url;
     }
 
-    // Log dữ liệu đã khởi tạo
     console.log("Initialized blog data:", blog.value);
 
-    // Fetch keywords
     const keywordsResponse = await getPagedTags();
     availableKeywords.value = keywordsResponse.map(keyword => ({
       id: keyword.id,
@@ -128,6 +128,8 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error initializing blog data:", error);
     toast.error("Không thể tải dữ liệu blog.");
+  } finally {
+    loadingSpinner.value.hideSpinner();
   }
 });
 
@@ -216,10 +218,12 @@ const validateForm = () => {
 
 const submitBlog = async () => {
   if (!validateForm()) return;
+  
+  loadingSpinner.value.showSpinner();
+  
   try {
     const formData = new FormData();
 
-    // Log dữ liệu gốc
     console.log("Original blog data:", {
       id: blogData.value.id,
       title: blogData.value.title,
@@ -234,13 +238,11 @@ const submitBlog = async () => {
       tags: blogData.value.tags
     });
 
-    // Append dữ liệu cơ bản
     formData.append("Id", blogData.value.id);
     formData.append("Title", blog.value.title);
     formData.append("Status", blogData.value.status);
     formData.append("IsCommentDisabled", blogData.value.isCommentDisabled);
 
-    // Xử lý tags
     const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
     const previousTags = blogData.value.tags.map(tag => tag.id);
     const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
@@ -249,7 +251,6 @@ const submitBlog = async () => {
     removedTags.forEach(tag => formData.append("RemovedTags", tag));
     addedTags.forEach(tag => formData.append("AddedTags", tag));
 
-    // Xử lý thumb
     if (blog.value.thumb instanceof File) {
       formData.append("Thumb.File", blog.value.thumb);
       formData.append("Thumb.Title", blog.value.thumb.name);
@@ -258,7 +259,6 @@ const submitBlog = async () => {
       formData.append("Thumb.Title", blogData.value.thumb.title);
     }
 
-    // Xử lý sections
     if (blog.value.sections && blog.value.sections.length > 0) {
       blog.value.sections.forEach((section, index) => {
         formData.append(`Sections[${index}].Id`, section.id || '');
@@ -275,7 +275,6 @@ const submitBlog = async () => {
       });
     }
 
-    // Log FormData một cách chi tiết
     console.log("Form data entries:");
     for (let pair of formData.entries()) {
       console.log(pair[0] + ': ' + pair[1]);
@@ -295,6 +294,8 @@ const submitBlog = async () => {
     } else {
       toast.error("Cập nhật blog thất bại! Vui lòng thử lại.");
     }
+  } finally {
+    loadingSpinner.value.hideSpinner();
   }
 };
 </script>
@@ -440,5 +441,9 @@ const submitBlog = async () => {
 .multiselect__clear:hover {
   color: #0056b3;
 }
-  </style>
+
+:deep(.loading-spinner) {
+  z-index: 9999;
+}
+</style>
   

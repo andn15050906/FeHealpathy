@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <LoadingSpinner ref="loadingSpinner" />
     <div class="card shadow custom-card">
       <div class="card-header bg-primary text-white text-center py-3">
         <h1 class="h3 mb-0">
@@ -10,7 +11,7 @@
       <div class="card-body">
         <form @submit.prevent="openSavePopup">
           <div class="mb-3">
-            <label for="title" class="form-label">
+            <label for="title" class="form-label required">
               <i class="fas fa-pen-nib me-1 bold-icon"></i>
               <span class="bold-text">Course Title</span>
             </label>
@@ -18,7 +19,7 @@
               required />
           </div>
           <div class="mb-3">
-            <label for="intro" class="form-label">
+            <label for="intro" class="form-label required">
               <i class="fas fa-book me-1 bold-icon"></i>
               <span class="bold-text">Course Intro</span>
             </label>
@@ -26,7 +27,7 @@
               placeholder="Write a short intro for the course" rows="3" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="description" class="form-label">
+            <label for="description" class="form-label required">
               <i class="fas fa-align-left me-1 bold-icon"></i>
               <span class="bold-text">Course Description</span>
             </label>
@@ -34,11 +35,12 @@
               placeholder="Detailed course description" rows="5" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="thumb" class="form-label">
+            <label for="thumb" class="form-label required">
               <i class="fas fa-image me-1 bold-icon"></i>
               <span class="bold-text">Course Thumbnail</span>
             </label>
-            <input type="file" id="thumb" @change="handleImageUpload" class="form-control" accept="image/*" />
+            <input type="file" id="thumb" @change="handleImageUpload" class="form-control" accept="image/*"
+              required />
             <div v-if="previewImage" class="mt-2 text-center">
               <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
             </div>
@@ -57,19 +59,19 @@
           </div> -->
 
           <div class="mb-3">
-            <label for="price" class="form-label">
+            <label for="price" class="form-label required">
               <i class="fas fa-dollar-sign me-1 bold-icon"></i>
               <span class="bold-text">Course Price</span>
             </label>
-            <input type="number" id="price" v-model="course.price" class="form-control" placeholder="Enter price (VND)"
-              min="0" required />
+            <input type="number" id="price" v-model="course.price" class="form-control" 
+              placeholder="Enter price (VND)" min="10000" required />
           </div>
           <div class="mb-3">
-            <label for="level" class="form-label">
+            <label for="level" class="form-label required">
               <i class="fas fa-signal me-1 bold-icon"></i>
               <span class="bold-text">Course Level</span>
             </label>
-            <select id="level" v-model="course.level" required class="form-select">
+            <select id="level" v-model="course.level" class="form-select" required>
               <option value="" disabled>Select level</option>
               <option value="1">Beginner</option>
               <option value="2">Intermediate</option>
@@ -77,20 +79,20 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="outcomes" class="form-label">
+            <label for="outcomes" class="form-label required">
               <i class="fas fa-award me-1 bold-icon"></i>
               <span class="bold-text">Course Outcomes</span>
             </label>
             <textarea id="outcomes" v-model="course.outcomes" class="form-control"
-              placeholder="Expected learning outcomes" rows="3"></textarea>
+              placeholder="Expected learning outcomes" rows="3" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="requirements" class="form-label">
+            <label for="requirements" class="form-label required">
               <i class="fas fa-info-circle me-1 bold-icon"></i>
               <span class="bold-text">Course Requirements</span>
             </label>
             <textarea id="requirements" v-model="course.requirements" class="form-control"
-              placeholder="Course prerequisites" rows="3"></textarea>
+              placeholder="Course prerequisites" rows="3" required></textarea>
           </div>
           <div class="mb-4">
             <h2 class="h5 mb-3">
@@ -99,43 +101,44 @@
             </h2>
             <div class="mb-4 border rounded p-3" v-for="(lecture, index) in course.lectures" :key="index">
               <div class="mb-3">
-                <label class="form-label">
+                <label class="form-label required">
                   <i class="fas fa-sticky-note me-1 bold-icon"></i>
                   <span class="bold-text">Lecture Title {{ index + 1 }}</span>
                 </label>
-                <input type="text" v-model="lecture.title" class="form-control" placeholder="Lecture title" required />
+                <input type="text" v-model="lecture.title" class="form-control" 
+                  placeholder="Lecture title" required />
               </div>
               <div class="mb-3">
-                <label class="form-label">
+                <label class="form-label required">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
                   <span class="bold-text">Lecture Content</span>
                 </label>
-                <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content" rows="4"
-                  required></textarea>
+                <textarea v-model="lecture.content" class="form-control" 
+                  placeholder="Lecture content" rows="4" required></textarea>
               </div>
               <div class="mb-3">
-                <label class="form-label">
+                <label class="form-label required">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
                   <span class="bold-text">Content Summary</span>
                 </label>
-                <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture content" rows="4"
-                  required></textarea>
+                <textarea v-model="lecture.contentSummary" class="form-control" 
+                  placeholder="Lecture content summary" rows="4" required></textarea>
               </div>
               <div class="form-check form-switch mb-3">
-                <input type="checkbox" class="form-check-input" v-model="lecture.isPreviewable"
-                  :id="'previewable-' + index" />
+                <input type="checkbox" class="form-check-input" 
+                  v-model="lecture.isPreviewable" :id="'previewable-' + index" />
                 <label class="form-check-label bold-text" :for="'previewable-' + index">
                   <i class="fas fa-eye me-1 bold-icon"></i>
                   <span class="bold-text">Is Previewable</span>
                 </label>
               </div>
               <div class="mb-3">
-                <label class="form-label">
+                <label class="form-label required">
                   <i class="fas fa-upload me-1 bold-icon"></i>
                   <span class="bold-text">Upload Lecture Materials</span>
                 </label>
                 <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
-                  accept="image/*,video/*,application/pdf" multiple />
+                  accept="image/*,video/*,application/pdf" multiple required />
                 <div v-if="lecture.medias.length > 0" class="mt-2">
                   <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
                     class="d-flex align-items-center mb-2 p-2 border rounded">
@@ -186,9 +189,16 @@
 <script>
 import SaveConfirmPopUp from '../../../../components/Common/Popup/SaveConfirmPopUp.vue';
 import { createCourse } from '@/scripts/api/services/courseService';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
+
 export default {
   name: "CreateCourse",
-  components: { SaveConfirmPopUp },
+  components: { 
+    SaveConfirmPopUp,
+    LoadingSpinner 
+  },
   data() {
     return {
       course: {
@@ -245,9 +255,14 @@ export default {
       this.course.lectures.push({
         title: "",
         content: "",
-        contentSummary:"",
+        contentSummary: "",
         isPreviewable: false,
         medias: []
+      });
+      
+      toast.info("Vui lòng điền đầy đủ thông tin và tải lên tài liệu cho bài giảng mới", {
+        autoClose: 3000,
+        position: toast.POSITION.TOP_RIGHT
       });
     },
     removeLecture(index) {
@@ -255,62 +270,188 @@ export default {
     },
     removeLectureMedia(lectureIndex, mediaIndex) {
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
+      
+      if (this.course.lectures[lectureIndex].medias.length === 0) {
+        toast.warning(`Bài giảng ${lectureIndex + 1}: Vui lòng tải lên ít nhất một tài liệu`, {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+      }
     },
     openSavePopup() {
       this.showSavePopup = true;
     },
 
+    validateForm() {
+      // Validate title
+      if (!this.course.title.trim()) {
+        toast.error("Vui lòng nhập tiêu đề khóa học");
+        return false;
+      }
+
+      // Validate intro
+      if (!this.course.intro.trim()) {
+        toast.error("Vui lòng nhập giới thiệu khóa học");
+        return false;
+      }
+
+      // Validate description
+      if (!this.course.description.trim()) {
+        toast.error("Vui lòng nhập mô tả chi tiết khóa học");
+        return false;
+      }
+
+      // Validate thumbnail
+      if (!this.course.thumb.file && !this.course.thumb.url) {
+        toast.error("Vui lòng chọn hình ảnh cho khóa học");
+        return false;
+      }
+
+      // Validate price
+      if (!this.course.price || this.course.price < 10000) {
+        toast.error("Giá khóa học phải từ 10,000 VND trở lên");
+        return false;
+      }
+
+      // Validate level
+      if (!this.course.level) {
+        toast.error("Vui lòng chọn cấp độ khóa học");
+        return false;
+      }
+
+      // Validate outcomes
+      if (!this.course.outcomes.trim()) {
+        toast.error("Vui lòng nhập kết quả học tập mong đợi");
+        return false;
+      }
+
+      // Validate requirements
+      if (!this.course.requirements.trim()) {
+        toast.error("Vui lòng nhập yêu cầu tiên quyết của khóa học");
+        return false;
+      }
+
+      // Validate lectures
+      if (this.course.lectures.length > 0) {
+        for (let i = 0; i < this.course.lectures.length; i++) {
+          const lecture = this.course.lectures[i];
+          
+          // Validate lecture title
+          if (!lecture.title || !lecture.title.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập tiêu đề bài giảng`);
+            return false;
+          }
+
+          // Validate lecture content
+          if (!lecture.content || !lecture.content.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập nội dung bài giảng`);
+            return false;
+          }
+
+          // Validate lecture content summary
+          if (!lecture.contentSummary || !lecture.contentSummary.trim()) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng nhập tóm tắt nội dung bài giảng`);
+            return false;
+          }
+
+          // Validate lecture materials
+          if (!lecture.medias || lecture.medias.length === 0) {
+            toast.error(`Bài giảng ${i + 1}: Vui lòng tải lên ít nhất một tài liệu cho bài giảng`);
+            return false;
+          }
+
+          // Kiểm tra độ dài tối thiểu cho các trường
+          if (lecture.title.trim().length < 5) {
+            toast.error(`Bài giảng ${i + 1}: Tiêu đề phải có ít nhất 5 ký tự`);
+            return false;
+          }
+
+          if (lecture.content.trim().length < 20) {
+            toast.error(`Bài giảng ${i + 1}: Nội dung phải có ít nhất 20 ký tự`);
+            return false;
+          }
+
+          if (lecture.contentSummary.trim().length < 10) {
+            toast.error(`Bài giảng ${i + 1}: Tóm tắt nội dung phải có ít nhất 10 ký tự`);
+            return false;
+          }
+        }
+      }
+
+      return true;
+    },
+
     async handleSave(confirm) {
-  if (!confirm) return;
+      if (!confirm) return;
+      
+      if (!this.validateForm()) {
+        return;
+      }
 
-  try {
-    const formData = new FormData();
+      this.$refs.loadingSpinner.showSpinner();
 
-    formData.append('Title', this.course.title);
-    formData.append('Intro', this.course.intro);
-    formData.append('Description', this.course.description);
-    formData.append('Price', this.course.price);
-    formData.append('Level', this.course.level);
-    formData.append('Outcomes', this.course.outcomes);
-    formData.append('Requirements', this.course.requirements);
-    formData.append('LeafCategoryId', this.course.leafCategoryId);
+      try {
+        const formData = new FormData();
 
-    // Thumb
-    if (this.course.thumb.file) {
-      formData.append('Thumb.File', this.course.thumb.file, this.course.thumb.title);
-      formData.append('Thumb.Title', this.course.thumb.title || 'thumbnail');
-    }
+        formData.append('Title', this.course.title);
+        formData.append('Intro', this.course.intro);
+        formData.append('Description', this.course.description);
+        formData.append('Price', this.course.price);
+        formData.append('Level', this.course.level);
+        formData.append('Outcomes', this.course.outcomes);
+        formData.append('Requirements', this.course.requirements);
+        formData.append('LeafCategoryId', this.course.leafCategoryId);
 
-    if (this.course.thumb.url) {
-      formData.append('Thumb.Url', this.course.thumb.url);
-    }
+        // Thumb
+        if (this.course.thumb.file) {
+          formData.append('Thumb.File', this.course.thumb.file, this.course.thumb.title);
+          formData.append('Thumb.Title', this.course.thumb.title || 'thumbnail');
+        }
 
-    // Lectures
-    this.course.lectures.forEach((lecture, index) => {
-      formData.append(`Lectures[${index}].Title`, lecture.title);
-      formData.append(`Lectures[${index}].Content`, lecture.content);
-      formData.append(`Lectures[${index}].ContentSummary`, lecture.contentSummary);
-      formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
+        if (this.course.thumb.url) {
+          formData.append('Thumb.Url', this.course.thumb.url);
+        }
 
-      lecture.medias.forEach((media, mediaIndex) => {
-        formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
-      });
-    });
+        // Lectures
+        this.course.lectures.forEach((lecture, index) => {
+          formData.append(`Lectures[${index}].Title`, lecture.title);
+          formData.append(`Lectures[${index}].Content`, lecture.content);
+          formData.append(`Lectures[${index}].ContentSummary`, lecture.contentSummary);
+          formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
 
-    for (let key of formData.keys()) {
-      console.log(`${key}:`, formData.getAll(key));
-    }
+          lecture.medias.forEach((media, mediaIndex) => {
+            formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
+          });
+        });
 
-    const response = await createCourse(formData);
-    console.log('Course created successfully:', response);
-    this.resetForm();
-  } catch (error) {
-    console.error('Failed to create course:', error);
-  }
-}
+        const response = await createCourse(formData);
+        console.log('Course created successfully:', response);
+        
+        toast.success("Tạo khóa học thành công!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
 
+        // Chuyển hướng về trang advisor/content
+        this.$router.push({
+          path: '/advisor/content',
+          query: {
+            createSuccess: true,
+            message: 'Tạo khóa học thành công!'
+          }
+        });
 
-,
+      } catch (error) {
+        console.error('Failed to create course:', error);
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tạo khóa học. Vui lòng thử lại!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
+      }
+    },
+
     resetForm() {
       this.course = {
         title: "",
@@ -401,5 +542,15 @@ body {
 
 .shadow {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+:deep(.loading-spinner) {
+  z-index: 9999;
+}
+
+.form-label.required::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
 }
 </style>

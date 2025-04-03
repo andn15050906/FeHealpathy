@@ -1,5 +1,6 @@
 <template>
     <div class="roadmap-creation">
+      <LoadingSpinner ref="loadingSpinner" />
       <h1 class="title">✨ Update Roadmap ✨</h1>
       <form @submit.prevent="submitRoadmap" class="roadmap-form">
         <div class="form-group">
@@ -89,7 +90,7 @@
         </div>
   
         <div class="form-actions">
-          <button type="submit" class="btn submit">✅ Cập nhật Roadmap</button>
+          <button type="submit" class="btn submit" :disabled="!isFormValid">✅ Cập nhật Roadmap</button>
         </div>
       </form>
     </div>
@@ -103,10 +104,11 @@
   import { getPagedSurveys } from '@/scripts/api/services/surveysService';
   import { TRACKED_EVENTS, ENTITY_TYPES, getEntityTypeByEventLabel } from '@/scripts/api/services/activityLogService';
   import { updateRoadmap, getRoadmapById } from '@/scripts/api/services/roadmapService';
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import { onMounted } from "vue";
   import { toast } from "vue3-toastify";
   import { useRouter, useRoute } from 'vue-router';
+  import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
   
   const router = useRouter();
   const route = useRoute();
@@ -124,6 +126,23 @@
     phases: [],
   });
   
+  const loadingSpinner = ref(null);
+  
+  const toastConfig = {
+    autoClose: 3000,
+    position: toast.POSITION.TOP_RIGHT,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  };
+
+  const isFormValid = computed(() => {
+    return roadmap.value.title.trim() !== '' && 
+           roadmap.value.introText.trim() !== '' && 
+           roadmap.value.phases.length > 0;
+  });
+
   async function fetchRoadmapData() {
     try {
       const roadmapId = route.params.id;
@@ -194,16 +213,142 @@
   }
   
   async function submitRoadmap() {
-    try {
-      console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
-      
-      await updateRoadmap(roadmap.value); 
-      toast.success("Cập nhật roadmap thành công");
-      router.push('/advisor/content');
-    } catch (error) {
-      toast.error("Cập nhật roadmap thất bại");
-      console.error('Error updating roadmap:', error);
+    if (!validateRoadmapBasicInfo() || !validatePhases()) {
+        return;
     }
+
+    try {
+        loadingSpinner.value.showSpinner();
+        console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
+        
+        await updateRoadmap(roadmap.value);
+        router.push({ 
+            name: 'ManageAdvisorContent',
+            query: { 
+                updateSuccess: true,
+                message: 'Cập nhật roadmap thành công!'
+            }
+        });
+    } catch (error) {
+        console.error('Error updating roadmap:', error);
+        toast.error("Cập nhật roadmap thất bại! " + (error.message || ''), toastConfig);
+    } finally {
+        loadingSpinner.value.hideSpinner();
+    }
+  }
+
+  function validateRoadmapBasicInfo() {
+    if (!roadmap.value.title.trim()) {
+        toast.error("Vui lòng nhập tiêu đề roadmap!", toastConfig);
+        return false;
+    }
+    if (roadmap.value.title.length > 200) {
+        toast.error("Tiêu đề roadmap không được vượt quá 200 ký tự!", toastConfig);
+        return false;
+    }
+    if (!roadmap.value.introText.trim()) {
+        toast.error("Vui lòng nhập giới thiệu roadmap!", toastConfig);
+        return false;
+    }
+    if (roadmap.value.introText.length > 1000) {
+        toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!", toastConfig);
+        return false;
+    }
+    return true;
+  }
+
+  function validatePhases() {
+    if (!roadmap.value.phases || roadmap.value.phases.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một giai đoạn!", toastConfig);
+        return false;
+    }
+
+    for (let i = 0; i < roadmap.value.phases.length; i++) {
+        const phase = roadmap.value.phases[i];
+        
+        if (!phase.title.trim()) {
+            toast.error(`Vui lòng nhập tiêu đề cho giai đoạn ${i + 1}!`, toastConfig);
+            return false;
+        }
+        if (phase.title.length > 100) {
+            toast.error(`Tiêu đề giai đoạn ${i + 1} không được vượt quá 100 ký tự!`, toastConfig);
+            return false;
+        }
+        if (!phase.description.trim()) {
+            toast.error(`Vui lòng nhập mô tả cho giai đoạn ${i + 1}!`, toastConfig);
+            return false;
+        }
+        if (phase.timeSpan <= 0) {
+            toast.error(`Thời gian dự kiến của giai đoạn ${i + 1} phải lớn hơn 0!`, toastConfig);
+            return false;
+        }
+        
+        if (!validateMilestones(phase.milestones, i)) {
+            return false;
+        }
+    }
+    return true;
+  }
+
+  function validateMilestones(milestones, phaseIndex) {
+    if (!milestones || milestones.length === 0) {
+        toast.error(`Vui lòng thêm ít nhất một mốc cho giai đoạn ${phaseIndex + 1}!`, toastConfig);
+        return false;
+    }
+
+    for (let i = 0; i < milestones.length; i++) {
+        const milestone = milestones[i];
+        
+        if (!milestone.title.trim()) {
+            toast.error(`Vui lòng nhập tiêu đề cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
+            return false;
+        }
+        if (!milestone.eventName) {
+            toast.error(`Vui lòng chọn sự kiện cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
+            return false;
+        }
+        if (milestone.repeatTimesRequired <= 0) {
+            toast.error(`Số lần lặp lại của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
+            return false;
+        }
+        if (milestone.timeSpentRequired <= 0) {
+            toast.error(`Thời gian cần thiết của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
+            return false;
+        }
+
+        if (isRecommendationAvailable(milestone.eventName) && 
+            milestone.recommendations && 
+            milestone.recommendations.length > 0) {
+            if (!validateRecommendations(milestone.recommendations, phaseIndex, i)) {
+                return false;
+            }
+        }
+    }
+    return true;
+  }
+
+  function validateRecommendations(recommendations, phaseIndex, milestoneIndex) {
+    if (!recommendations || recommendations.length === 0) {
+        return true;
+    }
+
+    for (let i = 0; i < recommendations.length; i++) {
+        const rec = recommendations[i];
+        
+        if (!rec.targetEntityId || rec.targetEntityId === "00000000-0000-0000-0000-000000000000") {
+            toast.error(`Vui lòng chọn nội dung khuyến nghị ${i + 1} cho mốc ${milestoneIndex + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
+            return false;
+        }
+        if (!rec.trait.trim()) {
+            toast.error(`Vui lòng nhập đặc tính cho khuyến nghị ${i + 1} của mốc ${milestoneIndex + 1} giai đoạn ${phaseIndex + 1}!`, toastConfig);
+            return false;
+        }
+        if (!rec.traitDescription.trim()) {
+            toast.error(`Vui lòng nhập mô tả đặc tính cho khuyến nghị ${i + 1} của mốc ${milestoneIndex + 1} giai đoạn ${phaseIndex + 1}!`, toastConfig);
+            return false;
+        }
+    }
+    return true;
   }
 
   function isRecommendationAvailable(eventLabel) {
@@ -234,7 +379,6 @@
   }
   
   function getAvailableContents(phaseIndex, milestoneIndex, recIndex, eventLabel) {
-    //const recommendation = roadmap.value.phases[phaseIndex].milestones[milestoneIndex].recommendations[recIndex];
     return getPreloadedEntities(getEntityTypeByEventLabel(eventLabel));
   }
   
@@ -339,6 +483,12 @@ body {
   
   .btn:hover {
     opacity: 0.9;
+  }
+  
+  .btn.submit:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
   }
   .multiselect {
   width: 100%;
