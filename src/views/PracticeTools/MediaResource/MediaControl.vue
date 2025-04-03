@@ -49,6 +49,15 @@ export default {
             mediaToDelete: null,
         };
     },
+    computed: {
+        currentUser() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            return {
+                id: userProfile?.id,
+                advisorId: userProfile?.advisorId
+            };
+        }
+    },
     methods: {
         async fetchMediaResources(page = 1) {
             this.currentPage = page;
@@ -59,7 +68,8 @@ export default {
                     Title: "",
                     Type: null,
                     PageIndex: page - 1,
-                    PageSize: 10
+                    PageSize: 10,
+                    CreatorId: this.currentUser.id,
                 };
                 const response = await getPagedMediaResources(params);
                 if (response && response.items) {
