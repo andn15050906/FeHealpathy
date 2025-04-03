@@ -41,6 +41,10 @@
               <hr class="menu-divider" />
             <router-link to="/advisor/content">Advisor Content</router-link>
             </li>
+            <li v-if="user.role === 1">
+              <hr class="menu-divider" />
+            <router-link to="/media/manage">Media Management</router-link>
+            </li>
             
             <li v-if="user.role === 2">
               <router-link to="/admin">Admin</router-link>
