@@ -26,8 +26,34 @@ const createApiClient = (contentType) => {
     return client;
 };
 
+const createMLApiClient = (contentType) => {
+    const client = axios.create({
+        baseURL: import.meta.env.VITE_ML_URL + "/api",
+        withCredentials: true,
+        headers: {
+            "Content-Type": contentType,
+        }
+    });
+
+    client.interceptors.request.use(config => {
+        return config;
+    }, error => {
+        return Promise.reject(error);
+    });
+
+    client.interceptors.response.use(response => {
+        return response;
+    }, error => {
+        console.error('API response error:', error.response || error);
+        return Promise.reject(error);
+    });
+
+    return client;
+};
+
 const apiClient = createApiClient("application/json");
 const formApiClient = createApiClient("multipart/formdata");
+const mlApiClient = createMLApiClient("application/json");
 
 const apiCall = async (client, method, url, data = null, params = null) => {
 try {
@@ -70,4 +96,5 @@ export const del = (url) => apiCall(apiClient, "delete", url);
 export const postForm = (url, data) => apiCall(formApiClient, "post", url, data);
 export const patchForm = (url, data) => apiCall(formApiClient, "patch", url, data);
 
+export const getML = (url, params) => apiCall(mlApiClient, "get", url, null, params);
 export default apiClient;

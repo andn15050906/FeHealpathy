@@ -37,28 +37,60 @@
                 </ul>
             </div>
         </div>
-        <!-- Disclaimer section with warning icon and italicized text -->
+
+        <div v-if="recommendedPoses.length" style="margin-top: 40px;">
+            <h3 class="text-center fw-bold mt-4">You May Like</h3>
+            <swiper :modules="swiperModules" :slides-per-view="1" :space-between="10" :navigation="true"
+                :pagination="{ clickable: true }" :breakpoints="{
+                    576: { slidesPerView: 1 },
+                    768: { slidesPerView: 2 },
+                    992: { slidesPerView: 3 }
+                }" class="recommended-swiper">
+                <swiper-slide v-for="item in recommendedPoses" :key="item.objectID">
+                    <div class="card h-100 shadow-sm p-3 pose-card" @click="navigateToPose(item.objectID)">
+                        <img :src="item.ThumpUrl" class="img-fluid rounded mb-3"
+                            style="height: 200px; object-fit: contain;" :alt="item.Name" />
+                        <h5 class="fw-bold mb-1">{{ item.Name }}</h5>
+                        <p class="text-muted mb-1">Level: {{ item.Level }}</p>
+                    </div>
+                </swiper-slide>
+            </swiper>
+        </div>
+
         <div class="text-center mt-4 disclaimer">
             <i class="fas fa-exclamation-triangle text-warning me-2"></i>
             <i>Disclaimer: We do not own any of the resources provided on this page.</i>
         </div>
     </div>
+
     <div v-else class="text-center mt-5">
         <p>Loading pose details...</p>
     </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { getPagedYogaPoses } from "../../../scripts/api/services/yogaService";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { getPagedYogaPoses, getRecommendationPoses } from "../../../scripts/api/services/yogaService";
 
 export default {
     name: "YogaPoseDetails",
+    components: {
+        Swiper,
+        SwiperSlide
+    },
     setup() {
         const route = useRoute();
+        const router = useRouter();
         const pose = ref(null);
         const selectedOption = ref("model");
+        const recommendedPoses = ref([]);
+        const swiperModules = [Navigation, Pagination];
 
         const currentEmbedUrl = computed(() => {
             if (!pose.value) return "";
@@ -69,23 +101,62 @@ export default {
             selectedOption.value = option;
         };
 
-        const loadPoseDetails = async () => {
+        const loadPoseDetails = async (id) => {
+            pose.value = null;
             try {
-                const id = route.params.id;
                 const response = await getPagedYogaPoses({ Id: id });
                 if (response.items && response.items.length > 0) {
                     pose.value = response.items[0];
+                    window.scrollTo(0, 0);
                 }
             } catch (error) {
                 console.error("Error loading pose details:", error);
             }
         };
 
+        const loadRecommendedPoses = async () => {
+            try {
+                const res = await getRecommendationPoses();
+                recommendedPoses.value = res || [];
+            } catch (error) {
+                console.error("Error fetching recommended poses:", error);
+            }
+        };
+
+        const navigateToPose = (id) => {
+            if (route.params.id === id) {
+                loadPoseDetails(id);
+            } else {
+                router.push({
+                    name: 'YogaPoseDetails',
+                    params: { id: id }
+                });
+            }
+        };
+
+        watch(
+            () => route.params.id,
+            (newId) => {
+                if (newId) {
+                    loadPoseDetails(newId);
+                }
+            }
+        );
+
         onMounted(() => {
-            loadPoseDetails();
+            loadPoseDetails(route.params.id);
+            loadRecommendedPoses();
         });
 
-        return { pose, selectedOption, currentEmbedUrl, selectOption };
+        return {
+            pose,
+            selectedOption,
+            currentEmbedUrl,
+            selectOption,
+            recommendedPoses,
+            swiperModules,
+            navigateToPose
+        };
     }
 };
 </script>
@@ -141,5 +212,42 @@ iframe {
 .disclaimer {
     font-style: italic;
     font-size: 0.9rem;
+}
+
+.recommended-swiper {
+    padding-bottom: 2rem;
+    margin-bottom: 1rem;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #6c757d;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.swiper-pagination-bullet-active {
+    background: #6c757d;
+}
+
+:deep(.swiper-pagination) {
+    bottom: 0 !important;
+    margin-bottom: 0.1rem;
+}
+
+.pose-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.pose-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 </style>
