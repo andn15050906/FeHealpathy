@@ -20,26 +20,43 @@
                 </div>
             </div>
         </div>
+        <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="goToPage" />
     </div>
 </template>
 
 <script>
 import { ref, onMounted } from "vue";
 import { getPagedYogaPoses } from "../../../scripts/api/services/yogaService";
+import Pagination from "../../../components/Common/Pagination.vue";
+
 export default {
     name: "YogaPoses",
+    components: { Pagination },
     setup() {
         const yogaPoses = ref([]);
+        const currentPage = ref(1);
+        const totalPages = ref(1);
+
         const loadYogaPoses = async () => {
             try {
-                const response = await getPagedYogaPoses();
+                const response = await getPagedYogaPoses({ pageIndex: currentPage.value - 1 , pageSize: 10});
                 yogaPoses.value = response.items;
+                totalPages.value = response.pageCount;
             } catch (error) {
                 console.error("Error loading yoga poses:", error);
             }
         };
-        onMounted(() => { loadYogaPoses(); });
-        return { yogaPoses };
+
+        const goToPage = (page) => {
+            currentPage.value = page;
+            loadYogaPoses();
+        };
+
+        onMounted(() => {
+            loadYogaPoses();
+        });
+
+        return { yogaPoses, currentPage, totalPages, goToPage };
     }
 };
 </script>
