@@ -9,15 +9,9 @@
             </p>
             <p class="mb-3">Drag and drop your MP3/MP4 file here or click to select</p>
             <input type="file" accept=".mp3,.mp4" class="d-none" ref="fileInput" @change="handleFileSelect" />
-            <button class="btn btn-outline-primary" @click="triggerFileInput" :disabled="isUrlActive">
+            <button class="btn btn-outline-primary" @click="triggerFileInput">
                 Select File
             </button>
-        </div>
-
-        <div class="mb-4">
-            <label for="mediaUrl" class="form-label fw-semibold">Or Enter Media URL</label>
-            <input v-model="editedMedia.url" type="text" class="form-control" id="mediaUrl"
-                placeholder="Enter media URL" :disabled="isFileActive" @input="handleUrlInput" />
         </div>
 
         <div class="mb-4">
@@ -67,10 +61,7 @@ export default {
     computed: {
         isFileActive() {
             return !!this.editedMedia.file;
-        },
-        isUrlActive() {
-            return !!this.editedMedia.url;
-        },
+        }
     },
     methods: {
         triggerFileInput() {
@@ -87,16 +78,10 @@ export default {
         processFile(file) {
             if (file && (file.type === "audio/mpeg" || file.type === "video/mp4")) {
                 this.editedMedia.file = file;
-                this.editedMedia.url = "";
                 this.editedMedia.title = file.name.replace(/\.(mp3|mp4)$/, "");
                 this.error = null;
             } else {
                 this.error = "Only MP3 and MP4 files are allowed.";
-            }
-        },
-        handleUrlInput() {
-            if (this.editedMedia.url) {
-                this.editedMedia.file = null;
             }
         },
         async handleEditMedia() {
@@ -117,10 +102,6 @@ export default {
 
                 if (this.editedMedia.file) {
                     formData.append("ReplacedMedia.File", this.editedMedia.file);
-                }
-
-                if (this.editedMedia.url) {
-                    formData.append("ReplacedMedia.Url", this.editedMedia.url);
                 }
 
                 this.$emit("edit-media", formData);

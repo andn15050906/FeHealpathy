@@ -27,7 +27,7 @@
             <hr class="menu-divider" />
             <li><router-link to="/enrolled-course">Enrolled courses</router-link></li>
 
-            <li v-if="user.role == 0">
+            <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
               <router-link to="/request-advisor">Request to be an advisor</router-link>
             </li>
@@ -36,12 +36,14 @@
               <hr class="menu-divider" />
               <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
             </li>
+
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
-              <router-link to="/courses">Manage courses</router-link>
+            <router-link to="/advisor/content">Advisor Content</router-link>
             </li>
             <li v-if="user.role === 1">
-            <router-link to="/blogs/manage">Manage blogs</router-link>
+              <hr class="menu-divider" />
+            <router-link to="/media/manage">Media Management</router-link>
             </li>
             
             <li v-if="user.role === 2">

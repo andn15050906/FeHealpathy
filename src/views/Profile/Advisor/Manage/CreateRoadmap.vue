@@ -1,5 +1,6 @@
 <template>
   <div class="roadmap-creation">
+    <LoadingSpinner ref="loadingSpinner" />
     <h1 class="title">✨ Tạo Roadmap Mới ✨</h1>
     <form @submit.prevent="submitRoadmap" class="roadmap-form">
       <div class="form-group">
@@ -35,10 +36,7 @@
                 <label>🏷️ Tiêu đề Mốc</label>
                 <input type="text" v-model="milestone.title" placeholder="Nhập tiêu đề mốc" required />
               </div>
-              <!-- <div class="form-group">
-                <label>📅 Sự Kiện</label>
-                <input type="text" v-model="milestone.eventName" placeholder="Tên sự kiện liên quan" required />
-              </div> -->
+
               <div class="form-group">
                   <label>📅 Sự Kiện</label>
                   <select v-model="milestone.eventName" class="form-select" @change="updateEventList(index, msIndex)">
@@ -99,7 +97,7 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn submit">✅ Tạo Roadmap</button>
+        <button type="submit" class="btn submit" :disabled="!isFormValid">✅ Tạo Roadmap</button>
       </div>
     </form>
   </div>
@@ -113,18 +111,17 @@ import { getPagedArticles } from '@/scripts/api/services/blogService';
 import { getPagedConversations } from '@/scripts/api/services/conversationService';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
 import { toast } from "vue3-toastify";
-import Multiselect from "vue-multiselect";
-import "vue-multiselect/dist/vue-multiselect.min.css";
 import {
   TRACKED_EVENTS,
   ENTITY_TYPES,
   getEntityTypeByEventLabel
 } from '@/scripts/api/services/activityLogService';
 import { createRoadmap } from "@/scripts/api/services/roadmapService";
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 export default {
   name: "roadmapCreation",
-  components: { Multiselect },
+  components: { LoadingSpinner },
   data() {
     return {
       roadmap: {
@@ -137,8 +134,15 @@ export default {
       allArticles: [],
       allConversations: [],
       allSurveys: [],
-      TRACKED_EVENTS // expose to template
+      TRACKED_EVENTS
     };
+  },
+  computed: {
+    isFormValid() {
+        return this.roadmap.title.trim() !== '' && 
+               this.roadmap.introText.trim() !== '' && 
+               this.roadmap.phases.length > 0;
+    }
   },
   methods: {
     updateEventList(phaseIndex, milestoneIndex) {
@@ -231,24 +235,173 @@ export default {
       }
     },
 
+    validateRoadmapBasicInfo() {
+      if (!this.roadmap.title.trim()) {
+        toast.error("Vui lòng nhập tiêu đề roadmap!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+      if (this.roadmap.title.length > 200) {
+        toast.error("Tiêu đề roadmap không được vượt quá 200 ký tự!");
+        return false;
+      }
+      if (!this.roadmap.introText.trim()) {
+        toast.error("Vui lòng nhập giới thiệu roadmap!");
+        return false;
+      }
+      if (this.roadmap.introText.length > 1000) {
+        toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!");
+        return false;
+      }
+      return true;
+    },
+
+    validatePhases() {
+      if (this.roadmap.phases.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một giai đoạn!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+
+      for (let i = 0; i < this.roadmap.phases.length; i++) {
+        const phase = this.roadmap.phases[i];
+        
+        if (!phase.title.trim()) {
+          toast.error(`Vui lòng nhập tiêu đề cho giai đoạn ${i + 1}!`);
+          return false;
+        }
+        if (phase.title.length > 100) {
+          toast.error(`Tiêu đề giai đoạn ${i + 1} không được vượt quá 100 ký tự!`);
+          return false;
+        }
+        if (!phase.description.trim()) {
+          toast.error(`Vui lòng nhập mô tả cho giai đoạn ${i + 1}!`);
+          return false;
+        }
+        if (phase.timeSpan <= 0) {
+          toast.error(`Thời gian dự kiến của giai đoạn ${i + 1} phải lớn hơn 0!`);
+          return false;
+        }
+        
+        if (!this.validateMilestones(phase.milestones, i)) {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    validateMilestones(milestones, phaseIndex) {
+      if (!milestones || milestones.length === 0) {
+        toast.error(`Vui lòng thêm ít nhất một mốc cho giai đoạn ${phaseIndex + 1}!`);
+        return false;
+      }
+
+      for (let i = 0; i < milestones.length; i++) {
+        const milestone = milestones[i];
+        
+        if (!milestone.title.trim()) {
+          toast.error(`Vui lòng nhập tiêu đề cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`);
+          return false;
+        }
+        if (!milestone.eventName) {
+          toast.error(`Vui lòng chọn sự kiện cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`);
+          return false;
+        }
+        if (milestone.repeatTimesRequired <= 0) {
+          toast.error(`Số lần lặp lại của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`);
+          return false;
+        }
+        if (milestone.timeSpentRequired <= 0) {
+          toast.error(`Thời gian cần thiết của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`);
+          return false;
+        }
+
+        if (this.isRecommendationAvailable(milestone.eventName) && 
+            milestone.recommendations && 
+            milestone.recommendations.length > 0) {
+            if (!this.validateRecommendations(milestone.recommendations, phaseIndex, i)) {
+                return false;
+            }
+        }
+      }
+      return true;
+    },
+
+    validateRecommendations(recommendations, phaseIndex, milestoneIndex) {
+      if (!recommendations || recommendations.length === 0) {
+        return true;
+      }
+
+      for (let i = 0; i < recommendations.length; i++) {
+        const rec = recommendations[i];
+        
+        if (!rec.targetEntityId || rec.targetEntityId === "00000000-0000-0000-0000-000000000000") {
+          toast.error(`Vui lòng chọn nội dung khuyến nghị ${i + 1} cho mốc ${milestoneIndex + 1} của giai đoạn ${phaseIndex + 1}!`);
+          return false;
+        }
+        if (!rec.trait.trim()) {
+          toast.error(`Vui lòng nhập đặc tính cho khuyến nghị ${i + 1} của mốc ${milestoneIndex + 1} giai đoạn ${phaseIndex + 1}!`);
+          return false;
+        }
+        if (!rec.traitDescription.trim()) {
+          toast.error(`Vui lòng nhập mô tả đặc tính cho khuyến nghị ${i + 1} của mốc ${milestoneIndex + 1} giai đoạn ${phaseIndex + 1}!`);
+          return false;
+        }
+      }
+      return true;
+    },
+
     async submitRoadmap() {
+      if (!this.validateRoadmapBasicInfo() || !this.validatePhases()) {
+        return;
+      }
+
       try {
+        this.$refs.loadingSpinner.showSpinner();
         console.log("Sending roadmap data:", this.roadmap);
         await createRoadmap(this.roadmap);
-        toast.success("Tạo roadmap thành công!");
-        this.$router.push({ name: 'ManageAdvisorContent' });
+        
+        this.$router.push({ 
+            name: 'ManageAdvisorContent',
+            query: { 
+                createSuccess: true,
+                message: 'Tạo roadmap thành công!'
+            }
+        });
       } catch (error) {
         console.error(error);
-        toast.error("Tạo roadmap thất bại!");
+        toast.error("Tạo roadmap thất bại! " + (error.message || ''), {
+            autoClose: 3000,
+            position: toast.POSITION.TOP_RIGHT,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        });
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
     }
   },
   mounted() {
-    getCourses({ pageIndex: 0, pageSize: 10 }).then(res => this.allCourses = res.items);
-    getPagedMediaResources({ pageIndex: 0, pageSize: 10 }).then(res => this.allMediaResources = res.items);
-    getPagedArticles({ pageIndex: 0, pageSize: 10 }).then(res => this.allArticles = res.items);
-    getPagedConversations({ pageIndex: 0, pageSize: 10 }).then(res => this.allConversations = res.items);
-    getPagedSurveys({ pageIndex: 0, pageSize: 10 }).then(res => this.allSurveys = res.items);
+    const pageConfig = { pageIndex: 0, pageSize: 10 };
+    Promise.all([
+        getCourses(pageConfig),
+        getPagedMediaResources(pageConfig),
+        getPagedArticles(pageConfig),
+        getPagedConversations(pageConfig),
+        getPagedSurveys(pageConfig)
+    ]).then(([courses, media, articles, conversations, surveys]) => {
+        this.allCourses = courses.items;
+        this.allMediaResources = media.items;
+        this.allArticles = articles.items;
+        this.allConversations = conversations.items;
+        this.allSurveys = surveys.items;
+    });
   }
 };
 </script>
@@ -289,25 +442,6 @@ body {
     resize: none;
   }
   
-  .image-preview img {
-    width: 100%;
-    max-width: 200px;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-  
-  .sections {
-    margin-top: 20px;
-  }
-  
-  .section {
-    background: #fafafa;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  
   .divider {
     border-top: 1px dashed #ddd;
     margin: 15px 0;
@@ -345,53 +479,10 @@ body {
   .btn:hover {
     opacity: 0.9;
   }
-  .multiselect {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: #fff;
-}
-
-.multiselect__tags {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-}
-
-.multiselect__input {
-  font-size: 1rem;
-  margin-left: 5px;
-  padding: 5px;
-  border: none;
-  outline: none;
-}
-
-.multiselect--active {
-  border-color: #007bff;
-}
-
-.multiselect__tag {
-  background: #007bff;
-  color: #fff;
-  border-radius: 3px;
-  padding: 3px 5px;
-  margin: 2px 5px 2px 0;
-}
-
-.multiselect__tag:hover {
-  background: #0056b3;
-}
-
-.multiselect__clear {
-  color: #007bff;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.multiselect__clear:hover {
-  color: #0056b3;
-}
+  
+  .btn.submit:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 </style>  

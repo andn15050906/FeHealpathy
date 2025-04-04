@@ -21,7 +21,15 @@ export const deleteRoadmap = async (roadmapId) => {
 };
 
 
-
+export const getRoadmapById = async (id) => {
+  try {
+    const response = await get(`${API_BASE_URL}/${id}`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching roadmap:', error);
+    throw error;
+  }
+};
 
 
 

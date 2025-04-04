@@ -17,3 +17,13 @@ export const updateArticle = async (articleData) => {
 export const deleteArticle = async (articleId) => {
     return await del(`${API_BASE_URL}/${articleId}`);
 };
+
+export const getBlogById = async (id) => {
+  try {
+    const response = await get(`${API_BASE_URL}/${id}`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching blog:', error);
+    throw error;
+  }
+};

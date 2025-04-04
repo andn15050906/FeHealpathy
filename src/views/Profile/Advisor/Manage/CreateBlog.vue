@@ -1,5 +1,6 @@
 <template>
   <div class="blog-creation">
+    <LoadingSpinner ref="loadingSpinner" />
     <h1 class="title">✨ Tạo Blog Mới ✨</h1>
 
     <form @submit.prevent="submitBlog" class="blog-form">
@@ -61,10 +62,14 @@ import { toast } from "vue3-toastify";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/scripts/api/services/tagService";
 import { createArticle } from "@/scripts/api/services/blogService";
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 export default {
   name: "BlogCreation",
-  components: { Multiselect },
+  components: { 
+    Multiselect,
+    LoadingSpinner 
+  },
   data() {
     return {
       blog: {
@@ -134,104 +139,135 @@ export default {
       this.blog.sections.splice(index, 1);
     },
 
-  async submitBlog() {
-    if (!this.validateForm()) {
-      return;
-    }
-    const formData = new FormData();
-    formData.append("Title", this.blog.title);
-    const status = "Draft"; 
-    formData.append("Status", status);
-    const isCommentDisabled = false;
-    formData.append("IsCommentDisabled", isCommentDisabled);
-    this.selectedKeywords.forEach(tag => {
-      formData.append("Tags[]", tag.id);
-    });
-    if (this.blog.thumb instanceof File) {
-      formData.append("Thumb.File", this.blog.thumb);
-    }
-    formData.append("Thumb.Title", this.blog.thumb?.name || "thumb.jpg");
-    this.blog.sections.forEach((section, index) => {
-    const sectionId = section.id || this.generateUUID();
-    formData.append(`Sections[${index}].id`, sectionId);
-    formData.append(`Sections[${index}].header`, section.title);
-    formData.append(`Sections[${index}].content`, section.content);
-    if (section.thumb instanceof File) {
-      formData.append(`Sections[${index}].media.file`, section.thumb);
-    }
-      const mediaTitle = section.thumb?.name || `section-${index + 1}.jpg`;
-      formData.append(`Sections[${index}].media.title`, mediaTitle);
-    });
-  try {
-    const response = await createArticle(formData);
-    this.$router.push("/advisor/content");
-  } catch (error) {
-    console.error("Lỗi khi tạo blog:", error);
-    if (error.response && error.response.data) {
-      console.error("Chi tiết lỗi:", error.response.data);
-    } else {
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
-    }
-  }
-},
-validateForm() {
-  if (!this.blog.title.trim()) {
-    toast.error("Vui lòng nhập tiêu đề blog.");
-    return false;
-  }
+    showLoading() {
+      if (this.$refs.loadingSpinner) {
+        this.$refs.loadingSpinner.showSpinner();
+      }
+    },
 
-  if (!this.blog.thumb) {
-    toast.error("Vui lòng chọn hình ảnh cho blog.");
-    return false;
-  }
+    hideLoading() {
+      if (this.$refs.loadingSpinner) {
+        this.$refs.loadingSpinner.hideSpinner();
+      }
+    },
 
-  if (this.selectedKeywords.length === 0) {
-    toast.error("Vui lòng chọn ít nhất một từ khóa.");
-    return false;
-  }
+    async submitBlog() {
+      if (!this.validateForm()) {
+        return;
+      }
 
-  if (!this.blog.sections || this.blog.sections.length === 0) {
-    toast.error("Vui lòng thêm ít nhất một phần nội dung.");
-    return false;
-  }
+      this.showLoading();
 
-  for (let i = 0; i < this.blog.sections.length; i++) {
-    const section = this.blog.sections[i];
-    if (!section.title.trim()) {
-      toast.error(`Phần ${i + 1} thiếu tiêu đề.`);
-      return false;
-    }
-    if (!section.content.trim()) {
-      toast.error(`Phần ${i + 1} thiếu nội dung.`);
-      return false;
-    }
-    if (!section.thumb) {
-      toast.error(`Phần ${i + 1} thiếu hình ảnh.`);
-      return false;
-    }
-  }
+      try {
+        const formData = new FormData();
+        formData.append("Title", this.blog.title);
+        const status = "Draft"; 
+        formData.append("Status", status);
+        const isCommentDisabled = false;
+        formData.append("IsCommentDisabled", isCommentDisabled);
+        
+        this.selectedKeywords.forEach(tag => {
+          formData.append("Tags[]", tag.id);
+        });
+        
+        if (this.blog.thumb instanceof File) {
+          formData.append("Thumb.File", this.blog.thumb);
+        }
+        formData.append("Thumb.Title", this.blog.thumb?.name || "thumb.jpg");
+        
+        this.blog.sections.forEach((section, index) => {
+          const sectionId = section.id || this.generateUUID();
+          formData.append(`Sections[${index}].id`, sectionId);
+          formData.append(`Sections[${index}].header`, section.title);
+          formData.append(`Sections[${index}].content`, section.content);
+          if (section.thumb instanceof File) {
+            formData.append(`Sections[${index}].media.file`, section.thumb);
+          }
+          const mediaTitle = section.thumb?.name || `section-${index + 1}.jpg`;
+          formData.append(`Sections[${index}].media.title`, mediaTitle);
+        });
 
-  return true;
-}
-,
+        const response = await createArticle(formData);
+        
+        this.$router.push({ 
+          path: "/advisor/content",
+          query: { 
+            createSuccess: true,
+            message: 'Tạo blog thành công!'
+          }
+        });
 
-generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0,
-          v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-},
-formattedContent(text) {
-    if (!text) return "";
-    return text.replace(/\n/g, "<br>");
-  },
+      } catch (error) {
+        console.error("Lỗi khi tạo blog:", error);
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } finally {
+        this.hideLoading();
+      }
+    },
+
+    validateForm() {
+      if (!this.blog.title.trim()) {
+        toast.error("Vui lòng nhập tiêu đề blog.");
+        return false;
+      }
+
+      if (!this.blog.thumb) {
+        toast.error("Vui lòng chọn hình ảnh cho blog.");
+        return false;
+      }
+
+      if (this.selectedKeywords.length === 0) {
+        toast.error("Vui lòng chọn ít nhất một từ khóa.");
+        return false;
+      }
+
+      if (!this.blog.sections || this.blog.sections.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một phần nội dung.");
+        return false;
+      }
+
+      for (let i = 0; i < this.blog.sections.length; i++) {
+        const section = this.blog.sections[i];
+        if (!section.title.trim()) {
+          toast.error(`Phần ${i + 1} thiếu tiêu đề.`);
+          return false;
+        }
+        if (!section.content.trim()) {
+          toast.error(`Phần ${i + 1} thiếu nội dung.`);
+          return false;
+        }
+        if (!section.thumb) {
+          toast.error(`Phần ${i + 1} thiếu hình ảnh.`);
+          return false;
+        }
+      }
+
+      return true;
+    },
+
+    generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0,
+              v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    },
+
+    formattedContent(text) {
+      if (!text) return "";
+      return text.replace(/\n/g, "<br>");
+    },
   },
 };
-
 </script>
 
-  
 <style scoped>
 body {
     font-family: 'Arial', sans-serif;
@@ -370,5 +406,9 @@ body {
 
 .multiselect__clear:hover {
   color: #0056b3;
+}
+
+:deep(.loading-spinner) {
+  z-index: 9999;
 }
 </style>

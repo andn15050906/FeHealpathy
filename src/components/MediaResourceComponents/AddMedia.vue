@@ -12,25 +12,10 @@
             </p>
             <p class="mb-3">Drag and drop your MP3/MP4 file here or click to select</p>
             <input type="file" accept=".mp3, .mp4" class="d-none" ref="fileInput" @change="handleFileSelect" />
-            <button type="button" class="btn btn-outline-primary" @click="triggerFileInput" :disabled="isUrlActive">
+            <button type="button" class="btn btn-outline-primary" @click="triggerFileInput">
                 Select File
             </button>
             <div v-if="errors.file" class="text-danger mt-2">{{ errors.file }}</div>
-        </div>
-
-        <div class="mb-4">
-            <label for="mediaUrl" class="form-label fw-semibold">Or Enter Media URL</label>
-            <input 
-                v-model="newMedia.url" 
-                type="text" 
-                class="form-control" 
-                id="mediaUrl" 
-                placeholder="Enter media URL"
-                :disabled="isFileActive"
-                @input="handleUrlInput"
-                :class="{ 'is-invalid': errors.url }"
-            />
-            <div v-if="errors.url" class="invalid-feedback">{{ errors.url }}</div>
         </div>
 
         <div class="mb-4">
@@ -129,7 +114,7 @@ export default {
                    this.newMedia.title &&
                    this.newMedia.artistName &&
                    this.newMedia.description &&
-                   (this.newMedia.file || this.validateUrl(this.newMedia.url));
+                   this.newMedia.file;
         }
     },
     methods: {
@@ -236,15 +221,14 @@ export default {
             const isValidTitle = this.validateTitle();
             const isValidArtist = this.validateArtistName();
             const isValidDesc = this.validateDescription();
-            const isValidUrl = this.validateUrl(this.newMedia.url);
             const isValidFile = this.validateFile(this.newMedia.file);
 
-            if (!isValidTitle || !isValidArtist || !isValidDesc || !isValidUrl || !isValidFile) {
+            if (!isValidTitle || !isValidArtist || !isValidDesc || !isValidFile) {
                 return;
             }
 
-            if (!this.newMedia.file && !this.newMedia.url) {
-                this.error = "Please upload a file or provide a valid URL";
+            if (!this.newMedia.file) {
+                this.error = "Please upload a file";
                 return;
             }
 
@@ -256,15 +240,8 @@ export default {
                 formData.append("Description", this.newMedia.description);
                 formData.append("Artist", this.newMedia.artistName);
                 formData.append("Media.Title", this.newMedia.title);
-                formData.append("Media.Type", this.newMedia.type || this.determineMediaType());
-
-                if (this.newMedia.file) {
-                    formData.append("Media.File", this.newMedia.file);
-                }
-
-                if (this.newMedia.url) {
-                    formData.append("Media.Url", this.newMedia.url);
-                }
+                formData.append("Media.Type", this.newMedia.type);
+                formData.append("Media.File", this.newMedia.file);
 
                 this.$emit("add-media", formData);
                 this.resetForm();

@@ -81,7 +81,7 @@ import ManageCourse from '@/views/Profile/Advisor/Manage/ManageCourse.vue'
 import CreateCourse from '@/views/Profile/Advisor/Manage/CreateCourse.vue'
 import UpdateCourse from '@/views/Profile/Advisor/Manage/UpdateCourse.vue'
 import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
-
+import UpdateRoadmap from '@/views/Profile/Advisor/Manage/UpdateRoadmap.vue'
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
 import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
 
@@ -486,7 +486,8 @@ const router = createRouter({
     {
       path: '/request-advisor',
       name: 'Request',
-      component: RequestToBeAdvisor
+      component: RequestToBeAdvisor,
+      meta: { requiresAuth: true, requiresMember: true }
     },
     {
       path: '/submissions-review/:id',
@@ -521,7 +522,11 @@ const router = createRouter({
       name: 'CreateRoadmap',
       component: CreateRoadmap
     },
-
+    {
+      path: '/roadmaps/edit/:id',
+      name: 'updateRoadmap',
+      component: UpdateRoadmap
+    },
 
     // Advisor
     {
@@ -588,7 +593,9 @@ const isAuthorized = (to) => {
   if (to.matched.some(record => record.meta.requiresAdvisor) && role != 'Advisor')
     return false;
   if (to.matched.some(record => record.meta.requiresAdmin) && role != 'Admin')
-    return false
+    return false;
+  if (to.matched.some(record => record.meta.requiresMember) && role != 'Member')
+    return false;
   
   return true;
 }
