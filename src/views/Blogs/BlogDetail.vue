@@ -48,7 +48,7 @@
 import ScrollToTop from "@/components/Common/Misc/ScrollToTop.vue";
 import BlogRelatedItems from "@/components/BlogComponents/BlogRelatedItems.vue";
 import BlogCommentSection from "@/components/BlogComponents/BlogCommentSection.vue";
-import { getPagedArticles } from "@/scripts/api/services/blogService";
+import { getBlogById } from "@/scripts/api/services/blogService";
 
 export default {
   components: {
@@ -69,10 +69,8 @@ export default {
   methods: {
     async fetchBlogData() {
       try {
-        const response = await getPagedArticles();
-        const articles = response.items && Array.isArray(response.items) ? response.items : [];
         const blogId = this.$route.params.id;
-        this.blog = articles.find((article) => String(article.id) === String(blogId));
+        this.blog = await getBlogById(blogId);
 
         if (!this.blog) {
           console.error("Không tìm thấy bài viết với ID:", blogId);
@@ -80,7 +78,7 @@ export default {
 
         this.loading = false;
       } catch (error) {
-        console.error("Lỗi khi tải danh sách blog:", error);
+        console.error("Lỗi khi tải blog:", error);
         this.loading = false;
       }
     },

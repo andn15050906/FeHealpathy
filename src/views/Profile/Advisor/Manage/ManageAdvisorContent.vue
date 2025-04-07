@@ -1,5 +1,6 @@
 <template>
   <div class="container py-4">
+    <LoadingSpinner ref="loadingSpinner" />
     <h1 class="text-center mb-4">Advisor Moderation</h1>
     <ul class="nav nav-tabs mb-4 justify-content-center">
       <li class="nav-item" v-for="tab in tabs" :key="tab.id">
@@ -9,6 +10,7 @@
         </button>
       </li>
     </ul>
+  <!-- Courses Tab -->
     <div v-if="currentTab === 'courses'" class="tab-pane fade show active">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4">Your Courses</h2>
@@ -41,8 +43,9 @@
           <tbody>
             <tr v-for="item in filteredCourses" :key="item.id">
               <td class="text-center">
-                <img v-if="item.thumbUrl" :src="item.thumbUrl" :alt="item.title" class="img-fluid rounded"
-                  style="max-width: 100px;" />
+                  <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
+                    <img :src="item.thumbUrl" :alt="item.title" @error="setDefaultImage" />
+                  </div>
               </td>
               <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
               <td class="col-level fixed-col text-center" :title="item.level">{{ item.level }}</td>
@@ -94,10 +97,11 @@
             </thead>
             <tbody>
               <tr v-for="item in filteredBlogs" :key="item.id">
-                <td class="text-center">
-                  <img v-if="item.thumb && item.thumb.url" :src="item.thumb.url" :alt="item.thumb.title"
-                    class="img-fluid rounded" style="max-width: 100px;" />
-                </td>
+              <td class="text-center">
+                  <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
+                    <img :src="item.thumb?.url || 'https://placehold.co/160x90'" :alt="item.thumb?.title || 'Default image'" class="img-fluid rounded" @error="setDefaultImage"/>
+                  </div>
+              </td>
                 <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
                 <td class="col-tags fixed-col">
                   <div class="d-flex flex-wrap gap-1">
@@ -186,9 +190,12 @@ import Pagination from '@/components/Common/Pagination.vue'
 import UpdateBlog from './UpdateBlog.vue'
 import UpdateRoadmap from './UpdateRoadmap.vue'
 import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue'
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue'
+import { toast } from "vue3-toastify";
+
 export default {
   emits: ['authenticated', 'addNotification', 'removeNotification'],
-  components: { Pagination, DeleteConfirmPopup, UpdateBlog, UpdateRoadmap },
+  components: { Pagination, DeleteConfirmPopup, UpdateBlog, UpdateRoadmap, LoadingSpinner },
   data() {
     return {
       isEditingBlog: false,
@@ -220,28 +227,41 @@ export default {
     }
   },
   methods: {
+    setDefaultImage(event) {
+      const fallbackUrl = 'https://placehold.co/160x90';
+      if (event.target.src !== fallbackUrl) {
+        event.target.src = fallbackUrl;
+      }
+    },
     editBlog(blog) {
-      if (blog) {
-        this.selectedBlog = blog
-        this.isEditingBlog = true
+      if (blog && blog.id) {
+        this.$router.push({ 
+          name: 'updateBlog', 
+          params: { id: blog.id }
+        });
       }
     },
     editCourse(id) {
       this.$router.push({ name: 'updateCourse', params: { id } })
     },
     editRoadmap(roadmap) {
-      if (roadmap) {
-        this.selectedRoadmap = roadmap
-        this.isEditingRoadmap = true
+      if (roadmap && roadmap.id) {
+        this.$router.push({ 
+          name: 'updateRoadmap', 
+          params: { id: roadmap.id }
+        });
       }
     },
     handleBlogUpdated() {
       this.isEditingBlog = false
       this.selectedBlog = null
+      toast.success("Blog updated successfully!");
+      this.fetchBlogs()
     },
     handleRoadmapUpdated() {
       this.isEditingRoadmap = false
       this.selectedRoadmap = null
+      toast.success("Roadmap updated successfully!");
       this.fetchRoadmaps()
     },
     prepareDelete(item, type) {
@@ -296,31 +316,39 @@ export default {
     async confirmDelete(confirm) {
       if (confirm) {
         try {
+          this.$refs.loadingSpinner.showSpinner();
           switch (this.selectedItemType) {
             case 'courses':
               await deleteCourse(this.selectedItem.id);
+              toast.success("Course deleted successfully!");
               break;
             case 'blogs':
               await deleteArticle(this.selectedItem.id);
+              toast.success("Blog deleted successfully!");
               break;
             case 'roadmaps':
               await deleteRoadmap(this.selectedItem.id);
+              toast.success("Roadmap deleted successfully!");
               break;
           }
           
-          this.fetchCourses();
-          this.fetchBlogs();
-          this.fetchRoadmaps();
+          await Promise.all([
+            this.fetchCourses(),
+            this.fetchBlogs(),
+            this.fetchRoadmaps()
+          ]);
         } catch (error) {
-          console.error('Error deleting content:', error)
-          //... other alert
-          alert('Failed to delete the content.')
+          console.error('Error deleting content:', error);
+          toast.error("Failed to delete content. Please try again.");
+        } finally {
+          this.$refs.loadingSpinner.hideSpinner();
         }
       }
-      this.showDeletePopup = false
+      this.showDeletePopup = false;
     },
     async fetchBlogs() {
       try {
+        this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getPagedArticles(params);
 
@@ -335,11 +363,15 @@ export default {
         this.sortBlogs();
       } catch (error) {
         console.error('Error fetching blogs:', error);
+        toast.error("Failed to fetch blogs. Please try again.");
         this.blogs = [];
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
     },
     async fetchRoadmaps() {
       try {
+        this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getRoadmaps(params);
 
@@ -354,11 +386,15 @@ export default {
         this.sortRoadmaps();
       } catch (error) {
         console.error('Error fetching roadmaps:', error);
+        toast.error("Failed to fetch roadmaps. Please try again.");
         this.roadmaps = [];
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
     },
     async fetchCourses() {
       try {
+        this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getCourses(params);
 
@@ -373,7 +409,10 @@ export default {
         this.sortCourses();
       } catch (error) {
         console.error('Error fetching courses:', error);
+        toast.error("Failed to fetch courses. Please try again.");
         this.courses = [];
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
     },
     getStatusClass(status) {
@@ -381,6 +420,18 @@ export default {
       if (status === 'approved') return 'bg-success'
       if (status === 'rejected') return 'bg-danger'
       return 'bg-secondary'
+    },
+    handleBlogCreated() {
+      toast.success("Blog created successfully!");
+      this.fetchBlogs();
+    },
+    handleCourseCreated() {
+      toast.success("Course created successfully!");
+      this.fetchCourses();
+    },
+    handleRoadmapCreated() {
+      toast.success("Roadmap created successfully!");
+      this.fetchRoadmaps();
     }
   },
   computed: {
@@ -400,9 +451,18 @@ export default {
     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'
     link.rel = 'stylesheet'
     document.head.appendChild(link)
-    this.fetchBlogs()
-    this.fetchCourses()
-    this.fetchRoadmaps()
+
+    this.$refs.loadingSpinner.showSpinner();
+    try {
+      Promise.all([
+        this.fetchBlogs(),
+        this.fetchCourses(),
+        this.fetchRoadmaps()
+      ]);
+    } finally {
+      this.$refs.loadingSpinner.hideSpinner();
+    }
+
   }
 }
 </script>
@@ -455,5 +515,23 @@ export default {
 .col-phase {
   width: 80px;
   text-align: center;
+}
+
+.ratio-16x9 {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 ratio */
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #f0f0f0;
+}
+
+.ratio-16x9 img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

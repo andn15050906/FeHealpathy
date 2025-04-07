@@ -1,5 +1,6 @@
 <template>
     <div class="container mt-4">
+        <LoadingSpinner ref="loadingSpinner" />
         <div v-if="showAddMedia">
             <AddMedia @cancel="toggleAddMedia" @add-media="createMedia" />
         </div>
@@ -33,9 +34,10 @@ import {
     deleteMediaResource,
 } from "../../../scripts/api/services/mediaResourcesService";
 import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
+import LoadingSpinner from "../../../components/Common/Popup/LoadingSpinner.vue";
 
 export default {
-    components: { MediaList, Pagination, AddMedia, EditMedia, DeleteConfirmPopup },
+    components: { MediaList, Pagination, AddMedia, EditMedia, DeleteConfirmPopup, LoadingSpinner },
     data() {
         return {
             mediaFiles: [],
@@ -47,7 +49,17 @@ export default {
             selectedMediaIndex: null,
             showDeletePopup: false,
             mediaToDelete: null,
+            isLoading: false,
         };
+    },
+    computed: {
+        currentUser() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            return {
+                id: userProfile?.id,
+                advisorId: userProfile?.advisorId
+            };
+        }
     },
     methods: {
         async fetchMediaResources(page = 1) {
@@ -59,15 +71,18 @@ export default {
                     Title: "",
                     Type: null,
                     PageIndex: page - 1,
-                    PageSize: 10
+                    PageSize: 10,
+                    CreatorId: this.currentUser.id,
                 };
                 const response = await getPagedMediaResources(params);
-                if (response && response.items) {
-                    this.mediaFiles = response.items;
+                if (response) {
+                    this.mediaFiles = response.items || [];
                     this.totalPages = response.pageCount || 1;
                 }
             } catch (error) {
-                toast.error("Failed to fetch media resources.");
+                console.error("Error fetching media resources:", error);
+                this.mediaFiles = [];
+                this.totalPages = 1;
             }
         },
         toggleAddMedia() {
@@ -79,24 +94,29 @@ export default {
         },
         async createMedia(newMedia) {
             try {
+                this.$refs.loadingSpinner.showSpinner();
                 await createMediaResource(newMedia);
                 this.showAddMedia = false;
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media added successfully!");
             } catch (error) {
                 console.error("Failed to add media.");
+            } finally {
+                this.$refs.loadingSpinner.hideSpinner();
             }
         },
         async updateMedia(updatedMediaFormData) {
             try {
+                this.$refs.loadingSpinner.showSpinner();
                 await updateMediaResource(updatedMediaFormData);
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media updated successfully!");
                 this.showEditMedia = false;
                 this.selectedMedia = null;
-                
             } catch (error) {
                 toast.error("Failed to update media.");
+            } finally {
+                this.$refs.loadingSpinner.hideSpinner();
             }
         },
         editMedia(media, index) {

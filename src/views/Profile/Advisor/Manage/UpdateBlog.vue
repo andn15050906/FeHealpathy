@@ -1,5 +1,6 @@
 <template>
   <div class="blog-creation">
+    <LoadingSpinner ref="loadingSpinner" />
     <h1 class="title">✨ Cập Nhật Blog ✨</h1>
 
     <form @submit.prevent="submitBlog" class="blog-form">
@@ -65,62 +66,72 @@ import { ref, onMounted } from 'vue';
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/scripts/api/services/tagService";
-import { updateArticle } from "@/scripts/api/services/blogService";
-import { useRouter } from 'vue-router';
+import { updateArticle, getBlogById } from "@/scripts/api/services/blogService";
+import { useRouter, useRoute } from 'vue-router';
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 const router = useRouter();
+const route = useRoute();
 const emits = defineEmits(['blogUpdated']);
-const props = defineProps({
-  blogData: {
-    type: Object,
-    required: true,
-  },
-});
-const blog = ref({
-  title: props.blogData?.title || "",
-  thumb: props.blogData?.Id || null,
-  selectedKeywords: Array.isArray(props.blogData?.tags) 
-    ? props.blogData.tags.map(tag => ({ id: tag.id, name: tag.title })) 
-    : [],
-  sections: Array.isArray(props.blogData?.sections) ? [...props.blogData.sections] : [],
-});
 
+const blogData = ref(null);
+const blog = ref({
+  title: "",
+  thumb: null,
+  selectedKeywords: [],
+  sections: [],
+});
 
 const availableKeywords = ref([]);
-const previewImage = ref(props.blogData?.id || null);
+const previewImage = ref(null);
+const loadingSpinner = ref(null);
 
 onMounted(async () => {
-  await fetchAvailableKeywords();
+  loadingSpinner.value.showSpinner();
+  
+  try {
+    const blogId = route.params.id;
+    const response = await getBlogById(blogId);
+    blogData.value = response;
 
-  if (props.blogData?.thumb?.url) {
-    previewImage.value = props.blogData.thumb.url;
-  } else {
-    console.log("⚠️ Không có URL ảnh đại diện.");
-  }
+    console.log("API Response:", response);
 
-  if (props.blogData?.sections) {
-    blog.value.sections = props.blogData.sections.map((sections, index) => {
-      return {
-        header: sections.header || "",
-        content: sections.content || "",
-        thumb: null,
-        previewImage: sections.media?.url || null,
-      };
-    });
+    blog.value = {
+      title: blogData.value.title,
+      thumb: null, 
+      selectedKeywords: blogData.value.tags.map(tag => ({
+        id: tag.id,
+        name: tag.title
+      })),
+      sections: blogData.value.sections.map(section => ({
+        id: section.id,
+        header: section.header || section.title, 
+        content: section.content,
+        thumb: null, 
+        previewImage: section.media?.url || section.thumb?.url,
+        thumbTitle: section.media?.title || section.thumb?.title
+      }))
+    };
+
+    if (blogData.value.thumb?.url) {
+      previewImage.value = blogData.value.thumb.url;
+    }
+
+    console.log("Initialized blog data:", blog.value);
+
+    const keywordsResponse = await getPagedTags();
+    availableKeywords.value = keywordsResponse.map(keyword => ({
+      id: keyword.id,
+      name: keyword.title
+    }));
+
+  } catch (error) {
+    console.error("Error initializing blog data:", error);
+    toast.error("Không thể tải dữ liệu blog.");
+  } finally {
+    loadingSpinner.value.hideSpinner();
   }
 });
-
-const fetchAvailableKeywords = async () => {
-  try {
-    const response = await getPagedTags();
-    availableKeywords.value = response.map(tag => ({
-      name: tag.title,
-      id: tag.id,
-    }));
-  } catch (error) {
-    console.error("Lỗi tải từ khóa:", error);
-  }
-};
 
 const handleThumbUpload = (event) => {
   const file = event.target.files[0];
@@ -149,10 +160,6 @@ const handleSectionThumbUpload = (event, index) => {
     }
 };
 
-
-
-
-
 const addSection = () => {
   blog.value.sections.push({
     title: "",
@@ -161,7 +168,6 @@ const addSection = () => {
     content: "",
   });
 };
-
 
 const removeSection = (index) => {
   blog.value.sections.splice(index, 1);
@@ -212,60 +218,87 @@ const validateForm = () => {
 
 const submitBlog = async () => {
   if (!validateForm()) return;
-    try {
-        const formData = new FormData();
+  
+  loadingSpinner.value.showSpinner();
+  
+  try {
+    const formData = new FormData();
 
-        formData.append("Id", props.blogData.id);
-        formData.append("Title", blog.value.title);
-        formData.append("Status", "Draft");
-        formData.append("IsCommentDisabled", JSON.stringify(false));
+    console.log("Original blog data:", {
+      id: blogData.value.id,
+      title: blogData.value.title,
+      status: blogData.value.status,
+      isCommentDisabled: blogData.value.isCommentDisabled,
+      thumb: {
+        id: blogData.value.thumb.id,
+        url: blogData.value.thumb.url,
+        title: blogData.value.thumb.title
+      },
+      sections: blogData.value.sections,
+      tags: blogData.value.tags
+    });
 
+    formData.append("Id", blogData.value.id);
+    formData.append("Title", blog.value.title);
+    formData.append("Status", blogData.value.status);
+    formData.append("IsCommentDisabled", blogData.value.isCommentDisabled);
 
-        const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
-        const previousTags = props.blogData.tags ? props.blogData.tags.map(tag => tag.id) : [];
-        const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
-        const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
+    const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
+    const previousTags = blogData.value.tags.map(tag => tag.id);
+    const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
+    const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
 
-        if (addedTags.length > 0) {
-          addedTags.forEach(tag => formData.append("AddedTags", tag));
-        } 
+    removedTags.forEach(tag => formData.append("RemovedTags", tag));
+    addedTags.forEach(tag => formData.append("AddedTags", tag));
 
-        if (removedTags.length > 0) {
-          removedTags.forEach(tag => formData.append("RemovedTags", tag));
-        } 
-        
-        formData.append("Thumb.Title", "Sau Khi Cap Nhat");
-
-        if (blog.value.thumb instanceof File) {
-              formData.append("Thumb.File", blog.value.thumb);
-        } else if (props.blogData.thumb?.url) {
-              formData.append("Thumb.Url", props.blogData.thumb.url);
-        }
-
-
-        blog.value.sections.forEach((section, index) => {
-            formData.append(`Sections[${index}].Title`, section.header); 
-            formData.append(`Sections[${index}].Content`, section.content);
-
-            if (section.thumb) {
-                formData.append(`Sections[${index}].Thumb.File`, section.thumb);
-                formData.append(`Sections[${index}].Thumb.Title`, `Ảnh cho phần ${index + 1}`);
-            } else if (section.previewImage) {
-                formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
-            }
-        });
-
-        console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
-
-        const response = await updateArticle(formData);
-        toast.success("Cập nhật blog thành công!");
-        router.go(0);
-    } catch (error) {
-        toast.error("Cập nhật blog thất bại!");
+    if (blog.value.thumb instanceof File) {
+      formData.append("Thumb.File", blog.value.thumb);
+      formData.append("Thumb.Title", blog.value.thumb.name);
+    } else {
+      formData.append("Thumb.Url", blogData.value.thumb.url);
+      formData.append("Thumb.Title", blogData.value.thumb.title);
     }
+
+    if (blog.value.sections && blog.value.sections.length > 0) {
+      blog.value.sections.forEach((section, index) => {
+        formData.append(`Sections[${index}].Id`, section.id || '');
+        formData.append(`Sections[${index}].Title`, section.header);
+        formData.append(`Sections[${index}].Content`, section.content);
+
+        if (section.thumb instanceof File) {
+          formData.append(`Sections[${index}].Thumb.File`, section.thumb);
+          formData.append(`Sections[${index}].Thumb.Title`, section.thumb.name);
+        } else if (section.previewImage) {
+          formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
+          formData.append(`Sections[${index}].Thumb.Title`, section.thumbTitle);
+        }
+      });
+    }
+
+    console.log("Form data entries:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+
+    const response = await updateArticle(formData);
+    console.log("Update response:", response);
+    
+    toast.success("Cập nhật blog thành công!");
+    router.push('/advisor/content');
+  } catch (error) {
+    console.error("Lỗi khi cập nhật blog:", error);
+    if (error.response) {
+      console.error("Error response:", error.response);
+      const errorMessage = error.response.data?.message || 'Vui lòng thử lại';
+      toast.error(`Cập nhật blog thất bại: ${errorMessage}`);
+    } else {
+      toast.error("Cập nhật blog thất bại! Vui lòng thử lại.");
+    }
+  } finally {
+    loadingSpinner.value.hideSpinner();
+  }
 };
 </script>
-
 
 
 <style scoped>
@@ -408,5 +441,9 @@ const submitBlog = async () => {
 .multiselect__clear:hover {
   color: #0056b3;
 }
-  </style>
+
+:deep(.loading-spinner) {
+  z-index: 9999;
+}
+</style>
   
