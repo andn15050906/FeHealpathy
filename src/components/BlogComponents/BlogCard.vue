@@ -2,13 +2,13 @@
   <GlowingCard class="blog-card" justify="unset" padding="10px">
     <div style="flex-grow: 1; width: 100%;">
         <div class="blog-thumbnail" style="background-image: url(/assets/images/10.jpg);">
-            <RouterLink :to="`/blog/${blog.id}`">
+            <RouterLink :to="`/blogs/${blog.id}`">
                 <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" :onError="(e) => e.target.style.display = 'none'">
             </RouterLink>
         </div>
         <div class="blog-content">
           <h3 class="blog-title">
-            <RouterLink :to="`/blog/${blog.id}`">{{ blog.title || 'Untitled Blog' }}</RouterLink>
+            <RouterLink :to="`/blogs/${blog.id}`">{{ blog.title || 'Untitled Blog' }}</RouterLink>
           </h3>
         </div>
     </div>

@@ -1,393 +1,77 @@
 <template>
-    <div class="container">
-        <div class="content-wrapper">
-            <h3 class="section-title">Bài viết liên quan</h3>
-            <div class="articles-grid">
-                <div class="articles-row">
-                    <article v-for="(article, index) in relatedArticles" :key="index" class="article-card">
-                        
-                        <div class="card-content">
-                            <RouterLink :to="`/blog/${article.id}`" style="">
-                                <div class="article-image-wrapper">
-                                    <img :src="article.imageUrl" alt="Article Thumbnail" class="article-image">
-                                </div>
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body">
+            <h4 class="fw-bold text-dark card-title mb-4">Bài viết liên quan</h4>
+            <div class="row g-4">
+                <div v-for="article in relatedArticles" :key="article.id" class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0">
+                        <RouterLink :to="`/blogs/${article.id}`" class="text-decoration-none">
+                            <img :src="article.imageUrl" :alt="article.title" class="card-img-top" />
+                        </RouterLink>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ article.title }}</h5>
+                            <p class="text-muted mb-2">{{ article.author }}</p>
+                            <p class="text-secondary mb-3">{{ formatDate(article.creationTime) }}</p>
+                            <RouterLink :to="`/blogs/${article.id}`" class="mt-auto btn btn-outline-primary">
+                                Xem chi tiết
                             </RouterLink>
-                                <h4 class="article-title">{{ article.title }}</h4>
-                                <span class="author-name">{{ article.author }}</span>
-                                <p class="article-date">{{ formatDate(article.creationTime) }}</p>
                         </div>
-                    </article>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getPagedArticles } from '@/scripts/api/services/blogService';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { watch } from 'vue';
+import { getPagedArticles } from '@/scripts/api/services/blogService';
 
 const relatedArticles = ref([]);
 const route = useRoute();
 
 const fetchRelatedArticles = async () => {
     try {
-        const currentBlogId = route.params.id;  
-        const queryParams = { limit: 4, random: true };
-        const response = await getPagedArticles(queryParams);
-        if (response && response.items) {
-            const filteredArticles = response.items.filter(article => article.id !== currentBlogId);
-            relatedArticles.value = filteredArticles.slice(0, 3).map(article => ({
+        const currentBlogId = route.params.id;
+        const { items = [] } = await getPagedArticles({ limit: 4, random: true });
+        relatedArticles.value = items
+            .filter((a) => a.id !== currentBlogId)
+            .slice(0, 3)
+            .map((article) => ({
                 id: article.id,
                 imageUrl: article.thumb.url,
                 title: article.title,
                 author: article.creator.fullName,
-                creationTime: article.creationTime
+                creationTime: article.creationTime,
             }));
-        }
     } catch (error) {
-        console.error('Failed to fetch articles:', error);
+        console.error('Failed to fetch related articles:', error);
     }
 };
 
 onMounted(fetchRelatedArticles);
-
 watch(() => route.params.id, (newId, oldId) => {
     if (newId !== oldId) {
         fetchRelatedArticles();
-        reloadPage();
     }
 });
 
 const formatDate = (dateString) => {
-    try {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
-        return new Date(dateString).toLocaleDateString('vi-VN', options);
-    } catch (error) {
-        console.error("Error formatting date:", error);
-        return dateString;
-    }
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+    });
 };
-
-function reloadPage() {
-    window.location.reload();
-}
-
 </script>
 
-
-
 <style scoped>
-.container {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.content-wrapper {
-    width: 1110px;
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.section-title {
-    color: #1b1b1b;
-    font: 700 18px/1.2 Roboto, sans-serif;
-    margin-bottom: 10px;
-}
-
-.articles-grid {
-    margin-top: 10px;
-}
-
-.articles-row {
-    display: flex;
-    gap: 20px;
-}
-
-.article-card {
-    flex: 1;
-    border-radius: 4px;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(27, 27, 27, 0.075);
-    border: 1px solid rgba(27, 27, 27, 0.125);
-}
-
-.card-content {
-    padding: 20px;
-}
-
-.article-title {
-    color: #0b1a33;
-    font: 400 18px/24px Roboto, sans-serif;
-    margin-bottom: 8px;
-}
-
-.author-name {
-    font: 400 14px/1.6 Roboto, sans-serif;
-    display: block;
-    margin-bottom: 4px;
-    text-align: center;
-}
-
-.read-time {
-    color: #9b9b9b;
-    font: 400 13px/1.6 Roboto, sans-serif;
-}
-
-.engagement-stats {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 5px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #9b9b9b;
-    font: 400 14px/2 Roboto, sans-serif;
-}
-
-.stat-icon {
-    width: 14px;
-    height: 14px;
-    object-fit: contain;
-}
-
-.stat-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.stat-icons {
-    display: flex;
-    flex-direction: column;
-}
-
-.pagination {
-    display: flex;
-    gap: 8px;
-    margin: 8px auto;
-}
-
-.page-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 8px;
-    background: #000;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.page-dot.active {
-    background: #007aff;
-}
-
-.comments-section {
-    margin-top: 32px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.002);
-    box-shadow: 0 10px 15px -3px rgba(47, 181, 250, 0.05);
-    border: 1px solid #ebeef5;
-    padding: 41px;
-    max-width: 100%;
-}
-
-.comment-form {
-    display: flex;
-    gap: 20px;
-    padding: 16px 12px 35px 0;
-}
-
-.comment-input {
-    flex: 1;
-    border: 1px solid #ebeef5;
-    border-radius: 4px;
-    padding: 12px;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    resize: vertical;
-}
-
-.submit-button {
-    padding: 4px 8px;
-    border-radius: 5px;
-    border: none;
-    background: none;
-    color: #161616;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-}
-
-.comment-filters {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.filter-button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    color: #161616;
-    cursor: pointer;
-}
-
-.filter-button.active {
-    color: #4299e1;
-}
-
-.comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.comment-item {
-    display: flex;
-    gap: 16px;
-}
-
-.avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
+.card-img-top {
+    height: 180px;
     object-fit: cover;
-}
-
-.comment-content {
-    flex: 1;
-}
-
-.comment-header {
-    gap: 8px;
-    align-items: center;
-}
-
-.comment-author {
-    font: 700 14px/2 'Noto Sans', sans-serif;
-    color: #161616;
-}
-
-.comment-date {
-    font: 400 13px 'Noto Sans', sans-serif;
-    color: rgba(113, 128, 150, 0.75);
-}
-
-.comment-text {
-    margin: 24px 0;
-    font: 400 14px/22px 'Noto Sans', sans-serif;
-    color: #161616;
-}
-
-.comment-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.article-date{
-    color: black;
-    text-align: center;
-}
-.action-button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    padding: 0;
-    color: rgba(113, 128, 150, 0.75);
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-}
-
-.action-icon {
-    width: 17px;
-    height: 17px;
-}
-
-.load-more {
-    width: 100%;
-    text-align: center;
-    padding: 9px 0;
-    border-top: 1px solid #e2e8f0;
-    background: none;
-    border: none;
-    color: #161616;
-    font: 700 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-    margin-top: 16px;
-}
-
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.article-image-wrapper {
-    width: 100%; 
-    padding-top: 56.25%;
-    position: relative;
-    background-color: #f0f0f0;
-    border-radius: 10%;
-}
-
-.article-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    
-}
-/* .router-link-active, .router-link-exact-active {
-    text-decoration: none;
-    color: inherit;
-}
-
-.article-card a {
-    text-decoration: none;
-    color: black;
-}
-
-.article-card a:hover {
-    text-decoration: underline;
-    color: darkblue;
-} */
-
-
-@media (max-width: 991px) {
-    .container {
-        padding: 0 20px 100px;
-    }
-
-    .articles-row {
-        flex-direction: column;
-    }
-
-    .comments-section {
-        padding: 20px;
-    }
-
-    .comment-form {
-        flex-direction: column;
-    }
+    border-top-left-radius: .375rem;
+    border-top-right-radius: .375rem;
 }
 </style>
