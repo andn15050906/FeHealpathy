@@ -39,6 +39,7 @@ import ScrollToTop from "@/components/Common/Misc/ScrollToTop.vue";
 import BlogRelatedItems from "@/components/BlogComponents/BlogRelatedItems.vue";
 import BlogCommentSection from "@/components/BlogComponents/BlogCommentSection.vue";
 import { getBlogById } from "@/scripts/api/services/blogService";
+import { logArticleRead } from "@/scripts/api/services/activityLogService";
 
 export default {
   components: {
@@ -60,6 +61,15 @@ export default {
       try {
         const blogId = this.$route.params.id;
         this.blog = await getBlogById(blogId);
+        
+        if (!this.blog) {
+          console.error("Không tìm thấy bài viết với ID:", blogId);
+        }
+        else {
+          logArticleRead(blogId);
+        }
+
+        this.loading = false;
       } catch (error) {
         console.error(error);
       }

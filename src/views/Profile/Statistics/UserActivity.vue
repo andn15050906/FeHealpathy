@@ -33,11 +33,6 @@
 
     <div class="section">
       <h2>📈 Mood & Activity Trends</h2>
-      <canvas ref="moodChart"></canvas>
-    </div>
-
-    <div class="section">
-      <h2>📈 Mood & Activity Trends</h2>
       <Line :data="sentimentChartData" :options="sentimentChartOptions" />
     </div>
   </div>
@@ -47,7 +42,7 @@
 import { ref, onMounted, onBeforeMount } from "vue";
 import Chart from "chart.js/auto";
 import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
-import { formatISODateWithHMS, formatISODate } from '@/scripts/logic/common';
+import { formatISODateWithHMS, formatISODateWithDDMM } from '@/scripts/logic/common';
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { getSentimentAnalysis } from '@/scripts/api/services/statisticsService';
 import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
@@ -61,13 +56,38 @@ const sentimentChartData = ref({
   datasets: []
 });
 const sentimentChartOptions = ref({
-  /*responsive: true,
-  maintainAspectRatio: false*/
+  responsive: true,
+  scales: {
+    "y-mood": {
+      type: "linear",
+      position: "left",
+      //beginAtZero: true,
+      //max: 100,
+      title: { display: true, text: "Sentiment Score" },
+      //ticks: { callback: (value) => value + "%" },
+    },
+    "y-activity": {
+      type: "linear",
+      position: "right",
+      beginAtZero: true,
+      title: { display: true, text: "Activeness" },
+    },
+  }
 });
 
 onBeforeMount(async () => {
   let userId = (await getUserProfile()).id;
-  var activityLogs = (await getActivityLogs({ pageSize: 10 })).filter(_ => _.creatorId == userId);
+  ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
+
+  var sentimentDataTask = getSentimentAnalysis();
+  var activityLogsTask = getActivityLogs({ pageSize: 128, CreatorId: userId });
+
+  await Promise.all([sentimentDataTask, activityLogsTask]);
+  const sentimentData = await sentimentDataTask;
+  const activityLogs = await activityLogsTask;
+  console.log(sentimentData);
+  console.log(activityLogs);
+
   recentActivities.value = activityLogs.map(log => {
     let json = undefined;
     try {
@@ -101,11 +121,15 @@ onBeforeMount(async () => {
         };
       }
       else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated.label) {
-        action = TRACKED_EVENTS.Mood_Updated.displayName;
+        action = TRACKED_EVENTS.DiaryNote_Created.displayName;
+        /*action = TRACKED_EVENTS.Mood_Updated.displayName;
         content =  {
           type: 'text',
           display: parsedContent.content
-        };
+        };*/''
+      }
+      else if (parsedContent.event == TRACKED_EVENTS.Media_Viewed.label) {
+        action = TRACKED_EVENTS.Media_Viewed.displayName;
       }
     }
 
@@ -114,100 +138,51 @@ onBeforeMount(async () => {
       action: action,
       content: content
     }
-  })
-})
+  }).slice(0, 20);
 
-onBeforeMount(async () => {
-  var sentimentDataTask = getSentimentAnalysis();
-
-  ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
-
-  const rawData = await sentimentDataTask;
   let labels = [];
-  let scores = [];
-  let lastScore = null;
+  let scores = {};
+  let activities = {};
 
-  for (let date in rawData) {
-    labels.push(formatISODate(date));
-    const prediction = rawData[date].prediction;
-    if (prediction && prediction.score !== undefined) {
-      lastScore = prediction.score;
-    }
-    scores.push(lastScore);
+  for (let date in sentimentData) {
+    labels.push(formatISODateWithDDMM(date, 'DD/MM'));
+    scores[date] = sentimentData[date].score * -1;
+  }
+
+  for (let date of labels) {
+    if (!activities[date])
+      activities[date] = [];
+  }
+  for (let logItem of activityLogs) {
+    let date = formatISODateWithDDMM(logItem.creationTime, 'DD/MM');
+    if (!activities[date])
+      continue;
+    activities[date].push(logItem);
   }
 
   sentimentChartData.value = {
     labels: labels,
     datasets: [
       {
-        label: 'Your sentiment analysis',
-        data: scores,
-        borderColor: '#42A5F5',
-        backgroundColor: 'rgba(66, 165, 245, 0.2)',
+        label: 'Sentiment score',
+        data: Object.values(scores),
+        borderColor: "#4CAF50",
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
         fill: true,
+        tension: 0.3,
+        yAxisID: "y-mood",
       },
+      {
+        label: "Activity Count",
+        data: Object.values(activities).map(_ => _.length),
+        borderColor: "#FFA726",
+        backgroundColor: "rgba(255, 167, 38, 0.2)",
+        tension: 0.3,
+        yAxisID: "y-activity",
+        fill: true,
+      }
     ],
   };
-});
-
-onMounted(() => {
-  const ctx = moodChart.value.getContext("2d");
-
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: [
-        "2024-02-25",
-        "2024-02-26",
-        "2024-02-27",
-        "2024-02-28",
-        "2024-03-01",
-        "2024-03-02",
-        "2024-03-03",
-        "2024-03-04",
-        "2024-03-05",
-      ],
-      datasets: [
-        {
-          label: "Mood Score (%)",
-          data: [75, 80, 85, 78, 82, 60, 55, 65, 70],
-          borderColor: "#4CAF50",
-          backgroundColor: "rgba(76, 175, 80, 0.2)",
-          tension: 0.3,
-          yAxisID: "y-mood",
-          fill: true,
-        },
-        {
-          label: "Activity Count",
-          data: [3, 4, 6, 5, 7, 2, 1, 5, 8],
-          borderColor: "#FFA726",
-          backgroundColor: "rgba(255, 167, 38, 0.2)",
-          tension: 0.3,
-          yAxisID: "y-activity",
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        "y-mood": {
-          type: "linear",
-          position: "left",
-          beginAtZero: true,
-          max: 100,
-          title: { display: true, text: "Mood Score (%)" },
-          ticks: { callback: (value) => value + "%" },
-        },
-        "y-activity": {
-          type: "linear",
-          position: "right",
-          beginAtZero: true,
-          title: { display: true, text: "Activity Count" },
-        },
-      },
-    },
-  });
 })
 </script>
 

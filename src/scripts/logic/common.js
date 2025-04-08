@@ -81,6 +81,11 @@ export const parseTimestamp = (timestamp, format = '') => {
     return date
 }
 
+export const formatISODateWithDDMM = (isoDate) => {
+    const date = new Date(isoDate);    
+    return date.toLocaleString('en-GB', { day: '2-digit', month: '2-digit' });
+};
+
 export const formatISODate = (isoDate) => {
     const date = new Date(isoDate);
     const timestampFormat = isSameDay(date, new Date()) ? 'HH:mm' : 'DD/MM/YY';
