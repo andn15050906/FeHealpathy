@@ -332,8 +332,8 @@ const router = createRouter({
       props: true
     },
     {
-      path: "/blog/:id",
-      name: 'blogDetail',
+      path: "/blogs/:id",
+      name: 'BlogDetail',
       component: BlogDetail,
       props: true
     },

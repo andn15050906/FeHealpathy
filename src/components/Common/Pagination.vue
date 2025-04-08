@@ -44,7 +44,6 @@ export default {
 .pagination-nav {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
 }
 
 .pagination {
@@ -63,10 +62,10 @@ export default {
 
 .page-link {
     display: block;
-    padding: 8px 16px;
+    padding: 10px 24px;
     background-color: #ffffff;
     border: 1px solid #e9ecef;
-    color: #007bff;
+    color: #55a0f0;
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -82,8 +81,8 @@ export default {
 }
 
 .page-item.active .page-link {
-    background-color: #007bff;
+    background-color: #55a0f0;
     color: #ffffff;
-    border-color: #007bff;
+    border-color: #55a0f0;
 }
 </style>
