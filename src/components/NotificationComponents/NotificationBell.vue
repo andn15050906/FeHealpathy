@@ -64,17 +64,41 @@ export default {
       this.isDropdownVisible = !this.isDropdownVisible;
     },
     markAsRead(index) {
-      this.notifications[index].read = true; // Đánh dấu thông báo là đã đọc
+      const notification = this.notifications[index];
+      notification.read = true;
+
+      const readIds = JSON.parse(
+        localStorage.getItem("readNotifications") || "[]"
+      );
+      readIds.push(notification.id);
+      localStorage.setItem(
+        "readNotifications",
+        JSON.stringify([...new Set(readIds)])
+      );
     },
+
     async fetchNotifications() {
       try {
-        const response = await getNotifications({ CreatorId: this.userId });
-        this.notifications = (response.items || response).map(
-          (notification) => ({
-            content: notification.message,
-            read: notification.read,
-          })
-        );
+        const response = await getNotifications({ ReceiverId: this.userId });
+        const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
+
+        const notifications = response.items || response;
+
+        this.notifications = notifications.map((notification) => {
+          let content = "";
+          try {
+            const parsed = JSON.parse(notification.message);
+            content = parsed.Message || "No message";
+          } catch (e) {
+            content = notification.message;
+          }
+
+          return {
+            id: notification.id,
+            content,
+            read: readIds.includes(notification.id),
+          };
+        });
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -82,21 +106,8 @@ export default {
   },
   mounted() {
     if (this.isAuthenticated) {
-      this.fetchNotifications(); // Fetch thông báo khi user đã đăng nhập
+      this.fetchNotifications();
     }
-  },
-
-  watch: {
-    isAuthenticated(newVal) {
-      if (newVal && this.userId) {
-        this.fetchNotifications();
-      }
-    },
-    userId(newVal) {
-      if (newVal && this.isAuthenticated) {
-        this.fetchNotifications();
-      }
-    },
   },
 };
 </script>

@@ -35,8 +35,12 @@ export const submitAdminMessage = async ({ title, content, recipients }) => {
   return await post(`${API_BASE_URL}/AdminMessage`, { title, content, recipients });
 };
 
-export const submitInviteMember = async ({ email, message }) => {
-  return await post(`${API_BASE_URL}/InviteMember`, { email, message });
+export const submitInviteMember = async ({ conversationId, userIds, message }) => {
+  return await post(`${API_BASE_URL}/InviteMember`, {
+    conversationId,
+    userIds,
+    message: message || "You have been invited to join a conversation.",
+  });
 };
 
 export const submitUserReport = async ({ reportedUserId, reason }) => {
