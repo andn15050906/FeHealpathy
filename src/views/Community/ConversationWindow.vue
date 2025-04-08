@@ -52,6 +52,15 @@
             <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
             <!--@show-audio="false"-->
         </vue-advanced-chat>
+        <teleport to="body">
+            <InviteUser
+                v-if="showInviteModal"
+                :conversationId="inviteRoomId"
+                @close="() => {
+                    showInviteModal = false;
+                }"
+            />
+        </teleport>
     </div>
 </template>
 
@@ -63,11 +72,14 @@ import { getUsers } from '@/scripts/api/services/userService';
 import { getPagedConversations } from '@/scripts/api/services/conversationService';
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
-import { submitInviteMember } from "@/scripts/api/services/notificationService";
+import InviteUser from "@/components/Common/Popup/InviteUser.vue";
 
 register();
 
 export default {
+    components: {
+        InviteUser,
+    },
     props: {
         singleRoom: {
             type: Boolean
@@ -146,6 +158,7 @@ export default {
             removeUsers: [],
             roomActions: [],
             menuActions: [],
+            showInviteModal: false,
             messageActions: [
                 { name: 'editMessage', title: 'Edit Message', onlyMe: true },
                 { name: 'deleteMessage', title: 'Delete Message', onlyMe: true }
@@ -731,7 +744,9 @@ export default {
         },
 
         inviteUser(roomId) {
-            this.resetForms()
+            this.resetForms(),
+            this.showInviteModal = true;
+            console.log("showInviteModal:", this.showInviteModal);
             this.inviteRoomId = roomId
         },
 
@@ -744,13 +759,6 @@ export default {
             await firestoreService.updateUser(id, { _id: id })
         
             await firestoreService.addRoomUser(this.inviteRoomId, id)*/
-
-            const payload = {
-                conversationId: this.inviteRoomId,
-                userIds: [invitedUser._id]
-            };
-
-            await submitInviteMember(payload);
             
             this.inviteRoomId = null
             this.invitedUsername = ''
