@@ -10,10 +10,10 @@
           </span>
         </div>
         <div class="d-flex justify-content-center gap-3 mb-4">
-          <button @click="likeBlog" class="btn btn-danger">
+          <!--<button @click="likeBlog" class="btn btn-danger">
             <i class="fas fa-thumbs-up me-2"></i>
             Likes ({{ likes }})
-          </button>
+          </button>-->
           <button @click="shareBlog" class="btn btn-primary">
             <i class="fas fa-share-alt me-2"></i>
             Share
