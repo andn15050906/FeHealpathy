@@ -1,35 +1,29 @@
 <template>
-  <GlowingCard class="blog-card" justify="unset" padding="10px">
-    <div style="flex-grow: 1; width: 100%;">
-        <div class="blog-thumbnail" style="background-image: url(/assets/images/10.jpg);">
-            <RouterLink :to="`/blogs/${blog.id}`" target="_blank">
-                <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" :onError="(e) => e.target.style.display = 'none'">
-            </RouterLink>
-        </div>
-        <div class="blog-content">
-          <h3 class="blog-title">
-            <RouterLink :to="`/blogs/${blog.id}`" target="_blank">{{ blog.title || 'Untitled Blog' }}</RouterLink>
-          </h3>
-        </div>
+  <div class="blog-card shadow h-100">
+    <div class="blog-thumbnail position-relative">
+      <RouterLink :to="`/blogs/${blog.id}`" target="_blank">
+        <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" class="img-fluid w-100 h-100"
+          :onError="(e) => e.target.style.display = 'none'">
+        <div v-else class="default-thumbnail" :style="{ backgroundImage: 'url(/assets/images/10.jpg)' }"></div>
+      </RouterLink>
     </div>
-
-    <!-- Footer Section -->
-    <div class="blog-footer">
-      <div class="tags">
-        <ul class="blog-tags">
-          <li v-for="tag in blog.tags" :key="tag.id">{{ tag.title }}</li>
-        </ul>
-      </div>
-      <div class="meta-info">
-        <span class="instructor">{{ blog.creator.fullName }}</span>
-        <p class="blog-date">{{ formatDate(blog.creationTime) }}</p>
+    <div class="blog-content d-flex flex-column p-3">
+      <h3 class="blog-title text-center mb-3">
+        <RouterLink :to="`/blogs/${blog.id}`" target="_blank" class="text-decoration-none">
+          {{ blog.title || 'Untitled Blog' }}
+        </RouterLink>
+      </h3>
+      <div class="blog-footer mt-auto">
+        <div class="meta-info d-flex justify-content-between align-items-center">
+          <span class="instructor">{{ blog.creator.fullName }}</span>
+          <p class="blog-date m-0">{{ formatDate(blog.creationTime) }}</p>
+        </div>
       </div>
     </div>
-  </GlowingCard>
+  </div>
 </template>
 
 <script setup>
-import GlowingCard from '@/components/Common/GlowingCard.vue';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps({
@@ -53,130 +47,83 @@ const formatDate = (dateString) => {
 
 <style scoped>
 .blog-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background: #fff;
   transition: transform 0.3s, box-shadow 0.3s;
-  width: 100%;
   height: 380px;
+  display: flex;
+  flex-direction: column;
 }
 
 .blog-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .blog-thumbnail {
-    position: relative;
-    aspect-ratio: 16/9;
-    width: 100%;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    background-position: center top;
+  height: 200px;
+  overflow: hidden;
 }
 
-.blog-thumbnail img {
+.blog-thumbnail img,
+.default-thumbnail {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
 
-.blog-thumbnail img:hover {
+.default-thumbnail {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+}
+
+.blog-thumbnail:hover img,
+.blog-thumbnail:hover .default-thumbnail {
   transform: scale(1.05);
 }
 
 .blog-content {
-  padding: 15px;
-  margin-bottom: -20px;
-  text-align: left;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .blog-title {
-  font-size: 1rem;
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
   line-height: 1.4;
 }
 
 .blog-title a {
-  text-decoration: none;
-  color: inherit;
+  color: #2c3e50;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   overflow: hidden;
+  transition: color 0.2s ease;
 }
 
 .blog-title a:hover {
-  color: #007bff;
-}
-
-.blog-description {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 12px;
-  line-height: 1.5;
+  color: #3498db;
 }
 
 .blog-footer {
-  padding: 10px 15px;
-  border-top: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: -20px;
-  gap: 8px;
-  width: 100%;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.blog-tags {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: flex-start;
-}
-
-.blog-tags li {
-  background: #f0f0f0;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  max-width: 100px;
-  color: #007bff;
-  font-weight: bold;
-}
-
-.meta-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #666;
+  padding-top: 12px;
+  border-top: 1px solid #eef2f7;
 }
 
 .instructor {
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.9rem;
 }
 
 .blog-date {
   font-size: 0.85rem;
-  color: #999;
+  color: #7f8c8d;
 }
 </style>
