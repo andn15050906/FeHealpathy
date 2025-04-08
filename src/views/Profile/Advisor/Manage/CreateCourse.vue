@@ -73,9 +73,9 @@
             </label>
             <select id="level" v-model="course.level" class="form-select" required>
               <option value="" disabled>Select level</option>
-              <option value="1">Beginner</option>
-              <option value="2">Intermediate</option>
-              <option value="3">Advanced</option>
+              <option value="0">Beginner</option>
+              <option value="1">Intermediate</option>
+              <option value="2">Advanced</option>
             </select>
           </div>
           <div class="mb-3">
@@ -420,7 +420,8 @@ export default {
           formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
 
           lecture.medias.forEach((media, mediaIndex) => {
-            formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
+            formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file);
+            formData.append(`Lectures[${index}].Medias[${mediaIndex}].Title`, media.title);
           });
         });
 

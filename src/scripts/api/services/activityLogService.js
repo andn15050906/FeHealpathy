@@ -19,6 +19,34 @@ export const logQuestionOfTheDay = async (question, answer) => {
   });
 }
 
+export const logYogaPracticed = async (id) => {
+    return await addSingleLog({
+        event: TRACKED_EVENTS.Yoga_Practiced.label,
+        id: id
+    });
+}
+
+export const logCourseCompleted = async (id) => {
+    return await addSingleLog({
+        event: TRACKED_EVENTS.Course_Completed.label,
+        id: id
+    });
+}
+
+export const logMediaViewed = async (id) => {
+    return await addSingleLog({
+        event: TRACKED_EVENTS.Media_Viewed.label,
+        id: id
+    });
+}
+
+export const logArticleRead = async (id) => {
+    return await addSingleLog({
+        event: TRACKED_EVENTS.Article_Read.label,
+        id: id
+    });
+}
+
 // Enums for events
 export const getDisplayName = (trackedEvent) => {
   return TRACKED_EVENTS[trackedEvent].displayName;
@@ -59,7 +87,9 @@ export const TRACKED_EVENTS = Object.freeze({
   Course_Enrolled: { value: 26, label: 'Course_Enrolled', displayName: 'Đăng kí khóa học', entity: 'Course' },
   Course_Unenrolled: { value: 27, label: 'Course_Unenrolled', displayName: 'Hủy đăng kí khóa học', entity: 'Course' },
   CourseReview_Created: { value: 28, label: 'CourseReview_Created', displayName: 'Đánh giá về khóa học', entity: 'CourseReview' },
-  LectureComment_Created: { value: 29, label: 'LectureComment_Created', displayName: 'Bình luận về bài giảng', entity: 'LectureComment' }
+  LectureComment_Created: { value: 29, label: 'LectureComment_Created', displayName: 'Bình luận về bài giảng', entity: 'LectureComment' },
+
+  Article_Read: { value: 30, label: 'Article_Read', displayName: 'Đọc bài viết', entity: 'Article' }
 });
 
 export const ENTITY_TYPES = Object.freeze({
