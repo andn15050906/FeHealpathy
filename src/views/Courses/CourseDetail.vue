@@ -56,7 +56,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { getCourseById } from "@/scripts/api/services/CourseService";
-import { purchaseCourse as purchaseCourseAPI } from "@/scripts/api/services/paymentService";
+import { purchaseCourse } from "@/scripts/api/services/paymentService";
 
 export default {
   name: "CourseDetail",
@@ -178,7 +178,7 @@ export default {
           return;
         }
 
-        const data = await purchaseCourseAPI(id);
+        const data = await purchaseCourse(id);
         if (!data?.url) {
           alert("Không nhận được URL thanh toán.");
           return;

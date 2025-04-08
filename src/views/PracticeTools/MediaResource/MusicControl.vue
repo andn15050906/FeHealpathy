@@ -21,6 +21,7 @@ import MediaPlayer from "./MediaPlayer.vue"
 import MediaDisplay from "./MediaDisplay.vue"
 import MediaLibrary from "./MediaLibrary.vue"
 import { getPagedMediaResources } from "@/scripts/api/services/mediaResourcesService"
+import { logMediaViewed } from "@/scripts/api/services/activityLogService";
 
 export default {
     name: "MusicControl",
@@ -72,6 +73,7 @@ export default {
                         if (items.length > 0) {
                             items[0].active = true
                             currentMedia.value = items[0]
+                            logMediaViewed(items[0].id)
                             audioRef.value.src = items[0].audio
                         }
                     } else {
@@ -111,6 +113,7 @@ export default {
 
         const setCurrentMedia = (media) => {
             currentMedia.value = media
+            logMediaViewed(media.id)
             audioRef.value.src = media.audio
             medias.value.forEach((s) => {
                 s.active = s.id === media.id

@@ -49,6 +49,7 @@ import ScrollToTop from "@/components/Common/Misc/ScrollToTop.vue";
 import BlogRelatedItems from "@/components/BlogComponents/BlogRelatedItems.vue";
 import BlogCommentSection from "@/components/BlogComponents/BlogCommentSection.vue";
 import { getBlogById } from "@/scripts/api/services/blogService";
+import { logArticleRead } from "@/scripts/api/services/activityLogService";
 
 export default {
   components: {
@@ -74,6 +75,9 @@ export default {
 
         if (!this.blog) {
           console.error("Không tìm thấy bài viết với ID:", blogId);
+        }
+        else {
+          logArticleRead(blogId);
         }
 
         this.loading = false;
