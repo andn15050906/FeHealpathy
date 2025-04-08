@@ -83,8 +83,8 @@
 <script>
 import dayjs from "dayjs";
 import {
-    getPagedComments,
-    createComment,
+    getPagedBlogComments,
+    createBlogComment,
     updateComment,
     deleteComment,
 } from "@/scripts/api/services/commentService";
@@ -120,7 +120,7 @@ export default {
     methods: {
         async fetchComments() {
             try {
-                const response = await getPagedComments(
+                const response = await getPagedBlogComments(
                     this.blogId,
                     this.page,
                     this.pageSize
@@ -153,8 +153,8 @@ export default {
             if (!this.newComment.trim()) return;
             this.loading = true;
             try {
-                const payload = { SourceId: this.blogId, content: this.newComment.trim() };
-                await createComment(payload);
+                const payload = { SourceId: this.blogId, Content: this.newComment.trim() };
+                await createBlogComment(payload);
                 this.newComment = "";
                 this.page = 1;
                 await this.fetchComments();

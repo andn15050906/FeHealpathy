@@ -45,15 +45,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { getUsers } from "@/scripts/api/services/userService";
 import { submitInviteMember } from "@/scripts/api/services/notificationService";
 
 const emit = defineEmits(["close"]);
-
-onMounted(() => {
-  console.log("InviteUser component mounted");
-});
 
 const props = defineProps({
   conversationId: String,
@@ -68,12 +64,11 @@ const handleSearch = async () => {
   const keyword = search.value.trim();
   if (keyword.length < 2) return;
 
+  let res = [];
   try {
-    const res = await getUsers({ name: keyword });
-    searchResults.value = res.items;
-  } catch (err) {
-    console.error("Error searching users", err);
-  }
+    res = (await getUsers({ name: keyword })).items;
+  } catch (err) { }
+  searchResults.value = res;
 };
 
 const selectUser = (user) => {
