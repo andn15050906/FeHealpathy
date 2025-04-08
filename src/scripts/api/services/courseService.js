@@ -1,7 +1,8 @@
 import apiClient from '@/scripts/api/apiClients';
-import {get, post, postForm, patchForm, del } from '@/scripts/api/apiClients';
+import {get, post, postForm, patchForm, del, getML } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Courses';
+const API_COURSE_RECOMMENDATION = "you-may-like/courses"
 
 export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   try {
@@ -55,4 +56,8 @@ export const updateCourse = async (courseData) => {
 
 export const deleteCourse = async (courseId) => {
   return await del(`${API_BASE_URL}/${courseId}`);
+};
+
+export const getRecommendationCourses = async (queryParams) => {
+  return await getML(`${API_COURSE_RECOMMENDATION}`, queryParams);
 };
