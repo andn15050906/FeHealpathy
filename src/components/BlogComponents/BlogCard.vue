@@ -2,13 +2,13 @@
   <GlowingCard class="blog-card" justify="unset" padding="10px">
     <div style="flex-grow: 1; width: 100%;">
         <div class="blog-thumbnail" style="background-image: url(/assets/images/10.jpg);">
-            <RouterLink :to="`/blog/${blog.id}`">
+            <RouterLink :to="`/blogs/${blog.id}`" target="_blank">
                 <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" :onError="(e) => e.target.style.display = 'none'">
             </RouterLink>
         </div>
         <div class="blog-content">
           <h3 class="blog-title">
-            <RouterLink :to="`/blog/${blog.id}`">{{ blog.title || 'Untitled Blog' }}</RouterLink>
+            <RouterLink :to="`/blogs/${blog.id}`" target="_blank">{{ blog.title || 'Untitled Blog' }}</RouterLink>
           </h3>
         </div>
     </div>
@@ -97,7 +97,8 @@ const formatDate = (dateString) => {
 }
 
 .blog-title {
-  font-size: 1.2rem;
+  font-size: 1rem;
+  text-align: center;
   font-weight: bold;
   margin-bottom: 8px;
   color: #333;
@@ -107,6 +108,11 @@ const formatDate = (dateString) => {
 .blog-title a {
   text-decoration: none;
   color: inherit;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .blog-title a:hover {
@@ -127,6 +133,7 @@ const formatDate = (dateString) => {
   flex-direction: column;
   margin-bottom: -20px;
   gap: 8px;
+  width: 100%;
 }
 
 .tags {
@@ -157,8 +164,7 @@ const formatDate = (dateString) => {
 
 .meta-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  justify-content: space-between;
   font-size: 0.85rem;
   color: #666;
 }
