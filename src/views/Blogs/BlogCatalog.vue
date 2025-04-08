@@ -153,6 +153,13 @@ watch([searchQuery, selectedTags], () => changePage(1));
   gap: 20px;
 }
 
+.blog-grid>* {
+  justify-self: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .blogs-container {
   margin: 0 auto 40px;
 }

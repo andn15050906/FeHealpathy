@@ -1,6 +1,7 @@
-import { get, postForm, patchForm, del } from '@/scripts/api/apiClients';
+import { get, postForm, patchForm, del, getML } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Articles';
+const API_ARTICAL_RECOMMENDATION = "you-may-like/articles"
 
 export const getPagedArticles = async (queryParams = {}) => {
     return await get(`${API_BASE_URL}`, queryParams);    
@@ -26,4 +27,8 @@ export const getBlogById = async (id) => {
     console.error('Error fetching blog:', error);
     throw error;
   }
+};
+
+export const getRecommendationArticals = async (queryParams) => {
+  return await getML(`${API_ARTICAL_RECOMMENDATION}`, queryParams);
 };

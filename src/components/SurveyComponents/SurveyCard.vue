@@ -1,17 +1,14 @@
 <template>
     <div class="survey-card-grid-item">
-        <GlowingCard class="survey-card" justify="unset" padding="10px">
-            <div style="flex-grow: 1; display: flex;">
-                <div class="survey-thumbnail">
-                    <img :src="survey.icon" :alt="survey.name">
-                </div>
+        <GlowingCard class="survey-card" justify="center" padding="20px">
+            <div class="survey-thumbnail">
+                <img :src="survey.icon" :alt="survey.name" />
             </div>
-            <h3 class="survey-title">{{ survey.name }}</h3>
+            <h3 class="survey-title mt-3">{{ survey.name }}</h3>
         </GlowingCard>
-        <h4 class="survey-description">{{ survey.description }}</h4>
+        <p class="survey-description mt-2">{{ survey.description }}</p>
     </div>
 </template>
-
 
 <script setup>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
@@ -19,39 +16,49 @@ import GlowingCard from '@/components/Common/GlowingCard.vue';
 const props = defineProps({
     survey: Object
 });
-
-console.log(props.survey);
 </script>
 
 <style scoped>
 .survey-card-grid-item {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .survey-card {
-    display: flex;
-    align-self: center;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    padding: 20px;
 }
 
 .survey-thumbnail {
-    position: relative;
     width: 100%;
-    padding: 10px 30px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .survey-thumbnail img {
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
 }
 
 .survey-title {
-    color: #000000;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
 }
 
 .survey-description {
-    padding: 6px 10px;
+    font-size: 1.2rem;
+    color: #555;
+    font-weight: 800;
     text-align: center;
+    margin-top: 0.5rem;
 }
 </style>

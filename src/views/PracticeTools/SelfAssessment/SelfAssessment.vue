@@ -1,27 +1,21 @@
 <template>
-  <div class="container mt-5">
-    <h2 class="mb-4 text-title">Tests</h2>
-    <!--<div class="test-options">
-      <div v-for="(item, index) in surveys" :key="item.id" class="test-option" @click="openTest(item.id)">
-        <div class="test-option-image" :style="{ backgroundImage: 'url(' + item.icon + ')' }"></div>
-      </div>
-    </div>-->
-
-    <div class="survey-container">
-      <div class="survey-grid">
-        <SurveyCard v-for="(item, index) in surveys" :key="item.id" :survey="item" @click="openTest(item.id)" />
-      </div>
+  <div class="container mt-2">
+    <h2 class="fw-bold text-center mb-5 text-dark">Mental Health Assessments</h2>
+    <div class="survey-grid">
+      <SurveyCard v-for="(item, index) in surveys" :key="item.id" :survey="item" @click="openTest(item.id)" />
     </div>
+  </div>
 
-    <div v-if="showPopup" class="popup">
-      <div class="popup-content">
-        <span class="close" @click="closePopup">&times;</span>
-        <h3 class="text-center text-title">{{ currentSurvey.title }}</h3>
-        <h5 class="text-center">{{ text.pleaseAnswer }}</h5>
-        <div class="questions-container">
-          <div class="survey-container">
-            <SingleSelectSurvey :options="currentSurveyOptions" :padding='"0"' :isSinglePage="true" ref="currentSurveyRef"></SingleSelectSurvey>
-          </div>
+  <!-- Modal Popup (kept inside the same hierarchy) -->
+  <div v-if="showPopup" class="popup">
+    <div class="popup-content">
+      <span class="close" @click="closePopup">&times;</span>
+      <h4 class="popup-title">{{ currentSurvey.title }}</h4>
+      <h5 class="popup-subtitle">{{ text.pleaseAnswer }}</h5>
+      <div class="questions-container">
+        <div class="survey-inner-container">
+          <SingleSelectSurvey :options="currentSurveyOptions" :padding='"0"' :isSinglePage="true"
+            ref="currentSurveyRef" />
         </div>
       </div>
     </div>
@@ -39,8 +33,7 @@ import SingleSelectSurvey from '@/components/SurveyComponents/SingleSelectSurvey
 import SurveyCard from '@/components/SurveyComponents/SurveyCard.vue';
 
 const text = {
-  //Please answer the following questions:
-  pleaseAnswer : "Bạn hãy trả lời những câu hỏi sau:"
+  pleaseAnswer: "Bạn hãy trả lời những câu hỏi sau:"
 }
 const surveys = ref([]);
 const showPopup = ref(false);
@@ -48,6 +41,7 @@ const currentSurvey = ref({});
 const currentSurveyRef = ref();
 const currentQuestionIndex = ref(0);
 const router = useRouter();
+
 const props = defineProps({
   id: {
     type: String,
@@ -65,7 +59,6 @@ const surveysMapping = {
 }
 
 onBeforeMount(async () => {
-  //...
   surveys.value = (await getPagedSurveys()).items
     .filter(item => !item.name.includes("Wellness") && !item.name.includes("First"))
     .map(item => {
@@ -74,19 +67,19 @@ onBeforeMount(async () => {
         icon: getSurveyImage(item.name)
       }
     });
-  
+
   if (props.id) {
     openTest(props.id);
   }
 })
 
 const getSurveyImage = (name) => {
-    for (let key in surveysMapping) {
-        if (name.includes(key)) {
-            return "/assets/images/surveys/" + surveysMapping[key];
-        }
+  for (let key in surveysMapping) {
+    if (name.includes(key)) {
+      return "/assets/images/surveys/" + surveysMapping[key];
     }
-    return "/assets/images/surveys/Survey_Demographic.png";
+  }
+  return "/assets/images/surveys/Survey_Demographic.png";
 }
 
 const currentSurveyOptions = computed(() => new SurveyOptions(
@@ -105,25 +98,27 @@ const openTest = (testId) => {
     showPopup.value = true;
   }
 }
+
 const closePopup = () => {
   showPopup.value = false;
-  //currentSurveyRef.resetSurvey();
 }
+
 const submitSurvey = async (survey, questionsWithAnswer) => {
   let data = new CreateSubmissionDto(
     survey.id,
     questionsWithAnswer
       .filter(item => survey.questions.find(question => question.id == item.questionId))
       .map(item => {
-          return new CreateMcqChoiceDto(item.questionId, item.answerId)
+        return new CreateMcqChoiceDto(item.questionId, item.answerId)
       })
   );
   return await createSubmission(data);
 }
+
 const submitCallback = async (questionsWithAnswer) => {
   try {
     var response = await submitSurvey(currentSurvey.value, questionsWithAnswer);
-    router.push({ name: 'SubmissionReview', params: { id: response }});
+    router.push({ name: 'SubmissionReview', params: { id: response } });
   }
   catch (error) {
     console.log(error);
@@ -133,77 +128,76 @@ const submitCallback = async (questionsWithAnswer) => {
 
 <style scoped>
 .container {
-  display: grid;
-  gap: 20px;
+  margin: 0 auto;
+  padding: 0 15px;
 }
 
 .survey-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
-  width: 100%;
-}
-
-.icon-container {
-  margin-bottom: 10px;
-}
-
-.icon {
-  width: 50px;
-  height: 50px;
-}
-
-.option-title {
-  font-size: 18px;
 }
 
 .popup {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+  z-index: 1000;
 }
 
 .popup-content {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  width: 80%;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  width: 100%;
   max-width: 900px;
-  min-height: 80vh;
+  max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
 
 .close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: 600;
   cursor: pointer;
-  float: right;
-  font-size: 20px;
+  color: #999;
+  transition: color 0.3s ease;
 }
 
-.progress, .survey-container {
-  width: 95%;
+.close:hover {
+  color: #47a3ff;
+}
+
+.popup-title {
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.popup-subtitle {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
 }
 
 .questions-container {
-  max-height: 600px;
-  overflow-y: auto;
+  padding: 10px 0;
 }
 
-input[type="radio"] {
-  margin-right: 10px;
-}
-
-.selected {
-  background-color: #4CAF50;
-}
-
-.text-title {
-  color: #007bff;
+.survey-inner-container {
+  width: 100%;
 }
 </style>
