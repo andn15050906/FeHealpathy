@@ -1,11 +1,26 @@
 <template>
-    <div class="card border-0 shadow-sm mb-5">
+    <div class="card border-0 shadow-sm mb-2">
         <div class="card-body">
-            <h4 class="fw-bold text-dark card-title mb-4">Bài viết liên quan</h4>
-            <div class="row g-4">
-                <div v-for="article in relatedArticles" :key="article.id" class="col-12 col-md-6 col-lg-4">
-                    <BlogCard :blog="article"/>
-                </div>
+            <h4 class="fw-bold text-dark card-title mb-4">Bài viết bạn có thể thích</h4>
+
+            <div class="position-relative">
+                <swiper :modules="swiperModules" :slides-per-view="1" :space-between="10" :navigation="true"
+                    :pagination="{ clickable: true }" :breakpoints="{
+                        576: { slidesPerView: 1 },
+                        768: { slidesPerView: 2, spaceBetween: 10 },
+                        992: { slidesPerView: 3, spaceBetween: 10 }
+                    }" class="related-articles-swiper">
+                    <swiper-slide v-for="article in recommendedArticals" :key="article.id">
+                        <div class="card h-100 shadow-sm p-3 article-card" @click="navigateToArticle(article.objectID)">
+                            <img :src="article.ThumbnailUrl || article.ImageUrl" class="img-fluid rounded mb-3"
+                                style="height: 180px; width: 100%; object-fit: cover;" :alt="article.Title" />
+                            <div class="card-content">
+                                <h5 class="fw-bold mb-1 title-truncate">{{ article.Title }}</h5>
+                                <p class="text-muted mb-0">{{ formatDate(article.CreationTime) }}</p>
+                            </div>
+                        </div>
+                    </swiper-slide>
+                </swiper>
             </div>
         </div>
     </div>
@@ -13,29 +28,40 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { getPagedArticles } from '@/scripts/api/services/blogService';
-import BlogCard from './BlogCard.vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getRecommendationArticals } from '../../scripts/api/services/blogService';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-const relatedArticles = ref([]);
+const recommendedArticals = ref([]);
 const route = useRoute();
+const router = useRouter();
+const swiperModules = [Navigation, Pagination];
 
-const fetchRelatedArticles = async () => {
+const fetchrecommendedArticals = async () => {
     try {
-        const currentBlogId = route.params.id;
-        const { items = [] } = await getPagedArticles({ limit: 4, random: true });
-        relatedArticles.value = items
-            .filter((a) => a.id !== currentBlogId)
-            .slice(0, 3);
+        const res = await getRecommendationArticals();
+        console.log(res)
+        recommendedArticals.value = res || [];
     } catch (error) {
-        console.error('Failed to fetch related articles:', error);
+        console.error("Error fetching recommended articals:", error);
     }
 };
 
-onMounted(fetchRelatedArticles);
+const navigateToArticle = (id) => {
+    router.push({
+        name: 'BlogDetail',
+        params: { id: id }
+    });
+};
+
+onMounted(fetchrecommendedArticals);
 watch(() => route.params.id, (newId, oldId) => {
     if (newId !== oldId) {
-        fetchRelatedArticles();
+        fetchrecommendedArticals();
     }
 });
 
@@ -50,10 +76,88 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
-.card-img-top {
-    height: 180px;
-    object-fit: cover;
-    border-top-left-radius: .375rem;
-    border-top-right-radius: .375rem;
+.related-articles-swiper {
+    padding: 0 15px;
+    padding-bottom: 2.5rem;
+    max-width: 100%;
+}
+
+.card-content {
+    height: 75px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 44px;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #6c757d;
+    font-weight: bold;
+    top: 45%;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.swiper-pagination-bullet-active {
+    background: #6c757d;
+}
+
+:deep(.swiper-pagination) {
+    bottom: 0 !important;
+    margin-bottom: 0.5rem;
+}
+
+:deep(.swiper-button-prev) {
+    left: 0;
+}
+
+:deep(.swiper-button-next) {
+    right: 0;
+}
+
+.article-card {
+    height: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.swiper-wrapper) {
+    width: 100%;
+}
+
+:deep(.swiper-slide) {
+    width: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.card-body {
+    padding: 1.25rem 0.75rem;
 }
 </style>
