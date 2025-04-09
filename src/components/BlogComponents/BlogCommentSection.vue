@@ -87,6 +87,7 @@ import {
     createBlogComment,
     updateComment,
     deleteComment,
+    TargetFeedbackEntities
 } from "@/scripts/api/services/commentService";
 import { getUserById } from "@/scripts/api/services/userService";
 import DeleteConfirmPopup from "../Common/Popup/DeleteConfirmPopup.vue";
@@ -153,8 +154,11 @@ export default {
             if (!this.newComment.trim()) return;
             this.loading = true;
             try {
-                const payload = { SourceId: this.blogId, Content: this.newComment.trim() };
-                await createBlogComment(payload);
+                const formData = new FormData();
+                formData.append(`SourceId`, this.blogId);
+                formData.append(`Content`, this.newComment.trim());
+                formData.append(`TargetEntity`, TargetFeedbackEntities.ArticleComment.value);
+                await createBlogComment(formData);
                 this.newComment = "";
                 this.page = 1;
                 await this.fetchComments();

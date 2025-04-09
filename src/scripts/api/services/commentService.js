@@ -2,7 +2,7 @@ import { get, postForm, patchForm, del } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Comments';
 
-const TargetFeedbackEntities = Object.freeze({
+export const TargetFeedbackEntities = Object.freeze({
     ArticleComment: { value: 0, label: 'ArticleComment' },
     LectureComment: { value: 1, label: 'LectureComment' },
 
@@ -27,12 +27,9 @@ export const getPagedBlogComments = async (blogId, page = 1, pageSize = 5) => {
     }
 };
 
-export const createBlogComment = async (commentData) => {
+export const createBlogComment = async (formData) => {
     try {
-        return await postForm(`${API_BASE_URL}`, {
-            ...commentData,
-            TargetEntity: TargetFeedbackEntities.ArticleComment.value
-        });
+        return await postForm(`${API_BASE_URL}`, formData);
     } catch (error) {
         throw error;
     }
