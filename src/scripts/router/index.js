@@ -51,6 +51,7 @@ import CourseList from '@/views/Courses/CourseList.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/LectureDetail.vue'
 import CoursePayment from '@/views/Courses/CoursePayment.vue'
+import CoursesEnrolled from '@/views/Courses/CoursesEnrolled.vue'
 
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
@@ -348,6 +349,11 @@ const router = createRouter({
       path: '/courses',
       name: 'courseList',
       component: CourseList
+    },
+    {
+      path: '/courses/enrolled',
+      name: 'coursesEnrolled',
+      component: CoursesEnrolled
     },
     {
       path: '/courses/manage',

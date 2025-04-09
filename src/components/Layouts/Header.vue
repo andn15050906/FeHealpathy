@@ -25,7 +25,7 @@
             <hr class="menu-divider" />
             <li><router-link to="/settings">Settings</router-link></li>
             <hr class="menu-divider" />
-            <li><router-link to="/enrolled-course">Enrolled courses</router-link></li>
+            <li><router-link to="/courses/enrolled">Enrolled courses</router-link></li>
 
             <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
