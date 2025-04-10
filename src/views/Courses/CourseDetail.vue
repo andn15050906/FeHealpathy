@@ -8,9 +8,13 @@
           <div class="course-media-actions">
             <img :src="course.thumbUrl" alt="Course Thumbnail" class="course-thumb" />
             
+            <div class="owner-status" v-if="isOwner">
+              <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
+            </div>
+
             <div 
               class="course-actions" 
-              v-if="!isEnrolled && !isLoadingEnrollment" 
+              v-else-if="!isEnrolled && !isLoadingEnrollment" 
             >
               <div class="course-pricing">
                 <span class="price-label">Giá:</span>
@@ -121,6 +125,7 @@ import { getCourseById } from "@/scripts/api/services/CourseService";
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";
+import { getUserProfile } from "@/scripts/api/services/authService";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue'; 
 import { getUserById } from "@/scripts/api/services/userService";
 
@@ -140,6 +145,17 @@ export default {
     const isLoadingLectures = ref(true);
     const isEnrolled = ref(false);
     const isLoadingEnrollment = ref(true);
+    const isOwner = ref(false);
+    const currentUser = ref(null);
+
+    const getCurrentUserInfo = () => {
+      try {
+        currentUser.value = getUserProfile();
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin người dùng từ localStorage:", error);
+        currentUser.value = null;
+      }
+    };
 
     const fetchCourseInfo = async () => {
        isLoadingCourse.value = true;
@@ -172,13 +188,18 @@ export default {
             } else {
               instructorName.value = "Không rõ";
             }
+           if (currentUser.value && course.value) {
+               isOwner.value = course.value.creatorId === currentUser.value.id;
+           }
            return true;
          } else {
            console.error("Không tìm thấy dữ liệu khóa học.");
+           isOwner.value = false;
            return false;
          }
        } catch (error) {
          console.error("Lỗi khi lấy thông tin khóa học:", error);
+         isOwner.value = false;
          return false; 
        } finally {
          isLoadingCourse.value = false;
@@ -278,8 +299,10 @@ export default {
     };
 
     onMounted(async () => {
+       getCurrentUserInfo();
+       
        await Promise.all([
-         fetchCourseInfo(), 
+         fetchCourseInfo(),
          fetchLectures(),
          checkEnrollmentStatus()
        ]);
@@ -291,6 +314,7 @@ export default {
       isLoadingLectures, 
       isLoadingEnrollment,
       isEnrolled,
+      isOwner,
       course,
       lectures,
       instructorName,
@@ -631,5 +655,20 @@ export default {
     margin-top: 20px;
     text-align: center;
     color: #6c757d;
+}
+
+.owner-status {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.owner-message {
+  color: #856404;
+  font-weight: 600;
+  margin: 0;
 }
 </style>
