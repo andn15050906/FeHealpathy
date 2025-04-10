@@ -36,7 +36,7 @@
 import { ref, computed, watch, onBeforeMount } from 'vue';
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import { getPagedArticles } from '@/scripts/api/services/blogService.js';
+import { getAllArticles } from '@/scripts/api/services/blogService.js';
 import { getPagedTags } from '@/scripts/api/services/tagService.js';
 
 const searchQuery = ref('');
@@ -93,8 +93,8 @@ function changePage(page) {
 
 onBeforeMount(async () => {
   try {
-    const resp = await getPagedArticles();
-    blogs.value = resp.items || [];
+    const allArticles = await getAllArticles();
+    blogs.value = allArticles || [];
     const tagResp = await getPagedTags();
     filters.value = tagResp.map(tag => ({ value: tag.id, label: tag.title }));
     sortBlogs();

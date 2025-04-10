@@ -29,7 +29,7 @@
 import { ref, computed, watch, onBeforeMount } from 'vue';
 import courseCard from '@/components/courseComponents/courseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import { getCourses } from '@/scripts/api/services/courseService.js';
+import { getAllCourses } from '@/scripts/api/services/courseService.js';
 
 const searchQuery = ref('');
 const sortOption = ref('name-asc');
@@ -37,7 +37,6 @@ const itemsPerPage = 12;
 const currentPage = ref(1);
 const courses = ref([]);
 
-// Filter courses based only on search query.
 const filteredList = computed(() => {
   let result = courses.value;
   if (searchQuery.value) {
@@ -73,8 +72,8 @@ function changePage(page) {
 
 onBeforeMount(async () => {
   try {
-    const courseResp = await getCourses();
-    courses.value = courseResp?.items?.map(course => ({ ...course })) || [];
+    const courseResp = await getAllCourses();
+    courses.value = courseResp.map(course => ({ ...course })) || [];
     sortCourses();
   } catch (e) {
     console.error('Failed to fetch courses', e);
