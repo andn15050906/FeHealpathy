@@ -26,7 +26,7 @@
           <p class="text-secondary">{{ section.content }}</p>
         </div>
         <BlogCommentSection :blogId="blog.id" class="mb-5" />
-        <BlogRelatedItems :currentBlogId="blog.id" />
+        <BlogRelatedItems />
       </div>
       <ScrollToTop />
     </div>
@@ -61,7 +61,7 @@ export default {
       try {
         const blogId = this.$route.params.id;
         this.blog = await getBlogById(blogId);
-        
+
         if (!this.blog) {
           console.error("Không tìm thấy bài viết với ID:", blogId);
         }

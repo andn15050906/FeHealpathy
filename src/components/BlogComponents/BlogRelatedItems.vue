@@ -12,8 +12,9 @@
                     }" class="related-articles-swiper">
                     <swiper-slide v-for="article in recommendedArticals" :key="article.id">
                         <div class="card h-100 shadow-sm p-3 article-card" @click="navigateToArticle(article.objectID)">
-                            <img :src="article.ThumbnailUrl || article.ImageUrl" class="img-fluid rounded mb-3"
-                                style="height: 180px; width: 100%; object-fit: cover;" :alt="article.Title" />
+                            <div v-if="!article.Url" class="default-thumbnail"
+                                style="height: 180px; width: 100%; background-image: url(/assets/images/10.jpg); background-size: cover; border-radius: 0.25rem;">
+                            </div>
                             <div class="card-content">
                                 <h5 class="fw-bold mb-1 title-truncate">{{ article.Title }}</h5>
                                 <p class="text-muted mb-0">{{ formatDate(article.CreationTime) }}</p>
@@ -51,11 +52,13 @@ const fetchrecommendedArticals = async () => {
     }
 };
 
-const navigateToArticle = (id) => {
-    router.push({
-        name: 'BlogDetail',
-        params: { id: id }
-    });
+const navigateToArticle = async (id) => {
+    try {
+        await router.push({ name: 'BlogDetail', params: { id } });
+        window.location.reload();
+    } catch (error) {
+        console.error("Navigation error:", error);
+    }
 };
 
 onMounted(fetchrecommendedArticals);
