@@ -7,7 +7,11 @@
         <div class="course-header">
           <div class="course-media-actions">
             <img :src="course.thumbUrl" alt="Course Thumbnail" class="course-thumb" />
-            <div class="course-actions">
+            
+            <div 
+              class="course-actions" 
+              v-if="!isEnrolled && !isLoadingEnrollment" 
+            >
               <div class="course-pricing">
                 <span class="price-label">Giá:</span>
                 <span class="price" v-if="course.discount > 0">
@@ -22,6 +26,12 @@
               <div class="buy-button-container">
                 <button class="btn-buy" @click="handlePurchase">💰 Mua ngay</button>
               </div>
+            </div>
+            <div class="enrollment-status" v-else-if="isEnrolled && !isLoadingEnrollment">
+              <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
+            </div>
+            <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
+                <p>Đang kiểm tra trạng thái...</p>
             </div>
           </div>
 
@@ -83,20 +93,26 @@
                 >🔓 Xem trước miễn phí</span 
               >
             </div>
-            <button class="btn-view" @click="viewLecture(lecture.id)">▶️ Xem bài giảng</button> 
+            <button 
+              class="btn-view" 
+              @click="viewLecture(lecture.id)"
+              :disabled="!lecture.isPreviewable" 
+              :title="!lecture.isPreviewable ? 'Bạn cần mua khóa học để xem bài giảng này' : 'Xem bài giảng'"
+            >
+              ▶️ Xem bài giảng
+            </button> 
           </div>
         </div>
         <div v-else-if="!isLoadingLectures && course">
             <p>Chưa có bài giảng nào cho khóa học này.</p>
         </div>
       </div>
-      <div v-else-if="!isLoadingCourse && !course"> 
+      <div v-else-if="!isLoadingCourse && !course && !isLoadingEnrollment"> 
         <p class="loading-placeholder">⚠️ Không thể tải thông tin khóa học.</p>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import { ref, computed, onMounted } from "vue";
@@ -104,6 +120,7 @@ import { useRouter, useRoute } from "vue-router";
 import { getCourseById } from "@/scripts/api/services/CourseService"; 
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
+import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue'; 
 import { getUserById } from "@/scripts/api/services/userService";
 
@@ -121,6 +138,8 @@ export default {
     const lectures = ref([]);
     const isLoadingCourse = ref(true);
     const isLoadingLectures = ref(true);
+    const isEnrolled = ref(false);
+    const isLoadingEnrollment = ref(true);
 
     const fetchCourseInfo = async () => {
        isLoadingCourse.value = true;
@@ -140,7 +159,19 @@ export default {
              totalRating: courseData.totalRating, 
              outcomes: courseData.outcomes || "Thông tin đang được cập nhật.",
              requirements: courseData.requirements || "Thông tin đang được cập nhật.",
+             creatorId: courseData.creatorId
            };
+           if (courseData.creatorId) {
+              try {
+                const instructorData = await getUserById(courseData.creatorId);
+                instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
+              } catch (userError) {
+                console.error(`Lỗi khi lấy thông tin giảng viên ${courseData.creatorId}:`, userError);
+                instructorName.value = "Không rõ";
+              }
+            } else {
+              instructorName.value = "Không rõ";
+            }
            return true;
          } else {
            console.error("Không tìm thấy dữ liệu khóa học.");
@@ -157,10 +188,9 @@ export default {
     const fetchLectures = async () => {
        if (!courseId) return; 
        isLoadingLectures.value = true;
-       instructorName.value = "Đang tải...";
        try {
-          const lectureData = await getLectures(courseId); 
-          const lectureList = Array.isArray(lectureData) ? lectureData : lectureData?.items || [];
+          const response = await getLectures(courseId); 
+          const lectureList = response?.items || [];
           lectures.value = lectureList.map(lecture => {
              const firstImageMaterial = lecture.materials?.find(material => material.type === 1); 
              return {
@@ -168,30 +198,39 @@ export default {
                 firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null 
              };
           });
-
-          const firstLecture = lectureList[0];
-          if (firstLecture && firstLecture.creatorId) {
-            try {
-              const instructorData = await getUserById(firstLecture.creatorId);
-              instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
-            } catch (userError) {
-              console.error(`Lỗi khi lấy thông tin giảng viên ${firstLecture.creatorId}:`, userError);
-              instructorName.value = "Không rõ";
-            }
-          } else {
-            instructorName.value = "Không rõ";
-          }
-
        } catch (error) {
           console.error(`Lỗi khi lấy danh sách bài giảng cho khóa học ${courseId}:`, error);
           lectures.value = []; 
-          instructorName.value = "Không rõ";
        } finally {
           isLoadingLectures.value = false;
        }
     };
 
-    const isLoading = computed(() => isLoadingCourse.value || isLoadingLectures.value);
+    const checkEnrollmentStatus = async () => {
+      if (!courseId) return;
+      isLoadingEnrollment.value = true;
+      try {
+        const response = await getEnrollments({ pageSize: 100 }); 
+        
+        if (response && response.items) {
+          const enrolled = response.items.some(enrollment => enrollment.courseId === courseId);
+          isEnrolled.value = enrolled;
+        } else {
+          isEnrolled.value = false;
+        }
+      } catch (error) {
+        console.error("Lỗi khi kiểm tra trạng thái đăng ký:", error);
+        isEnrolled.value = false; 
+      } finally {
+        isLoadingEnrollment.value = false;
+      }
+    };
+
+    const isLoading = computed(() => 
+      isLoadingCourse.value || 
+      isLoadingLectures.value || 
+      isLoadingEnrollment.value
+    );
 
     const discountedPrice = computed(() => {
        if (!course.value) return 0;
@@ -239,13 +278,19 @@ export default {
     };
 
     onMounted(async () => {
-       await Promise.all([fetchCourseInfo(), fetchLectures()]);
+       await Promise.all([
+         fetchCourseInfo(), 
+         fetchLectures(),
+         checkEnrollmentStatus()
+       ]);
     });
 
     return {
       isLoading, 
       isLoadingCourse, 
       isLoadingLectures, 
+      isLoadingEnrollment,
+      isEnrolled,
       course,
       lectures,
       instructorName,
@@ -488,11 +533,22 @@ export default {
   text-align: center;
   margin-top: 10px;
   width: 100%;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 .btn-view:hover {
   background: #0056b3;
+}
+
+.btn-view:disabled {
+  background-color: #adb5bd;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-view:disabled:hover {
+  background-color: #adb5bd;
 }
 
 @media (max-width: 768px) {
@@ -554,5 +610,26 @@ export default {
   border-radius: 8px;
   border: 1px dashed #ddd;
   margin-bottom: 15px;
+}
+
+.enrollment-status {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e9f7ef;
+  border: 1px solid #b8e0c8;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.enrolled-message {
+  color: #155724;
+  font-weight: 600;
+  margin: 0;
+}
+
+.enrollment-loading {
+    margin-top: 20px;
+    text-align: center;
+    color: #6c757d;
 }
 </style>
