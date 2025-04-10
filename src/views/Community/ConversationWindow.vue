@@ -56,9 +56,10 @@
             <InviteUser
                 v-if="showInviteModal"
                 :conversationId="inviteRoomId"
-                @close="() => {
-                    showInviteModal = false;
-                }"
+                :current-user="currentUser"
+                :current-room-members="currentRoomMembers"
+                @created="fetchRooms"
+                @close="showInviteModal = false"
             />
         </teleport>
     </div>
@@ -69,7 +70,7 @@ import { register } from 'vue-advanced-chat'
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODate, reactionMap } from '@/scripts/logic/common';
 import { getUsers } from '@/scripts/api/services/userService';
-import { getPagedConversations } from '@/scripts/api/services/conversationService';
+import { getPagedConversations, createConversation } from '@/scripts/api/services/conversationService';
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
 import InviteUser from "@/components/Common/Popup/InviteUser.vue";
