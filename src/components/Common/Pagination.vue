@@ -44,6 +44,7 @@ export default {
 .pagination-nav {
     display: flex;
     justify-content: center;
+    margin-top: 20px;
 }
 
 .pagination {
