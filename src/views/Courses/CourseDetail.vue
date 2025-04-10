@@ -224,7 +224,18 @@ export default {
     };
 
     const viewLecture = (lectureId) => {
-       router.push({ name: 'LectureDetail', params: { courseId: course.value.id, lectureId: lectureId } });
+      if (!lectureId) {
+        console.error("Không có ID bài giảng trong CourseDetail");
+        return;
+      }
+
+      console.log("Redirecting to lecture with ID:", lectureId);
+      
+      router.push({ 
+        name: 'lectureDetail',
+        params: { id: lectureId },
+        query: { courseId: course.value.id }
+      });
     };
 
     onMounted(async () => {

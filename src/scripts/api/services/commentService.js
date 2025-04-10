@@ -44,6 +44,25 @@ export const updateComment = async (commentId, newContent) => {
         const formData = new FormData();
         formData.append("id", commentId);
         formData.append("content", newContent.trim());
+        
+        const response = await patchForm(`${API_BASE_URL}`, formData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateLectureComment = async (commentId, newContent) => {
+    try {
+        if (!commentId || !newContent || typeof newContent !== "string") {
+            throw new Error("Id và Content phải là chuỗi hợp lệ.");
+        }
+
+        const formData = new FormData();
+        formData.append("id", commentId);
+        formData.append("content", newContent.trim());
+        formData.append("targetEntity", TargetFeedbackEntities.LectureComment.value);
+        
         const response = await patchForm(`${API_BASE_URL}`, formData);
         return response;
     } catch (error) {
@@ -54,6 +73,35 @@ export const updateComment = async (commentId, newContent) => {
 export const deleteComment = async (commentId) => {
     try {
         return await del(`${API_BASE_URL}/${commentId}`);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getPagedLectureComments = async (lectureId, page = 1, pageSize = 10) => {
+    try {
+        return await get(`${API_BASE_URL}`, {
+            SourceId: lectureId,
+            TargetEntity: TargetFeedbackEntities.LectureComment.value,
+            page,
+            pageSize
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createLectureComment = async (lectureId, content) => {
+    try {
+        if (!lectureId || !content || typeof content !== "string") {
+            throw new Error("LectureId và Content phải là chuỗi hợp lệ.");
+        }
+
+        const formData = new FormData();
+        formData.append("sourceId", lectureId);
+        formData.append("targetEntity", TargetFeedbackEntities.LectureComment.value);
+        formData.append("content", content.trim());
+        return await postForm(`${API_BASE_URL}`, formData);
     } catch (error) {
         throw error;
     }
