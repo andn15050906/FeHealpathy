@@ -69,6 +69,7 @@ export default {
     color: #55a0f0;
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
 }
 
 .page-link:hover {
@@ -79,6 +80,7 @@ export default {
     color: #6c757d;
     pointer-events: none;
     background-color: #ffffff;
+    cursor: default;
 }
 
 .page-item.active .page-link {

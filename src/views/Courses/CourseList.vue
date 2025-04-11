@@ -29,7 +29,7 @@
 import { ref, onMounted, watch } from 'vue';
 import courseCard from '@/components/courseComponents/courseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import { getCourses } from '@/scripts/api/services/courseService.js';
+import { getAllCourses } from '@/scripts/api/services/courseService.js';
 
 const searchQuery = ref('');
 const sortOption = ref('name-asc');

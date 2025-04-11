@@ -65,7 +65,7 @@
           </tbody>
         </table>
       </div>
-      <Pagination :currentPage="currentPageCourses" :totalPages="totalPagesCourses" @GoToPage="changePageCourse" />
+      <Pagination :currentPage="currentPageCourses" style="margin-top: 20px;" :totalPages="totalPagesCourses" @GoToPage="changePageCourse" />
     </div>
     <!-- Blogs Tab -->
     <div v-if="currentTab === 'blogs'" class="tab-pane fade show active">
@@ -125,7 +125,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageBlogs" :totalPages="totalPagesBlogs" @GoToPage="changePageBlog" />
+        <Pagination :currentPage="currentPageBlogs" style="margin-top: 20px;" :totalPages="totalPagesBlogs" @GoToPage="changePageBlog" />
       </div>
     </div>
     <!-- Roadmaps Tab -->
@@ -172,7 +172,7 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageRoadmaps" :totalPages="totalPagesRoadmaps" @GoToPage="changePageRoadmap" />
+        <Pagination :currentPage="currentPageRoadmaps" style="margin-top: 20px;" :totalPages="totalPagesRoadmaps" @GoToPage="changePageRoadmap" />
       </div>
     </div>
     <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog" @blogUpdated="handleBlogUpdated" />

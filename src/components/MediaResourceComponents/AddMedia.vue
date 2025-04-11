@@ -237,9 +237,10 @@ export default {
 
             try {
                 const formData = new FormData();
+                formData.append("Title", this.newMedia.title);
                 formData.append("Description", this.newMedia.description);
                 formData.append("Artist", this.newMedia.artistName);
-                formData.append("Media.Title", this.newMedia.title);
+                formData.append("Media.Title", this.newMedia.file.name.replace(/\.(mp3|mp4)$/i, ""));
                 formData.append("Media.Type", this.newMedia.type);
                 formData.append("Media.File", this.newMedia.file);
 

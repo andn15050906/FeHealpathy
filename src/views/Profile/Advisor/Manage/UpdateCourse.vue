@@ -135,14 +135,14 @@
                 </label>
                 <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
                   accept="image/*,video/*,application/pdf" multiple />
-                  <div v-if="lecture.medias && lecture.medias.length > 0" class="mt-2">
+                <div v-if="lecture.medias && lecture.medias.length > 0" class="mt-2">
                   <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
                     class="d-flex align-items-center mb-2 p-2 border rounded">
-                    <template v-if="media.type === 'image'">
+                    <template v-if="media.type === 1">
                       <img :src="media.preview" alt="Lecture Image" class="img-thumbnail me-2"
                         style="max-width: 100px;" />
                     </template>
-                    <template v-else-if="media.type === 'video'">
+                    <template v-else-if="media.type === 2">
                       <video controls :src="media.preview" class="me-2"
                         style="max-width: 100px; border-radius: 5px;"></video>
                     </template>
@@ -237,13 +237,19 @@ export default {
 
         // Gọi getLectures riêng biệt
         try {
-          const lectureResponse = await getLectures({ courseId });
-          this.course.lectures = lectureResponse.items.map(lecture => ({
+          const lectureResponse = await getLectures(courseId);
+          const lectureList = lectureResponse?.items || [];
+
+          this.course.lectures = lectureList.map(lecture => ({
             title: lecture.title,
             content: lecture.content,
             contentSummary: lecture.contentSummary,
             isPreviewable: lecture.isPreviewable,
-            medias: lecture.materials,
+            medias: (lecture.materials || lecture.medias || []).map(material => ({
+              ...material,
+              preview: material.type === 1 || material.type === 2 ? material.url : '',
+              file: null
+            })),
             id: lecture.id,
           }));
         } catch (lectureError) {
@@ -251,7 +257,9 @@ export default {
             console.warn("📭 Không có lecture cho khóa học này.");
             this.course.lectures = [];
           } else {
-            throw lectureError;
+            console.error("❌ Lỗi khi lấy lectures:", lectureError);
+            toast.error("Không thể tải danh sách bài giảng.");
+            this.course.lectures = [];
           }
         }
 
@@ -263,7 +271,7 @@ export default {
       this.course.lectures.push({
         title: "",
         content: "",
-        contentSummary: "",
+        contentSummary: "test",
         isPreviewable: false,
         medias: []
       });
@@ -293,16 +301,16 @@ export default {
       const files = Array.from(event.target.files);
       files.forEach((file) => {
         const fileType = file.type.startsWith("image")
-          ? "image"
+          ? 1
           : file.type.startsWith("video")
-            ? "video"
-            : "document";
+            ? 2
+            : 3;
         const reader = new FileReader();
         reader.onload = (e) => {
           this.course.lectures[lectureIndex].medias.push({
             type: fileType,
             file: file,
-            preview: e.target.result,
+            preview: fileType === 1 || fileType === 2 ? e.target.result : '',
             url: "",
             title: file.name
           });
@@ -334,28 +342,56 @@ export default {
 
         // Thumb
         if (this.course.thumb.file) {
-          formData.append('Thumb.File', this.course.thumb.file, this.course.thumb.title);
+          const thumbBase64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64String = e.target.result.split(',')[1];
+              resolve(base64String);
+            };
+            reader.readAsDataURL(this.course.thumb.file);
+          });
+          formData.append('Thumb.File', thumbBase64);
           formData.append('Thumb.Title', this.course.thumb.title || 'thumbnail');
-        }
-
-        if (this.course.thumb.url) {
+        } else if (this.course.thumb.url) {
           formData.append('Thumb.Url', this.course.thumb.url);
         }
 
         // Lectures
-        this.course.lectures.forEach((lecture, index) => {
+        for (let index = 0; index < this.course.lectures.length; index++) {
+          const lecture = this.course.lectures[index];
           formData.append(`Lectures[${index}].Id`, lecture.id || '');
           formData.append(`Lectures[${index}].Title`, lecture.title);
           formData.append(`Lectures[${index}].Content`, lecture.content);
           formData.append(`Lectures[${index}].ContentSummary`, lecture.contentSummary);
           formData.append(`Lectures[${index}].IsPreviewable`, lecture.isPreviewable.toString());
 
-          lecture.medias.forEach((media, mediaIndex) => {
+          for (let mediaIndex = 0; mediaIndex < lecture.medias.length; mediaIndex++) {
+            const media = lecture.medias[mediaIndex];
             if (media.file) {
-              formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, media.file, media.title);
+              const mediaBase64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  const base64String = e.target.result.split(',')[1];
+                  resolve(base64String);
+                };
+                reader.readAsDataURL(media.file);
+              });
+              formData.append(`Lectures[${index}].Medias[${mediaIndex}].File`, mediaBase64);
+              formData.append(`Lectures[${index}].Medias[${mediaIndex}].Title`, media.title);
             }
-          });
-        });
+          }
+        }
+
+        // Log FormData entries for debugging
+        console.log("FormData entries:");
+        for (let pair of formData.entries()) {
+          // Log the key and a snippet of the value (especially for long base64 strings)
+          if (typeof pair[1] === 'string' && pair[1].length > 100) {
+            console.log(pair[0] + ': ', pair[1].substring(0, 50) + '...'); 
+          } else {
+            console.log(pair[0] + ': ', pair[1]); 
+          }
+        }
 
         const response = await updateCourse(formData);
         console.log('Course updated successfully:', response);
