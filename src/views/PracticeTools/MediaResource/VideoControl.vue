@@ -39,13 +39,22 @@ export default {
                 const params = { Description: "", Artist: "", Title: "", Type: 2, PageIndex: page - 1, PageSize: 10 };
                 const response = await getPagedMediaResources(params);
                 if (response && response.items.length > 0) {
-                    const newMedias = response.items.map((item) => ({
-                        name: item.title,
-                        artist: item.artist,
-                        video: item.media.url,
-                        id: item.id,
-                        active: false,
-                        duration: 0
+                    const newMedias = await Promise.all(response.items.map(async (item) => {
+                        const videoElement = document.createElement('video');
+                        videoElement.src = item.media.url;
+                        await new Promise((resolve) => {
+                            videoElement.addEventListener('loadedmetadata', () => {
+                                resolve();
+                            });
+                        });
+                        return {
+                            name: item.title,
+                            artist: item.artist,
+                            video: item.media.url,
+                            id: item.id,
+                            active: false,
+                            duration: videoElement.duration
+                        };
                     }));
                     if (page === 1) {
                         medias.value = newMedias;
