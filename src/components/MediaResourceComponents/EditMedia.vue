@@ -96,7 +96,8 @@ export default {
             try {
                 const formData = new FormData();
                 formData.append("Id", this.editedMedia.id);
-                formData.append("ReplacedMedia.Title", this.editedMedia.title);
+                formData.append("Title", this.editedMedia.title);
+                formData.append("ReplacedMedia.Title", this.editedMedia.file ? this.editedMedia.file.name.replace(/\.(mp3|mp4)$/, "") : this.editedMedia.title);
                 formData.append("Description", this.editedMedia.description);
                 formData.append("Artist", this.editedMedia.artist);
 
