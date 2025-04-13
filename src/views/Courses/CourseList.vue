@@ -26,10 +26,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import courseCard from '@/components/courseComponents/courseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import { getAllCourses } from '@/scripts/api/services/courseService.js';
+import { getCourses } from '@/scripts/api/services/courseService.js';
 
 const searchQuery = ref('');
 const sortOption = ref('name-asc');
@@ -61,7 +61,7 @@ function sortCourses() {
   loadCourses(1);
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   loadCourses();
 });
 

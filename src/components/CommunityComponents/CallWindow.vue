@@ -421,24 +421,9 @@ import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODate, reactionMap } from '@/scripts/logic/common';
 import { getUsers } from '@/scripts/api/services/userService';
 import { HubConnection, RTCHandler, ParticipantExtraInfo, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
-
-/*window.conversationName = "Video call";
-window.conversationId = "@Model.ConversationId";
-window.unsetClient = client;
-var currentClient = getClientData();
-if (!currentClient || currentClient.id != client.id) {
-    setClientData(client);
-}*/
-
 import { createSidebar, createInCallWindow, createOutCallWindow, createVideoTile, createMessageContainer, createMessage } from '@/components/call_html.js';
 import { VideoHandler } from '@/scripts/logic/conversationState';
 import { onMounted } from 'vue';
-//import { ChatHandler, ChatMessage } from '../chat/chatHandler.js';
-//import * as Storage from '../common/storage.js';
-//import { redirectToSignin } from '../common/utilities.js';
-
-
-
 
 
 
@@ -451,34 +436,31 @@ const constraints = {
     video: { width: 400, height: 300 }
 };
 
+const props = defineProps({
+  roomId: {
+    type: String,
+    required: true
+  }
+});
+
 const client = getUserProfile();
-//...
 var conversationName = 'Video Conference';
-var _roomId = 'eb4e0163-271a-4886-9e60-bee318d7ca44';
+var _roomId = props?.roomId ?? 'eb4e0163-271a-4886-9e60-bee318d7ca44';
 
 onMounted(() => {
     var _onCall = false;
-
     var callWindow;
     var _videoRow, roomChatInp, _defaultMedia = MEDIA_TYPE.DISPLAY_MEDIA;
-
     var _rtcHandler = new RTCHandler(new HubConnection());
     var _participants = {};
     var _localStream;
 
     setupRTCHandler(_rtcHandler);
     callWindow = document.getElementById('_callWindow');
-
-
-
     //document.getElementById('_sidebar').innerHTML = createSidebar();
-
-
 
     setCallWindow(_onCall);
     var _chatHandler;
-
-
 
     function setCallWindow(isOnCall) {
         _onCall = isOnCall;

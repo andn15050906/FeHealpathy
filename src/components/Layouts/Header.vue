@@ -20,11 +20,11 @@
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
-            <hr class="menu-divider" />
             <li><router-link to="/statistics/self-assessment">Statistics</router-link></li>
-            <hr class="menu-divider" />
             <li><router-link to="/settings">Settings</router-link></li>
+            
             <hr class="menu-divider" />
+            <li><router-link to="/meetings/schedule">Meetings</router-link></li>
             <li><router-link to="/courses/enrolled">Enrolled courses</router-link></li>
 
             <li v-if="user.role != 1 && user.role != 2" >
@@ -35,32 +35,20 @@
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
               <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
-            </li>
-
-            <li v-if="user.role === 1">
-              <hr class="menu-divider" />
-            <router-link to="/advisor/content">Advisor Content</router-link>
-            </li>
-            <li v-if="user.role === 1">
-              <hr class="menu-divider" />
-            <router-link to="/media/manage">Media Management</router-link>
+              <router-link to="/advisor/content">Advisor Content</router-link>
+              <router-link to="/media/manage">Media Management</router-link>
             </li>
             
             <li v-if="user.role === 2">
-              <router-link to="/admin">Admin</router-link>
-            </li>
-            <li v-if="user.role === 2">
-              <router-link to="/advisor/content">Moderate Advisor</router-link>
-            </li>
-            <li v-if="user.role === 2">
               <hr class="menu-divider" />
-              <router-link to="/yogas/manage">Manage Yoga Practice</router-link>
+              <router-link to="/admin">Admin</router-link>
+              <router-link to="/advisor/content">Moderate Advisor</router-link>
+              <router-link to="/yogas/manage">Yoga Lessons</router-link>
             </li>
 
             <li>
               <hr class="menu-divider" />
-              <button @click="signOut">Sign Out</button>
-              <hr class="menu-divider" />
+              <button style="width: 100%;" @click="signOut">Sign Out</button>
             </li>
           </ul>
         </div>
@@ -290,10 +278,6 @@ ul {
   cursor: pointer;
   color: #333;
   transition: background-color 0.2s;
-}
-
-.dropdown-menu li:hover {
-  background-color: #f3f3f3;
 }
 
 .dropdown-menu li a,

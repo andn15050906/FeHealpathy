@@ -16,6 +16,7 @@ export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   }
 };
 
+/*
 export const getAllCourses = async () => {
   let allCourses = [];
   let pageIndex = 0;
@@ -37,6 +38,7 @@ export const getAllCourses = async () => {
 
   return allCourses;
 };
+*/
 
 export const getCourseById = async (courseId) => {
   try {

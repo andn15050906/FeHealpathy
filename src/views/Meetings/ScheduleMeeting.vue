@@ -82,15 +82,18 @@
             <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
           </div>
           <div class="meeting-details">
-            <p><i class="fas fa-calendar"></i> {{ formatDate(meeting.startAfter) }}</p>
+            <p><i class="fas fa-calendar"></i> {{ formatISODateWithHMS(meeting.startAt) }}</p>
             <p><i class="fas fa-clock"></i> 
-              {{ new Date(meeting.startAfter).toLocaleTimeString('vi-VN') }} - 
-              {{ new Date(meeting.endAfter).toLocaleTimeString('vi-VN') }}
+              {{ new Date(meeting.startAt).toLocaleTimeString('vi-VN') }} - 
+              {{ new Date(meeting.endAt).toLocaleTimeString('vi-VN') }}
             </p>
             <p v-if="meeting.description"><i class="fas fa-sticky-note"></i> {{ meeting.description }}</p>
           </div>
           <div class="meeting-actions">
-            <button v-if="meeting.status === 'pending'" 
+            <button @click="joinMeeting(meeting.id)" class="btn btn-success">
+              Tham gia
+            </button>
+            <!--<button v-if="meeting.status === 'pending'" 
                     @click="cancelMeeting(meeting.id)" 
                     class="btn btn-danger">
               Hủy lịch
@@ -99,7 +102,7 @@
                     @click="joinMeeting(meeting.id)" 
                     class="btn btn-success">
               Tham gia
-            </button>
+            </button>-->
           </div>
         </div>
       </div>
@@ -108,12 +111,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onBeforeMount, computed } from 'vue';
 import { createMeeting, getMeetings, deleteMeeting, joinMeeting as joinMeetingApi } from '@/scripts/api/services/meetingService';
 import { getUsers } from '@/scripts/api/services/userService';
+import { getUserProfile } from '@/scripts/api/services/authService';
+import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
+import { useRouter } from 'vue-router';
 
-// Khai báo các reactive states
 const meetingDate = ref('');
 const startTime = ref('');
 const endTime = ref('');
@@ -123,8 +128,8 @@ const isLoading = ref(false);
 const meetings = ref([]);
 const advisors = ref([]);
 const today = new Date().toISOString().split('T')[0];
+const router = useRouter();
 
-// Validate thời gian
 const isValidTime = computed(() => {
   if (!startTime.value || !endTime.value || !meetingDate.value) return true;
 
@@ -139,52 +144,45 @@ const isValidTime = computed(() => {
   return startDateTime < endDateTime;
 });
 
-// Lấy danh sách advisors khi component được mount
-onMounted(async () => {
+onBeforeMount(async () => {
   try {
-    // Gọi API với Role=2 để lấy danh sách advisor
     const response = await getUsers({ 
-      Role: 2,
+      Role: 1,
       PageIndex: 0,
-      PageSize: 100 // Lấy tối đa 100 advisor
+      PageSize: 100
     });
-    console.log('Users response:', response); // Debug log
-
-    if (response?.data?.items) {
-      advisors.value = response.data.items.map(advisor => ({
+    
+    if (response?.items) {
+      advisors.value = response.items.map(advisor => ({
         id: advisor.id,
-        fullName: advisor.fullName || advisor.userName || 'Unknown',
+        fullName: advisor.fullName || advisor.userName || 'Advisor',
         email: advisor.email
       }));
 
-      console.log('Mapped advisors:', advisors.value); // Debug log
       await loadMeetings();
     }
   } catch (error) {
-    console.error('Error loading advisors:', error);
     toast.error('Không thể tải danh sách advisor');
   }
 });
 
-// Lấy danh sách các cuộc họp
 const loadMeetings = async () => {
   try {
     const response = await getMeetings({
       PageIndex: 0,
       PageSize: 10
     });
-    
-    if (response?.data?.items) {
-      meetings.value = response.data.items.map(meeting => ({
+
+    if (response?.items) {
+      meetings.value = response.items.map(meeting => ({
         ...meeting,
-        advisorName: advisors.value.find(a => a.id === meeting.advisorId)?.fullName || 'Unknown'
+        advisorName: advisors.value.find(a => a.id === meeting.advisorId)?.fullName || 'Advisor'
       }));
     } else {
       meetings.value = [];
     }
   } catch (error) {
-    console.error('Error loading meetings:', error);
-    toast.error('Không thể tải danh sách cuộc họp');
+    //toast.error('Không thể tải danh sách cuộc họp');
   }
 };
 
@@ -212,34 +210,31 @@ const scheduleMeeting = async () => {
 
     const dto = {
       title: 'Cuộc họp với Advisor',
-      startAfter: startDateTime.toISOString(),
-      endAfter: endDateTime.toISOString(),
+      startAt: startDateTime,
+      endAt: endDateTime,
       maxParticipants: 2,
-      participants: [selectedAdvisor.value],
+      participants: [
+        { userId: getUserProfile().id, isHost: true },
+        { userId: selectedAdvisor.value, isHost: false },
+      ],
       description: notes.value || ''
     };
 
     const response = await createMeeting(dto);
     
-    if (response?.data) {
+    if (response) {
       toast.success('Đặt lịch họp thành công');
       
-      // Reset form
       meetingDate.value = '';
       startTime.value = '';
       endTime.value = '';
       selectedAdvisor.value = '';
       notes.value = '';
       
-      // Tải lại danh sách cuộc họp
       await loadMeetings();
     }
   } catch (error) {
-    console.error('Error scheduling meeting:', error);
-    const errorMessage = error.response?.data?.message 
-      || error.response?.data?.errors?.join(', ')
-      || 'Không thể đặt lịch họp';
-    toast.error(errorMessage);
+    //toast.error('Không thể đặt lịch họp');
   } finally {
     isLoading.value = false;
   }
@@ -254,7 +249,6 @@ const cancelMeeting = async (meetingId) => {
     toast.success('Hủy lịch họp thành công');
     await loadMeetings();
   } catch (error) {
-    console.error('Error canceling meeting:', error);
     toast.error('Không thể hủy lịch họp');
   }
 };
@@ -262,22 +256,12 @@ const cancelMeeting = async (meetingId) => {
 // Tham gia cuộc họp
 const joinMeeting = async (meetingId) => {
   try {
-    await joinMeetingApi(meetingId);
-    toast.success('Đã tham gia cuộc họp');
-    // Có thể thêm logic để mở video call ở đây
+    console.log(meetingId);
+    //await joinMeetingApi(meetingId);
+    router.push(`/call/${meetingId}`);
   } catch (error) {
-    console.error('Error joining meeting:', error);
     toast.error('Không thể tham gia cuộc họp');
   }
-};
-
-// Format ngày tháng
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
 };
 </script>
 

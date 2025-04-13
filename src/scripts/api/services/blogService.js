@@ -16,7 +16,7 @@ export const getPagedArticles = async (params = { pageIndex: 0, pageSize: 20 }) 
   }
 };
 
-
+/*
 export const getAllArticles = async () => {
   let allArticles = [];
   let pageIndex = 0;
@@ -38,6 +38,7 @@ export const getAllArticles = async () => {
 
   return allArticles;
 };
+*/
 
 export const createArticle = async (articleData) => {
     return await postForm(`${API_BASE_URL}`, articleData);

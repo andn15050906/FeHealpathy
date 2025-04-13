@@ -33,10 +33,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import { getAllArticles } from '@/scripts/api/services/blogService.js';
+import { getPagedArticles } from '@/scripts/api/services/blogService.js';
 import { getPagedTags } from '@/scripts/api/services/tagService.js';
 
 const searchQuery = ref('');
@@ -87,7 +87,7 @@ function sortBlogs() {
   loadBlogs(1);
 }
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await loadTags();
   loadBlogs();
 });
