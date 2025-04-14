@@ -1,21 +1,47 @@
 <template>
-    <div class="container mt-4">
+    <div class="container">
+        <header class="mb-4 text-center">
+            <h2 class="mb-2" style="font-weight: bold;">Media Manager</h2>
+        </header>
+
         <LoadingSpinner ref="loadingSpinner" />
-        <div v-if="showAddMedia">
-            <AddMedia @cancel="toggleAddMedia" @add-media="createMedia" />
-        </div>
-        <div v-else-if="showEditMedia">
-            <EditMedia :media="selectedMedia" @cancel="toggleEditMedia" @edit-media="updateMedia" />
-        </div>
-        <div v-else>
-            <MediaList :mediaFiles="mediaFiles" @edit-media="editMedia" @delete-media="deleteMedia" />
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn btn-primary" @click="toggleAddMedia">
-                    <i class="fas fa-plus me-1"></i> Add Media
-                </button>
+
+        <transition name="fade" mode="out-in">
+            <div v-if="showAddMedia" key="add">
+                <div class="shadow-sm">
+                    <div class="header bg-primary text-white">
+                        <h4 class="mb-0">Add New Media</h4>
+                    </div>
+                    <div class="body">
+                        <AddMedia @cancel="toggleAddMedia" @add-media="createMedia" />
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="showEditMedia" key="edit">
+                <div class="shadow-sm">
+                    <div class="body">
+                        <EditMedia :media="selectedMedia" @cancel="toggleEditMedia" @edit-media="updateMedia" />
+                    </div>
+                </div>
+            </div>
+
+            <div v-else key="list">
+                <div class="shadow-sm mb-3">
+                    <div class="header d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary mb-2" @click="toggleAddMedia">
+                            <i class="fas fa-plus me-1"></i> Add Media
+                        </button>
+                    </div>
+                    <div class="body p-0">
+                        <MediaList :mediaFiles="mediaFiles" @edit-media="editMedia" @delete-media="deleteMedia" />
+                    </div>
+                </div>
+
                 <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="fetchMediaResources" />
             </div>
-        </div>
+        </transition>
+
         <DeleteConfirmPopup v-model:isVisible="showDeletePopup" message="Are you sure you want to delete this media?"
             url="" @confirmDelete="handleDeleteConfirm" />
     </div>
@@ -27,17 +53,24 @@ import MediaList from "../../../components/MediaResourceComponents/MediaList.vue
 import Pagination from "../../../components/Common/Pagination.vue";
 import AddMedia from "../../../components/MediaResourceComponents/AddMedia.vue";
 import EditMedia from "../../../components/MediaResourceComponents/EditMedia.vue";
+import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
+import LoadingSpinner from "../../../components/Common/Popup/LoadingSpinner.vue";
 import {
     getPagedMediaResources,
     createMediaResource,
     updateMediaResource,
     deleteMediaResource,
 } from "../../../scripts/api/services/mediaResourcesService";
-import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
-import LoadingSpinner from "../../../components/Common/Popup/LoadingSpinner.vue";
 
 export default {
-    components: { MediaList, Pagination, AddMedia, EditMedia, DeleteConfirmPopup, LoadingSpinner },
+    components: {
+        MediaList,
+        Pagination,
+        AddMedia,
+        EditMedia,
+        DeleteConfirmPopup,
+        LoadingSpinner,
+    },
     data() {
         return {
             mediaFiles: [],
@@ -49,7 +82,6 @@ export default {
             selectedMediaIndex: null,
             showDeletePopup: false,
             mediaToDelete: null,
-            isLoading: false,
         };
     },
     computed: {
@@ -57,9 +89,9 @@ export default {
             const userProfile = JSON.parse(localStorage.getItem('userProfile'));
             return {
                 id: userProfile?.id,
-                advisorId: userProfile?.advisorId
+                advisorId: userProfile?.advisorId,
             };
-        }
+        },
     },
     methods: {
         async fetchMediaResources(page = 1) {
@@ -100,7 +132,8 @@ export default {
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Media added successfully!");
             } catch (error) {
-                console.error("Failed to add media.");
+                console.error("Failed to add media.", error);
+                toast.error("Failed to add media.");
             } finally {
                 this.$refs.loadingSpinner.hideSpinner();
             }
@@ -143,23 +176,31 @@ export default {
                 this.mediaToDelete = null;
                 this.showDeletePopup = false;
             }
-        }
+        },
     },
     mounted() {
         this.fetchMediaResources();
-    }
+    },
 };
 </script>
 
 <style scoped>
-.table {
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
 }
 
-.list-group-item {
-    padding: 1rem;
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.btn {
+    font-weight: 500;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>
