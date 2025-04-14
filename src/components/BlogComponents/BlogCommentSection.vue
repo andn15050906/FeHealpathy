@@ -54,12 +54,21 @@
                                 <button class="btn btn-link p-0 text-secondary" @click="likeComment(comment)">
                                     <i class="fas fa-thumbs-up me-1"></i>{{ comment.likes }}
                                 </button>
-                                <button class="btn btn-link p-0 text-secondary" @click="toggleEditComment(comment)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-link p-0 text-danger" @click="confirmDeleteComment(comment.id)">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <span style="display: none">
+                                    Current User ID: {{ currentUserId }} ({{ typeof currentUserId }})
+                                    Creator ID: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
+                                    Is Owner: {{ currentUserId === comment.creatorId }}
+                                </span>
+                                <template v-if="isCommentOwner(comment)">
+                                    <button class="btn btn-link p-0 text-secondary" @click="toggleEditComment(comment)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-link p-0 text-danger" @click="confirmDeleteComment(comment.id)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </template>
+                                {{ console.log('Comment Creator ID:', comment.creatorId) }}
+                                {{ console.log('Current User ID:', currentUserId) }}
                             </div>
                         </div>
                     </div>
@@ -95,7 +104,10 @@ import DeleteConfirmPopup from "../Common/Popup/DeleteConfirmPopup.vue";
 export default {
     name: "BlogCommentSection",
     components: { DeleteConfirmPopup },
-    props: { blogId: { type: [String, Number], required: true } },
+    props: {
+        blogId: { type: [String, Number], required: true },
+        currentUserId: { type: [String, Number], required: true }
+    },
     data() {
         return {
             comments: [],
@@ -210,6 +222,9 @@ export default {
         },
         formatDate(date) {
             return dayjs(date).format("DD/MM/YYYY");
+        },
+        isCommentOwner(comment) {
+            return String(this.currentUserId) === String(comment.creatorId);
         },
     },
 };
