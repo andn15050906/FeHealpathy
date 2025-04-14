@@ -8,17 +8,17 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="creationTime">Join Date</label>
-                <span class="form-control readonly-field">{{ form.creationTime }}</span>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.creationTime }}</span>
               </div>
               <div class="form-group">
                 <label for="balance">Balance</label>
-                <span class="form-control readonly-field">{{ form.balance }}</span>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.balance }}</span>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label for="courseCount">Course Count</label>
-                <span class="form-control readonly-field">{{ form.courseCount }}</span>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.courseCount }}</span>
               </div>
               <div class="form-group">
                 <label for="experience">Experience</label>
@@ -140,10 +140,31 @@ const confirmChanges = async () => {
   }
 };
 
+const validateExperience = () => {
+  const wordCount = form.value.experience.trim().split(/\s+/).length;
+  console.log('Experience word count:', wordCount);
+  if (wordCount < 5) {
+    sweetAlert.showError('Experience must be at least 5 words.');
+    return false;
+  }
+  return true;
+};
 
-    const handleSubmit = () => {
-      confirmDialogVisible.value = true;
-    };
+const validateIntroduction = () => {
+  const wordCount = form.value.intro.trim().split(/\s+/).length;
+  console.log('Introduction word count:', wordCount);
+  if (wordCount < 10) {
+    sweetAlert.showError('Introduction must be at least 10 words.');
+    return false;
+  }
+  return true;
+};
+
+const handleSubmit = () => {
+  if (validateExperience() && validateIntroduction()) {
+    confirmDialogVisible.value = true;
+  }
+};
 
     const handleConfirmUpdate = (confirm) => {
       if (confirm) {
