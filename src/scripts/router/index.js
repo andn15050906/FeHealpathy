@@ -147,6 +147,11 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/advisor/view-profile/:advisorId',
+      name: 'viewAdvisor',
+      component: ViewAdvisor
+    },
+    {
       path: '/advisor/edit-profile',
       name: 'editAdvisor',
       component: EditAdvisor,

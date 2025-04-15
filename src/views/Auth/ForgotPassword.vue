@@ -37,13 +37,9 @@ const router = useRouter();
 const loadingSpinner = inject('loadingSpinner');
 const sweetAlert = inject('sweetAlert');
 
-// Hàm kiểm tra định dạng email Gmail
+// Hàm kiểm tra định dạng email
 const validateEmail = (email) => {
-  // Regex pattern để kiểm tra:
-  // ^ - bắt đầu chuỗi
-  // [a-zA-Z0-9._%+-]+ - cho phép các ký tự chữ cái, số và một số ký tự đặc biệt
-  // @gmail\.com$ - phải kết thúc bằng @gmail.com
-  const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  const gmailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   return gmailRegex.test(email);
 };
 
@@ -55,7 +51,7 @@ const handleForgotPassword = async () => {
 
     // Kiểm tra định dạng email
     if (!validateEmail(email.value)) {
-      generalError.value = 'Please enter a valid Gmail address (e.g., example@gmail.com)';
+      generalError.value = 'Please enter a valid Email address (e.g., example@gmail.com)';
       return;
     }
 

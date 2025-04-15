@@ -182,9 +182,9 @@ export default {
     // Validate email
     const validateEmail = () => {
       if (!form.value.email) return true; // Email is optional in edit
-      const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      const gmailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
       if (!gmailRegex.test(form.value.email)) {
-        errors.value.email = 'Please enter a valid Gmail address';
+        errors.value.email = 'Please enter a valid Email address';
         return false;
       }
       errors.value.email = '';

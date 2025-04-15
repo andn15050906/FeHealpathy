@@ -2,25 +2,14 @@
   <div class="schedule-meeting">
     <h2 class="page-title">Đặt lịch họp với Advisor</h2>
 
-    <!-- Form đặt lịch -->
     <div class="meeting-form">
       <div class="form-group">
         <label>Chọn ngày họp:</label>
-        <input 
-          type="date" 
-          v-model="meetingDate" 
-          :min="today"
-          class="form-input" 
-        />
+        <input type="date" v-model="meetingDate" :min="today" class="form-input"/>
       </div>
-
       <div class="form-group">
         <label>Chọn giờ bắt đầu:</label>
-        <input 
-          type="time" 
-          v-model="startTime" 
-          class="form-input" 
-        />
+        <input type="time" v-model="startTime" class="form-input" />
         <small class="form-text" v-if="startTime">
           {{ new Date(`${meetingDate}T${startTime}`).toLocaleTimeString('vi-VN') }}
         </small>
@@ -28,11 +17,7 @@
 
       <div class="form-group">
         <label>Chọn giờ kết thúc:</label>
-        <input 
-          type="time" 
-          v-model="endTime" 
-          class="form-input" 
-        />
+        <input type="time" v-model="endTime" class="form-input" />
         <small class="form-text" v-if="endTime">
           {{ new Date(`${meetingDate}T${endTime}`).toLocaleTimeString('vi-VN') }}
           <span v-if="endTime < startTime">(Ngày hôm sau)</span>
@@ -40,19 +25,25 @@
       </div>
 
       <div class="form-group">
-        <label>Chọn Advisor:</label>
-        <select v-model="selectedAdvisor" class="form-input">
-          <option value="">-- Chọn Advisor --</option>
-          <option v-for="advisor in advisors" :key="advisor.id" :value="advisor.id">
-            {{ advisor.fullName }} {{ advisor.email ? `(${advisor.email})` : '' }}
-          </option>
-        </select>
+        <label>Chọn chuyên gia tư vấn:</label>
+        <div class="advisors-grid">
+          <div
+            v-for="advisor in advisors"
+            :key="advisor.advisorId"
+            class="advisor-card"
+            :class="{ selected: selectedAdvisor === advisor.advisorId }"
+            @click="selectedAdvisor = advisor.advisorId"
+          >
+            <img :src="advisor.avatarUrl" alt="avatar" class="avatar" />
+            <h3>{{ advisor.fullName }}</h3>
+            <p class="bio">{{ advisor.intro }}</p>
+            <RouterLink class="btn btn-info" :to="`/advisor/view-profile/${advisor.advisorId}`">View Profile</RouterLink>
+        </div>
         <small v-if="advisors.length === 0" class="form-text text-muted">
-          Đang tải danh sách advisor...
+          Đang tải danh sách chuyên gia...
         </small>
-        <small v-else class="form-text text-muted">
-          Có {{ advisors.length }} advisor
-        </small>
+      </div>
+
       </div>
 
       <div class="form-group">
@@ -69,16 +60,15 @@
       </button>
     </div>
 
-    <!-- Danh sách các cuộc họp đã đặt -->
     <div class="meetings-list">
-      <h3>Lịch họp của bạn</h3>
+      <h3>Lịch hẹn của bạn</h3>
       <div v-if="meetings.length === 0" class="no-meetings">
-        Chưa có cuộc họp nào được đặt
+        Chưa có cuộc hẹn nào được đặt
       </div>
       <div v-else class="meetings-grid">
         <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
           <div class="meeting-header">
-            <h4>Cuộc họp với {{ meeting.advisorName }}</h4>
+            <h4>Cuộc hẹn với {{ meeting.advisorName }}</h4>
             <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
           </div>
           <div class="meeting-details">
@@ -91,7 +81,7 @@
           </div>
           <div class="meeting-actions">
             <button @click="joinMeeting(meeting.id)" class="btn btn-success">
-              Tham gia
+              Tham gia cuộc gọi
             </button>
             <!--<button v-if="meeting.status === 'pending'" 
                     @click="cancelMeeting(meeting.id)" 
@@ -113,7 +103,7 @@
 <script setup>
 import { ref, onBeforeMount, computed } from 'vue';
 import { createMeeting, getMeetings, deleteMeeting, joinMeeting as joinMeetingApi } from '@/scripts/api/services/meetingService';
-import { getUsers } from '@/scripts/api/services/userService';
+import { getAllAdvisors } from '@/scripts/api/services/advisorService';
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
@@ -136,7 +126,6 @@ const isValidTime = computed(() => {
   const startDateTime = new Date(`${meetingDate.value}T${startTime.value}`);
   const endDateTime = new Date(`${meetingDate.value}T${endTime.value}`);
 
-  // Nếu giờ kết thúc < giờ bắt đầu, tự động đẩy sang ngày hôm sau
   if (endDateTime < startDateTime) {
     endDateTime.setDate(endDateTime.getDate() + 1);
   }
@@ -146,19 +135,10 @@ const isValidTime = computed(() => {
 
 onBeforeMount(async () => {
   try {
-    const response = await getUsers({ 
-      Role: 1,
-      PageIndex: 0,
-      PageSize: 100
-    });
-    
-    if (response?.items) {
-      advisors.value = response.items.map(advisor => ({
-        id: advisor.id,
-        fullName: advisor.fullName || advisor.userName || 'Advisor',
-        email: advisor.email
-      }));
-
+    const response = await getAllAdvisors();
+    if (response) {
+      console.log(response);
+      advisors.value = response.filter(_ => _.userId != getUserProfile().id);
       await loadMeetings();
     }
   } catch (error) {
@@ -168,16 +148,14 @@ onBeforeMount(async () => {
 
 const loadMeetings = async () => {
   try {
-    const response = await getMeetings({
-      PageIndex: 0,
-      PageSize: 10
-    });
-
+    const response = await getMeetings();
     if (response?.items) {
-      meetings.value = response.items.map(meeting => ({
-        ...meeting,
-        advisorName: advisors.value.find(a => a.id === meeting.advisorId)?.fullName || 'Advisor'
-      }));
+      meetings.value = response.items
+        .filter(_ => _.participants.find(_ => _.creatorId == getUserProfile().id))
+        .map(meeting => ({
+          ...meeting,
+          advisorName: advisors.value.find(a => a.advisorId === meeting.advisorId)?.fullName || 'Advisor'
+        }));
     } else {
       meetings.value = [];
     }
@@ -253,10 +231,8 @@ const cancelMeeting = async (meetingId) => {
   }
 };
 
-// Tham gia cuộc họp
 const joinMeeting = async (meetingId) => {
   try {
-    console.log(meetingId);
     //await joinMeetingApi(meetingId);
     router.push(`/call/${meetingId}`);
   } catch (error) {
@@ -433,7 +409,6 @@ const joinMeeting = async (meetingId) => {
   display: block;
 }
 
-/* Thêm style cho Calendar component */
 .form-input[type="date"] {
   width: 100%;
   padding: 8px 12px;
@@ -441,5 +416,49 @@ const joinMeeting = async (meetingId) => {
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.advisors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.advisor-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.advisor-card:hover {
+  border-color: #007bff;
+  transform: scale(1.03);
+}
+
+.advisor-card.selected {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+.advisor-card .avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.advisor-card .bio {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.advisor-card .email {
+  font-size: 0.8rem;
+  color: #888;
 }
 </style> 

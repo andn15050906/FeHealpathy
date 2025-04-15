@@ -34,9 +34,9 @@
 
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
-              <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
+              <router-link to="/advisor/edit-profile">Advisor Profile</router-link>
               <router-link to="/advisor/content">Advisor Content</router-link>
-              <router-link to="/media/manage">Media Management</router-link>
+              <router-link to="/media/manage">Manage Media</router-link>
             </li>
             
             <li v-if="user.role === 2">

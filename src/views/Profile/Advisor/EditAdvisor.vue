@@ -40,16 +40,50 @@
           </form>
         </div>
       </div>
-      <div class="password-change-btn">
-        <RouterLink class="btn btn-warning white-text" to="/change-password">
-          Change Password
-        </RouterLink>
-      </div>
     </div>
     <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Are you sure you want to update your advisor profile?"
       url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
     <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Are you sure to cancel your changes?"
       @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
+  </div>
+  <div>
+    <div class="meetings-list">
+      <h3>Lịch hẹn của bạn</h3>
+      <div v-if="meetings.length === 0" class="no-meetings">
+        Chưa có cuộc hẹn nào được đặt
+      </div>
+      <div v-else class="meetings-grid">
+        <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
+          <div class="meeting-header">
+            <h4>Cuộc hẹn với người dùng</h4>
+            <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
+          </div>
+          <div class="meeting-details">
+            <p><i class="fas fa-calendar"></i> {{ formatISODateWithHMS(meeting.startAt) }}</p>
+            <p><i class="fas fa-clock"></i> 
+              {{ new Date(meeting.startAt).toLocaleTimeString('vi-VN') }} - 
+              {{ new Date(meeting.endAt).toLocaleTimeString('vi-VN') }}
+            </p>
+            <p v-if="meeting.description"><i class="fas fa-sticky-note"></i> {{ meeting.description }}</p>
+          </div>
+          <div class="meeting-actions">
+            <button @click="joinMeeting(meeting.id)" class="btn btn-success">
+              Tham gia cuộc gọi
+            </button>
+            <!--<button v-if="meeting.status === 'pending'" 
+                    @click="cancelMeeting(meeting.id)" 
+                    class="btn btn-danger">
+              Hủy lịch
+            </button>
+            <button v-if="meeting.status === 'confirmed'" 
+                    @click="joinMeeting(meeting.id)" 
+                    class="btn btn-success">
+              Tham gia
+            </button>-->
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -60,6 +94,9 @@ import { getAdvisorProfile, updateAdvisorProfile } from '@/scripts/api/services/
 import SweetAlert from '../../../components/Common/Popup/SweetAlert.vue';
 import UpdateConfirmPopup from '../../../components/Common/Popup/UpdateConfirmPopup.vue';
 import CancelConfirmPopup from '../../../components/Common/Popup/CancelConfirmPopup.vue';
+import { formatISODateWithHMS } from '@/scripts/logic/common.js';
+import { getMeetings } from '@/scripts/api/services/meetingService';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
@@ -76,69 +113,63 @@ export default {
       experience: '',
       intro: ''
     });
-
+    const meetings = ref([]);
+    const router = useRouter();
     const originalForm = ref({});
     const confirmDialogVisible = ref(false);
     const cancelDialogVisible = ref(false);
     const loadingSpinner = inject('loadingSpinner');
     const sweetAlert = inject('sweetAlert');
     const text = dict['en']
+    const userId = JSON.parse(localStorage.getItem('userProfile'))?.id;
 
     const fetchProfile = async () => {
-  try {
-    loadingSpinner?.showSpinner();
+      try {
+        loadingSpinner?.showSpinner();
 
-    const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-    const userId = userProfile?.id;
-    const advisorData = await getAdvisorProfile(userId);
+        const advisorData = await getAdvisorProfile(userId);
 
-    const advisor = advisorData.items ? advisorData.items[0] : advisorData;
-    console.log(advisorData);
-    advisor.creationTime = formatDate(advisor.creationTime);
-    advisor.intro = advisor.intro;
+        const advisor = advisorData.items ? advisorData.items[0] : advisorData;
+        advisor.creationTime = formatDate(advisor.creationTime);
+        advisor.intro = advisor.intro;
 
-    Object.assign(form.value, advisor);
-    originalForm.value = { ...form.value };
-  } catch (error) {
-    console.error(error);
-    await sweetAlert.showError('Failed to retrieve advisor profile');
-  } finally {
-    loadingSpinner?.hideSpinner();
-  }
-};
+        Object.assign(form.value, advisor);
+        originalForm.value = { ...form.value };
+      } catch (error) {
+        console.error(error);
+        await sweetAlert.showError('Failed to retrieve advisor profile');
+      } finally {
+        loadingSpinner?.hideSpinner();
+      }
+    };
 
-const confirmChanges = async () => {
-  try {
-    loadingSpinner?.showSpinner();
+    const confirmChanges = async () => {
+      try {
+        loadingSpinner?.showSpinner();
 
-    const formData = new FormData();
+        const formData = new FormData();
 
-    formData.append("Id", form.value.id);
-    formData.append("Experience", form.value.experience);
-    formData.append("intro", form.value.intro); 
+        formData.append("Id", form.value.id);
+        formData.append("Experience", form.value.experience);
+        formData.append("intro", form.value.intro); 
 
-    const response = await updateAdvisorProfile(formData);
-    console.log(response);
-    console.log('API Response:', response);
-
-    if (response !== false) {
-      loadingSpinner.hideSpinner();
-      await sweetAlert.showAlert({
-        icon: 'success',
-        title: 'Profile Updated',
-        text: 'Your advisor profile has been successfully updated!'
-      });
-
-    } else {
-      throw new Error(response?.message || 'Update failed.');
-    }
-  } catch (error) {
-    console.error(error);
-    sweetAlert.showError('Error updating advisor profile.');
-  } finally {
-    loadingSpinner?.hideSpinner();
-  }
-};
+        const response = await updateAdvisorProfile(formData);
+        if (response !== false) {
+          loadingSpinner.hideSpinner();
+          await sweetAlert.showAlert({
+            icon: 'success',
+            title: 'Profile Updated',
+            text: 'Your advisor profile has been successfully updated!'
+          });
+        } else {
+          throw new Error(response?.message || 'Update failed.');
+        }
+      } catch (error) {
+        sweetAlert.showError('Error updating advisor profile.');
+      } finally {
+        loadingSpinner?.hideSpinner();
+      }
+    };
 
 const validateExperience = () => {
   const wordCount = form.value.experience.trim().split(/\s+/).length;
@@ -153,8 +184,8 @@ const validateExperience = () => {
 const validateIntroduction = () => {
   const wordCount = form.value.intro.trim().split(/\s+/).length;
   console.log('Introduction word count:', wordCount);
-  if (wordCount < 10) {
-    sweetAlert.showError('Introduction must be at least 10 words.');
+  if (wordCount < 5) {
+    sweetAlert.showError('Introduction must be at least 5 words.');
     return false;
   }
   return true;
@@ -187,18 +218,51 @@ const handleSubmit = () => {
       return date.split('T')[0];
     };
 
+    const loadMeetings = async () => {
+      try {
+        const response = await getMeetings();
+        if (response?.items) {
+          console.log(response);
+          meetings.value = response.items
+            .filter(_ => _.participants.find(_ => _.creatorId == userId))
+            .map(meeting => ({
+              ...meeting
+            }));
+        } else {
+          meetings.value = [];
+        }
+      } catch (error) {
+        //toast.error('Không thể tải danh sách cuộc họp');
+      }
+    };
+
+    const joinMeeting = async (meetingId) => {
+      try {
+        //await joinMeetingApi(meetingId);
+        router.push(`/call/${meetingId}`);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     onBeforeMount(() => {
       fetchProfile();
+      loadMeetings();
     });
 
-    return { form,
+    return {
+      form,
+      meetings,
       text,
       handleSubmit,
       openCancelPopup,
       confirmDialogVisible,
       cancelDialogVisible,
       handleConfirmUpdate,
-      handleConfirmCancel };
+      handleConfirmCancel,
+      formatISODateWithHMS,
+      joinMeeting
+    };
   }
 };
 </script>
@@ -366,5 +430,80 @@ textarea.form-control {
 
 .white-text a {
   color: whitesmoke;
+}
+
+/*meeting */
+  
+.meetings-list {
+  margin-top: 40px;
+}
+
+.meetings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.meeting-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.meeting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.status-badge.pending {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-badge.confirmed {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-badge.cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+.meeting-details {
+  margin-bottom: 15px;
+}
+
+.meeting-details p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.meeting-details i {
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.meeting-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.no-meetings {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 </style>
