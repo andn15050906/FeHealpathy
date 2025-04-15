@@ -11,7 +11,8 @@
               <i class="fas fa-pen"></i> Blog Title
             </label>
             <input type="text" class="form-control" id="title" v-model="blog.title" placeholder="Enter blog title"
-              required />
+              @blur="validateTitle" required />
+            <div v-if="errors.title" class="text-danger small mt-1">{{ errors.title }}</div>
           </div>
 
           <div class="mb-3">
@@ -19,6 +20,7 @@
               <i class="fas fa-image"></i> Blog Image
             </label>
             <input type="file" class="form-control" id="thumb" @change="handleThumbUpload" accept="image/*" />
+            <div v-if="errors.thumb" class="text-danger small mt-1">{{ errors.thumb }}</div>
             <div v-if="previewImage" class="image-preview mt-2">
               <img :src="previewImage" alt="Blog image" class="img-thumbnail" />
             </div>
@@ -32,6 +34,9 @@
               :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select keywords"
               label="name" track-by="id" class="multiselect" />
             <small class="form-text text-muted">You can select multiple keywords from the list.</small>
+            <div v-if="errors.selectedKeywords" class="text-danger small mt-1">
+              {{ errors.selectedKeywords }}
+            </div>
           </div>
         </div>
       </div>
@@ -51,7 +56,10 @@
                     <i class="fas fa-heading"></i> Section Title {{ index + 1 }}
                   </label>
                   <input type="text" class="form-control" v-model="section.header" placeholder="Enter section title"
-                    required />
+                    @blur="() => validateSection(index)" required />
+                  <div v-if="errors.sections[index]?.header" class="text-danger small mt-1">
+                    {{ errors.sections[index].header }}
+                  </div>
                 </div>
 
                 <div class="mb-3">
@@ -60,6 +68,9 @@
                   </label>
                   <input type="file" class="form-control" @change="(e) => handleSectionThumbUpload(e, index)"
                     accept="image/*" />
+                  <div v-if="errors.sections[index]?.thumb" class="text-danger small mt-1">
+                    {{ errors.sections[index].thumb }}
+                  </div>
                   <div v-if="section.previewImage" class="image-preview mt-2">
                     <img :src="section.previewImage" alt="Section image" class="img-thumbnail" />
                   </div>
@@ -70,7 +81,10 @@
                     <i class="fas fa-align-left"></i> Section Content {{ index + 1 }}
                   </label>
                   <textarea class="form-control" v-model="section.content" placeholder="Enter detailed content" rows="4"
-                    required></textarea>
+                    @blur="() => validateSection(index)" required></textarea>
+                  <div v-if="errors.sections[index]?.content" class="text-danger small mt-1">
+                    {{ errors.sections[index].content }}
+                  </div>
                 </div>
 
                 <button class="btn btn-danger" @click.prevent="openDeleteConfirm(index)">
@@ -105,20 +119,20 @@
 </template>
 
 <script setup>
+import { ref, reactive, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { toast } from "vue3-toastify";
-import { ref, onMounted } from "vue";
+import "vue3-toastify/dist/index.css";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/scripts/api/services/tagService";
 import { updateArticle, getBlogById } from "@/scripts/api/services/blogService";
-import { useRouter, useRoute } from "vue-router";
 import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
-import DeleteConfirmPopup from "../../../../components/Common/Popup/DeleteConfirmPopup.vue";
-import SaveConfirmPopUp from "../../../../components/Common/Popup/SaveConfirmPopUp.vue";
+import DeleteConfirmPopup from "@/components/Common/Popup/DeleteConfirmPopup.vue";
+import SaveConfirmPopUp from "@/components/Common/Popup/SaveConfirmPopUp.vue";
 
 const router = useRouter();
 const route = useRoute();
-const emits = defineEmits(["blogUpdated"]);
 
 const blogData = ref(null);
 const blog = ref({
@@ -134,8 +148,14 @@ const loadingSpinner = ref(null);
 
 const deleteDialogVisible = ref(false);
 const sectionToDeleteIndex = ref(null);
-
 const saveDialogVisible = ref(false);
+
+const errors = reactive({
+  title: "",
+  thumb: "",
+  selectedKeywords: "",
+  sections: []
+});
 
 onMounted(async () => {
   loadingSpinner.value.showSpinner();
@@ -159,6 +179,12 @@ onMounted(async () => {
         thumbTitle: section.media?.title || section.thumb?.title,
       })),
     };
+
+    errors.sections = blog.value.sections.map(() => ({
+      header: "",
+      content: "",
+      thumb: ""
+    }));
 
     if (blogData.value.thumb?.url) {
       previewImage.value = blogData.value.thumb.url;
@@ -185,6 +211,7 @@ const handleThumbUpload = (event) => {
       previewImage.value = e.target.result;
     };
     reader.readAsDataURL(file);
+    errors.thumb = "";
   }
 };
 
@@ -198,6 +225,7 @@ const handleSectionThumbUpload = (event, index) => {
         thumb: file,
         previewImage: e.target.result,
       };
+      errors.sections[index].thumb = "";
     };
     reader.readAsDataURL(file);
   }
@@ -205,11 +233,12 @@ const handleSectionThumbUpload = (event, index) => {
 
 const addSection = () => {
   blog.value.sections.push({
-    title: "",
+    header: "",
     thumb: null,
     previewImage: null,
     content: "",
   });
+  errors.sections.push({ header: "", content: "", thumb: "" });
 };
 
 const openDeleteConfirm = (index) => {
@@ -220,11 +249,11 @@ const openDeleteConfirm = (index) => {
 const handleConfirmDelete = (confirm) => {
   if (confirm && sectionToDeleteIndex.value !== null) {
     blog.value.sections.splice(sectionToDeleteIndex.value, 1);
+    errors.sections.splice(sectionToDeleteIndex.value, 1);
   }
   sectionToDeleteIndex.value = null;
   deleteDialogVisible.value = false;
 };
-
 
 const openSaveConfirm = () => {
   if (!validateForm()) return;
@@ -265,7 +294,7 @@ const submitBlogInternal = async () => {
 
     if (blog.value.sections && blog.value.sections.length > 0) {
       blog.value.sections.forEach((section, index) => {
-        formData.append(`Sections[${index}].Id`, section.id || '');
+        formData.append(`Sections[${index}].Id`, section.id || "");
         formData.append(`Sections[${index}].Title`, section.header);
         formData.append(`Sections[${index}].Content`, section.content);
 
@@ -278,9 +307,6 @@ const submitBlogInternal = async () => {
         }
       });
     }
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ', ' + pair[1]);
-    }
     const response = await updateArticle(formData);
     toast.success("Blog updated successfully!");
     router.push("/advisor/content");
@@ -292,39 +318,71 @@ const submitBlogInternal = async () => {
   }
 };
 
-const validateForm = () => {
+const validateTitle = () => {
   if (!blog.value.title.trim()) {
-    toast.error("Please enter the blog title.");
-    return false;
+    errors.title = "Please enter the blog title.";
+  } else if (blog.value.title.trim().length < 3) {
+    errors.title = "Blog title must be at least 3 characters.";
+  } else if (blog.value.title.trim().length > 100) {
+    errors.title = "Blog title must be less than 100 characters.";
+  } else {
+    errors.title = "";
   }
+};
 
+const validateThumb = () => {
   if (!blog.value.thumb && !previewImage.value) {
-    toast.error("Please select or keep the featured image.");
-    return false;
+    errors.thumb = "Please select or keep the featured image.";
+  } else {
+    errors.thumb = "";
   }
+};
 
+const validateKeywords = () => {
   if (!blog.value.selectedKeywords || blog.value.selectedKeywords.length === 0) {
-    toast.error("Please select at least one keyword.");
+    errors.selectedKeywords = "Please select at least one keyword.";
+  } else {
+    errors.selectedKeywords = "";
+  }
+};
+
+const validateSection = (index) => {
+  const section = blog.value.sections[index];
+  if (!errors.sections[index]) {
+    errors.sections[index] = { header: "", content: "", thumb: "" };
+  }
+  if (!section.header || !section.header.trim()) {
+    errors.sections[index].header = `Section ${index + 1} is missing a title.`;
+  } else {
+    errors.sections[index].header = "";
+  }
+  if (!section.content || !section.content.trim()) {
+    errors.sections[index].content = `Section ${index + 1} is missing content.`;
+  } else {
+    errors.sections[index].content = "";
+  }
+  if (!section.thumb && !section.previewImage) {
+    errors.sections[index].thumb = `Section ${index + 1} is missing an image.`;
+  } else {
+    errors.sections[index].thumb = "";
+  }
+};
+
+const validateForm = () => {
+  validateTitle();
+  validateThumb();
+  validateKeywords();
+  blog.value.sections.forEach((_, index) => {
+    validateSection(index);
+  });
+
+  if (errors.title || errors.thumb || errors.selectedKeywords) {
+    toast.error("Please fix the errors in the form.");
     return false;
   }
-
-  if (!blog.value.sections || blog.value.sections.length === 0) {
-    toast.error("Please add at least one content section.");
-    return false;
-  }
-
-  for (let i = 0; i < blog.value.sections.length; i++) {
-    const section = blog.value.sections[i];
-    if (!section.header || !section.header.trim()) {
-      toast.error(`Section ${i + 1} is missing a title.`);
-      return false;
-    }
-    if (!section.content || !section.content.trim()) {
-      toast.error(`Section ${i + 1} is missing content.`);
-      return false;
-    }
-    if (!section.thumb && !section.previewImage) {
-      toast.error(`Section ${i + 1} is missing an image.`);
+  for (const secError of errors.sections) {
+    if (secError.header || secError.content || secError.thumb) {
+      toast.error("Please fix the errors in the sections.");
       return false;
     }
   }
