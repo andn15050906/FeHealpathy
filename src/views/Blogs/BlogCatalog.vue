@@ -55,7 +55,9 @@ async function loadBlogs(page = 1) {
   try {
     const params = {
       pageIndex: currentPage.value - 1,
-      pageSize: itemsPerPage
+      pageSize: itemsPerPage,
+      search: searchQuery.value.trim() || undefined,
+      tags: selectedTags.value.length ? selectedTags.value.join(',') : undefined
     };
 
     const response = await getPagedArticles(params);
@@ -83,13 +85,54 @@ function toggleTag(tagId) {
   loadBlogs(1);
 }
 
+// Sắp xếp blogs theo thứ tự A-Z hoặc Z-A
 function sortBlogs() {
-  loadBlogs(1);
+  blogs.value.sort((a, b) => {
+    if (sortOption.value === 'name-asc') {
+      return a.title.localeCompare(b.title);
+    } else {
+      return b.title.localeCompare(a.title);
+    }
+  });
+}
+
+// Gọi hàm sortBlogs khi thay đổi tùy chọn sắp xếp
+watch(sortOption, () => {
+  sortBlogs();
+});
+
+// Fetch all blogs and sort them
+async function fetchAndSortBlogs() {
+  try {
+    const response = await getPagedArticles({ pageIndex: 0, pageSize: 1000 }); // Fetch a large number to cover all blogs
+    blogs.value = response.items || [];
+    
+    // Sort blogs by title
+    blogs.value.sort((a, b) => {
+      if (sortOption.value === 'name-asc') {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+
+    // Paginate sorted blogs
+    paginateBlogs();
+  } catch (e) {
+    console.error('Failed to fetch and sort blogs', e);
+  }
+}
+
+// Paginate the sorted blogs
+function paginateBlogs() {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  blogs.value = blogs.value.slice(start, end);
 }
 
 onBeforeMount(async () => {
   await loadTags();
-  loadBlogs();
+  fetchAndSortBlogs();
 });
 
 let searchTimeout;
@@ -101,6 +144,9 @@ function onSearchChange() {
 }
 
 watch(searchQuery, onSearchChange);
+
+// Update pagination when page changes
+watch(currentPage, paginateBlogs);
 </script>
 
 <style scoped>

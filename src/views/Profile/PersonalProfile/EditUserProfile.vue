@@ -28,11 +28,11 @@
             </div>
             <div class="info-item">
               <div class="info-label">Join Date:</div>
-              <div class="info-value">{{ form.creationTime }}</div>
+              <div class="info-value" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.creationTime }}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Courses enrolled:</div>
-              <div class="info-value">{{ form.enrollmentCount }}</div>
+              <div class="info-value" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.enrollmentCount }}</div>
             </div>
           </div>
         </div>
