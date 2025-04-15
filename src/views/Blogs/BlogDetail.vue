@@ -25,7 +25,7 @@
             class="img-fluid rounded mb-3" />
           <p class="text-secondary">{{ section.content }}</p>
         </div>
-        <BlogCommentSection :blogId="blog.id" class="mb-5" />
+        <BlogCommentSection :blogId="blog.id" :currentUserId="currentUserId" class="mb-5" />
         <BlogRelatedItems />
       </div>
       <ScrollToTop />
@@ -40,6 +40,9 @@ import BlogRelatedItems from "@/components/BlogComponents/BlogRelatedItems.vue";
 import BlogCommentSection from "@/components/BlogComponents/BlogCommentSection.vue";
 import { getBlogById } from "@/scripts/api/services/blogService";
 import { logArticleRead } from "@/scripts/api/services/activityLogService";
+import { getUserProfile } from "@/scripts/api/services/authService";
+import apiClient from '@/scripts/api/apiClients';
+import { getPagedBlogComments } from "@/scripts/api/services/commentService";
 
 export default {
   components: {
@@ -51,10 +54,13 @@ export default {
     return {
       blog: null,
       likes: 0,
+      currentUserId: null,
     };
   },
   async created() {
     await this.fetchBlogData();
+    const userProfile = getUserProfile();
+    this.currentUserId = userProfile?.id;
   },
   methods: {
     async fetchBlogData() {
@@ -64,8 +70,7 @@ export default {
 
         if (!this.blog) {
           console.error("Không tìm thấy bài viết với ID:", blogId);
-        }
-        else {
+        } else {
           logArticleRead(blogId);
         }
 
