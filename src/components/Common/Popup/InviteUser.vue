@@ -48,11 +48,14 @@
 import { ref } from "vue";
 import { getUsers } from "@/scripts/api/services/userService";
 import { submitInviteMember } from "@/scripts/api/services/notificationService";
+import { createConversation } from "@/scripts/api/services/conversationService";
 
 const emit = defineEmits(["close"]);
 
 const props = defineProps({
   conversationId: String,
+  currentUser: Object,
+  currentRoomMembers: Array,
 });
 
 const search = ref("");
@@ -67,7 +70,7 @@ const handleSearch = async () => {
   let res = [];
   try {
     res = (await getUsers({ name: keyword })).items;
-  } catch (err) { }
+  } catch (err) {}
   searchResults.value = res;
 };
 
@@ -90,12 +93,39 @@ const inviteUser = async () => {
 
     await submitInviteMember(payload);
 
-    // Gửi lời mời vào conversation
-    // ...
+    const memberIds = [
+      ...(props.currentRoomMembers || []),
+      props.currentUser?.id,
+      selectedUser.value.id,
+    ];
 
+    const uniqueIds = [...new Set(memberIds.filter(Boolean))];
+
+    const members = uniqueIds.map((id) => ({
+      userId: id,
+      isAdmin: id === props.currentUser?.id,
+    }));
+
+    const formData = new FormData();
+    formData.append("Title", "New Group");
+    formData.append("IsPrivate", "false");
+
+    members.forEach((member, index) => {
+      formData.append(`Members[${index}].UserId`, member.userId);
+      formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
+    });
+
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+    // Gọi API tạo nhóm mới
+    await createConversation(formData);
+
+    emit("created");
+    emit("close");
     selectedUser.value = null;
     search.value = "";
-    emit("close");
   } catch (error) {
     console.error("Invite failed:", error);
   } finally {

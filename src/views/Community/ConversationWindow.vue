@@ -56,9 +56,10 @@
             <InviteUser
                 v-if="showInviteModal"
                 :conversationId="inviteRoomId"
-                @close="() => {
-                    showInviteModal = false;
-                }"
+                :current-user="currentUser"
+                :current-room-members="currentRoomMembers"
+                @created="fetchRooms"
+                @close="showInviteModal = false"
             />
         </teleport>
     </div>
@@ -311,11 +312,16 @@ export default {
             fetchedRooms.forEach(room => {
                 // re-assign room users (convert from userId to user)
                 for (let i = 0; i < room.users.length; i++) {
-                    room.users[i] = allUsers.find(user => user?._id === room.users[i]);
+                    const foundUser = allUsers.find(user => user?._id === room.users[i]);
+                    if (foundUser) {
+                        room.users[i] = foundUser;
+                    } else {
+                        room.users[i] = { _id: room.users[i], username: 'Unknown User', avatar: '' };
+                    }
                 }
 
                 // re-assign room name
-                const otherRoomUsers = room.users.filter(user => user._id != this.currentUser.id);
+                const otherRoomUsers = room.users.filter(user => user && user._id !== this.currentUser.id);
                 //room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
                 room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner'
                 formattedRooms.push({
