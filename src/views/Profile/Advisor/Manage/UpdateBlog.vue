@@ -74,6 +74,7 @@
                   <div v-if="section.previewImage" class="image-preview mt-2">
                     <img :src="section.previewImage" alt="Section image" class="img-thumbnail" />
                   </div>
+                  <small class="form-text text-muted">Optional: upload a related image.</small>
                 </div>
 
                 <div class="mb-3">
@@ -361,11 +362,7 @@ const validateSection = (index) => {
   } else {
     errors.sections[index].content = "";
   }
-  if (!section.thumb && !section.previewImage) {
-    errors.sections[index].thumb = `Section ${index + 1} is missing an image.`;
-  } else {
-    errors.sections[index].thumb = "";
-  }
+  errors.sections[index].thumb = "";
 };
 
 const validateForm = () => {
