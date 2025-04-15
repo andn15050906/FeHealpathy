@@ -278,7 +278,9 @@ const submitBlogInternal = async () => {
         }
       });
     }
-
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ', ' + pair[1]);
+    }
     const response = await updateArticle(formData);
     toast.success("Blog updated successfully!");
     router.push("/advisor/content");

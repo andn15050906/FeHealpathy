@@ -43,13 +43,44 @@
           </div>
         </div>
 
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="price" class="form-label required">
+              <i class="fas fa-dollar-sign me-1 bold-icon"></i>
+              <span class="bold-text">Course Price</span>
+            </label>
+            <input type="number" id="price" v-model="course.price" class="form-control" placeholder="Enter price (VND)"
+              min="10000" required />
+          </div>
+
+          <div class="col-md-4">
+            <label for="discount" class="form-label">
+              <i class="fas fa-tags me-1 bold-icon"></i>
+              <span class="bold-text">Discount (%)</span>
+            </label>
+            <input type="number" id="discount" v-model="course.discount" class="form-control"
+              placeholder="Discount percentage" min="0" max="100" />
+          </div>
+
+          <div class="col-md-4">
+            <label for="discountExpiry" class="form-label">
+              <i class="fas fa-calendar-alt me-1 bold-icon"></i>
+              <span class="bold-text">Discount Expiry Date</span>
+            </label>
+            <input type="date" id="discountExpiry" v-model="course.discountExpiry" class="form-control" />
+          </div>
+        </div>
+
         <div class="mb-3">
-          <label for="price" class="form-label required">
-            <i class="fas fa-dollar-sign me-1 bold-icon"></i>
-            <span class="bold-text">Course Price</span>
+          <label for="status" class="form-label required">
+            <i class="fas fa-flag me-1 bold-icon"></i>
+            <span class="bold-text">Course Status</span>
           </label>
-          <input type="number" id="price" v-model="course.price" class="form-control" placeholder="Enter price (VND)"
-            min="10000" required />
+          <select id="status" v-model="course.status" required class="form-select">
+            <option value="0">Draft</option>
+            <option value="1">Published</option>
+            <option value="2">Archived</option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -210,6 +241,7 @@ export default {
         description: "",
         thumb: { url: "", file: null, title: "" },
         leafCategoryId: "",
+        status: 0,
         price: 0,
         level: 0,
         outcomes: "",
@@ -229,6 +261,12 @@ export default {
       const courseId = this.$route.params.id;
       try {
         const courseData = await getCourseById(courseId);
+        courseData.discount *= 100;
+        if (courseData.discountExpiry) {
+          const expiryDate = new Date(courseData.discountExpiry);
+          courseData.discountExpiry = expiryDate.toISOString().split('T')[0];
+        }
+        console.log(courseData);
         this.course = {
           ...courseData,
           thumb: {
@@ -319,7 +357,10 @@ export default {
         formData.append("Title", this.course.title);
         formData.append("Intro", this.course.intro);
         formData.append("Description", this.course.description);
+        formData.append("Status", this.course.status);
         formData.append("Price", this.course.price);
+        formData.append("Discount", this.course.discount / 100);
+        formData.append("DiscountExpiry", this.course.discountExpiry);
         formData.append("Level", this.course.level);
         formData.append("Outcomes", this.course.outcomes);
         formData.append("Requirements", this.course.requirements);
@@ -334,6 +375,7 @@ export default {
           formData.append("Thumb.File", thumbBase64);
           formData.append("Thumb.Title", this.course.thumb.title);
         } else if (this.course.thumb.url) {
+          formData.append("Thumb.Title", this.course.title);
           formData.append("Thumb.Url", this.course.thumb.url);
         }
 
@@ -370,7 +412,9 @@ export default {
             }
           }
         }
-
+        for (var pair of formData.entries()) {
+          console.log(pair[0] + ', ' + pair[1]);
+        }
         await updateCourse(formData);
         toast.success("Course updated successfully!", { autoClose: 3000 });
         this.$router.push({
@@ -413,6 +457,10 @@ export default {
       }
       if (!this.course.price || this.course.price < 10000) {
         toast.error("Price must be at least 10,000 VND");
+        return false;
+      }
+      if (this.course.status === null || this.course.status === undefined) {
+        toast.error("Please select course status");
         return false;
       }
       if (this.course.level === "" || this.course.level === null) {

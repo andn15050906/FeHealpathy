@@ -1,86 +1,111 @@
 <template>
-    <form @submit.prevent="handleAddMedia" class="add-media-dropzone p-4 border rounded bg-white">
-        <h3 class="mb-4 text-primary">Add New Media</h3>
+    <div class="add-media p-4 border rounded shadow-sm bg-white">
+        <h3 class="mb-4 text-primary border-bottom pb-2">Add New Media</h3>
+        <form @submit.prevent="openSaveDialog">
+            <div class="dropzone p-5 text-center border rounded mb-4" :class="{
+                'border-primary': isFileActive,
+                'border-dashed': !isFileActive,
+                'bg-light': !isFileActive
+            }" @dragover.prevent @drop.prevent="handleFileDrop" @click="triggerFileInput">
+                <div v-if="!newMedia.file">
+                    <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-secondary"></i>
+                    <p class="mb-3">Drag and drop your MP3/MP4 file here or click to select</p>
+                    <button type="button" class="btn btn-outline-primary px-4" @click="triggerFileInput">
+                        Select File
+                    </button>
+                </div>
+                <div v-else class="py-3">
+                    <i :class="newMedia.type === 'audio' ? 'fas fa-file-audio fa-3x text-success' : 'fas fa-file-video fa-3x text-success'"
+                        class="mb-3"></i>
+                    <p class="h5 mb-1 text-primary">{{ newMedia.file.name }}</p>
+                    <p class="text-muted mb-2">{{ (newMedia.file.size / (1024 * 1024)).toFixed(2) }} MB</p>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click.stop="newMedia.file = null">
+                        Change File
+                    </button>
+                </div>
+                <input type="file" accept=".mp3, .mp4" class="d-none" ref="fileInput" @change="handleFileSelect" />
+                <div v-if="errors.file" class="text-danger mt-2 small">
+                    <i class="fas fa-exclamation-circle"></i> {{ errors.file }}
+                </div>
+            </div>
 
-        <div v-if="error" class="alert alert-danger mb-3">{{ error }}</div>
+            <div class="mb-4">
+                <label for="mediaTitle" class="form-label fw-semibold">
+                    Media Title <span class="text-danger">*</span>
+                </label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-heading"></i>
+                    </span>
+                    <input v-model="newMedia.title" type="text" class="form-control" id="mediaTitle"
+                        placeholder="Enter media title" :class="{ 'is-invalid': errors.title }" @input="validateTitle"
+                        required />
+                    <div class="invalid-feedback">{{ errors.title }}</div>
+                </div>
+                <small class="text-muted">3-100 characters</small>
+            </div>
 
-        <div class="dropzone p-5 text-center border border-dashed rounded mb-4" 
-             @dragover.prevent @drop.prevent="handleFileDrop"
-             :class="{ 'error-border': errors.file }">
-            <p class="m-0 text-muted">
-                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-            </p>
-            <p class="mb-3">Drag and drop your MP3/MP4 file here or click to select</p>
-            <input type="file" accept=".mp3, .mp4" class="d-none" ref="fileInput" @change="handleFileSelect" />
-            <button type="button" class="btn btn-outline-primary" @click="triggerFileInput">
-                Select File
-            </button>
-            <div v-if="errors.file" class="text-danger mt-2">{{ errors.file }}</div>
-        </div>
+            <div class="mb-4">
+                <label for="artistName" class="form-label fw-semibold">
+                    Artist/Creator Name <span class="text-danger">*</span>
+                </label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input v-model="newMedia.artistName" type="text" class="form-control" id="artistName"
+                        placeholder="Enter artist/creator name" :class="{ 'is-invalid': errors.artistName }"
+                        @input="validateArtistName" required />
+                    <div class="invalid-feedback">{{ errors.artistName }}</div>
+                </div>
+                <small class="text-muted">2-50 characters</small>
+            </div>
 
-        <div class="mb-4">
-            <label for="mediaTitle" class="form-label fw-semibold">Media Title <span class="text-danger">*</span></label>
-            <input 
-                v-model="newMedia.title" 
-                type="text" 
-                class="form-control" 
-                id="mediaTitle" 
-                placeholder="Enter media title" 
-                required
-                :class="{ 'is-invalid': errors.title }"
-                @blur="validateTitle"
-            />
-            <div v-if="errors.title" class="invalid-feedback">{{ errors.title }}</div>
-        </div>
+            <div class="mb-4">
+                <label for="description" class="form-label fw-semibold">
+                    Media Description <span class="text-danger">*</span>
+                </label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-align-left"></i>
+                    </span>
+                    <textarea v-model="newMedia.description" class="form-control" id="description"
+                        placeholder="Enter media description" :class="{ 'is-invalid': errors.description }"
+                        @input="validateDescription" rows="3" required></textarea>
+                    <div class="invalid-feedback">{{ errors.description }}</div>
+                </div>
+                <small class="text-muted">10-500 characters</small>
+            </div>
 
-        <div class="mb-4">
-            <label for="artistName" class="form-label fw-semibold">Artist/Creator Name <span class="text-danger">*</span></label>
-            <input 
-                v-model="newMedia.artistName" 
-                type="text" 
-                class="form-control" 
-                id="artistName" 
-                placeholder="Enter artist/creator name" 
-                required
-                :class="{ 'is-invalid': errors.artistName }"
-                @blur="validateArtistName"
-            />
-            <div v-if="errors.artistName" class="invalid-feedback">{{ errors.artistName }}</div>
-        </div>
+            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                <button class="btn btn-outline-danger px-4" @click="openCancelDialog">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button class="btn btn-success px-4" :disabled="loading || !isFormValid">
+                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i v-else class="fas fa-plus me-2"></i>
+                    {{ loading ? 'Processing...' : 'Add Media' }}
+                </button>
+            </div>
+        </form>
 
-        <div class="mb-4">
-            <label for="description" class="form-label fw-semibold">Media Description <span class="text-danger">*</span></label>
-            <textarea 
-                v-model="newMedia.description" 
-                class="form-control" 
-                id="description" 
-                placeholder="Enter media description" 
-                required
-                rows="3"
-                :class="{ 'is-invalid': errors.description }"
-                @blur="validateDescription"
-            ></textarea>
-            <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
-        </div>
-
-        <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-danger" @click="$emit('cancel')">
-                <i class="fas fa-times me-2"></i>Cancel
-            </button>
-            <button 
-                type="submit" 
-                class="btn btn-success" 
-                :disabled="loading || !isFormValid">
-                <i class="fas fa-spinner fa-spin me-2" v-if="loading"></i>
-                <i class="fas fa-plus me-2" v-else></i>
-                Add Media
-            </button>
-        </div>
-    </form>
+        <CancelConfirmPopup :message="cancelMessage" :isVisible="showCancelConfirm" @confirmCancel="handleCancelConfirm"
+            @update:isVisible="showCancelConfirm = $event" />
+        <SaveConfirmPopUp :message="saveMessage" :isVisible="showSaveConfirm" @confirmSave="handleSaveConfirm"
+            @update:isVisible="showSaveConfirm = $event" />
+    </div>
 </template>
 
 <script>
+import CancelConfirmPopup from "../Common/Popup/CancelConfirmPopup.vue";
+import SaveConfirmPopUp from "../Common/Popup/SaveConfirmPopUp.vue";
+
 export default {
+    name: "AddMedia",
+    components: {
+        CancelConfirmPopup,
+        SaveConfirmPopUp
+    },
     data() {
         return {
             newMedia: {
@@ -99,28 +124,35 @@ export default {
                 description: "",
                 file: "",
                 url: ""
-            }
+            },
+            showCancelConfirm: false,
+            showSaveConfirm: false,
+            cancelMessage: "Are you sure you want to cancel? Your progress will be lost.",
+            saveMessage: "Do you want to add this media?"
         };
     },
     computed: {
         isFileActive() {
             return !!this.newMedia.file;
         },
-        isUrlActive() {
-            return !!this.newMedia.url;
-        },
         isFormValid() {
-            return !Object.values(this.errors).some(error => error !== "") &&
-                   this.newMedia.title &&
-                   this.newMedia.artistName &&
-                   this.newMedia.description &&
-                   this.newMedia.file;
+            return (
+                !Object.values(this.errors).some(err => err) &&
+                this.newMedia.title &&
+                this.newMedia.artistName &&
+                this.newMedia.description &&
+                this.newMedia.file
+            );
         }
     },
     methods: {
         validateTitle() {
             if (!this.newMedia.title.trim()) {
                 this.errors.title = "Title is required";
+                return false;
+            }
+            if (this.newMedia.title.length < 3) {
+                this.errors.title = "Title must be at least 3 characters";
                 return false;
             }
             if (this.newMedia.title.length > 100) {
@@ -135,8 +167,12 @@ export default {
                 this.errors.artistName = "Artist/Creator name is required";
                 return false;
             }
+            if (this.newMedia.artistName.length < 2) {
+                this.errors.artistName = "Artist/Creator name must be at least 2 characters";
+                return false;
+            }
             if (this.newMedia.artistName.length > 50) {
-                this.errors.artistName = "Artist name must be less than 50 characters";
+                this.errors.artistName = "Artist/Creator name must be less than 50 characters";
                 return false;
             }
             this.errors.artistName = "";
@@ -147,6 +183,10 @@ export default {
                 this.errors.description = "Description is required";
                 return false;
             }
+            if (this.newMedia.description.length < 10) {
+                this.errors.description = "Description must be at least 10 characters";
+                return false;
+            }
             if (this.newMedia.description.length > 500) {
                 this.errors.description = "Description must be less than 500 characters";
                 return false;
@@ -154,39 +194,26 @@ export default {
             this.errors.description = "";
             return true;
         },
-        validateUrl(url) {
-            if (!url) return true; // URL is optional if file is provided
-            try {
-                new URL(url);
-                const isMediaUrl = url.match(/\.(mp3|mp4)$/i) || 
-                                 url.includes('youtube.com') || 
-                                 url.includes('youtu.be') ||
-                                 url.includes('vimeo.com');
-                if (!isMediaUrl) {
-                    this.errors.url = "URL must be a valid media link (MP3, MP4, YouTube, or Vimeo)";
-                    return false;
-                }
-                this.errors.url = "";
-                return true;
-            } catch {
-                this.errors.url = "Please enter a valid URL";
-                return false;
-            }
-        },
         validateFile(file) {
-            if (!file) return true; // File is optional if URL is provided
-            
-            const maxSize = 100 * 1024 * 1024; // 100MB
+            if (!file) {
+                this.errors.file = "File is required";
+                return false;
+            }
+            const maxSize = 50 * 1024 * 1024;
+            const allowedTypes = ["audio/mpeg", "video/mp4"];
+            const allowedExtensions = /\.(mp3|mp4)$/i;
+            if (!allowedExtensions.test(file.name)) {
+                this.errors.file = "Only MP3 and MP4 files are allowed";
+                return false;
+            }
+            if (!allowedTypes.includes(file.type)) {
+                this.errors.file = "Invalid file type";
+                return false;
+            }
             if (file.size > maxSize) {
-                this.errors.file = "File size must be less than 100MB";
+                this.errors.file = "File size must not exceed 50MB";
                 return false;
             }
-
-            if (!file.type.match(/^(audio\/mpeg|video\/mp4)$/)) {
-                this.errors.file = "Only MP3 or MP4 files are allowed";
-                return false;
-            }
-
             this.errors.file = "";
             return true;
         },
@@ -195,72 +222,67 @@ export default {
         },
         handleFileDrop(event) {
             const file = event.dataTransfer.files[0];
-            this.processFile(file);
+            if (this.validateFile(file)) {
+                this.processFile(file);
+            }
         },
         handleFileSelect(event) {
             const file = event.target.files[0];
-            this.processFile(file);
+            if (this.validateFile(file)) {
+                this.processFile(file);
+            }
         },
         processFile(file) {
-            if (this.validateFile(file)) {
+            if (file && this.validateFile(file)) {
                 this.newMedia.file = file;
-                this.newMedia.url = "";
                 this.newMedia.title = file.name.replace(/\.(mp3|mp4)$/i, "");
                 this.newMedia.type = file.type.startsWith("audio") ? "audio" : "video";
-                this.error = null;
             }
         },
-        handleUrlInput() {
-            if (this.newMedia.url) {
-                this.newMedia.file = null;
-                this.validateUrl(this.newMedia.url);
+        openCancelDialog() {
+            this.showCancelConfirm = true;
+        },
+        openSaveDialog() {
+            const validTitle = this.validateTitle();
+            const validArtist = this.validateArtistName();
+            const validDesc = this.validateDescription();
+            const validFile = this.validateFile(this.newMedia.file);
+            if (validTitle && validArtist && validDesc && validFile) {
+                this.showSaveConfirm = true;
             }
+        },
+        handleCancelConfirm(confirm) {
+            if (confirm) {
+                this.resetForm();
+                this.$emit("cancel");
+            }
+            this.showCancelConfirm = false;
+        },
+        handleSaveConfirm(confirm) {
+            if (confirm) {
+                this.handleAddMedia();
+            }
+            this.showSaveConfirm = false;
         },
         async handleAddMedia() {
-            // Validate all fields
-            const isValidTitle = this.validateTitle();
-            const isValidArtist = this.validateArtistName();
-            const isValidDesc = this.validateDescription();
-            const isValidFile = this.validateFile(this.newMedia.file);
-
-            if (!isValidTitle || !isValidArtist || !isValidDesc || !isValidFile) {
-                return;
-            }
-
-            if (!this.newMedia.file) {
-                this.error = "Please upload a file";
-                return;
-            }
-
             this.loading = true;
-            this.error = null;
-
             try {
                 const formData = new FormData();
                 formData.append("Title", this.newMedia.title);
                 formData.append("Description", this.newMedia.description);
                 formData.append("Artist", this.newMedia.artistName);
-                formData.append("Media.Title", this.newMedia.file.name.replace(/\.(mp3|mp4)$/i, ""));
+                formData.append("Media.Title", this.newMedia.title);
                 formData.append("Media.Type", this.newMedia.type);
                 formData.append("Media.File", this.newMedia.file);
 
                 this.$emit("add-media", formData);
-                this.resetForm();
             } catch (err) {
                 this.error = "Failed to add media. Please try again.";
                 console.error("Add media error:", err);
             } finally {
                 this.loading = false;
+                this.resetForm();
             }
-        },
-        determineMediaType() {
-            if (this.newMedia.url) {
-                if (this.newMedia.url.match(/\.(mp3)$/i)) return "audio";
-                if (this.newMedia.url.match(/\.(mp4)$/i)) return "video";
-                if (this.newMedia.url.includes('youtube.com') || this.newMedia.url.includes('youtu.be')) return "video";
-                if (this.newMedia.url.includes('vimeo.com')) return "video";
-            }
-            return "video"; // default to video
         },
         resetForm() {
             this.newMedia = {
@@ -285,33 +307,50 @@ export default {
 </script>
 
 <style scoped>
-.add-media-dropzone {
+.add-media {
     background-color: #fdfdfd;
     border-radius: 12px;
 }
 
 .dropzone {
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dropzone:hover {
-    background-color: #f8f9fa;
+    background-color: #f0f7ff !important;
+    border-color: #0d6efd !important;
 }
 
 .border-dashed {
     border-style: dashed !important;
+    border-width: 2px !important;
 }
 
-.error-border {
-    border-color: #dc3545 !important;
+.input-group-text {
+    width: 42px;
+    justify-content: center;
 }
 
-.invalid-feedback {
-    display: block;
-}
-
-textarea {
+textarea.form-control {
+    resize: vertical;
     min-height: 100px;
+}
+
+.btn {
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-success {
+    background-color: #198754;
+}
+
+.btn-success:hover {
+    background-color: #157347;
 }
 </style>
