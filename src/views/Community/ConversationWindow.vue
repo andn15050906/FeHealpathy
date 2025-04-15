@@ -70,7 +70,7 @@ import { register } from 'vue-advanced-chat'
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODate, reactionMap } from '@/scripts/logic/common';
 import { getUsers } from '@/scripts/api/services/userService';
-import { getPagedConversations, createConversation } from '@/scripts/api/services/conversationService';
+import { getPagedConversations } from '@/scripts/api/services/conversationService';
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
 import InviteUser from "@/components/Common/Popup/InviteUser.vue";
@@ -312,11 +312,16 @@ export default {
             fetchedRooms.forEach(room => {
                 // re-assign room users (convert from userId to user)
                 for (let i = 0; i < room.users.length; i++) {
-                    room.users[i] = allUsers.find(user => user?._id === room.users[i]);
+                    const foundUser = allUsers.find(user => user?._id === room.users[i]);
+                    if (foundUser) {
+                        room.users[i] = foundUser;
+                    } else {
+                        room.users[i] = { _id: room.users[i], username: 'Unknown User', avatar: '' };
+                    }
                 }
 
                 // re-assign room name
-                const otherRoomUsers = room.users.filter(user => user._id != this.currentUser.id);
+                const otherRoomUsers = room.users.filter(user => user && user._id !== this.currentUser.id);
                 //room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
                 room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner'
                 formattedRooms.push({
