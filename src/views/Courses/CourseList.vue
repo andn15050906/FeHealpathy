@@ -17,16 +17,16 @@
 
     <div class="courses-container">
       <div class="course-grid">
-        <courseCard v-for="course in pagedCourses" :key="course.id" :course="course" />
+        <courseCard v-for="course in courses" :key="course.id" :course="course" />
       </div>
     </div>
 
-    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="changePage" />
+    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="loadCourses" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import courseCard from '@/components/courseComponents/courseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 import { getCourses } from '@/scripts/api/services/courseService.js';
@@ -36,54 +36,44 @@ const sortOption = ref('name-asc');
 const itemsPerPage = 12;
 const currentPage = ref(1);
 const courses = ref([]);
+const totalPages = ref(1);
+const totalItems = ref(0);
 
-// Filter courses based only on search query.
-const filteredList = computed(() => {
-  let result = courses.value;
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    result = result.filter(course =>
-      course.title.toLowerCase().includes(q)
-    );
-  }
-  return result;
-});
-
-const totalPages = computed(() =>
-  Math.ceil(filteredList.value.length / itemsPerPage)
-);
-const pagedCourses = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredList.value.slice(start, start + itemsPerPage);
-});
-
-function sortCourses() {
-  courses.value.sort((a, b) =>
-    sortOption.value === 'name-asc'
-      ? a.title.localeCompare(b.title)
-      : b.title.localeCompare(a.title)
-  );
-  changePage(1);
-}
-
-function changePage(page) {
-  if (page < 1 || page > totalPages.value) return;
+async function loadCourses(page = 1) {
   currentPage.value = page;
-}
 
-onBeforeMount(async () => {
   try {
-    const courseResp = await getCourses();
-    courses.value = courseResp?.items?.map(course => ({ ...course })) || [];
-    sortCourses();
+    const params = {
+      pageIndex: currentPage.value - 1,
+      pageSize: itemsPerPage
+    };
+
+    const response = await getCourses(params);
+    courses.value = response.items || [];
+    totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
+    totalItems.value = response.totalCount || 0;
   } catch (e) {
     console.error('Failed to fetch courses', e);
   }
+}
+
+function sortCourses() {
+  loadCourses(1);
+}
+
+onBeforeMount(() => {
+  loadCourses();
 });
 
-watch(searchQuery, () => {
-  changePage(1);
-});
+let searchTimeout;
+function onSearchChange() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    loadCourses(1);
+  }, 300);
+}
+
+watch(searchQuery, onSearchChange);
 </script>
 
 <style scoped>

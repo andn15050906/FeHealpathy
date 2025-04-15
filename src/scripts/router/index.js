@@ -428,9 +428,10 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/call',
+      path: '/call/:roomId',
       name: 'call',
       component: CallWindow,
+      props: true,
       meta: { isAppMode: true, requiresAuth: true }
     },
 

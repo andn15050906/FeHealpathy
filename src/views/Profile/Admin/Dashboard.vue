@@ -143,7 +143,7 @@
             <div class="double-bounce2"></div>
           </div>
         </div>
-        <line-chart v-else :chart-data="userGrowthData" :options="chartOptions"></line-chart>
+        <line-chart v-else :data="userGrowthData" :options="chartOptions"></line-chart>
       </div>
       
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
@@ -163,7 +163,7 @@
             <div class="double-bounce2"></div>
           </div>
         </div>
-        <bar-chart v-else :chart-data="revenueData" :options="chartOptions"></bar-chart>
+        <bar-chart v-else :data="revenueData" :options="chartOptions"></bar-chart>
       </div>
     </div>
 
@@ -200,13 +200,6 @@
             placeholder="Search activities..."
             class="search-input"
           >
-          <select v-model="activityFilter" class="filter-select">
-            <option value="all">All Activities</option>
-            <option value="user">User Related</option>
-            <option value="content">Content Related</option>
-            <option value="system">System Related</option>
-          </select>
-          <button class="btn-text">View All</button>
         </div>
       </div>
       <div class="activity-list">
@@ -285,8 +278,7 @@ export default {
         }]
       },
       chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false
+        responsive: true
       },
       loading: {
         stats: true,

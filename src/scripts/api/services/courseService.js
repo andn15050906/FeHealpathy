@@ -16,6 +16,30 @@ export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   }
 };
 
+/*
+export const getAllCourses = async () => {
+  let allCourses = [];
+  let pageIndex = 0;
+  const pageSize = 20;
+
+  while (true) {
+    const params = { pageIndex, pageSize };
+    const response = await getCourses(params);
+    const courses = response.items || [];
+
+    allCourses = allCourses.concat(courses);
+
+    if (courses.length < pageSize) {
+      break;
+    }
+
+    pageIndex++;
+  }
+
+  return allCourses;
+};
+*/
+
 export const getCourseById = async (courseId) => {
   try {
     const response = await apiClient.get(`${API_BASE_URL}/${courseId}`);
@@ -61,3 +85,4 @@ export const deleteCourse = async (courseId) => {
 export const getRecommendationCourses = async (queryParams) => {
   return await getML(`${API_COURSE_RECOMMENDATION}`, queryParams);
 };
+

@@ -7,7 +7,7 @@
           <p v-if="generalError" class="error">{{ generalError }}</p>
 
           <div class="input-group">
-            <label for="username">Username</label>
+            <label for="username">User Name</label>
             <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
           </div>
 

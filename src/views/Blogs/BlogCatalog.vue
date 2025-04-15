@@ -24,16 +24,16 @@
 
     <div class="blogs-container">
       <div class="blog-grid">
-        <blogCard v-for="blog in pagedBlogs" :key="blog.id" :blog="blog" />
+        <blogCard v-for="blog in blogs" :key="blog.id" :blog="blog" />
       </div>
     </div>
 
-    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="changePage" />
+    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="loadBlogs" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 import { getPagedArticles } from '@/scripts/api/services/blogService.js';
@@ -46,64 +46,107 @@ const itemsPerPage = 12;
 const currentPage = ref(1);
 const blogs = ref([]);
 const filters = ref([]);
+const totalPages = ref(1);
+const totalItems = ref(0);
 
-const filteredList = computed(() => {
-  let result = blogs.value;
-  if (selectedTags.value.length) {
-    result = result.filter(blog =>
-      selectedTags.value.every(tagId =>
-        blog.tags.some(tag => tag.id === tagId)
-      )
-    );
+async function loadBlogs(page = 1) {
+  currentPage.value = page;
+
+  try {
+    const params = {
+      pageIndex: currentPage.value - 1,
+      pageSize: itemsPerPage,
+      search: searchQuery.value.trim() || undefined,
+      tags: selectedTags.value.length ? selectedTags.value.join(',') : undefined
+    };
+
+    const response = await getPagedArticles(params);
+    blogs.value = response.items || [];
+    totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
+    totalItems.value = response.totalCount || 0;
+  } catch (e) {
+    console.error('Failed to fetch blogs', e);
   }
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
-    result = result.filter(blog => blog.title.toLowerCase().includes(q));
+}
+
+async function loadTags() {
+  try {
+    const tagResp = await getPagedTags();
+    filters.value = tagResp.map(tag => ({ value: tag.id, label: tag.title }));
+  } catch (e) {
+    console.error('Failed to fetch tags', e);
   }
-  return result;
-});
-
-const totalPages = computed(() => Math.ceil(filteredList.value.length / itemsPerPage));
-
-const pagedBlogs = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredList.value.slice(start, start + itemsPerPage);
-});
+}
 
 function toggleTag(tagId) {
   const idx = selectedTags.value.indexOf(tagId);
   if (idx === -1) selectedTags.value.push(tagId);
   else selectedTags.value.splice(idx, 1);
-  changePage(1);
+  loadBlogs(1);
 }
 
+// Sắp xếp blogs theo thứ tự A-Z hoặc Z-A
 function sortBlogs() {
-  blogs.value.sort((a, b) =>
-    sortOption.value === 'name-asc'
-      ? a.title.localeCompare(b.title)
-      : b.title.localeCompare(a.title)
-  );
-  changePage(1);
+  blogs.value.sort((a, b) => {
+    if (sortOption.value === 'name-asc') {
+      return a.title.localeCompare(b.title);
+    } else {
+      return b.title.localeCompare(a.title);
+    }
+  });
 }
 
-function changePage(page) {
-  if (page < 1 || page > totalPages.value) return;
-  currentPage.value = page;
+// Gọi hàm sortBlogs khi thay đổi tùy chọn sắp xếp
+watch(sortOption, () => {
+  sortBlogs();
+});
+
+// Fetch all blogs and sort them
+async function fetchAndSortBlogs() {
+  try {
+    const response = await getPagedArticles({ pageIndex: 0, pageSize: 1000 }); // Fetch a large number to cover all blogs
+    blogs.value = response.items || [];
+    
+    // Sort blogs by title
+    blogs.value.sort((a, b) => {
+      if (sortOption.value === 'name-asc') {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+
+    // Paginate sorted blogs
+    paginateBlogs();
+  } catch (e) {
+    console.error('Failed to fetch and sort blogs', e);
+  }
+}
+
+// Paginate the sorted blogs
+function paginateBlogs() {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  blogs.value = blogs.value.slice(start, end);
 }
 
 onBeforeMount(async () => {
-  try {
-    const resp = await getPagedArticles();
-    blogs.value = resp.items || [];
-    const tagResp = await getPagedTags();
-    filters.value = tagResp.map(tag => ({ value: tag.id, label: tag.title }));
-    sortBlogs();
-  } catch (e) {
-    console.error('Failed to fetch blogs or tags', e);
-  }
+  await loadTags();
+  fetchAndSortBlogs();
 });
 
-watch([searchQuery, selectedTags], () => changePage(1));
+let searchTimeout;
+function onSearchChange() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    loadBlogs(1);
+  }, 300);
+}
+
+watch(searchQuery, onSearchChange);
+
+// Update pagination when page changes
+watch(currentPage, paginateBlogs);
 </script>
 
 <style scoped>
