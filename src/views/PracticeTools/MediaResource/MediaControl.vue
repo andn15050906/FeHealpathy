@@ -9,9 +9,6 @@
         <transition name="fade" mode="out-in">
             <div v-if="showAddMedia" key="add">
                 <div class="shadow-sm">
-                    <div class="header bg-primary text-white">
-                        <h4 class="mb-0">Add New Media</h4>
-                    </div>
                     <div class="body">
                         <AddMedia @cancel="toggleAddMedia" @add-media="createMedia" />
                     </div>

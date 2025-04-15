@@ -11,7 +11,8 @@
             <span class="bold-text">Course Title</span>
           </label>
           <input type="text" id="title" v-model="course.title" class="form-control" placeholder="Insert course title"
-            required />
+            @blur="validateTitle" required />
+          <div v-if="errors.title" class="text-danger small mt-1">{{ errors.title }}</div>
         </div>
 
         <div class="mb-3">
@@ -20,7 +21,8 @@
             <span class="bold-text">Course Intro</span>
           </label>
           <textarea id="intro" v-model="course.intro" class="form-control"
-            placeholder="Write a short intro for the course" rows="3" required></textarea>
+            placeholder="Write a short intro for the course" rows="3" @blur="validateIntro" required></textarea>
+          <div v-if="errors.intro" class="text-danger small mt-1">{{ errors.intro }}</div>
         </div>
 
         <div class="mb-3">
@@ -29,7 +31,8 @@
             <span class="bold-text">Course Description</span>
           </label>
           <textarea id="description" v-model="course.description" class="form-control"
-            placeholder="Detailed course description" rows="5" required></textarea>
+            placeholder="Detailed course description" rows="5" @blur="validateDescription" required></textarea>
+          <div v-if="errors.description" class="text-danger small mt-1">{{ errors.description }}</div>
         </div>
 
         <div class="mb-3">
@@ -38,18 +41,51 @@
             <span class="bold-text">Course Thumbnail</span>
           </label>
           <input type="file" id="thumb" @change="handleImageUpload" class="form-control" accept="image/*" />
+          <div v-if="errors.thumb" class="text-danger small mt-1">{{ errors.thumb }}</div>
           <div v-if="previewImage" class="mt-2 text-center">
             <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
           </div>
         </div>
 
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="price" class="form-label required">
+              <i class="fas fa-dollar-sign me-1 bold-icon"></i>
+              <span class="bold-text">Course Price</span>
+            </label>
+            <input type="number" id="price" v-model.number="course.price" class="form-control"
+              placeholder="Enter price (VND)" min="10000" @blur="validatePrice" required />
+            <div v-if="errors.price" class="text-danger small mt-1">{{ errors.price }}</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="discount" class="form-label">
+              <i class="fas fa-tags me-1 bold-icon"></i>
+              <span class="bold-text">Discount (%)</span>
+            </label>
+            <input type="number" id="discount" v-model.number="course.discount" class="form-control"
+              placeholder="Discount percentage" min="0" max="100" />
+          </div>
+
+          <div class="col-md-4">
+            <label for="discountExpiry" class="form-label">
+              <i class="fas fa-calendar-alt me-1 bold-icon"></i>
+              <span class="bold-text">Discount Expiry Date</span>
+            </label>
+            <input type="date" id="discountExpiry" v-model="course.discountExpiry" class="form-control" />
+          </div>
+        </div>
+
         <div class="mb-3">
-          <label for="price" class="form-label required">
-            <i class="fas fa-dollar-sign me-1 bold-icon"></i>
-            <span class="bold-text">Course Price</span>
+          <label for="status" class="form-label required">
+            <i class="fas fa-flag me-1 bold-icon"></i>
+            <span class="bold-text">Course Status</span>
           </label>
-          <input type="number" id="price" v-model="course.price" class="form-control" placeholder="Enter price (VND)"
-            min="10000" required />
+          <select id="status" v-model="course.status" required class="form-select">
+            <option value="0">Draft</option>
+            <option value="1">Published</option>
+            <option value="2">Archived</option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -57,12 +93,13 @@
             <i class="fas fa-signal me-1 bold-icon"></i>
             <span class="bold-text">Course Level</span>
           </label>
-          <select id="level" v-model="course.level" required class="form-select">
+          <select id="level" v-model="course.level" required class="form-select" @blur="validateLevel">
             <option value="" disabled>Select level</option>
             <option value="0">Beginner</option>
             <option value="1">Intermediate</option>
             <option value="2">Advanced</option>
           </select>
+          <div v-if="errors.level" class="text-danger small mt-1">{{ errors.level }}</div>
         </div>
 
         <div class="mb-3">
@@ -71,7 +108,8 @@
             <span class="bold-text">Course Outcomes</span>
           </label>
           <textarea id="outcomes" v-model="course.outcomes" class="form-control"
-            placeholder="Expected learning outcomes" rows="3" required></textarea>
+            placeholder="Expected learning outcomes" rows="3" @blur="validateOutcomes" required></textarea>
+          <div v-if="errors.outcomes" class="text-danger small mt-1">{{ errors.outcomes }}</div>
         </div>
 
         <div class="mb-3">
@@ -80,7 +118,8 @@
             <span class="bold-text">Course Requirements</span>
           </label>
           <textarea id="requirements" v-model="course.requirements" class="form-control"
-            placeholder="Course prerequisites" rows="3" required></textarea>
+            placeholder="Course prerequisites" rows="3" @blur="validateRequirements" required></textarea>
+          <div v-if="errors.requirements" class="text-danger small mt-1">{{ errors.requirements }}</div>
         </div>
 
         <div class="mb-4">
@@ -91,29 +130,39 @@
 
           <div class="mb-4 border rounded p-3" v-for="(lecture, index) in course.lectures" :key="index">
             <div class="mb-3">
-              <label class="form-label">
+              <label class="form-label required">
                 <i class="fas fa-sticky-note me-1 bold-icon"></i>
-                <span class="bold-text">Lecture Title {{ index + 1 }}</span>
+                <span class="bold-text">Lecture Title</span>
               </label>
-              <input type="text" v-model="lecture.title" class="form-control" placeholder="Lecture title" />
+              <input type="text" v-model="lecture.title" class="form-control" placeholder="Lecture title"
+                @blur="validateLecture(index)" required />
+              <div v-if="lectureErrors[index] && lectureErrors[index].title" class="text-danger small mt-1">
+                {{ lectureErrors[index].title }}
+              </div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">
+              <label class="form-label required">
                 <i class="fas fa-align-left me-1 bold-icon"></i>
                 <span class="bold-text">Lecture Content</span>
               </label>
-              <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content"
-                rows="4"></textarea>
+              <textarea v-model="lecture.content" class="form-control" placeholder="Lecture content" rows="4"
+                @blur="validateLecture(index)" required></textarea>
+              <div v-if="lectureErrors[index] && lectureErrors[index].content" class="text-danger small mt-1">
+                {{ lectureErrors[index].content }}
+              </div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">
+              <label class="form-label required">
                 <i class="fas fa-align-left me-1 bold-icon"></i>
                 <span class="bold-text">Content Summary</span>
               </label>
-              <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture summary"
-                rows="4"></textarea>
+              <textarea v-model="lecture.contentSummary" class="form-control" placeholder="Lecture summary" rows="4"
+                @blur="validateLecture(index)" required></textarea>
+              <div v-if="lectureErrors[index] && lectureErrors[index].contentSummary" class="text-danger small mt-1">
+                {{ lectureErrors[index].contentSummary }}
+              </div>
             </div>
 
             <div class="form-check form-switch mb-3">
@@ -130,8 +179,8 @@
                 <i class="fas fa-upload me-1 bold-icon"></i>
                 <span class="bold-text">Upload Lecture Materials</span>
               </label>
-              <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
-                accept="image/*,video/*,application/pdf" multiple />
+              <input type="file" :ref="'fileInput' + index" class="form-control"
+                @change="handleLectureMediaUpload($event, index)" accept="image/*,video/*,application/pdf" multiple />
               <div v-if="lecture.medias.length" class="mt-2">
                 <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
                   class="d-flex align-items-center mb-2 p-2 border rounded">
@@ -210,8 +259,9 @@ export default {
         description: "",
         thumb: { url: "", file: null, title: "" },
         leafCategoryId: "",
+        status: 0,
         price: 0,
-        level: 0,
+        level: "",
         outcomes: "",
         requirements: "",
         discount: 0,
@@ -221,20 +271,37 @@ export default {
       previewImage: null,
       showSavePopup: false,
       showDeletePopup: false,
-      lectureToDeleteIndex: null
+      lectureToDeleteIndex: null,
+      errors: {
+        title: "",
+        intro: "",
+        description: "",
+        price: "",
+        level: "",
+        outcomes: "",
+        requirements: "",
+        thumb: ""
+      },
+      lectureErrors: []
     };
   },
   methods: {
     async fetchCourse() {
       const courseId = this.$route.params.id;
       try {
+        this.$refs.loadingSpinner.showSpinner();
         const courseData = await getCourseById(courseId);
+        courseData.discount *= 100;
+        if (courseData.discountExpiry) {
+          const expiryDate = new Date(courseData.discountExpiry);
+          courseData.discountExpiry = expiryDate.toISOString().split("T")[0];
+        }
         this.course = {
           ...courseData,
           thumb: {
             url: courseData.thumbUrl || "",
             file: null,
-            title: ""
+            title: courseData.title || ""
           },
           lectures: []
         };
@@ -253,9 +320,20 @@ export default {
             file: null
           }))
         }));
-      } catch {
+
+        this.initializeLectureErrors();
+      } catch (error) {
         toast.error("Unable to load course data.");
+      } finally {
+        this.$refs.loadingSpinner.hideSpinner();
       }
+    },
+    initializeLectureErrors() {
+      this.lectureErrors = Array(this.course.lectures.length).fill().map(() => ({
+        title: "",
+        content: "",
+        contentSummary: ""
+      }));
     },
     addLecture() {
       this.course.lectures.push({
@@ -266,22 +344,52 @@ export default {
         isPreviewable: false,
         medias: []
       });
+      this.lectureErrors.push({
+        title: "",
+        content: "",
+        contentSummary: ""
+      });
     },
     removeLecture(index) {
       this.course.lectures.splice(index, 1);
+      this.lectureErrors.splice(index, 1);
     },
     removeLectureMedia(lectureIndex, mediaIndex) {
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
+
+      if (this.course.lectures[lectureIndex].medias.length === 0) {
+        this.$nextTick(() => {
+          if (this.$refs['fileInput' + lectureIndex]) {
+            if (Array.isArray(this.$refs['fileInput' + lectureIndex])) {
+              this.$refs['fileInput' + lectureIndex][0].value = '';
+            } else {
+              this.$refs['fileInput' + lectureIndex].value = '';
+            }
+          }
+        });
+      }
     },
     handleImageUpload(event) {
       const file = event.target.files[0];
-      if (file) {
-        this.course.thumb.file = file;
-        this.course.thumb.title = file.name;
-        const reader = new FileReader();
-        reader.onload = e => (this.previewImage = e.target.result);
-        reader.readAsDataURL(file);
+      this.processThumbFile(file);
+    },
+    processThumbFile(file) {
+      if (!file) return;
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        this.errors.thumb = "File size must be less than 5MB";
+        return;
       }
+      if (!file.type.startsWith("image/")) {
+        this.errors.thumb = "Only image files are allowed";
+        return;
+      }
+      this.errors.thumb = "";
+      this.course.thumb.file = file;
+      this.course.thumb.title = file.name;
+      const reader = new FileReader();
+      reader.onload = e => (this.previewImage = e.target.result);
+      reader.readAsDataURL(file);
     },
     handleLectureMediaUpload(event, lectureIndex) {
       Array.from(event.target.files).forEach(file => {
@@ -304,14 +412,17 @@ export default {
       });
     },
     openSavePopup() {
-      this.showSavePopup = true;
+      if (this.validateForm()) {
+        this.showSavePopup = true;
+      }
     },
     openDeletePopup(index) {
       this.lectureToDeleteIndex = index;
       this.showDeletePopup = true;
     },
     async handleSave(confirm) {
-      if (!confirm || !this.validateForm()) return;
+      if (!confirm) return;
+
       this.$refs.loadingSpinner.showSpinner();
       try {
         const formData = new FormData();
@@ -319,21 +430,20 @@ export default {
         formData.append("Title", this.course.title);
         formData.append("Intro", this.course.intro);
         formData.append("Description", this.course.description);
+        formData.append("Status", this.course.status);
         formData.append("Price", this.course.price);
+        formData.append("Discount", this.course.discount / 100);
+        formData.append("DiscountExpiry", this.course.discountExpiry);
         formData.append("Level", this.course.level);
         formData.append("Outcomes", this.course.outcomes);
         formData.append("Requirements", this.course.requirements);
         formData.append("LeafCategoryId", this.course.leafCategoryId);
 
         if (this.course.thumb.file) {
-          const thumbBase64 = await new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onload = e => resolve(e.target.result.split(",")[1]);
-            reader.readAsDataURL(this.course.thumb.file);
-          });
-          formData.append("Thumb.File", thumbBase64);
+          formData.append("Thumb.File", this.course.thumb.file);
           formData.append("Thumb.Title", this.course.thumb.title);
         } else if (this.course.thumb.url) {
+          formData.append("Thumb.Title", this.course.title);
           formData.append("Thumb.Url", this.course.thumb.url);
         }
 
@@ -342,31 +452,19 @@ export default {
           formData.append(`Lectures[${i}].Id`, lec.id || "");
           formData.append(`Lectures[${i}].Title`, lec.title);
           formData.append(`Lectures[${i}].Content`, lec.content);
-          formData.append(
-            `Lectures[${i}].ContentSummary`,
-            lec.contentSummary
-          );
-          formData.append(
-            `Lectures[${i}].IsPreviewable`,
-            lec.isPreviewable
-          );
+          formData.append(`Lectures[${i}].ContentSummary`, lec.contentSummary);
+          formData.append(`Lectures[${i}].IsPreviewable`, lec.isPreviewable);
 
           for (let mi = 0; mi < lec.medias.length; mi++) {
             const m = lec.medias[mi];
             if (m.file) {
-              const mediaBase64 = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result.split(",")[1]);
-                reader.readAsDataURL(m.file);
-              });
-              formData.append(
-                `Lectures[${i}].Medias[${mi}].File`,
-                mediaBase64
-              );
-              formData.append(
-                `Lectures[${i}].Medias[${mi}].Title`,
-                m.title
-              );
+              formData.append(`Lectures[${i}].Medias[${mi}].File`, m.file);
+              formData.append(`Lectures[${i}].Medias[${mi}].Title`, m.title);
+              formData.append(`Lectures[${i}].Medias[${mi}].Type`, m.type);
+            } else if (m.url) {
+              formData.append(`Lectures[${i}].Medias[${mi}].Url`, m.url);
+              formData.append(`Lectures[${i}].Medias[${mi}].Title`, m.title);
+              formData.append(`Lectures[${i}].Medias[${mi}].Type`, m.type);
             }
           }
         }
@@ -380,10 +478,8 @@ export default {
             message: "Course updated successfully!"
           }
         });
-      } catch {
-        toast.error(
-          "An error occurred while updating the course."
-        );
+      } catch (error) {
+        toast.error("An error occurred while updating the course.");
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
       }
@@ -394,60 +490,154 @@ export default {
       }
       this.lectureToDeleteIndex = null;
     },
-    validateForm() {
+    validateTitle() {
       if (!this.course.title.trim()) {
-        toast.error("Please enter course title");
-        return false;
+        this.errors.title = "Please enter course title";
+      } else if (this.course.title.trim().length < 5) {
+        this.errors.title = "Course title must be at least 5 characters";
+      } else if (this.course.title.trim().length > 255) {
+        this.errors.title = "Course title must be less than 255 characters";
+      } else {
+        this.errors.title = "";
       }
+    },
+    validateIntro() {
       if (!this.course.intro.trim()) {
-        toast.error("Please enter course intro");
-        return false;
+        this.errors.intro = "Please enter course intro";
+      } else {
+        this.errors.intro = "";
       }
+    },
+    validateDescription() {
       if (!this.course.description.trim()) {
-        toast.error("Please enter course description");
-        return false;
+        this.errors.description = "Please enter course description";
+      } else {
+        this.errors.description = "";
       }
-      if (!this.course.thumb.file && !this.course.thumb.url) {
-        toast.error("Please select a thumbnail image");
-        return false;
-      }
+    },
+    validatePrice() {
       if (!this.course.price || this.course.price < 10000) {
-        toast.error("Price must be at least 10,000 VND");
-        return false;
+        this.errors.price = "Price must be at least 10,000 VND";
+      } else {
+        this.errors.price = "";
       }
+    },
+    validateLevel() {
       if (this.course.level === "" || this.course.level === null) {
-        toast.error("Please select course level");
-        return false;
+        this.errors.level = "Please select course level";
+      } else {
+        this.errors.level = "";
       }
+    },
+    validateOutcomes() {
       if (!this.course.outcomes.trim()) {
-        toast.error("Please enter course outcomes");
-        return false;
+        this.errors.outcomes = "Please enter course outcomes";
+      } else {
+        this.errors.outcomes = "";
       }
+    },
+    validateRequirements() {
       if (!this.course.requirements.trim()) {
-        toast.error("Please enter course requirements");
+        this.errors.requirements = "Please enter course requirements";
+      } else {
+        this.errors.requirements = "";
+      }
+    },
+    validateThumb() {
+      if (!this.course.thumb.file && !this.course.thumb.url) {
+        this.errors.thumb = "Please select a thumbnail image";
+      } else {
+        this.errors.thumb = "";
+      }
+    },
+    validateLecture(index) {
+      if (!this.lectureErrors[index]) {
+        while (this.lectureErrors.length <= index) {
+          this.lectureErrors.push({
+            title: "",
+            content: "",
+            contentSummary: ""
+          });
+        }
+      }
+
+      const lec = this.course.lectures[index];
+      const errors = {
+        title: "",
+        content: "",
+        contentSummary: ""
+      };
+
+      if (!lec.title || !lec.title.trim()) {
+        errors.title = `Lecture ${index + 1}: please enter a title or remove this lecture`;
+      } else if (lec.title.trim().length < 5) {
+        errors.title = `Lecture ${index + 1}: title must be at least 5 characters`;
+      } else if (lec.title.trim().length > 255) {
+        errors.title = `Lecture ${index + 1}: title must be less than 255 characters`;
+      }
+
+      if (!lec.content || !lec.content.trim()) {
+        errors.content = `Lecture ${index + 1}: please enter content or remove this lecture`;
+      } else if (lec.content.trim().length < 10) {
+        errors.content = `Lecture ${index + 1}: content must be at least 10 characters`;
+      } else if (lec.content.trim().length > 1000) {
+        errors.content = `Lecture ${index + 1}: content must be less than 1000 characters`;
+      }
+
+      if (!lec.contentSummary || !lec.contentSummary.trim()) {
+        errors.contentSummary = `Lecture ${index + 1}: please enter summary or remove this lecture`;
+      } else if (lec.contentSummary.trim().length < 5) {
+        errors.contentSummary = `Lecture ${index + 1}: summary must be at least 5 characters`;
+      } else if (lec.contentSummary.trim().length > 100) {
+        errors.contentSummary = `Lecture ${index + 1}: summary must be less than 100 characters`;
+      }
+
+      this.lectureErrors[index] = errors;
+      return errors.title === "" && errors.content === "" && errors.contentSummary === "";
+    },
+    validateAllLectures() {
+      this.initializeLectureErrors();
+
+      let allValid = true;
+      for (let i = 0; i < this.course.lectures.length; i++) {
+        const isValid = this.validateLecture(i);
+        if (!isValid) {
+          allValid = false;
+        }
+      }
+      return allValid;
+    },
+    validateForm() {
+      this.validateTitle();
+      this.validateIntro();
+      this.validateDescription();
+      this.validatePrice();
+      this.validateLevel();
+      this.validateOutcomes();
+      this.validateRequirements();
+      this.validateThumb();
+
+      const lecturesValid = this.validateAllLectures();
+
+      if (Object.values(this.errors).some(err => err !== "")) {
+        const firstError = Object.keys(this.errors).find(key => this.errors[key] !== "");
+        toast.error(`Please fix the error: ${this.errors[firstError]}`);
         return false;
       }
-      for (let i = 0; i < this.course.lectures.length; i++) {
-        const lec = this.course.lectures[i];
-        if (!lec.title.trim()) {
-          toast.error(
-            `Lecture ${i + 1}: please enter a title or remove this lecture`
-          );
-          return false;
-        }
-        if (!lec.content.trim()) {
-          toast.error(
-            `Lecture ${i + 1}: please enter content or remove this lecture`
-          );
-          return false;
-        }
-        if (!lec.contentSummary.trim()) {
-          toast.error(
-            `Lecture ${i + 1}: please enter summary or remove this lecture`
-          );
-          return false;
+
+      if (!lecturesValid) {
+        for (let i = 0; i < this.lectureErrors.length; i++) {
+          const err = this.lectureErrors[i];
+          if (err.title) {
+            return false;
+          } else if (err.content) {
+            return false;
+          } else if (err.contentSummary) {
+            return false;
+          }
         }
       }
+
       return true;
     }
   },
