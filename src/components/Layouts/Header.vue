@@ -14,49 +14,41 @@
         </ul>
       </div>
       <div class="user-actions">
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile dropdown" @click="toggleProfileMenu">
+        <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
           <span>Hi, {{ user.userName }}</span>
+          <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Personal Profile</router-link></li>
-            <hr class="menu-divider" />
             <li><router-link to="/statistics/self-assessment">Statistics</router-link></li>
-            <hr class="menu-divider" />
             <li><router-link to="/settings">Settings</router-link></li>
+            
             <hr class="menu-divider" />
-            <li><router-link to="/enrolled-course">Enrolled courses</router-link></li>
+            <li><router-link to="/meetings/schedule">Meetings</router-link></li>
+            <li><router-link to="/courses/enrolled">Enrolled courses</router-link></li>
 
-            <li v-if="user.role == 0">
+            <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
               <router-link to="/request-advisor">Request to be an advisor</router-link>
             </li>
 
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
-              <router-link to="/advisor/edit-profile">Edit Advisor Profile</router-link>
-            </li>
-            <li v-if="user.role === 1">
-              <hr class="menu-divider" />
-              <router-link to="/courses">Manage courses</router-link>
-            </li>
-            <li v-if="user.role === 1">
-            <router-link to="/blogs/manage">Manage blogs</router-link>
+              <router-link to="/advisor/edit-profile">Advisor Profile</router-link>
+              <router-link to="/advisor/content">Advisor Content</router-link>
+              <router-link to="/media/manage">Manage Media</router-link>
             </li>
             
             <li v-if="user.role === 2">
-              <router-link to="/admin">Admin</router-link>
-            </li>
-            <li v-if="user.role === 2">
-              <router-link to="/advisor/moderate-advisors">Moderate Advisor</router-link>
-            </li>
-            <li v-if="user.role === 2">
               <hr class="menu-divider" />
-              <router-link to="/yogas/manage">Manage Yoga Practice</router-link>
+              <router-link to="/admin">Admin</router-link>
+              <router-link to="/advisor/content">Moderate Advisor</router-link>
+              <router-link to="/yogas/manage">Yoga Lessons</router-link>
             </li>
 
             <li>
               <hr class="menu-divider" />
-              <button @click="signOut">Sign Out</button>
-              <hr class="menu-divider" />
+              <button style="width: 100%;" @click="signOut">Sign Out</button>
             </li>
           </ul>
         </div>
@@ -72,6 +64,7 @@
 import { getUserProfile, signOut } from '@/scripts/api/services/authService';
 import Logo from '@/components/Common/Misc/Logo.vue';
 // import { getNotifications, updateNotification } from '@/scripts/api/services/notificationService';
+import NotificationBell from "@/components/NotificationComponents/NotificationBell.vue";
 
 export default {
   data() {
@@ -79,8 +72,10 @@ export default {
       isLoggedIn: false,
       user: {
         userName: '',
-        role: ''
+        role: '',
+        avatarUrl: ''
       },
+      //cập nhật data vào methods
       // notifications: [],
       // showNotifications: false,
       showProfileMenu: false
@@ -88,7 +83,8 @@ export default {
   },
 
   components: {
-    Logo
+    Logo,
+    NotificationBell
   },
 
   async mounted() {
@@ -108,8 +104,10 @@ export default {
         if (clientData) {
           this.isLoggedIn = true;
           this.user = {
+            id: clientData.id,
             userName: clientData.userName || 'User',
             role: clientData.role || 'Member',
+            avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
           };
         }
         console.log("User role:", this.user.role);
@@ -133,8 +131,9 @@ export default {
     async signOut() {
       try {
         await signOut();
+				this.$emit('authenticated', false);
         this.isLoggedIn = false;
-        this.user = { name: '', role: '' };
+        this.user = { name: '', role: '', avatarUrl: '' };
         this.$router.push({ name: 'signIn' });
       } catch (error) {
         console.error('Error signing out:', error);
@@ -143,7 +142,7 @@ export default {
 
     handleClickOutside(event) {
       const dropdown = this.$el.querySelector('.dropdown-menu');
-      const profileMenu = this.$el.querySelector('.profile');
+      const profileMenu = this.$el.querySelector('.profile-menu');
 
       if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
         this.showProfileMenu = false;
@@ -179,8 +178,14 @@ export default {
     //     console.error('Error marking notifications as read:', error);
     //   }
     // },
-  }
+  },
 
+  props: {
+    isAuthenticated: {
+      type: Boolean,
+      required: true,
+    },
+  },
   
 };
 
@@ -225,6 +230,7 @@ ul {
 
 .menu ul {
   display: flex;
+  margin-left: 45px;
 }
 
 .menu ul li {
@@ -235,13 +241,18 @@ ul {
   line-height: 60px;
 }
 
+#bell {
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
 .user-actions {
   display: flex;
   align-items: center;
 }
 
 .notification,
-.profile {
+.profile-menu {
   position: relative;
   margin-left: 10px;
   cursor: pointer;
@@ -257,7 +268,8 @@ ul {
   z-index: 1000;
   display: block;
   width: max-content;
-  left: -15px;
+  left: 0;
+  width: 100%;
 }
 
 .dropdown-menu li {
@@ -266,10 +278,6 @@ ul {
   cursor: pointer;
   color: #333;
   transition: background-color 0.2s;
-}
-
-.dropdown-menu li:hover {
-  background-color: #f3f3f3;
 }
 
 .dropdown-menu li a,
@@ -295,16 +303,16 @@ ul {
   border-bottom: 1px solid #ccc;
   margin: 5px 0;
 }
-
 .login-btn {
   display: flex;
   align-items: center;
+  gap: 10px; 
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   border-radius: 20px;
   background-color: #f3ef51;
-  padding: 5px 20px;
+  padding: 5px 15px 5px 20px;
   transition: background-color 0.3s;
 }
 
@@ -330,6 +338,14 @@ ul {
 .hovered-link:hover {
   opacity: 1;
   color: #3db83b;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {

@@ -1,47 +1,64 @@
 <template>
-    <GlowingCard class="course-card" justify="unset" padding="10px">
-        <div style="flex-grow: 1;">
-            <div class="course-thumbnail">
-                <RouterLink :to="`/courses/${course.id}`">
-                    <img :src="course.thumbUrl" :alt="course.title">
-                </RouterLink>
-                <span class="duration">{{ course.duration }}</span>
-                <!--<span class="level-badge">{{ course.level }}</span>-->
-                <span v-if="course.discount > 0" class="level-badge">-{{ course.discount * 100 }}%</span>
-            </div>
-            <p class="course-title">{{ course.title }}</p>
+    <div class="course-card shadow h-100">
+        <div class="course-thumbnail position-relative">
+            <RouterLink :to="`/courses/${course.id}`">
+                <img :src="course.thumbUrl" alt="" class="img-fluid w-100 h-100"
+                    :onError="(e) => e.target.style.display = 'none'">
+                <div v-if="!course.thumbUrl" class="default-thumbnail"
+                    style="background-image: url(/assets/images/10.jpg);"></div>
+            </RouterLink>
+            <span class="level">{{ getLevelText(course.level) }}</span>
+            <span v-if="course.discount > 0" class="discount-badge">-{{ course.discount }}%</span>
         </div>
-        <div>
-            <span class="instructor">{{ course.instructor }}</span>
-            <span class="rating">
-                
-                <i v-if="course.ratingCount > 0" :key="n" class="fa fa-star co-or"
-                    v-for="n in Math.ceil(course.totalRating / course.ratingCount)"
-                    aria-hidden="true"></i>
-
-                <span class="rating-text">
-                    <span v-if="course.ratingCount > 0">
-                    ({{ course.ratingCount }})
+        <div class="course-content p-3 d-flex flex-column">
+            <h3 class="course-title mb-2">{{ course.title }}</h3>
+            <div class="course-meta mt-auto">
+                <div class="instructor-info mb-2">
+                    <span class="instructor">{{ course.creator?.fullName }}</span>
+                    <p class="course-date m-0">{{ formatDate(course.creationTime) }}</p>
+                </div>
+                <div class="rating d-flex align-items-center">
+                    <div class="stars">
+                        <i v-if="course.ratingCount > 0" v-for="n in Math.ceil(course.totalRating / course.ratingCount)"
+                            :key="n" class="fa fa-star" aria-hidden="true"></i>
+                    </div>
+                    <span class="rating-text ms-2">
+                        <span v-if="course.ratingCount > 0">({{ course.ratingCount }})</span>
+                        <span v-else>No rating yet</span>
                     </span>
-                    <span v-else>No rating yet</span>
-                </span>
-
-                <!--<span v-for="n in 5" :key="n" class="star">★</span>
-                <span class="rating-count">({{ course.ratingCount }})</span>-->
-            </span>
+                </div>
+            </div>
         </div>
-    </GlowingCard>
+    </div>
 </template>
 
-
 <script setup>
-import GlowingCard from '@/components/Common/GlowingCard.vue';
+import { RouterLink } from 'vue-router';
 
 const props = defineProps({
     course: {
-        type: Object
+        type: Object,
+        required: true,
+        default: () => ({})
     }
 });
+
+const formatDate = (dateString) => {
+    try {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    } catch (error) {
+        console.error("Error formatting date:", error);
+        return dateString;
+    }
+};
+
+const getLevelText = (level) => {
+    if (level === 0) return "Beginner";
+    if (level === 1) return "Intermediate";
+    if (level === 2) return "Advanced";
+    return "Unknown";
+};
 
 function isOnDiscount(course) {
     return course.discount > 0 && new Date(course.discountExpiry) > new Date();
@@ -54,80 +71,119 @@ function formatPrice(price) {
 
 <style scoped>
 .course-card {
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: 280px;
+    background: #fff;
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .course-thumbnail {
-    position: relative;
-    aspect-ratio: 16/9;
-    width: 100%;
+    height: 160px;
+    overflow: hidden;
 }
 
-.course-thumbnail img {
+.course-thumbnail img,
+.default-thumbnail {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s ease;
 }
 
-.duration {
+.default-thumbnail {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+
+.course-thumbnail:hover img,
+.course-thumbnail:hover .default-thumbnail {
+    transform: scale(1.05);
+}
+
+.level {
     position: absolute;
     bottom: 10px;
     right: 10px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 4px;
     font-size: 12px;
+    font-weight: 500;
 }
 
-.level-badge {
+.discount-badge {
     position: absolute;
     top: 10px;
     left: 10px;
-    background: #5488c7;
+    background: #e74c3c;
     color: white;
-    padding: 2px 8px;
+    padding: 3px 8px;
     border-radius: 4px;
     font-size: 12px;
+    font-weight: 600;
 }
 
-.course-info {
-    padding: 15px;
+.course-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .course-title {
     font-size: 16px;
-    margin-bottom: 8px;
-    color: #000;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.course-meta {
+    margin-top: auto;
+}
+
+.instructor-info {
+    display: flex;
+    flex-direction: column;
 }
 
 .instructor {
-    color: #666;
     font-size: 14px;
-    margin-bottom: 8px;
+    color: #34495e;
+    font-weight: 500;
+}
+
+.course-date {
+    font-size: 13px;
+    color: #7f8c8d;
 }
 
 .rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    margin-top: 5px;
 }
 
 .fa-star {
-    font-size: 12px;
-    color: gold;
+    color: #f1c40f;
+    font-size: 14px;
+    margin-right: 1px;
 }
 
 .rating-text {
-    color: #000000;
-}
-
-.rating-count {
-    color: #666;
-    font-size: 12px;
+    font-size: 13px;
+    color: #7f8c8d;
 }
 </style>

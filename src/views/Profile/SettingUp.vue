@@ -1,10 +1,9 @@
 <template>
     <div class="container text-center">
         <SingleSelectSurvey v-if="childIndex == 0" :options="firstEvaluationOptions"></SingleSelectSurvey>
-        <PersonalRoadmap v-if="childIndex == 1" :nextScreenCallback="() => switchChild(true)" :enableTour="true" />
-        <SingleSelectSurvey v-if="childIndex == 2" :options="wellnessSurveyOptions"></SingleSelectSurvey>
-        <!--Additionally provided-->
-        <multiple-select-survey v-if="childIndex == 3" :options="whatYouWantSurveyOptions"></multiple-select-survey>
+        <SingleSelectSurvey v-if="childIndex == 1" :options="wellnessSurveyOptions"></SingleSelectSurvey>
+        <MultipleSelectSurvey v-if="childIndex == 2" :options="whatYouWantSurveyOptions"></MultipleSelectSurvey>
+        <PersonalRoadmap v-if="childIndex == 3" :nextScreenCallback="() => { router.push({ path: '/' }); }" :enableTour="true" />
     </div>
 </template>
 
@@ -22,9 +21,11 @@ import { getUserProfile, setUserProfile } from '@/scripts/api/services/authServi
 import SingleSelectSurvey from "@/components/SurveyComponents/SingleSelectSurvey.vue";
 import MultipleSelectSurvey from "@/components/SurveyComponents/MultipleSelectSurvey.vue";
 import PersonalRoadmap from '../../components/RoadmapComponents/PersonalRoadmap.vue';
+import { onBeforeMount } from 'vue';
 
 const sweetAlert = inject('sweetAlert');
 const spinner = inject('loadingSpinner');
+const roadmapProgress = inject('roadmapProgress');
 const childIndex = ref(-1);
 const firstEvaluationOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
 const wellnessSurveyOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, false, false));
@@ -65,17 +66,19 @@ const submitWhatYouWantSurvey = async (selectedOptions) => {
         let user = getUserProfile();
         user.roadmapId = recommendedRoadmap;
         setUserProfile(user);
+        roadmapProgress.fetchPersonalRoadmap();
     }
     spinner.hideSpinner();
 
-    await sweetAlert.showSuccess("Setting up successfully!").then(() => { router.push({ path: '/' }); });
+    await sweetAlert.showSuccess("Hold on while we set up a roadmap for you!");
+    switchChild(true);
 }
 
 const switchChild = (isForward) => {
     childIndex.value = isForward ? childIndex.value + 1 : childIndex.value - 1;
 }
 
-(async () => {
+onBeforeMount(async () => {
     var surveys = await getPagedSurveys();
     var preferencesSurveys = await getAllPreferenceSurveys();
 
@@ -98,14 +101,14 @@ const switchChild = (isForward) => {
     whatYouWantSurveyOptions.value = new SurveyOptions(
         preferencesSurveys.find(survey => survey.title.includes("What you want us to help you")),
         "✨ What you want us to help you? ✨",
-        () => { },
+        null,
         submitWhatYouWantSurvey,
         false,
         false
     );
 
     childIndex.value = 0;
-})()
+});
 </script>
 
 <style scoped>

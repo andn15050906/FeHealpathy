@@ -33,7 +33,7 @@
 
     <div class="section">
       <h2>📈 Mood & Activity Trends</h2>
-      <canvas ref="moodChart"></canvas>
+      <Line :data="sentimentChartData" :options="sentimentChartOptions" />
     </div>
   </div>
 </template>
@@ -42,64 +42,57 @@
 import { ref, onMounted, onBeforeMount } from "vue";
 import Chart from "chart.js/auto";
 import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
-import { formatISODateWithHMS, formatISODate } from '@/scripts/logic/common';
-import { calcSurveyResult } from '@/scripts/logic/utils';
+import { formatISODateWithHMS, formatISODateWithDDMM } from '@/scripts/logic/common';
 import { getUserProfile } from '@/scripts/api/services/authService';
-import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
-import { getPagedSurveys } from '@/scripts/api/services/surveysService';
+import { getSentimentAnalysis } from '@/scripts/api/services/statisticsService';
 import StatisticsTabs from '@/components/StatisticsComponents/StatisticsTabs.vue';
+import { Line } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js';
 
-const recentActivities = ref([
-  /*{
-    creationTime: "2024-03-02 08:30",
-    action: "Answered Question of the Day",
-    content: "✅ Positive response",
-  },
-  {
-    creationTime: "2024-03-03 14:00",
-    action: "Updated Mood",
-    content: "😔 Slightly negative mood ⚠️",
-  },
-  {
-    creationTime: "2024-03-04 20:00",
-    action: "Joined a chat group",
-    content: "💬 Sent 5 messages",
-  },
-  {
-    creationTime: "2024-03-05 16:45",
-    action: "Completed stress management exercise",
-    content: "✅ Success!",
-  },
-  {
-    creationTime: "2024-03-06 10:00",
-    action: "Completed 10 minutes of meditation",
-    content: "🧘‍♂️ Done",
-  },
-  {
-    creationTime: "2024-03-07 09:00",
-    action: "Filled out a survey",
-    content: "📝 Submitted feedback",
-  },
-  {
-    creationTime: "2024-03-07 17:00",
-    action: "Completed a course",
-    content: "🎓 Finished 'Stress Control' course",
-  },*/
-]);
-
+const recentActivities = ref([]);
 const moodChart = ref(null);
+const sentimentChartData = ref({
+  labels: [],
+  datasets: []
+});
+const sentimentChartOptions = ref({
+  responsive: true,
+  scales: {
+    "y-mood": {
+      type: "linear",
+      position: "left",
+      //beginAtZero: true,
+      //max: 100,
+      title: { display: true, text: "Sentiment Score" },
+      //ticks: { callback: (value) => value + "%" },
+    },
+    "y-activity": {
+      type: "linear",
+      position: "right",
+      beginAtZero: true,
+      title: { display: true, text: "Activeness" },
+    },
+  }
+});
 
 onBeforeMount(async () => {
   let userId = (await getUserProfile()).id;
-  var activityLogs = (await getActivityLogs()).filter(_ => _.creatorId == userId);
+  ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
+
+  var sentimentDataTask = getSentimentAnalysis();
+  var activityLogsTask = getActivityLogs({ pageSize: 128, CreatorId: userId });
+
+  await Promise.all([sentimentDataTask, activityLogsTask]);
+  const sentimentData = await sentimentDataTask;
+  const activityLogs = await activityLogsTask;
+  console.log(sentimentData);
   console.log(activityLogs);
+
   recentActivities.value = activityLogs.map(log => {
     let json = undefined;
     try {
       json = JSON.parse(log.content);
     } catch (e) { }
-
-    console.log(json);
 
     let action = '';
     if (json && json.GenericType) {
@@ -110,17 +103,33 @@ onBeforeMount(async () => {
       type: 'link',
       display: 'Xem chi tiết...'
     };
+
     //...
-    if (!json.GenericType && json.Content) {
+    if ((!json.GenericType || json.GenericType == 'General_Activity_Created') && json.Content) {
       let parsedContent = JSON.parse(json.Content);
-      console.log(parsedContent);
+      try {
+        let nestedJson = JSON.parse(parsedContent.Content);
+        if (nestedJson)
+          parsedContent = nestedJson;
+      } catch (e) { }
+      
       if (parsedContent.question && parsedContent.answer) {
-        console.log(TRACKED_EVENTS.QuestionOfTheDay_Answered);
         action = TRACKED_EVENTS.QuestionOfTheDay_Answered.displayName;
         content =  {
           type: 'text',
           display: parsedContent.question
         };
+      }
+      else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated.label) {
+        action = TRACKED_EVENTS.DiaryNote_Created.displayName;
+        /*action = TRACKED_EVENTS.Mood_Updated.displayName;
+        content =  {
+          type: 'text',
+          display: parsedContent.content
+        };*/''
+      }
+      else if (parsedContent.event == TRACKED_EVENTS.Media_Viewed.label) {
+        action = TRACKED_EVENTS.Media_Viewed.displayName;
       }
     }
 
@@ -129,74 +138,52 @@ onBeforeMount(async () => {
       action: action,
       content: content
     }
-  })
-})
+  }).slice(0, 20);
 
-onMounted(() => {
-  const ctx = moodChart.value.getContext("2d");
+  let labels = [];
+  let scores = {};
+  let activities = {};
 
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: [
-        "2024-02-25",
-        "2024-02-26",
-        "2024-02-27",
-        "2024-02-28",
-        "2024-03-01",
-        "2024-03-02",
-        "2024-03-03",
-        "2024-03-04",
-        "2024-03-05",
-      ],
-      datasets: [
-        {
-          label: "Mood Score (%)",
-          data: [75, 80, 85, 78, 82, 60, 55, 65, 70],
-          borderColor: "#4CAF50",
-          backgroundColor: "rgba(76, 175, 80, 0.2)",
-          tension: 0.3,
-          yAxisID: "y-mood",
-          fill: true,
-        },
-        {
-          label: "Activity Count",
-          data: [3, 4, 6, 5, 7, 2, 1, 5, 8],
-          borderColor: "#FFA726",
-          backgroundColor: "rgba(255, 167, 38, 0.2)",
-          tension: 0.3,
-          yAxisID: "y-activity",
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        "y-mood": {
-          type: "linear",
-          position: "left",
-          beginAtZero: true,
-          max: 100,
-          title: {
-            display: true,
-            text: "Mood Score (%)",
-          },
-          ticks: { callback: (value) => value + "%" },
-        },
-        "y-activity": {
-          type: "linear",
-          position: "right",
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Activity Count",
-          },
-        },
+  for (let date in sentimentData) {
+    labels.push(formatISODateWithDDMM(date, 'DD/MM'));
+    scores[date] = sentimentData[date].score * -1;
+  }
+
+  for (let date of labels) {
+    if (!activities[date])
+      activities[date] = [];
+  }
+  for (let logItem of activityLogs) {
+    let date = formatISODateWithDDMM(logItem.creationTime, 'DD/MM');
+    if (!activities[date])
+      continue;
+    activities[date].push(logItem);
+  }
+
+  sentimentChartData.value = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Sentiment score',
+        data: Object.values(scores),
+        borderColor: "#4CAF50",
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.3,
+        yAxisID: "y-mood",
       },
-    },
-  });
-});
+      {
+        label: "Activity Count",
+        data: Object.values(activities).map(_ => _.length),
+        borderColor: "#FFA726",
+        backgroundColor: "rgba(255, 167, 38, 0.2)",
+        tension: 0.3,
+        yAxisID: "y-activity",
+        fill: true,
+      }
+    ],
+  };
+})
 </script>
 
 <style scoped>

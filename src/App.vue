@@ -1,17 +1,23 @@
 <template>
-  <!--<Guider v-if="isAuthAndShown" ref="guiderRef" />-->
   <div id="app">
     <LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <Header ref="headerRef" />
+    <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
     <main>
-      <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
-      <div class="page-container">
-        <!--<RouterView class="left-sidebar" v-if="isAuthAndShown" name="roadmapProgress"></RouterView>-->
-        <RouterView @authenticated="handleAuthenticated" @addNotification="addNotification"
-          @removeNotification="removeNotification" />
+      <div v-if="!router.currentRoute.value.meta.isAppMode">
+        <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
+        <div class="page-container">
+          <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
+            <PremiumBlocker></PremiumBlocker>
+          </div>
+          <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
+            @removeNotification="removeNotification" />
+        </div>
+        <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
       </div>
-      <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
+      <div v-else>
+        <CallWindow></CallWindow>
+      </div>
       <div class="partner-chat" v-if="isAuthAndShown">
         <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
       </div>
@@ -23,22 +29,23 @@
 <script setup>
 import { ref, provide, onMounted, computed } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
-import { getUserProfile } from '@/scripts/api/services/authService';
+import { getUserProfile, isPremium } from '@/scripts/api/services/authService';
 import Header from './components/Layouts/Header.vue';
 import Footer from './components/Layouts/Footer.vue';
 import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
 import SweetAlert from './components/Common/Popup/SweetAlert.vue';
-//import Guider from '@/components/PracticeComponents/Guider.vue';
 import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
 import ConversationWindow from './views/Community/ConversationWindow.vue';
-import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue'
+import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
+import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
+import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
 const router = useRouter();
 const isAuthenticated = ref(false);
 const roadmapProgress = ref(null);
-//const guiderRef = ref(null);
+const isPremiumUser = ref(isPremium());
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -54,7 +61,16 @@ provide('sweetAlert', {
 });
 
 provide('roadmapProgress', {
-  getPersonalRoadmap: () => roadmapProgress.value.getPersonalRoadmap()
+  getPersonalRoadmap: () => {
+    if (roadmapProgress.value)
+      return roadmapProgress.value.getPersonalRoadmap();
+    return null;
+  },
+  fetchPersonalRoadmap: () => {
+    if (roadmapProgress.value)
+      return roadmapProgress.value.fetchPersonalRoadmap();
+    return null;
+  }
 })
 
 /*provide('guider', {
@@ -64,13 +80,13 @@ provide('roadmapProgress', {
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
-    loadingSpinner.value.showSpinner();
+    loadingSpinner.value?.showSpinner();
     next();
   });
 
   router.afterEach(() => {
     setTimeout(() => {
-      loadingSpinner.value.hideSpinner();
+      loadingSpinner.value?.hideSpinner();
     }, 300);
   });
 
@@ -83,9 +99,12 @@ const isAuthAndShown = computed(() => {
 })
 
 const headerRef = ref(null);
-const handleAuthenticated = () => {
-  isAuthenticated.value = true;
-  headerRef.value.fetchUserProfile();
+const handleAuthenticated = (isAuth) => {
+  isAuth = isAuth ?? true;
+  isAuthenticated.value = isAuth;
+  if (isAuthenticated.value)
+    headerRef.value.fetchUserProfile();
+  isPremiumUser.value = isPremium();
 }
 
 const notificationRef = ref(null);
@@ -117,7 +136,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("/assets/background/green-bg1.jpg");
+  background-image: url("assets/background/chill.png");
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center top;
@@ -141,12 +160,14 @@ main {
 }
 
 .left-sidebar {
-  /*flex: 0.5;*/
   position: fixed;
-  top: 60px;
-  left: 0;
-  width: calc((100vw - 1200px)/2 - 8px);
+  top: 80px;
+  left: 20px;
+  border-radius: 15px;
+  /*width: calc((100vw - 1200px)/2 - 8px);*/
+  width: 320px;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  z-index: 1;
 }
 
 .partner-chat {
@@ -170,5 +191,8 @@ footer {
 }
 .v-tab__slider {
     display: none !important;
+}
+.v-expansion-panel__shadow {
+    display: none;
 }
 </style>

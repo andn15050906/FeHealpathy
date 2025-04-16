@@ -2,15 +2,15 @@
     <nav aria-label="Page navigation" class="pagination-nav">
         <ul class="pagination">
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                <a @click.prevent="goToPage(currentPage - 1)" class="page-link" aria-label="Previous">
+                <a @click.prevent="$emit('GoToPage', currentPage - 1)" class="page-link" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li v-for="page in totalPagesArray" :key="page" class="page-item" :class="{ active: currentPage === page }">
-                <a @click.prevent="goToPage(page)" class="page-link">{{ page }}</a>
+                <a @click.prevent="$emit('GoToPage', page)" class="page-link">{{ page }}</a>
             </li>
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                <a @click.prevent="goToPage(currentPage + 1)" class="page-link" aria-label="Next">
+                <a @click.prevent="$emit('GoToPage', currentPage + 1)" class="page-link" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -30,11 +30,8 @@ export default {
             type: Number,
             required: true,
         },
-        goToPage: {
-            type: Function,
-            required: true,
-        },
     },
+    emits: ['GoToPage'],
     computed: {
         totalPagesArray() {
             return Array.from({ length: this.totalPages }, (_, i) => i + 1);
@@ -47,7 +44,7 @@ export default {
 .pagination-nav {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin-top: 20px;
 }
 
 .pagination {
@@ -66,12 +63,13 @@ export default {
 
 .page-link {
     display: block;
-    padding: 8px 16px;
+    padding: 10px 24px;
     background-color: #ffffff;
     border: 1px solid #e9ecef;
-    color: #007bff;
+    color: #55a0f0;
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
 }
 
 .page-link:hover {
@@ -82,11 +80,12 @@ export default {
     color: #6c757d;
     pointer-events: none;
     background-color: #ffffff;
+    cursor: default;
 }
 
 .page-item.active .page-link {
-    background-color: #007bff;
+    background-color: #55a0f0;
     color: #ffffff;
-    border-color: #007bff;
+    border-color: #55a0f0;
 }
 </style>

@@ -1,473 +1,166 @@
 <template>
-    <div class="container">
-        <div class="content-wrapper">
-            <h3 class="section-title">Bài viết liên quan</h3>
-            <div class="articles-grid">
-                <div class="articles-row">
-                    <article v-for="(article, index) in relatedArticles" :key="index" class="article-card">
-                        <div class="card-content">
-                            <h4 class="article-title">{{ article.title }}</h4>
-                            <span class="author-name">{{ article.author }}</span>
-                            <span class="read-time">{{ article.readTime }}</span>
-                            <div class="engagement-stats">
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/266277c58c37e13e9be72997ef7fa3fc4e5ea86973cb8c87c401c64e235f8ac8?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.views }}</span>
-                                </div>
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0067e72d268af722a4b2e61f78916f3d246163026a619eb5c34382a9cb9470ae?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.comments }}</span>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-item">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/855f2c2cdc4327bf727cb4300c9d9a7ac50cb37d836043f89a106ad3b460b873?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <span>{{ article.likes }}</span>
-                                    </div>
-                                    <div class="stat-icons">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/140b2b6620207c91290d4bed28d9445a84dae3d1d31b2a95ee834f02f82c6f9b?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/a06b59d3e1aa30b97d32443ca1852a963282113b8c36021fb6edb6f0478b02ed?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                    </div>
-                                    <span>{{ article.shares }}</span>
-                                </div>
+    <div class="card border-0 shadow-sm mb-2">
+        <div class="card-body">
+            <h4 class="fw-bold text-dark card-title mb-4">Bài viết bạn có thể thích</h4>
+
+            <div class="position-relative">
+                <swiper :modules="swiperModules" :slides-per-view="1" :space-between="10" :navigation="true"
+                    :pagination="{ clickable: true }" :breakpoints="{
+                        576: { slidesPerView: 1 },
+                        768: { slidesPerView: 2, spaceBetween: 10 },
+                        992: { slidesPerView: 3, spaceBetween: 10 }
+                    }" class="related-articles-swiper">
+                    <swiper-slide v-for="article in recommendedArticals" :key="article.id">
+                        <div class="card h-100 shadow-sm p-3 article-card" @click="navigateToArticle(article.objectID)">
+                            <div v-if="!article.Url" class="default-thumbnail"
+                                style="height: 180px; width: 100%; background-image: url(/assets/images/10.jpg); background-size: cover; border-radius: 0.25rem;">
+                            </div>
+                            <div class="card-content">
+                                <h5 class="fw-bold mb-1 title-truncate">{{ article.Title }}</h5>
+                                <p class="text-muted mb-0">{{ formatDate(article.CreationTime) }}</p>
                             </div>
                         </div>
-                    </article>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <button class="page-dot active" aria-label="Page 1"></button>
-                <button class="page-dot" aria-label="Page 2"></button>
-                <button class="page-dot" aria-label="Page 3"></button>
-            </div>
-
-            <h3 class="section-title">Bài viết khác từ Kevinbkdev</h3>
-            <div class="articles-grid">
-                <div class="articles-row">
-                    <article v-for="(article, index) in authorArticles" :key="index" class="article-card">
-                        <div class="card-content">
-                            <h4 class="article-title">{{ article.title }}</h4>
-                            <span class="author-name">{{ article.author }}</span>
-                            <span class="read-time">{{ article.readTime }}</span>
-                            <div class="engagement-stats">
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5fea4c65443495c6ef78f0148d755af0e7331037d59c22271be24da1aa3a72f?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.views }}</span>
-                                </div>
-                                <div class="stat-item">
-                                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/eca4d7b81f4efb92c840395ed360348a96cd306b9f4092aa3823194de0416310?apiKey=581cb509eedd462787009da53a17f69a&"
-                                        alt="" class="stat-icon" />
-                                    <span>{{ article.comments }}</span>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-item">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/37d8c63261302945c42488c0ecac0a17170e06f8e179ea4c4300dc50c1f049d8?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <span>{{ article.likes }}</span>
-                                    </div>
-                                    <div class="stat-icons">
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/c53aac672b5526ebd04e2d8647f9fa3170f71dfc3f2e018b7721eacf4d704b39?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/43a665e07267353445f833b64b87760c5668710054e9d86c129003f8a557df65?apiKey=581cb509eedd462787009da53a17f69a&"
-                                            alt="" class="stat-icon" />
-                                    </div>
-                                    <span>{{ article.shares }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <button class="page-dot active" aria-label="Page 1"></button>
-                <button class="page-dot" aria-label="Page 2"></button>
-                <button class="page-dot" aria-label="Page 3"></button>
+                    </swiper-slide>
+                </swiper>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-export default {
-    name: 'BlogRelatedItems',
-    data() {
-        return {
-            relatedArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            authorArticles: [
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                },
-                {
-                    title: 'Tạo RESTful API với Golang và MongoDB',
-                    author: 'Lao Văn Tuấn',
-                    readTime: '2 phút đọc',
-                    views: '7.6K',
-                    comments: '7',
-                    likes: '6',
-                    shares: '9'
-                }
-            ],
-            comments: [
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                },
-                {
-                    author: 'duongAQ',
-                    avatar: 'https://cdn.builder.io/api/v1/image/assets/TEMP/e66ce5ecd6163c18d645912b45af4a08797755ba2eb35fbe8b4594df65f645fd?apiKey=581cb509eedd462787009da53a17f69a&',
-                    date: '3 tháng 12',
-                    text: 'Đọc bài mà cảm giác cứ như đang nhớ về nyc ấy...',
-                    likes: '3'
-                }
-            ]
-        }
-    },
-    methods: {
-        submitComment() {
-            // Handle comment submission
-        }
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getRecommendationArticals } from '../../scripts/api/services/blogService';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+const recommendedArticals = ref([]);
+const route = useRoute();
+const router = useRouter();
+const swiperModules = [Navigation, Pagination];
+
+const fetchrecommendedArticals = async () => {
+    try {
+        const res = await getRecommendationArticals();
+        console.log(res)
+        recommendedArticals.value = res || [];
+    } catch (error) {
+        console.error("Error fetching recommended articals:", error);
     }
-}
+};
+
+const navigateToArticle = async (id) => {
+    try {
+        await router.push({ name: 'BlogDetail', params: { id } });
+        window.location.reload();
+    } catch (error) {
+        console.error("Navigation error:", error);
+    }
+};
+
+onMounted(fetchrecommendedArticals);
+watch(() => route.params.id, (newId, oldId) => {
+    if (newId !== oldId) {
+        fetchrecommendedArticals();
+    }
+});
+
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+    });
+};
 </script>
 
 <style scoped>
-.container {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.content-wrapper {
-    width: 1110px;
+.related-articles-swiper {
+    padding: 0 15px;
+    padding-bottom: 2.5rem;
     max-width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.section-title {
-    color: #1b1b1b;
-    font: 700 18px/1.2 Roboto, sans-serif;
-    margin-bottom: 10px;
-}
-
-.articles-grid {
-    margin-top: 10px;
-}
-
-.articles-row {
-    display: flex;
-    gap: 20px;
-}
-
-.article-card {
-    flex: 1;
-    border-radius: 4px;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(27, 27, 27, 0.075);
-    border: 1px solid rgba(27, 27, 27, 0.125);
 }
 
 .card-content {
-    padding: 20px;
-}
-
-.article-title {
-    color: #0b1a33;
-    font: 400 18px/24px Roboto, sans-serif;
-    margin-bottom: 8px;
-}
-
-.author-name {
-    color: #5488c7;
-    font: 400 14px/1.6 Roboto, sans-serif;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.read-time {
-    color: #9b9b9b;
-    font: 400 13px/1.6 Roboto, sans-serif;
-}
-
-.engagement-stats {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 5px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #9b9b9b;
-    font: 400 14px/2 Roboto, sans-serif;
-}
-
-.stat-icon {
-    width: 14px;
-    height: 14px;
-    object-fit: contain;
-}
-
-.stat-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.stat-icons {
-    display: flex;
-    flex-direction: column;
-}
-
-.pagination {
-    display: flex;
-    gap: 8px;
-    margin: 8px auto;
-}
-
-.page-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 8px;
-    background: #000;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.page-dot.active {
-    background: #007aff;
-}
-
-.comments-section {
-    margin-top: 32px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.002);
-    box-shadow: 0 10px 15px -3px rgba(47, 181, 250, 0.05);
-    border: 1px solid #ebeef5;
-    padding: 41px;
-    max-width: 100%;
-}
-
-.comment-form {
-    display: flex;
-    gap: 20px;
-    padding: 16px 12px 35px 0;
-}
-
-.comment-input {
-    flex: 1;
-    border: 1px solid #ebeef5;
-    border-radius: 4px;
-    padding: 12px;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    resize: vertical;
-}
-
-.submit-button {
-    padding: 4px 8px;
-    border-radius: 5px;
-    border: none;
-    background: none;
-    color: #161616;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-}
-
-.comment-filters {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.filter-button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    color: #161616;
-    cursor: pointer;
-}
-
-.filter-button.active {
-    color: #4299e1;
-}
-
-.comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.comment-item {
-    display: flex;
-    gap: 16px;
-}
-
-.avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
-    object-fit: cover;
-}
-
-.comment-content {
-    flex: 1;
-}
-
-.comment-header {
-    gap: 8px;
-    align-items: center;
-}
-
-.comment-author {
-    font: 700 14px/2 'Noto Sans', sans-serif;
-    color: #161616;
-}
-
-.comment-date {
-    font: 400 13px 'Noto Sans', sans-serif;
-    color: rgba(113, 128, 150, 0.75);
-}
-
-.comment-text {
-    margin: 24px 0;
-    font: 400 14px/22px 'Noto Sans', sans-serif;
-    color: #161616;
-}
-
-.comment-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.action-button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    padding: 0;
-    color: rgba(113, 128, 150, 0.75);
-    font: 400 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-}
-
-.action-icon {
-    width: 17px;
-    height: 17px;
-}
-
-.load-more {
-    width: 100%;
-    text-align: center;
-    padding: 9px 0;
-    border-top: 1px solid #e2e8f0;
-    background: none;
-    border: none;
-    color: #161616;
-    font: 700 14px/2 'Noto Sans', sans-serif;
-    cursor: pointer;
-    margin-top: 16px;
-}
-
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+    height: 75px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-@media (max-width: 991px) {
-    .container {
-        padding: 0 20px 100px;
-    }
+.title-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 44px;
+}
 
-    .articles-row {
-        flex-direction: column;
-    }
+.swiper-button-next,
+.swiper-button-prev {
+    color: #6c757d;
+    font-weight: bold;
+    top: 45%;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    .comments-section {
-        padding: 20px;
-    }
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-weight: bold;
+    font-size: 20px;
+}
 
-    .comment-form {
-        flex-direction: column;
-    }
+.swiper-pagination-bullet-active {
+    background: #6c757d;
+}
+
+:deep(.swiper-pagination) {
+    bottom: 0 !important;
+    margin-bottom: 0.5rem;
+}
+
+:deep(.swiper-button-prev) {
+    left: 0;
+}
+
+:deep(.swiper-button-next) {
+    right: 0;
+}
+
+.article-card {
+    height: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.swiper-wrapper) {
+    width: 100%;
+}
+
+:deep(.swiper-slide) {
+    width: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.card-body {
+    padding: 1.25rem 0.75rem;
 }
 </style>

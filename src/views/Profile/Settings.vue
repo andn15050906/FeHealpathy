@@ -1,19 +1,16 @@
 <template>
-  <div class="settings-container">
-    <h1 class="page-title">Settings</h1>
-    <div class="settings-section">
-      <h3>Theme</h3>
-      <ThemeSwitcher />
-    </div>
-
-    <div class="settings-section">
-      <h3>General preferences</h3>
-      <LanguageSwitcher />
-    </div>
-
-    <div class="settings-section">
-      <h3>Notifications</h3>
-      <Notifications />
+  <div class="settings-page">
+    <div class="settings-main">
+      <h1 class="page-title">Customize Your Settings</h1>
+      <div class="settings-group">
+        <ThemeSwitcher />
+      </div>
+      <div class="settings-group">
+        <LanguageSwitcher />
+      </div>
+      <div class="settings-group">
+        <Notifications />
+      </div>
     </div>
   </div>
 </template>
@@ -25,13 +22,21 @@ import Notifications from '../../components/SettingsComponents/NotificationSetti
 </script>
 
 <style scoped>
-.settings-container {
-  max-width: 800px;
+.settings-page {
+  display: flex;
+  gap: 24px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
-
-.settings-section {
+.settings-main {
+  flex: 1;
+}
+.page-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+.settings-group {
   background: #fff;
   border-radius: 8px;
   padding: 20px;

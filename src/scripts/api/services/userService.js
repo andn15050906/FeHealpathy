@@ -51,7 +51,7 @@ export const getAllMinUsers = async () => {
   }
 };
 
-export const getUserAvatar = async (resourceId) => {
+export const getUserAvatar = async (resourceId) => { //lấy avt của user
   try {
     const response = await apiClient.get(`/Users/avatar/${resourceId}`, {
       responseType: "blob",
@@ -63,7 +63,7 @@ export const getUserAvatar = async (resourceId) => {
   }
 };
 
-export const updateUserProfile = async (formData) => {
+export const updateUserProfile = async (formData) => { //cập nhật thông tin user
   try {
     const response = await apiClient.put(`/Users`, formData, {
       headers: {
@@ -112,8 +112,6 @@ export const changePassword = async (currentPassword, newPassword) => {
   }
 };
 
-
-
 export const resetPassword = async (email, token, newPassword) => {
   try {
     const requestBody = {
@@ -129,12 +127,44 @@ export const resetPassword = async (email, token, newPassword) => {
   }
 };
 
-export const forgotPassword = async (email) => {
+// Hàm kiểm tra email đã tồn tại trong hệ thống chưa
+export const checkEmailExists = async (email) => {
   try {
-    const response = await apiClient.post('/Auth/ForgotPassword', email);
+    // Sử dụng Email thay vì email để match với C# model
+    const response = await apiClient.get(`/Users/check-email`, {
+      params: {
+        Email: email  // Đổi thành PascalCase
+      }
+    });
     return response.data;
   } catch (error) {
-    console.error('Forgot password failed:', error.response ? error.response.data : error.message);
+    console.error('Error checking email:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const forgotPassword = async (email) => {
+  try {
+    // Sử dụng FormData thay vì JSON object
+    const formData = new FormData();
+    formData.append('Email', email);  // Đổi thành PascalCase
+
+    const response = await apiClient.post('/Auth/ForgotPassword', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('Forgot password failed:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+    } else {
+      console.error('Forgot password failed:', error.message);
+    }
     throw error;
   }
 };

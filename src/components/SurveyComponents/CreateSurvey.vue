@@ -1,6 +1,6 @@
 <template>
     <div class="container my-5">
-        <h1 class="text-center mb-4">Create Survey</h1>
+        <h1 class="text-center mb-4">Create Survey from input</h1>
 
         <div class="card mb-4">
             <div class="card-body">
@@ -81,11 +81,32 @@
             </button>
         </div>
     </div>
+
+    <div class="horizontal-line">
+        <div class="line"></div>
+        <span class="or-text">OR</span>
+        <div class="line"></div>
+    </div>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Import Survey from structured sheet</h1>
+        <input type="file" class="form-control" @change="handleSheetUpload" accept=".xls,.xlsx" />
+        <div class="text-end">
+            <button class="btn btn-success" :disabled="isLoading" @click="importSurvey">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                Import Survey
+            </button>
+            <button class="btn btn-danger ms-2" @click="$emit('cancel')">
+                Cancel
+            </button>
+        </div>
+    </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { createSurvey } from "../../scripts/api/services/surveysService";
+import { createSurvey, createSurveyFromSheet } from "../../scripts/api/services/surveysService";
 
 const emits = defineEmits(["cancel", "surveyCreated"]);
 
@@ -101,9 +122,16 @@ const questions = ref([
         answers: [{ content: "" }],
     },
 ]);
+const importedSheet = ref(null);
 
 const isLoading = ref(false);
 const dummySurveyId = "00000000-0000-0000-0000-000000000000";
+
+function handleSheetUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    importedSheet.value = file;
+}
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -164,4 +192,37 @@ async function saveSurvey() {
         isLoading.value = false;
     }
 }
+async function importSurvey() {
+    console.log(importedSheet.value);
+
+    isLoading.value = true;
+    try {
+        await createSurveyFromSheet(importedSheet);
+        emits("surveyCreated");
+    } catch (error) {
+        console.error("Error saving survey:", error);
+    } finally {
+        isLoading.value = false;
+    }
+}
 </script>
+
+<style scoped>
+.horizontal-line {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: #000;
+}
+
+.or-text {
+    padding: 0 10px;
+    font-weight: bold;
+}
+</style>

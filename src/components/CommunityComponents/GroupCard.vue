@@ -1,29 +1,29 @@
 <template>
-    <v-card class="glowing v-card--material pa-3 v-card v-sheet theme--light v-card--material--has-heading elevation-2"
-        style="margin: 10px;">
-        <v-img :src="groupInfo.coverImgUrl" fit="fill" style="width: 100%; height: 13em;" />
-        <div>
-            <div style="font-weight: bold; font-size: 1rem; line-height: 1.75rem; letter-spacing: 0.00937em;">{{
-                groupInfo.name }}</div>
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <div>{{ groupInfo.totalMembers }} {{ text.members }}</div>
-                <div>{{ groupInfo.totalPosts }} {{ text.posts }}</div>
+    <v-card class="group-card" :to="toLink" elevation="0">
+        <v-img :src="groupInfo.coverImgUrl" 
+               class="group-image" 
+               height="200"
+               cover>
+            <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                </v-row>
+            </template>
+        </v-img>
+        
+        <div class="group-info">
+            <div class="info-container">
+                <div class="group-name text-truncate">{{ groupInfo.name }}</div>
+                <div class="member-count">
+                    <v-icon size="small" color="grey">mdi-account-group</v-icon>
+                    <span class="ml-1">{{ groupInfo.totalMembers }} members</span>
+                </div>
             </div>
-            <v-btn style="width: 100%;" color="primary" :to="toLink">{{ text.View }}</v-btn>
         </div>
     </v-card>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import dict from '@/scripts/data/dictionary.json';
-
-const text = ref({
-    members: '',
-    posts: '',
-    View: ''
-});
-
 const props = defineProps({
     groupInfo: {
         type: Object,
@@ -33,29 +33,57 @@ const props = defineProps({
         type: String,
         required: true
     }
-})
-
-onMounted(async () => {
-    text.value = {
-        members: dict["en"]["members"],
-        posts: dict["en"]["posts"],
-        View: dict["en"]["View"],
-    }
-})
+});
 </script>
 
-<style>
-.glowing {
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    border-radius: 10px;
-    color: white;
+<style scoped>
+.group-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    position: relative;
+    background: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-.glowing:hover {
-    transform: scale(1.05);
+.group-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.group-image {
+    width: 100%;
+}
+
+.group-info {
+    padding: 16px;
+    background: white;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.group-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+    max-width: 100%;
+}
+
+.member-count {
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
 }
 </style>

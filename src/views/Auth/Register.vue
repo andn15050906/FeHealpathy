@@ -7,7 +7,7 @@
           <p v-if="generalError" class="error">{{ generalError }}</p>
 
           <div class="input-group">
-            <label for="username">Username</label>
+            <label for="username">User Name</label>
             <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
           </div>
 
@@ -41,88 +41,120 @@
 </template>
 
 <script>
-import { inject } from 'vue';
-import { register } from '@/scripts/api/services/authService';
+import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
-
-const router = useRouter();
-const loadingSpinner = inject('loadingSpinner');
+import { register } from '@/scripts/api/services/authService';
 
 export default {
-  data() {
-    return {
-			loadingSpinner: loadingSpinner,
-      username: "",
-      email: "",
-      password: "",
-      retypePassword: "",
-      passwordError: "",
-      retypePasswordError: "",
-      generalError: ""
-    };
-  },
-  methods: {
-    validatePassword() {
-      const minLength = 6;
-      const hasUpperCase = /[A-Z]/.test(this.password);
-      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
+  setup() {
+    const router = useRouter();
+    const loadingSpinner = inject('loadingSpinner');
 
-      if (this.password.length < minLength) {
-        this.passwordError = "Password must be at least 6 characters long.";
+    const username = ref("");
+    const email = ref("");
+    const password = ref("");
+    const retypePassword = ref("");
+    const passwordError = ref("");
+    const retypePasswordError = ref("");
+    const generalError = ref("");
+
+    const validatePassword = () => {
+      const minLength = 6;
+      const hasUpperCase = /[A-Z]/.test(password.value);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password.value);
+
+      if (password.value.length < minLength) {
+        passwordError.value = "Password must be at least 6 characters long.";
         return false;
       } else if (!hasUpperCase) {
-        this.passwordError = "Password must include at least one uppercase letter.";
+        passwordError.value = "Password must include at least one uppercase letter.";
         return false;
       } else if (!hasSpecialChar) {
-        this.passwordError = "Password must include at least one special character.";
+        passwordError.value = "Password must include at least one special character.";
         return false;
       } else {
-        this.passwordError = "";
+        passwordError.value = "";
         return true;
       }
-    },
-    validateRetypePassword() {
-      if (this.passwordError) {
-        this.retypePasswordError = "";
-        this.generalError = "";
+    };
+
+    const validateRetypePassword = () => {
+      if (passwordError.value) {
+        retypePasswordError.value = "";
+        generalError.value = "";
         return true;
       }
-      if (this.password !== this.retypePassword) {
-        this.retypePasswordError = "Passwords do not match.";
-        this.generalError = "";
+      if (password.value !== retypePassword.value) {
+        retypePasswordError.value = "Passwords do not match.";
+        generalError.value = "";
         return false;
       }
       return true;
-    },
-    async handleRegister() {
-      const isPasswordValid = this.validatePassword();
-      const isRetypePasswordValid = this.validateRetypePassword();
+    };
 
-      if (isPasswordValid && isRetypePasswordValid) {
+    const validateEmail = () => {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
+      if (!emailPattern.test(email.value)) {
+        generalError.value = "Email must end with .com";
+        return false;
+      }
+      generalError.value = "";
+      return true;
+    };
+
+    const handleRegister = async () => {
+      const isPasswordValid = validatePassword();
+      const isRetypePasswordValid = validateRetypePassword();
+      const isEmailValid = validateEmail();
+
+      if (isPasswordValid && isRetypePasswordValid && isEmailValid) {
         try {
-          this.loadingSpinner.showSpinner();
-          await register(this.username, this.email, this.password);
-          this.retypePasswordError = "";
-          this.generalError = 'Registration successful! Please check your email to verify your account.';
+          if (loadingSpinner) {
+            loadingSpinner.showSpinner();
+          }
+          await register(username.value, email.value, password.value);
+          retypePasswordError.value = "";
+          generalError.value = 'Registration successful';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
-          let errors = error.response.data.errors;
-          console.log(errors);
-          for (let key in errors) {
-            if (errors[key][0].startsWith('400')) {
-              this.retypePasswordError = "";
-              this.generalError = errors[key][0].substring(5);
-              break;
+          if (error.response?.status === 409) {
+            const errorMessage = error.response?.data?.message || error.response?.data;
+            if (errorMessage?.toLowerCase().includes('email')) {
+              generalError.value = "This email has already been registered";
+            } else {
+              generalError.value = "This username has already been taken";
             }
+          } else if (error.response?.data?.errors) {
+            let errors = error.response.data.errors;
+            for (let key in errors) {
+              if (errors[key][0].startsWith('400')) {
+                retypePasswordError.value = "";
+                generalError.value = errors[key][0].substring(5);
+                break;
+              }
+            }
+          } else {
+            generalError.value = 'Network error. Please check your connection and try again.';
           }
-          //this.generalError = 'Registration failed. Please try again.';
-        }
-        finally {
-				  this.loadingSpinner.hideSpinner();
+        } finally {
+          if (loadingSpinner) {
+            loadingSpinner.hideSpinner();
+          }
         }
       }
-    },
-  },
+    };
+
+    return {
+      username,
+      email,
+      password,
+      retypePassword,
+      passwordError,
+      retypePasswordError,
+      generalError,
+      handleRegister
+    };
+  }
 };
 </script>
 
@@ -223,3 +255,4 @@ h2 {
   text-decoration: underline;
 }
 </style>
+

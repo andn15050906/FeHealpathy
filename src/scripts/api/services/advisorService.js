@@ -1,31 +1,46 @@
+import { get, patchForm } from '@/scripts/api/apiClients';
 import apiClient from '@/scripts/api/apiClients';
+import { getUsers } from './userService';
 
 const API_BASE_URL = '/Advisors';
 
-export const getAdvisorProfile = async () => {
+
+export const getAllAdvisors = async () => {
   try {
-    const response = await apiClient.get(API_BASE_URL);
+    let advisors = (await get(`${API_BASE_URL}`)).items;
+
+    let advisor_users = [];
+    for (let advisor of advisors) {
+      let user = (await getUsers({ advisorId: advisor.id }))?.items?.shift() ?? null;
+      advisor_users.push({
+        advisorId: advisor.id,
+        userId: user.id,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
+        creationTime: advisor.creationTime,
+        intro: advisor.intro,
+        experience: advisor.experience,
+        balance: advisor.balance,
+        courseCount: advisor.courseCount
+      });
+    }
+    
+    return advisor_users;
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+export const getAdvisorProfile = async (userId) => {
+  try {
+    const response = await apiClient.get(`${API_BASE_URL}?UserId=${userId}`);
     return response.data;
   } catch (error) {
-    console.error('❌ Error fetching advisor profile:', error.response ? error.response.data : error.message);
     throw error;
   }
 };
 
 export const updateAdvisorProfile = async (advisorData) => {
-  try {
-    const formData = new FormData();
-    Object.entries(advisorData).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    const response = await apiClient.patch(API_BASE_URL, formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error('❌ Error updating advisor profile:', error.response ? error.response.data : error.message);
-    throw error;
-  }
+    return await patchForm(`${API_BASE_URL}`, advisorData);
 };

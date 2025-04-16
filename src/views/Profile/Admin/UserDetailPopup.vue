@@ -7,7 +7,7 @@
       </div>
       <div class="user-info">
         <div class="user-avatar">
-          <img :src="user.avatar || 'https://via.placeholder.com/150'" alt="User avatar">
+          <img :src="avatarUrl || 'https://via.placeholder.com/150'" alt="User avatar">
         </div>
         <div class="user-details">
           <div class="info-row">
@@ -20,7 +20,7 @@
           </div>
           <div class="info-row">
             <label>Roles:</label>
-            <span class="role-badge">{{ user.role }}</span>
+            <span class="role-badge">{{ user.role === 0 ? 'Member' : user.role === 1 ? 'Advisor' : 'Admin' }}</span>
           </div>
           <div class="info-row">
             <label>Status:</label>
@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { getUserAvatar } from '@/scripts/api/services/userService';
+
 export default {
   name: 'UserDetailPopup',
   props: {
@@ -45,9 +47,47 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      avatarUrl: null
+    }
+  },
   methods: {
     close() {
       this.$emit('close');
+    },
+    // Lấy avatar của user từ API
+    async fetchUserAvatar() {
+      try {
+        if (this.user && this.user.avatarUrl) {
+          const avatarBlob = await getUserAvatar(this.user.avatarUrl);
+          this.avatarUrl = URL.createObjectURL(avatarBlob);
+        } else {
+          this.avatarUrl = 'https://via.placeholder.com/150'; // Ảnh mặc định nếu không có avatarUrl
+        }
+      } catch (error) {
+        console.error('Error fetching user avatar:', error);
+        this.avatarUrl = 'https://via.placeholder.com/150'; // Ảnh mặc định nếu lỗi
+      }
+    }
+  },
+  watch: {
+    // Theo dõi khi user thay đổi để cập nhật avatar
+    user: {
+      immediate: true,
+      handler(newUser) {
+        if (newUser && newUser.avatarUrl) {
+          this.fetchUserAvatar();
+        } else {
+          this.avatarUrl = 'https://via.placeholder.com/150';
+        }
+      }
+    }
+  },
+  beforeDestroy() {
+    // Xóa URL object khi component bị hủy để tránh memory leak
+    if (this.avatarUrl) {
+      URL.revokeObjectURL(this.avatarUrl);
     }
   }
 }

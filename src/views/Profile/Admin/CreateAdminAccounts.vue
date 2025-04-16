@@ -3,11 +3,28 @@
     <h1>User Management</h1>
     <data-table :data="users" :columns="columns">
       <template v-slot:actions="{ row }">
-        <button class="icon-button" @click="openUserDetail(row)" title="View Details">
+        <button
+          class="icon-button"
+          @click="openUserDetail(row)"
+          title="View Details"
+        >
           <i class="fas fa-eye"></i>
         </button>
-        <button class="icon-button" v-if="row.role !== 'Admin'" @click="openUpgradeAdmin(row)" title="Upgrade to Admin">
+        <button
+          class="icon-button"
+          v-if="row.role !== 2"
+          @click="openUpgradeAdmin(row)"
+          title="Upgrade to Admin"
+        >
           <i class="fas fa-user-shield"></i>
+        </button>
+        <button
+          class="icon-button ban"
+          v-if="row.role !== 2"
+          @click="handleBanUser(row)"
+          title="Ban User"
+        >
+          <i class="fas fa-ban"></i>
         </button>
       </template>
     </data-table>
@@ -28,9 +45,11 @@
 </template>
 
 <script>
-import DataTable from '@/views/Profile/Admin/DataTable.vue';
-import UserDetailPopup from '@/views/Profile/Admin/UserDetailPopup.vue';
-import UpgradeAdminPopup from '@/views/Profile/Admin/UpgradeAdminPopup.vue';
+import DataTable from "@/views/Profile/Admin/DataTable.vue";
+import UserDetailPopup from "@/views/Profile/Admin/UserDetailPopup.vue";
+import UpgradeAdminPopup from "@/views/Profile/Admin/UpgradeAdminPopup.vue";
+import { getUsers } from "@/scripts/api/services/userService";
+import { submitUserBanned } from "@/scripts/api/services/notificationService";
 
 export default {
   components: {
@@ -43,50 +62,83 @@ export default {
       showUserDetail: false,
       showUpgradeAdmin: false,
       selectedUser: null,
-      users: [
-        { id: 1, name: 'Nguyễn Văn A', email: 'a@example.com', role: 'Member' },
-        { id: 2, name: 'Trần Thị B', email: 'b@example.com', role: 'Member' },
-        { id: 3, name: 'Lê Văn C', email: 'c@example.com', role: 'Admin' },
-        { id: 4, name: 'Phạm Thị D', email: 'd@example.com', role: 'Member' },
-        { id: 5, name: 'Hoàng Văn E', email: 'e@example.com', role: 'Member' },
-        { id: 6, name: 'Đỗ Thị F', email: 'f@example.com', role: 'Member' },
-        { id: 7, name: 'Ngô Văn G', email: 'g@example.com', role: 'Member' },
-        { id: 8, name: 'Vũ Thị H', email: 'h@example.com', role: 'Member' },
-        { id: 9, name: 'Đặng Văn I', email: 'i@example.com', role: 'Member' },
-        { id: 10, name: 'Bùi Thị K', email: 'k@example.com', role: 'Member' },
-        { id: 11, name: 'Lý Văn L', email: 'l@example.com', role: 'Member' },
-        { id: 12, name: 'Mai Thị M', email: 'm@example.com', role: 'Member' },
-      ],
+      users: [],
       columns: [
-        { title: 'User ID', key: 'id' },
-        { title: 'Name', key: 'name' },
-        { title: 'Email', key: 'email' },
-        { title: 'Role', key: 'role' },
+        { title: "User ID", key: "id" },
+        { title: "Name", key: "fullName" },
+        { title: "Email", key: "email" },
+        { title: "Role", key: "role" },
       ],
     };
   },
   methods: {
+    // Lấy danh sách tất cả users từ API
+    async fetchUsers() {
+      try {
+        const response = await getUsers();
+        console.log("Users data:", response.items);
+        this.users = response.items;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+
+    // Mở popup hiển thị chi tiết thông tin user
     openUserDetail(user) {
+      console.log("Selected user:", user);
       this.selectedUser = user;
       this.showUserDetail = true;
     },
+
+    // Mở popup xác nhận nâng cấp user lên Admin
     openUpgradeAdmin(user) {
       this.selectedUser = user;
       this.showUpgradeAdmin = true;
     },
+
+    // Xử lý khi xác nhận nâng cấp user lên Admin
     handleUpgradeConfirm(data) {
-      console.log('Upgrading user with data:', data);
-      const userIndex = this.users.findIndex(u => u.id === data.userId);
+      console.log("Upgrading user with data:", data);
+      const userIndex = this.users.findIndex((u) => u.id === data.userId);
       if (userIndex !== -1) {
-        this.users[userIndex].role = 'Admin';
+        this.users[userIndex].role = "Admin";
       }
-    }
+    },
+
+    // Xử lý khi click nút ban user
+    async handleBanUser(user) {
+      if (confirm(`Are you sure you want to ban user ${user.fullName}?`)) {
+        try {
+          // TODO: Gọi API ban user
+          // 1. Gọi API ban user với user ID
+          // 2. Cập nhật trạng thái user trong danh sách
+          // const userIndex = this.users.findIndex((u) => u.id === user.id);
+          // if (userIndex !== -1) {
+          //   this.users[userIndex].role = "Banned";
+          // }
+          // 3. Hiển thị thông báo thành công/thất bại
+          console.log("Banning user:", user);
+
+          // Send notification ban user
+          await submitUserBanned({
+            userId: user.id,
+            message: "You have been banned due to a violation of our policies.",
+          });
+        } catch (error) {
+          console.error("Error banning user or sending notification:", error);
+        }
+      }
+    },
   },
   mounted() {
-    const link = document.createElement('link');
-    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+    this.fetchUsers();
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const link = document.createElement("link");
+      link.href =
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
   },
 };
 </script>
@@ -134,5 +186,17 @@ h1 {
 
 .icon-button .fa-user-shield {
   color: #00ff00;
+}
+
+.icon-button.ban {
+  background-color: #dc3545;
+}
+
+.icon-button.ban:hover {
+  background-color: #c82333;
+}
+
+.icon-button.ban i {
+  color: white;
 }
 </style>

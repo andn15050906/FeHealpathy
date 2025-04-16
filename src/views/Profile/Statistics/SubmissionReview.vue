@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import { ref, useTemplateRef, onMounted } from 'vue';
+import { ref, useTemplateRef, onBeforeMount } from 'vue';
 import { SurveyOptions } from "@/scripts/types/SurveyOptions";
 import { getPagedSubmissions } from '@/scripts/api/services/submissionsService';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
@@ -20,7 +20,7 @@ const props = defineProps({
 const surveyOptions = ref(new SurveyOptions({}, '', () => { }, () => { }, true, false));
 const surveyRef = useTemplateRef("surveyRef");
 
-onMounted(async () => {
+onBeforeMount(async () => {
   let resultPromise = getPagedSubmissions({ id: props.id });
   let surveysPromise = getPagedSurveys();
   await Promise.all([resultPromise, surveysPromise]);

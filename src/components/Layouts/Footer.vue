@@ -1,106 +1,107 @@
 <template>
-  <footer>
-    <div class="footerContainer">
-      <div class="socialIcons">
-        <a href=""><i class="fa-brands fa-facebook"></i></a>
-        <a href=""><i class="fa-brands fa-instagram"></i></a>
-        <a href=""><i class="fa-brands fa-twitter"></i></a>
-        <a href=""><i class="fa-brands fa-google-plus"></i></a>
-        <a href=""><i class="fa-brands fa-youtube"></i></a>
+  <footer class="footer bg-white pt-2">
+    <div class="container text-center p-0">
+      <ul class="nav justify-content-center mb-3">
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>Home</strong></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>News</strong></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>About Us</strong></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>Contact Us</strong></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>Our Team</strong></a>
+        </li>
+      </ul>
+
+      <div class="socialIcons mb-3">
+        <a href="#" class="mx-2">
+          <i class="fab fa-facebook-f facebook-icon"></i>
+        </a>
+        <a href="#" class="mx-2">
+          <i class="fab fa-linkedin-in linkedin-icon"></i>
+        </a>
+        <a href="#" class="mx-2">
+          <i class="fab fa-instagram instagram-icon"></i>
+        </a>
+        <a href="#" class="mx-2">
+          <i class="fab fa-facebook-messenger messenger-icon"></i>
+        </a>
+        <a href="#" class="mx-2">
+          <i class="fab fa-twitter twitter-icon"></i>
+        </a>
       </div>
-      <div class="footerNav">
-        <ul>
-          <li><a href="">Home</a></li>
-          <li><a href="">News</a></li>
-          <li><a href="">About</a></li>
-          <li><a href="">Contact Us</a></li>
-          <li><a href="">Our Team</a></li>
-        </ul>
+
+      <div class="text-secondary py-3">
+        © 2025 Healpathy. All rights reserved.
       </div>
     </div>
   </footer>
 </template>
 
 <style scoped>
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+.nav-link {
+  font-weight: 400;
+  transition: color 0.3s;
 }
 
-footer {
-  width: 100%;
-  background-color: #222;
-  padding: 5px 0;
-  /*position: fixed;*/
-  bottom: 0;
+.nav-link:hover {
+  color: #000 !important;
 }
 
-.footerContainer {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.socialIcons i {
+  font-size: 1.25rem;
+  transition: transform 0.2s, color 0.2s;
+  color: #6c757d;
 }
 
-.socialIcons {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 5px;
+.socialIcons i:hover {
+  transform: scale(1.1);
+  color: #000;
 }
 
-.socialIcons a {
-  text-decoration: none;
-  padding: 5px;
-  background-color: white;
-  margin: 3px;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.facebook-icon {
+  color: #3b5998;
 }
 
-.socialIcons a i {
-  font-size: 1em;
-  color: #3db83b;
+.linkedin-icon {
+  color: #0077b5;
 }
 
-.socialIcons a:hover {
-  background-color: #3db83b;
-  transition: 0.3s;
+.instagram-icon {
+  color: #e4405f;
 }
 
-.socialIcons a:hover i {
-  color: white;
+.messenger-icon {
+  color: #0084ff;
 }
 
-.footerNav {
-  margin-top: 5px;
+.twitter-icon {
+  color: #1da1f2;
 }
 
-.footerNav ul {
-  display: flex;
-  justify-content: center;
-  list-style-type: none;
+.facebook-icon:hover {
+  color: #2d4373;
 }
 
-.footerNav ul li {
-  margin: 0 8px;
+.linkedin-icon:hover {
+  color: #005582;
 }
 
-.footerNav ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 0.9em;
-  opacity: 0.7;
+.instagram-icon:hover {
+  color: #b63050;
 }
 
-.footerNav ul li a:hover {
-  opacity: 1;
-  color: #3db83b;
+.messenger-icon:hover {
+  color: #006fe0;
+}
+
+.twitter-icon:hover {
+  color: #1487c9;
 }
 </style>

@@ -1,4 +1,5 @@
 import { get, postForm, patchForm, del } from '../apiClients';
+import { getUsers } from './userService';
 
 const API_BASE_URL = '/Conversations';
 
@@ -16,4 +17,34 @@ export const updateConversation = async (conversationData) => {
 
 export const deleteConversation = async (conversationId) => {
     return await del(`${API_BASE_URL}/${conversationId}`);
+};
+
+// Hàm load danh sách users và conversations
+export const loadUsersAndConversations = async () => {
+    try {
+        // Lấy danh sách users từ API
+        const usersResponse = await getUsers();
+        // Chuyển đổi dữ liệu users 
+        const users = usersResponse.items.map(user => ({
+            userId: user.id,        
+            userName: user.fullName  
+        }));
+
+        // Lấy danh sách conversations từ API
+        const conversationsResponse = await getPagedConversations();
+        // Chuyển đổi dữ liệu conversations
+        const conversations = conversationsResponse.items.map(conv => ({
+            conversationId: conv.id,     
+            conversationName: conv.title 
+        }));
+
+        return {
+            users,
+            conversations
+        };
+    } catch (error) {
+        //sữa lỗi
+        console.error('Error loading users and conversations:', error);
+        throw error;
+    }
 };

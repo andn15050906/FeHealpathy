@@ -1,233 +1,209 @@
 <template>
-    <h4 class="page-title">Blog Catalog</h4>
-  
-    <div class="search-section">
-      <input type="text" placeholder="Search blogs..." v-model="searchQuery" class="search-input"/>
+  <div class="container mt-2">
+    <h2 class="fw-bold text-center mb-4 text-dark">Blog Catalog</h2>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-8">
+        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Search blogs..." />
+      </div>
     </div>
 
     <div class="filter-section">
       <button v-for="filter in filters" :key="filter.value"
-        :class="['filter-btn', selectedTags.includes(filter.value) ? 'active' : '']"
-        @click="toggleTag(filter.value)">
+        :class="['filter-btn', selectedTags.includes(filter.value) ? 'active' : '']" @click="toggleTag(filter.value)">
         {{ filter.label }}
       </button>
     </div>
-  
-      <select  v-model="sortOption" @change="sortCourses" class="form-select" style="width: 200px;">
-            <option selected value="name-asc">Name A-Z</option>
-            <option value="name-desc">Name Z-A</option>
-      </select>
 
+    <div class="sort-section">
+      <select v-model="sortOption" @change="sortBlogs" class="form-select sort-select">
+        <option value="name-asc">Name A-Z</option>
+        <option value="name-desc">Name Z-A</option>
+      </select>
+    </div>
 
     <div class="blogs-container">
       <div class="blog-grid">
-        <blogCard v-for="blog in filteredBlogs" :key="blog.id" :blog="blog" />
+        <blogCard v-for="blog in blogs" :key="blog.id" :blog="blog" />
       </div>
     </div>
-  
-    <div class="pagination">
-      <button v-for="page in Math.ceil(blogs.length / itemsPerPage)" :key="page"
-        :class="['page-btn', currentPage === page ? 'active' : '']"
-        @click="changePage(page)">
-        {{ page }}
-      </button>
-    </div>
-  </template>
-  
+
+    <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="loadBlogs" />
+  </div>
+</template>
+
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { getPagedArticles } from "@/scripts/api/services/blogService.js";
+import { ref, watch, onBeforeMount } from 'vue';
 import BlogCard from '@/components/BlogComponents/BlogCard.vue';
-import { getPagedTags } from "@/scripts/api/services/tagService.js"; 
-import { onMounted } from 'vue';
+import Pagination from '@/components/Common/Pagination.vue';
+import { getPagedArticles } from '@/scripts/api/services/blogService.js';
+import { getPagedTags } from '@/scripts/api/services/tagService.js';
 
-const selectedTags = ref([]);
 const searchQuery = ref('');
+const selectedTags = ref([]);
 const sortOption = ref('name-asc');
-const itemsPerPage = 20;
-const blogs = ref([]);
+const itemsPerPage = 12;
 const currentPage = ref(1);
-const paginatedblogs = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return blogs.value.slice(start, end);
-});
+const blogs = ref([]);
 const filters = ref([]);
-const currentFilter = ref('all');
+const totalPages = ref(1);
+const totalItems = ref(0);
 
-defineEmits(['authenticated', 'addNotification', 'removeNotification']);
+async function loadBlogs(page = 1) {
+  currentPage.value = page;
+
+  try {
+    const params = {
+      pageIndex: currentPage.value - 1,
+      pageSize: itemsPerPage,
+      search: searchQuery.value.trim() || undefined,
+      tags: selectedTags.value.length ? selectedTags.value.join(',') : undefined
+    };
+
+    const response = await getPagedArticles(params);
+    blogs.value = response.items || [];
+    totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
+    totalItems.value = response.totalCount || 0;
+  } catch (e) {
+    console.error('Failed to fetch blogs', e);
+  }
+}
+
+async function loadTags() {
+  try {
+    const tagResp = await getPagedTags();
+    filters.value = tagResp.map(tag => ({ value: tag.id, label: tag.title }));
+  } catch (e) {
+    console.error('Failed to fetch tags', e);
+  }
+}
 
 function toggleTag(tagId) {
-  const index = selectedTags.value.indexOf(tagId);
-  if (index === -1) {
-    selectedTags.value.push(tagId);
-  } else {
-    selectedTags.value.splice(index, 1);
-  }
+  const idx = selectedTags.value.indexOf(tagId);
+  if (idx === -1) selectedTags.value.push(tagId);
+  else selectedTags.value.splice(idx, 1);
+  loadBlogs(1);
 }
 
-const filteredBlogs = computed(() => {
-  let result = blogs.value;
-  if (selectedTags.value.length > 0) {
-    result = result.filter(blog => selectedTags.value.every(tagId =>
-      blog.tags.some(tag => tag.id === tagId)
-    ));
-  }
-  if (searchQuery.value) {
-    result = result.filter(blog => blog.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
-  }
-  return result.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
-});
-
+// Sắp xếp blogs theo thứ tự A-Z hoặc Z-A
 function sortBlogs() {
-  if (sortOption.value === 'name-asc') {
-    blogs.value.sort((a, b) => a.title.localeCompare(b.title));
-  } else if (sortOption.value === 'name-desc') {
-    blogs.value.sort((a, b) => b.title.localeCompare(a.title));
-  }
+  blogs.value.sort((a, b) => {
+    if (sortOption.value === 'name-asc') {
+      return a.title.localeCompare(b.title);
+    } else {
+      return b.title.localeCompare(a.title);
+    }
+  });
 }
 
+// Gọi hàm sortBlogs khi thay đổi tùy chọn sắp xếp
 watch(sortOption, () => {
   sortBlogs();
-  changePage(1);
 });
 
-
-onMounted(async () => {
+// Fetch all blogs and sort them
+async function fetchAndSortBlogs() {
   try {
-    const blogResponse = await getPagedArticles();
-    blogs.value = blogResponse?.items?.map(blog => ({ ...blog })) || [];
-    const tagResponse = await getPagedTags();
-    sortBlogs();
-    filters.value = tagResponse?.map(tag => ({
-      value: tag.id,
-      label: tag.title
-    })) || [];
-  } catch (error) {
-    console.error("Failed to fetch blogs or tags", error);
+    const response = await getPagedArticles({ pageIndex: 0, pageSize: 1000 }); // Fetch a large number to cover all blogs
+    blogs.value = response.items || [];
+    
+    // Sort blogs by title
+    blogs.value.sort((a, b) => {
+      if (sortOption.value === 'name-asc') {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+
+    // Paginate sorted blogs
+    paginateBlogs();
+  } catch (e) {
+    console.error('Failed to fetch and sort blogs', e);
   }
+}
+
+// Paginate the sorted blogs
+function paginateBlogs() {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  blogs.value = blogs.value.slice(start, end);
+}
+
+onBeforeMount(async () => {
+  await loadTags();
+  fetchAndSortBlogs();
 });
 
-
-function changePage(page) {
-  currentPage.value = page;
+let searchTimeout;
+function onSearchChange() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    loadBlogs(1);
+  }, 300);
 }
 
-function applyFilter(filterValue) {
-  currentFilter.value = filterValue;
+watch(searchQuery, onSearchChange);
 
-  if (filterValue === 'all') {
-    paginatedblogs.value = blogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
-  } else {
-    const filteredBlogs = blogs.value.filter(blog => blog.tags.some(tag => tag.id === filterValue));
-    paginatedblogs.value = filteredBlogs.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage);
-  }
-}
-
+// Update pagination when page changes
+watch(currentPage, paginateBlogs);
 </script>
 
-  
-  <style scoped>
-  .blogs-container {
-    max-width: 1200px;
-    margin: 60px auto 40px;
-    padding: 0 20px;
-    position: relative;
-    min-height: 300px;
-  }
-  
-  .total-count {
-    position: absolute;
-    left: 20px;
-    top: -30px;
-    font-size: 16px;
-    color: #666;
-  }
-  
-  .page-title {
-    font-size: 32px;
-    text-align: center;
-    margin: 40px 0;
-    color: #1b1b1b;
-  }
-  
-  .filter-section {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-  }
-  
-  .filter-btn {
-    padding: 8px 20px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    background: white;
-    cursor: pointer;
-  }
-  
-  .filter-btn.active {
-    background: #5488c7;
-    color: white;
-    border-color: #5488c7;
-  }
-  
-  .blog-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 40px;
-    width: 100%;
-  }
-  
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-  }
-  
-  .page-btn {
-    width: 35px;
-    height: 35px;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    background: white;
-    cursor: pointer;
-  }
-  
-  .page-btn.active {
-    background: #5488c7;
-    color: white;
-    border-color: #5488c7;
-  }
-
-  .page-title {
-  font-size: 32px;
-  text-align: center;
-  margin: 40px 0;
-  color: #1b1b1b;
+<style scoped>
+.search-bar {
+  border-radius: 70px;
+  padding-left: 20px;
+  transition: 0.3s ease;
+  height: 50px;
 }
 
-.search-section {
-  margin: 20px 0;
+.filter-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.filter-btn.active {
+  background: #5488c7;
+  color: white;
+  border-color: #5488c7;
+}
+
+.sort-section {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.sort-select {
+  width: 200px;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.blog-grid>* {
+  justify-self: center;
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.search-input {
-  width: 100%;
-  max-width: 800px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: border-color 0.3s;
+.blogs-container {
+  margin: 0 auto 40px;
 }
-
-.search-input:focus {
-  border-color: #007BFF;
-  outline: none;
-}
-  </style>
+</style>

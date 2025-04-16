@@ -1,125 +1,207 @@
 <template>
-  <div class="blog-creation">
-    <h1 class="title">✨ Cập Nhật Blog ✨</h1>
+  <div class="container">
+    <LoadingSpinner ref="loadingSpinner" />
+    <h1 class="title text-center mb-4">Update Blog</h1>
 
-    <form @submit.prevent="submitBlog" class="blog-form">
-      <div class="form-group">
-        <label for="title">🖋️ Tiêu đề Blog</label>
-        <input type="text" id="title" v-model="blog.title" placeholder="Nhập tiêu đề blog" required />
-      </div>
+    <form @submit.prevent="openSaveConfirm" class="blog-form">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">
+              <i class="fas fa-pen"></i> Blog Title
+            </label>
+            <input type="text" class="form-control" id="title" v-model="blog.title" placeholder="Enter blog title"
+              @blur="validateTitle" required />
+            <div v-if="errors.title" class="text-danger small mt-1">{{ errors.title }}</div>
+          </div>
 
-      <div class="form-group">
-        <label for="thumb">🖼️ Hình ảnh Blog</label>
-        <input type="file" id="thumb" @change="handleThumbUpload" accept="image/*" />
-        <div v-if="previewImage" class="image-preview">
-          <img :src="previewImage" alt="Hình ảnh blog" />
+          <div class="mb-3">
+            <label for="thumb" class="form-label">
+              <i class="fas fa-image"></i> Blog Image
+            </label>
+            <input type="file" class="form-control" id="thumb" @change="handleThumbUpload" accept="image/*" />
+            <div v-if="errors.thumb" class="text-danger small mt-1">{{ errors.thumb }}</div>
+            <div v-if="previewImage" class="image-preview mt-2">
+              <img :src="previewImage" alt="Blog image" class="img-thumbnail" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="keywords" class="form-label">
+              <i class="fas fa-tags"></i> Related Keywords
+            </label>
+            <multiselect v-model="blog.selectedKeywords" :options="availableKeywords" :multiple="true"
+              :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select keywords"
+              label="name" track-by="id" class="multiselect" />
+            <small class="form-text text-muted">You can select multiple keywords from the list.</small>
+            <div v-if="errors.selectedKeywords" class="text-danger small mt-1">
+              {{ errors.selectedKeywords }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="keywords">🏷️ Từ Khóa Liên Quan</label>
-        <multiselect v-model="blog.selectedKeywords" :options="availableKeywords" :multiple="true"
-          :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-          placeholder="Chọn từ khóa" label="name" track-by="id" class="multiselect" />
-        <small class="hint">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
-      </div>
-
-      <div class="sections">
-        <h2>📚 Thêm Các Phần Tùy Chọn</h2>
-        <div class="section" v-for="(section, index) in blog.sections" :key="index">
-          <div class="form-group">
-            <label>📌 Tiêu đề Phần {{ index + 1 }}</label>
-            <input type="text" v-model="section.header" placeholder="Nhập tiêu đề phần" required />
-          </div>
-          <div class="form-group">
-          <label>🖼️ Hình ảnh Phần {{ index + 1 }}</label>
-          <input type="file" @change="(e) => handleSectionThumbUpload(e, index)" accept="image/*" />
-  
-          <div v-if="section.previewImage" class="image-preview">
-        <img :src="section.previewImage" alt="Hình ảnh phần {{ index + 1 }}" />
-      </div>
-
-
-
-</div>
-          <div class="form-group">
-            <label>✏️ Nội dung Phần {{ index + 1 }}</label>
-            <textarea v-model="section.content" placeholder="Nhập nội dung chi tiết" rows="4" required></textarea>
-          </div>
-          <button type="button" class="btn remove" @click="removeSection(index)">❌ Xóa Phần</button>
-          <div class="divider"></div>
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h2 class="mb-0 fs-5">
+            <i class="fas fa-book"></i> Add Optional Sections
+          </h2>
         </div>
-        <button type="button" class="btn add" @click="addSection">➕ Thêm Phần</button>
+        <div class="card-body">
+          <div class="sections">
+            <div class="section card mb-3" v-for="(section, index) in blog.sections" :key="index">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">
+                    <i class="fas fa-heading"></i> Section Title {{ index + 1 }}
+                  </label>
+                  <input type="text" class="form-control" v-model="section.header" placeholder="Enter section title"
+                    @blur="() => validateSection(index)" required />
+                  <div v-if="errors.sections[index]?.header" class="text-danger small mt-1">
+                    {{ errors.sections[index].header }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">
+                    <i class="fas fa-image"></i> Section Image {{ index + 1 }}
+                  </label>
+                  <input type="file" class="form-control" @change="(e) => handleSectionThumbUpload(e, index)"
+                    accept="image/*" />
+                  <div v-if="errors.sections[index]?.thumb" class="text-danger small mt-1">
+                    {{ errors.sections[index].thumb }}
+                  </div>
+                  <div v-if="section.previewImage" class="image-preview mt-2">
+                    <img :src="section.previewImage" alt="Section image" class="img-thumbnail" />
+                  </div>
+                  <small class="form-text text-muted">Optional: upload a related image.</small>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">
+                    <i class="fas fa-align-left"></i> Section Content {{ index + 1 }}
+                  </label>
+                  <textarea class="form-control" v-model="section.content" placeholder="Enter detailed content" rows="4"
+                    @blur="() => validateSection(index)" required></textarea>
+                  <div v-if="errors.sections[index]?.content" class="text-danger small mt-1">
+                    {{ errors.sections[index].content }}
+                  </div>
+                </div>
+
+                <button class="btn btn-danger" @click.prevent="openDeleteConfirm(index)">
+                  <i class="fas fa-trash-alt me-1 bold-icon"></i>
+                  <span class="bold-text">Remove Section</span>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn btn-secondary custom-btn mt-5" @click.prevent="addSection">
+              <i class="fas fa-plus me-1 bold-icon"></i>
+              <span class="bold-text">Add Section</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn submit">✅ Cập Nhật Blog</button>
+      <div class="form-actions text-center d-grid">
+        <button class="btn btn-success custom-btn-lg">
+          <i class="fas fa-check me-1 bold-icon"></i>
+          <span class="bold-text">Update Blog</span>
+        </button>
       </div>
     </form>
+
+    <DeleteConfirmPopup v-model:isVisible="deleteDialogVisible" message="Are you sure you want to delete this section?"
+      @confirmDelete="handleConfirmDelete" />
+
+    <SaveConfirmPopUp v-model:isVisible="saveDialogVisible" message="Are you sure you want to save the changes?"
+      @confirmSave="handleConfirmSave" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, reactive, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import { getPagedTags } from "@/scripts/api/services/tagService";
-import { updateArticle } from "@/scripts/api/services/blogService";
-import { useRouter } from 'vue-router';
+import { updateArticle, getBlogById } from "@/scripts/api/services/blogService";
+import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
+import DeleteConfirmPopup from "@/components/Common/Popup/DeleteConfirmPopup.vue";
+import SaveConfirmPopUp from "@/components/Common/Popup/SaveConfirmPopUp.vue";
 
 const router = useRouter();
-const emits = defineEmits(['blogUpdated']);
-const props = defineProps({
-  blogData: {
-    type: Object,
-    required: true,
-  },
-});
-const blog = ref({
-  title: props.blogData?.title || "",
-  thumb: props.blogData?.Id || null,
-  selectedKeywords: Array.isArray(props.blogData?.tags) 
-    ? props.blogData.tags.map(tag => ({ id: tag.id, name: tag.title })) 
-    : [],
-  sections: Array.isArray(props.blogData?.sections) ? [...props.blogData.sections] : [],
-});
+const route = useRoute();
 
+const blogData = ref(null);
+const blog = ref({
+  title: "",
+  thumb: null,
+  selectedKeywords: [],
+  sections: [],
+});
 
 const availableKeywords = ref([]);
-const previewImage = ref(props.blogData?.id || null);
+const previewImage = ref(null);
+const loadingSpinner = ref(null);
 
-onMounted(async () => {
-  await fetchAvailableKeywords();
+const deleteDialogVisible = ref(false);
+const sectionToDeleteIndex = ref(null);
+const saveDialogVisible = ref(false);
 
-  if (props.blogData?.thumb?.url) {
-    previewImage.value = props.blogData.thumb.url;
-  } else {
-    console.log("⚠️ Không có URL ảnh đại diện.");
-  }
-
-  if (props.blogData?.sections) {
-    blog.value.sections = props.blogData.sections.map((sections, index) => {
-      return {
-        header: sections.header || "",
-        content: sections.content || "",
-        thumb: null,
-        previewImage: sections.media?.url || null,
-      };
-    });
-  }
+const errors = reactive({
+  title: "",
+  thumb: "",
+  selectedKeywords: "",
+  sections: []
 });
 
-const fetchAvailableKeywords = async () => {
+onMounted(async () => {
+  loadingSpinner.value.showSpinner();
   try {
-    const response = await getPagedTags();
-    availableKeywords.value = response.map(tag => ({
-      name: tag.title,
-      id: tag.id,
+    const blogId = route.params.id;
+    const response = await getBlogById(blogId);
+    blogData.value = response;
+    blog.value = {
+      title: blogData.value.title,
+      thumb: null,
+      selectedKeywords: blogData.value.tags.map((tag) => ({
+        id: tag.id,
+        name: tag.title,
+      })),
+      sections: blogData.value.sections.map((section) => ({
+        id: section.id,
+        header: section.header || section.title,
+        content: section.content,
+        thumb: null,
+        previewImage: section.media?.url || section.thumb?.url,
+        thumbTitle: section.media?.title || section.thumb?.title,
+      })),
+    };
+
+    errors.sections = blog.value.sections.map(() => ({
+      header: "",
+      content: "",
+      thumb: ""
+    }));
+
+    if (blogData.value.thumb?.url) {
+      previewImage.value = blogData.value.thumb.url;
+    }
+
+    const keywordsResponse = await getPagedTags();
+    availableKeywords.value = keywordsResponse.map((keyword) => ({
+      id: keyword.id,
+      name: keyword.title,
     }));
   } catch (error) {
-    console.error("Lỗi tải từ khóa:", error);
+    toast.error("Unable to load blog data.");
+  } finally {
+    loadingSpinner.value.hideSpinner();
   }
-};
+});
 
 const handleThumbUpload = (event) => {
   const file = event.target.files[0];
@@ -130,247 +212,316 @@ const handleThumbUpload = (event) => {
       previewImage.value = e.target.result;
     };
     reader.readAsDataURL(file);
+    errors.thumb = "";
   }
 };
 
 const handleSectionThumbUpload = (event, index) => {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            blog.value.sections[index] = {
-                ...blog.value.sections[index],
-                thumb: file,
-                previewImage: e.target.result,
-            };
-        };
-        reader.readAsDataURL(file);
-    }
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      blog.value.sections[index] = {
+        ...blog.value.sections[index],
+        thumb: file,
+        previewImage: e.target.result,
+      };
+      errors.sections[index].thumb = "";
+    };
+    reader.readAsDataURL(file);
+  }
 };
-
-
-
-
 
 const addSection = () => {
   blog.value.sections.push({
-    title: "",
+    header: "",
     thumb: null,
     previewImage: null,
     content: "",
   });
+  errors.sections.push({ header: "", content: "", thumb: "" });
 };
 
-
-const removeSection = (index) => {
-  blog.value.sections.splice(index, 1);
+const openDeleteConfirm = (index) => {
+  sectionToDeleteIndex.value = index;
+  deleteDialogVisible.value = true;
 };
 
+const handleConfirmDelete = (confirm) => {
+  if (confirm && sectionToDeleteIndex.value !== null) {
+    blog.value.sections.splice(sectionToDeleteIndex.value, 1);
+    errors.sections.splice(sectionToDeleteIndex.value, 1);
+  }
+  sectionToDeleteIndex.value = null;
+  deleteDialogVisible.value = false;
+};
 
+const openSaveConfirm = () => {
+  if (!validateForm()) return;
+  saveDialogVisible.value = true;
+};
 
-const submitBlog = async () => {
-    try {
-        const formData = new FormData();
+const handleConfirmSave = (confirm) => {
+  saveDialogVisible.value = false;
+  if (confirm) {
+    submitBlogInternal();
+  }
+};
 
-        formData.append("Id", props.blogData.id);
-        formData.append("Title", blog.value.title);
-        formData.append("Status", "Draft");
-        formData.append("IsCommentDisabled", JSON.stringify(false));
+const submitBlogInternal = async () => {
+  loadingSpinner.value.showSpinner();
+  try {
+    const formData = new FormData();
+    formData.append("Id", blogData.value.id);
+    formData.append("Title", blog.value.title);
+    formData.append("Status", blogData.value.status);
+    formData.append("IsCommentDisabled", blogData.value.isCommentDisabled);
 
+    const currentTags = blog.value.selectedKeywords.map((tag) => tag.id);
+    const previousTags = blogData.value.tags.map((tag) => tag.id);
+    const removedTags = previousTags.filter((tag) => !currentTags.includes(tag));
+    const addedTags = currentTags.filter((tag) => !previousTags.includes(tag));
 
-        const currentTags = blog.value.selectedKeywords.map(tag => tag.id);
-        const previousTags = props.blogData.tags ? props.blogData.tags.map(tag => tag.id) : [];
-        const removedTags = previousTags.filter(tag => !currentTags.includes(tag));
-        const addedTags = currentTags.filter(tag => !previousTags.includes(tag));
+    removedTags.forEach((tag) => formData.append("RemovedTags", tag));
+    addedTags.forEach((tag) => formData.append("AddedTags", tag));
 
-        if (addedTags.length > 0) {
-          addedTags.forEach(tag => formData.append("AddedTags", tag));
-        } 
-
-        if (removedTags.length > 0) {
-          removedTags.forEach(tag => formData.append("RemovedTags", tag));
-        } 
-        
-        formData.append("Thumb.Title", "Sau Khi Cap Nhat");
-
-        if (blog.value.thumb instanceof File) {
-              formData.append("Thumb.File", blog.value.thumb);
-        } else if (props.blogData.thumb?.url) {
-              formData.append("Thumb.Url", props.blogData.thumb.url);
-        }
-
-
-        blog.value.sections.forEach((section, index) => {
-            formData.append(`Sections[${index}].Title`, section.header); 
-            formData.append(`Sections[${index}].Content`, section.content);
-
-            if (section.thumb) {
-                formData.append(`Sections[${index}].Thumb.File`, section.thumb);
-                formData.append(`Sections[${index}].Thumb.Title`, `Ảnh cho phần ${index + 1}`);
-            } else if (section.previewImage) {
-                formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
-            }
-        });
-
-        console.log("🔍 Dữ liệu gửi lên API:", [...formData]);
-
-        const response = await updateArticle(formData);
-        router.go(0);
-    } catch (error) {
-        console.error("❌ Lỗi cập nhật blog:", error);
+    if (blog.value.thumb instanceof File) {
+      formData.append("Thumb.File", blog.value.thumb);
+      formData.append("Thumb.Title", blog.value.thumb.name);
+    } else {
+      formData.append("Thumb.Url", blogData.value.thumb.url);
+      formData.append("Thumb.Title", blogData.value.thumb.title);
     }
+
+    if (blog.value.sections && blog.value.sections.length > 0) {
+      blog.value.sections.forEach((section, index) => {
+        formData.append(`Sections[${index}].Id`, section.id || "");
+        formData.append(`Sections[${index}].Title`, section.header);
+        formData.append(`Sections[${index}].Content`, section.content);
+
+        if (section.thumb instanceof File) {
+          formData.append(`Sections[${index}].Thumb.File`, section.thumb);
+          formData.append(`Sections[${index}].Thumb.Title`, section.thumb.name);
+        } else if (section.previewImage) {
+          formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
+          formData.append(`Sections[${index}].Thumb.Title`, section.thumbTitle);
+        }
+      });
+    }
+    const response = await updateArticle(formData);
+    toast.success("Blog updated successfully!");
+    router.push("/advisor/content");
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    toast.error("Blog update failed! Please try again.");
+  } finally {
+    loadingSpinner.value.hideSpinner();
+  }
+};
+
+const validateTitle = () => {
+  if (!blog.value.title.trim()) {
+    errors.title = "Please enter the blog title.";
+  } else if (blog.value.title.trim().length < 3) {
+    errors.title = "Blog title must be at least 3 characters.";
+  } else if (blog.value.title.trim().length > 100) {
+    errors.title = "Blog title must be less than 100 characters.";
+  } else {
+    errors.title = "";
+  }
+};
+
+const validateThumb = () => {
+  if (!blog.value.thumb && !previewImage.value) {
+    errors.thumb = "Please select or keep the featured image.";
+  } else {
+    errors.thumb = "";
+  }
+};
+
+const validateKeywords = () => {
+  if (!blog.value.selectedKeywords || blog.value.selectedKeywords.length === 0) {
+    errors.selectedKeywords = "Please select at least one keyword.";
+  } else {
+    errors.selectedKeywords = "";
+  }
+};
+
+const validateSection = (index) => {
+  const section = blog.value.sections[index];
+  if (!errors.sections[index]) {
+    errors.sections[index] = { header: "", content: "", thumb: "" };
+  }
+  if (!section.header || !section.header.trim()) {
+    errors.sections[index].header = `Section ${index + 1} is missing a title.`;
+  } else {
+    errors.sections[index].header = "";
+  }
+  if (!section.content || !section.content.trim()) {
+    errors.sections[index].content = `Section ${index + 1} is missing content.`;
+  } else {
+    errors.sections[index].content = "";
+  }
+  errors.sections[index].thumb = "";
+};
+
+const validateForm = () => {
+  validateTitle();
+  validateThumb();
+  validateKeywords();
+  blog.value.sections.forEach((_, index) => {
+    validateSection(index);
+  });
+
+  if (errors.title || errors.thumb || errors.selectedKeywords) {
+    toast.error("Please fix the errors in the form.");
+    return false;
+  }
+  for (const secError of errors.sections) {
+    if (secError.header || secError.content || secError.thumb) {
+      toast.error("Please fix the errors in the sections.");
+      return false;
+    }
+  }
+  return true;
 };
 </script>
 
-
-
 <style scoped>
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .blog-creation {
-    max-width: 800px;
-    margin: 20px auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-  }
-  
-  .title {
-    text-align: center;
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    color: #555;
-  }
-  
-  .form-group input,
-  textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  textarea {
-    resize: none;
-  }
-  
-  .image-preview img {
-    width: 100%;
-    max-width: 200px;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-  
-  .sections {
-    margin-top: 20px;
-  }
-  
-  .section {
-    background: #fafafa;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .divider {
-    border-top: 1px dashed #ddd;
-    margin: 15px 0;
-  }
-  
-  .btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  
-  .btn.add {
-    background: #007bff;
-    color: white;
-    display: block;
-    margin: 0 auto;
-  }
-  
-  .btn.remove {
-    background: #ff6868;
-    color: white;
-  }
-  
-  .btn.submit {
-    margin-top: 20px;
-    background: #28a745;
-    color: white;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .btn:hover {
-    opacity: 0.9;
-  }
-  .multiselect {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: #fff;
+.title {
+  color: #343a40;
+  font-weight: bold;
 }
 
-.multiselect__tags {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
+.image-preview img {
+  max-width: 200px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.multiselect__input {
-  font-size: 1rem;
-  margin-left: 5px;
-  padding: 5px;
+.card {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   border: none;
-  outline: none;
 }
 
-.multiselect--active {
-  border-color: #007bff;
+.card-header {
+  font-weight: bold;
 }
 
-.multiselect__tag {
-  background: #007bff;
+.section {
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-actions {
+  margin-top: 30px;
+}
+
+.multiselect {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+:deep(.multiselect__tags) {
+  border: none;
+  padding: 8px;
+}
+
+:deep(.multiselect__tag) {
+  background-color: #3c98fb;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin-right: 5px;
+  border-radius: 4px;
+}
+
+:deep(.multiselect__tag-icon) {
+  margin-left: 8px;
+  position: static;
+  line-height: 1;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.multiselect__tag span) {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+:deep(.multiselect--active) {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+:deep(.multiselect__tag-icon:after) {
+  color: white;
+}
+
+:deep(.multiselect__tag-icon:hover) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+:deep(.multiselect__tag-icon:hover:after) {
+  color: white;
+}
+
+:deep(.loading-spinner) {
+  z-index: 9999;
+}
+
+.btn,
+.custom-btn,
+.custom-btn-lg {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 1.1rem;
+  padding: 12px 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+.btn:hover,
+.custom-btn:hover,
+.custom-btn-lg:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-success.custom-btn-lg {
+  background: linear-gradient(45deg, #28a745, #218838);
   color: #fff;
-  border-radius: 3px;
-  padding: 3px 5px;
-  margin: 2px 5px 2px 0;
 }
 
-.multiselect__tag:hover {
-  background: #0056b3;
+.btn-danger {
+  background: linear-gradient(45deg, #ff6868, #e63946);
+  color: #fff;
 }
 
-.multiselect__clear {
-  color: #007bff;
-  font-size: 1rem;
-  cursor: pointer;
+.btn-secondary.custom-btn {
+  background: linear-gradient(45deg, #6c757d, #5a6268);
+  color: #fff;
 }
 
-.multiselect__clear:hover {
-  color: #0056b3;
+.img-thumbnail {
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-  </style>
-  
+
+.bold-icon {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.bold-text {
+  font-weight: 700;
+}
+</style>

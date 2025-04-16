@@ -87,3 +87,26 @@ export const setUserProfile = (profile) => {
 export const clearUserAuthData = () => {
   localStorage.clear();
 }
+
+const parseJwt = (token) => {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+}
+
+export const getRole = () => {
+  let token = getUserBearerToken();
+  let payload = parseJwt(token);
+  return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+}
+
+export const isPremium = () => {
+  let profile = getUserProfile();
+  if (!profile)
+    return false;
+  return profile.role == 1 || profile.role == 2 || profile.isPremium;
+}

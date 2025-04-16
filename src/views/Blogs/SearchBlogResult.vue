@@ -24,7 +24,7 @@
             </div>
 
             <!-- Pagination -->
-            <Pagination :currentPage="currentPage" :totalPages="totalPages" :goToPage="goToPage" />
+            <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="goToPage" />
         </div>
     </div>
 </template>

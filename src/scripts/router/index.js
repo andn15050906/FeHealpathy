@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getUserBearerToken } from '@/scripts/api/services/authService'
+import { getUserBearerToken, getRole } from '@/scripts/api/services/authService'
 
 import SignIn from '@/views/Auth/SignIn.vue';
 import Register from '@/views/Auth/Register.vue'
@@ -12,6 +12,7 @@ import NotFound from '@/views/404.vue'
 
 import ViewUserProfile from '@/views/Profile/PersonalProfile/ViewUserProfile.vue'
 import EditUserProfile from '@/views/Profile/PersonalProfile/EditUserProfile.vue'
+import ChangePassword from '@/views/Profile/PersonalProfile/ChangePassword.vue'
 import RequestToBeAdvisor from '@/views/Profile/PersonalProfile/RequestToBeAdvisor.vue'
 import Settings from '@/views/Profile/Settings.vue'
 import SettingUp from '@/views/Profile/SettingUp.vue'
@@ -37,6 +38,9 @@ import MediaControl from '@/views/PracticeTools/MediaResource/MediaControl.vue'
 import YogaView from '@/views/PracticeTools/Yoga/YogaCatalog.vue'
 import YogaExerciseDetail from '@/views/PracticeTools/Yoga/YogaExerciseDetail.vue'
 import YogaPractice from '@/views/PracticeTools/Yoga/YogaPractice.vue'
+import YogaOptions from '@/views/PracticeTools/Yoga/YogaOptions.vue';
+import YogaPoses from '@/views/PracticeTools/Yoga/YogaPoses.vue';
+import YogaPoseDetails from '@/views/PracticeTools/Yoga/YogaPoseDetails.vue';
 import HabitTracking from '@/views/PracticeTools/HabitTracking/HabitTracking.vue'
 
 import BlogCatalog from '@/views/Blogs/BlogCatalog.vue'
@@ -47,6 +51,7 @@ import CourseList from '@/views/Courses/CourseList.vue'
 import CourseDetail from '@/views/Courses/CourseDetail.vue'
 import LectureDetail from '@/views/Courses/LectureDetail.vue'
 import CoursePayment from '@/views/Courses/CoursePayment.vue'
+import CoursesEnrolled from '@/views/Courses/CoursesEnrolled.vue'
 
 import CommunityOverview from '@/views/Community/CommunityOverview.vue'
 import GroupOverview from '@/views/Community/GroupOverview.vue'
@@ -54,9 +59,9 @@ import ViewGroup from '@/views/Community/ViewGroup.vue'
 import CreateGroup from '@/views/Community/CreateGroup.vue'
 import EditGroup from '@/views/Community/EditGroup.vue'
 import ConversationWindow from '@/views/Community/ConversationWindow.vue'
+import CallWindow from '@/components/CommunityComponents/CallWindow.vue'
 
 import Dashboard from '@/views/Profile/Admin/Dashboard.vue'
-import ModerateAdvisors from '@/views/Profile/Admin/ModerateAdvisors.vue'
 import ModerateUsers from '@/views/Profile/Admin/ModerateUsers.vue'
 import CreateAdminAccounts from '@/views/Profile/Admin/CreateAdminAccounts.vue'
 import ModerateUploadedContent from '@/views/Profile/Admin/ModerateUploadedContent.vue'
@@ -65,8 +70,10 @@ import ManageSurvey from '@/views/Profile/Admin/ManageSurvey.vue'
 import ManageYoga from '@/views/Profile/Admin/ManageYoga.vue'
 import CreateYogaLesson from '@/views/Profile/Admin/CreateYoga.vue'
 
+import ManageAdvisorContent from '@/views/Profile/Advisor/Manage/ManageAdvisorContent.vue';
 import ViewAdvisor from '@/views/Profile/Advisor/ViewAdvisor.vue'
 import EditAdvisor from '@/views/Profile/Advisor/EditAdvisor.vue'
+import ScheduleMeeting from '@/views/Meetings/ScheduleMeeting.vue'
 import Payment from '@/views/Profile/Advisor/Payment.vue'
 import CreateBlog from '@/views/Profile/Advisor/Manage/CreateBlog.vue'
 import ManageBlog from '@/views/Profile/Advisor/Manage/ManageBlog.vue'
@@ -75,14 +82,9 @@ import ManageCourse from '@/views/Profile/Advisor/Manage/ManageCourse.vue'
 import CreateCourse from '@/views/Profile/Advisor/Manage/CreateCourse.vue'
 import UpdateCourse from '@/views/Profile/Advisor/Manage/UpdateCourse.vue'
 import RoadmapBuilder from '@/views/Profile/Advisor/Manage/RoadmapBuilder.vue'
-
+import UpdateRoadmap from '@/views/Profile/Advisor/Manage/UpdateRoadmap.vue'
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
-
-/*import CreateAssignment from '@/views/Assignments_Old/Create.vue'
-import ManageAssignments from '@/views/Assignments_Old/Manage.vue'
-import OverviewAssignment from '@/views/Assignments_Old/Overview.vue'
-import ReviewAssignment from '@/views/Assignments_Old/Review.vue'
-import AttemptAssignment from '@/views/Assignments_Old/Attempt.vue'*/
+import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -122,17 +124,15 @@ const router = createRouter({
       name: 'register',
       component: Register
     },
-    // Moved to EditUserProfile
-    /*{
-      path: '/change-password',
-      name: 'changePassword',
-      component: ChangePassword,
-      meta: { requiresAuth: true }
-    },*/
     {
       path: '/forgot-password',
       name: 'forgotPassword',
       component: ForgotPassword
+    },
+    {
+      path: '/change-password',
+      name: 'ChangePassword',
+      component: ChangePassword
     },
     {
       path: '/reset-password/:email/:resetToken',
@@ -147,10 +147,21 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/advisor/view-profile/:advisorId',
+      name: 'viewAdvisor',
+      component: ViewAdvisor
+    },
+    {
       path: '/advisor/edit-profile',
       name: 'editAdvisor',
       component: EditAdvisor,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisor: true }
+    },
+    {
+      path: '/meetings/schedule',
+      name: 'ScheduleMeeting',
+      component: ScheduleMeeting,
+      //meta: {requiresAuth: true,title: 'Đặt lịch họp'}
     },
     {
       path: '/profile/:id',
@@ -182,6 +193,21 @@ const router = createRouter({
       path: '/yoga',
       name: 'yogaView',
       component: YogaView
+    },
+    {
+      path: '/options/yoga',
+      name: 'YogaOptions',
+      component: YogaOptions
+    },
+    {
+      path: '/yoga/poses',
+      name: 'YogaPoses',
+      component: YogaPoses
+    },
+    {
+      path: '/yoga/poses/:id',
+      name: 'YogaPoseDetails',
+      component: YogaPoseDetails
     },
     {
       path: '/yoga/:id',
@@ -242,9 +268,10 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/self-assessment',
+      path: '/self-assessment/:id?',
       name: 'SelfAssessment',
       component: SelfAssessment,
+      props: true,
       meta: { requiresAuth: true }
     },
     {
@@ -257,7 +284,8 @@ const router = createRouter({
     {
       path: '/media-resources',
       name: 'MediaResources',
-      component: MediaResources
+      component: MediaResources,
+      meta: { requiresPremium : true }
     },
     {
       path: '/music-library',
@@ -272,14 +300,15 @@ const router = createRouter({
     {
       path: '/media/manage',
       name: 'MediaControl',
-      component: MediaControl
+      component: MediaControl,
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     // Practice - Survey
     {
       path: '/surveys',
       name: 'Survey',
       component: ManageSurvey,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     // End of Practice
 
@@ -292,24 +321,25 @@ const router = createRouter({
     {
       path: '/blogs/manage',
       name: 'manageBlogs',
-      component: ManageBlog
+      component: ManageBlog,
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     {
       path: '/blogs/create',
       name: 'createBlog',
       component: CreateBlog,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     {
       path: '/blogs/edit-blog/:id',
       name: 'updateBlog',
       component: UpdateBlog,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       props: true
     },
     {
-      path: "/blog/:id",
-      name: 'blogDetail',
+      path: "/blogs/:id",
+      name: 'BlogDetail',
       component: BlogDetail,
       props: true
     },
@@ -326,22 +356,27 @@ const router = createRouter({
       component: CourseList
     },
     {
+      path: '/courses/enrolled',
+      name: 'coursesEnrolled',
+      component: CoursesEnrolled
+    },
+    {
       path: '/courses/manage',
       name: 'manageCourses',
       component: ManageCourse,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/create',
       name: 'createCourse',
       component: CreateCourse,
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {
       path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true, requiresAdvisor: true },
       props: true
     },
     {
@@ -397,6 +432,13 @@ const router = createRouter({
       component: ConversationWindow,
       meta: { requiresAuth: true }
     },
+    {
+      path: '/call/:roomId',
+      name: 'call',
+      component: CallWindow,
+      props: true,
+      meta: { isAppMode: true, requiresAuth: true }
+    },
 
     // Assignment - Old
     /*{
@@ -444,17 +486,20 @@ const router = createRouter({
     {
       path: '/yogas/manage',
       name: 'ManageYoga',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: ManageYoga
     },
     {
       path: '/yoga/create',
       name: 'CreateYoga',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: CreateYogaLesson
     },
     {
       path: '/request-advisor',
       name: 'Request',
-      component: RequestToBeAdvisor
+      component: RequestToBeAdvisor,
+      meta: { requiresAuth: true, requiresMember: true }
     },
     {
       path: '/submissions-review/:id',
@@ -476,6 +521,7 @@ const router = createRouter({
     {
       path: '/roadmap-builder',
       name: 'RoadmapBuilder',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       component: RoadmapBuilder
     },
     {
@@ -483,59 +529,87 @@ const router = createRouter({
       name: 'Progress',
       component: RoadmapProgress
     },
-
+    {
+      path: '/roadmaps/create',
+      name: 'CreateRoadmap',
+      component: CreateRoadmap
+    },
+    {
+      path: '/roadmaps/edit/:id',
+      name: 'updateRoadmap',
+      component: UpdateRoadmap
+    },
 
     // Advisor
     {
-      path: '/advisor/moderate-advisors',
-      name: 'ModerateAdvisors',
-      component: ModerateAdvisors,
+      path: '/advisor/content',
+      name: 'ManageAdvisorContent',
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
+      component: ManageAdvisorContent,
     },
+
     // Admin
     {
       path: '/admin',
       name: 'AdminDashboard',
-      component: Dashboard,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: Dashboard
     },
     {
       path: '/admin/moderate-users',
       name: 'ModerateUsers',
-      component: ModerateUsers,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ModerateUsers
     },
     {
       path: '/admin/create-admin',
       name: 'CreateAdminAccounts',
-      component: CreateAdminAccounts,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: CreateAdminAccounts
     },
     {
       path: '/admin/moderate-content',
       name: 'ModerateUploadedContent',
-      component: ModerateUploadedContent,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ModerateUploadedContent
     },
     {
       path: '/admin/view-reports',
       name: 'ViewReports',
-      component: ViewReports,
-      //meta: { requiresAuth: true, requiresAdmin: true }
+      meta: { requiresAuth: true, requiresAdmin: true },
+      component: ViewReports
     }
+
+    //
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = getUserBearerToken();
-    if (!token) {
-      next('/sign-in');
-    } else {
-      next();
-    }
-  } else {
+  let hasRight = isAuthorized(to);
+  if (hasRight)
     next();
-  }
+  else
+    next('/sign-in');
 });
+
+const isAuthorized = (to) => {
+  if (!to.matched.some(record => record.meta.requiresAuth))
+    return true;
+
+  if (!getUserBearerToken())
+    return false;
+
+  let role = getRole();
+  if (to.matched.some(record => record.meta.requiresAdvisorOrAdmin && !['Advisor', 'Admin'].includes(role)))
+    return false;
+  if (to.matched.some(record => record.meta.requiresAdvisor) && role != 'Advisor')
+    return false;
+  if (to.matched.some(record => record.meta.requiresAdmin) && role != 'Admin')
+    return false;
+  if (to.matched.some(record => record.meta.requiresMember) && role != 'Member')
+    return false;
+  
+  return true;
+}
 
 export default router;

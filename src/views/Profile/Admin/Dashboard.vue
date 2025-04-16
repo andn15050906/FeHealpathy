@@ -143,7 +143,7 @@
             <div class="double-bounce2"></div>
           </div>
         </div>
-        <line-chart v-else :chart-data="userGrowthData" :options="chartOptions"></line-chart>
+        <line-chart v-else :data="userGrowthData" :options="chartOptions"></line-chart>
       </div>
       
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
@@ -163,24 +163,8 @@
             <div class="double-bounce2"></div>
           </div>
         </div>
-        <bar-chart v-else :chart-data="revenueData" :options="chartOptions"></bar-chart>
+        <bar-chart v-else :data="revenueData" :options="chartOptions"></bar-chart>
       </div>
-    </div>
-
-    <!-- Calendar Section -->
-    <div class="calendar-section">
-      <div class="section-header">
-        <h2 class="section-title">Upcoming Events</h2>
-        <button class="btn-action">
-          <i class="fas fa-plus mr-2"></i>
-          Add Event
-        </button>
-      </div>
-      <vue-calendar 
-        :events="calendarEvents"
-        @dayClick="handleDayClick"
-        @eventClick="handleEventClick">
-      </vue-calendar>
     </div>
 
     <!-- Quick Actions -->
@@ -216,13 +200,6 @@
             placeholder="Search activities..."
             class="search-input"
           >
-          <select v-model="activityFilter" class="filter-select">
-            <option value="all">All Activities</option>
-            <option value="user">User Related</option>
-            <option value="content">Content Related</option>
-            <option value="system">System Related</option>
-          </select>
-          <button class="btn-text">View All</button>
         </div>
       </div>
       <div class="activity-list">
@@ -245,7 +222,6 @@
 
 <script>
 import { Line as LineChart, Bar as BarChart } from 'vue-chartjs'
-import VueCalendar from '@/components/Common/Misc/Calendar.vue'
 import { ref, computed } from 'vue'
 
 export default {
@@ -253,7 +229,6 @@ export default {
   components: {
     LineChart,
     BarChart,
-    VueCalendar
   },
   data() {
     return {
@@ -274,15 +249,6 @@ export default {
           read: false
         },
         
-      ],
-      calendarEvents: [
-        {
-          id: 1,
-          title: 'Team Meeting',
-          start: new Date(),
-          end: new Date(),
-          color: '#4299e1'
-        },
       ],
       activities: [
         {
@@ -312,8 +278,7 @@ export default {
         }]
       },
       chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false
+        responsive: true
       },
       loading: {
         stats: true,
@@ -409,7 +374,11 @@ export default {
       // Update activities...
     },
     navigateTo(path) {
-      this.$router.push(path)
+      this.$router.push(path).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Navigation error:', err);
+        }
+      });
     }
   },
   mounted() {
@@ -705,14 +674,6 @@ export default {
 .chart-header h3 {
   font-size: 18px;
   color: #2d3748;
-}
-
-.calendar-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 32px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .notifications-dropdown {

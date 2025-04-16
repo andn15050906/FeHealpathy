@@ -52,6 +52,16 @@
             <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
             <!--@show-audio="false"-->
         </vue-advanced-chat>
+        <teleport to="body">
+            <InviteUser
+                v-if="showInviteModal"
+                :conversationId="inviteRoomId"
+                :current-user="currentUser"
+                :current-room-members="currentRoomMembers"
+                @created="fetchRooms"
+                @close="showInviteModal = false"
+            />
+        </teleport>
     </div>
 </template>
 
@@ -63,10 +73,14 @@ import { getUsers } from '@/scripts/api/services/userService';
 import { getPagedConversations } from '@/scripts/api/services/conversationService';
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
+import InviteUser from "@/components/Common/Popup/InviteUser.vue";
 
 register();
 
 export default {
+    components: {
+        InviteUser,
+    },
     props: {
         singleRoom: {
             type: Boolean
@@ -145,6 +159,7 @@ export default {
             removeUsers: [],
             roomActions: [],
             menuActions: [],
+            showInviteModal: false,
             messageActions: [
                 { name: 'editMessage', title: 'Edit Message', onlyMe: true },
                 { name: 'deleteMessage', title: 'Delete Message', onlyMe: true }
@@ -297,11 +312,16 @@ export default {
             fetchedRooms.forEach(room => {
                 // re-assign room users (convert from userId to user)
                 for (let i = 0; i < room.users.length; i++) {
-                    room.users[i] = allUsers.find(user => user?._id === room.users[i]);
+                    const foundUser = allUsers.find(user => user?._id === room.users[i]);
+                    if (foundUser) {
+                        room.users[i] = foundUser;
+                    } else {
+                        room.users[i] = { _id: room.users[i], username: 'Unknown User', avatar: '' };
+                    }
                 }
 
                 // re-assign room name
-                const otherRoomUsers = room.users.filter(user => user._id != this.currentUser.id);
+                const otherRoomUsers = room.users.filter(user => user && user._id !== this.currentUser.id);
                 //room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
                 room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner'
                 formattedRooms.push({
@@ -730,7 +750,9 @@ export default {
         },
 
         inviteUser(roomId) {
-            this.resetForms()
+            this.resetForms(),
+            this.showInviteModal = true;
+            console.log("showInviteModal:", this.showInviteModal);
             this.inviteRoomId = roomId
         },
 
@@ -743,7 +765,7 @@ export default {
             await firestoreService.updateUser(id, { _id: id })
         
             await firestoreService.addRoomUser(this.inviteRoomId, id)*/
-
+            
             this.inviteRoomId = null
             this.invitedUsername = ''
             this.fetchRooms()

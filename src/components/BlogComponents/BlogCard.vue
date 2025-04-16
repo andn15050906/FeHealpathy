@@ -1,31 +1,37 @@
 <template>
-  <GlowingCard class="blog-card" justify="unset" padding="10px">
-    <div style="flex-grow: 1;">
-        <div class="blog-thumbnail">
-            <RouterLink :to="`/blog/${blog.id}`">
-                <img :src="blog.thumb.url" :alt="blog.title">
-            </RouterLink>
-        </div>
-        <p class="blog-title">{{ blog.title }}</p>
+  <div class="blog-card shadow h-100">
+    <div class="blog-thumbnail position-relative">
+      <RouterLink :to="`/blogs/${blog.id}`" target="_blank">
+        <img v-if="blog.thumb" :src="blog.thumb?.url" :alt="blog.title" class="img-fluid w-100 h-100"
+          :onError="(e) => e.target.style.display = 'none'">
+        <div v-else class="default-thumbnail" :style="{ backgroundImage: 'url(/assets/images/10.jpg)' }"></div>
+      </RouterLink>
     </div>
-    <div>
-        <div class="tags">
-            <ul class="blog-tags">
-                <li v-for="tag in blog.tags" :key="tag.id"> {{ tag.title }}</li>
-            </ul>
+    <div class="blog-content d-flex flex-column p-3">
+      <h3 class="blog-title text-center mb-3">
+        <RouterLink :to="`/blogs/${blog.id}`" target="_blank" class="text-decoration-none">
+          {{ blog.title || 'Untitled Blog' }}
+        </RouterLink>
+      </h3>
+      <div class="blog-footer mt-auto">
+        <div class="meta-info d-flex justify-content-between align-items-center">
+          <span class="instructor">{{ blog.creator.fullName }}</span>
+          <p class="blog-date m-0">{{ formatDate(blog.creationTime) }}</p>
         </div>
-        <span class="instructor">{{ blog.creator.fullName }}</span>
-        <p class="blog-date">{{ formatDate(blog.creationTime) }}</p>
+      </div>
     </div>
-  </GlowingCard>
+  </div>
 </template>
 
 <script setup>
-import GlowingCard from '@/components/Common/GlowingCard.vue';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps({
-    blog: Object
+  blog: {
+    type: Object,
+    required: true,
+    default: () => ({}),
+  },
 });
 
 const formatDate = (dateString) => {
@@ -33,120 +39,91 @@ const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   } catch (error) {
-    console.error("Error formatting date:", error);
+    console.error('Error formatting date:', error);
     return dateString;
   }
 };
-
-
 </script>
 
 <style scoped>
-.blog-date {
-    color: black;
-}
 .blog-card {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .blog-thumbnail {
-    position: relative;
-    aspect-ratio: 16/9;
-    width: 100%;
+  height: 200px;
+  overflow: hidden;
 }
 
-.blog-thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.blog-thumbnail img,
+.default-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
 }
 
-.duration {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
+.default-thumbnail {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
 }
 
-.level-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #5488c7;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+.blog-thumbnail:hover img,
+.blog-thumbnail:hover .default-thumbnail {
+  transform: scale(1.05);
 }
 
-.blog-info {
-    padding: 15px;
+.blog-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .blog-title {
-    font-size: 16px;
-    margin-bottom: 8px;
-    color: #000;
-    height : 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.blog-title a {
+  color: #2c3e50;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.blog-title a:hover {
+  color: #3498db;
+}
+
+.blog-footer {
+  padding-top: 12px;
+  border-top: 1px solid #eef2f7;
 }
 
 .instructor {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.9rem;
 }
 
-.rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.blog-date {
+  font-size: 0.85rem;
+  color: #7f8c8d;
 }
-
-.fa-star {
-    font-size: 12px;
-    color: gold;
-}
-
-.rating-text {
-    color: #000000;
-}
-
-.rating-count {
-    color: #666;
-    font-size: 12px;
-}
-.blog-tags {
-    list-style: none;
-    padding: 0;
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-}
-
-
-.blog-tags li {
-    background: #efefef; 
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 8px;
-    color: #00bfff;
-}
-.tags {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height:40px;
-    margin:5px 0;
-}
-
 </style>

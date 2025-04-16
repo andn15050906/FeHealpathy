@@ -6,7 +6,6 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { VStepperVertical, VStepperVerticalItem } from 'vuetify/labs/VStepperVertical';
 import { createPinia } from "pinia";
-import { toast } from "vue3-toastify";
 import VueFroala from "vue-froala-wysiwyg";
 import VueTour from "vue3-tour";
 
@@ -71,13 +70,7 @@ app.use(i18n);
 app.use(vuetify);
 app.use(createVuestic({ config: vuesticGlobalConfig }));
 app.use(pinia);
-app.use(toast, {
-  position: "bottom-left",
-  autoClose: 3000,
-  theme: "light",
-});
 app.use(VueFroala);
 app.use(VueTour);
 
-// Mount app
 app.mount("#app");
