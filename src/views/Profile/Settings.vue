@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page">
     <div class="settings-main">
-      <h1 class="page-title">Customize Your Settings</h1>
+      <h1 class="page-title">Tùy chỉnh cài đặt</h1>
       <div class="settings-group">
         <ThemeSwitcher />
       </div>

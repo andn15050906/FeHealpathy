@@ -2,52 +2,52 @@
     <section class="mood-pattern-hero">
         <div class="content-wrapper">
             <h1 class="hero-title">
-                Elevate Your Emotional Well-being with our Healpathy Website
+                Nâng cao sức khỏe tinh thần của bạn cùng Healpathy
             </h1>
-            <h2 class="mood-prompt">How do you feel today?</h2>
+            <h2 class="mood-prompt">Hôm nay bạn cảm thấy thế nào?</h2>
             <router-link to="/mood-cart/happy">
-                <button class="join-button" tabindex="0">Join with us</button>
+                <button class="join-button" tabindex="0">Tham gia cùng chúng tôi</button>
             </router-link>
         </div>
         <div class="mood-grid">
-            <!-- Happy -->
+            <!-- Vui vẻ -->
             <div class="mood-card happy">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/990d459e86807a6ad4ff81fbf586bb234d66989ae6f4e88c73f4c70c28f5267c?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        class="mood-icon" />
+                        class="mood-icon" alt="Vui vẻ" />
                 </div>
             </div>
-            <!-- Sad -->
+            <!-- Buồn -->
             <div class="mood-card sad">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/f5da17250d1078f13adbfd2de8c4c3dc53bb8c93c0a029d60459b4cb4091bbe6?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        class="mood-icon" />
+                        class="mood-icon" alt="Buồn" />
                 </div>
             </div>
-            <!-- eager -->
+            <!-- Hào hứng -->
             <div class="mood-card eager">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/e3ff816f600031f96b3bf75fa2c76bb2ac0a60cc572a49c3ab196222543d81c9?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        class="mood-icon" />
+                        class="mood-icon" alt="Hào hứng" />
                 </div>
             </div>
-            <!-- Angry -->
+            <!-- Tức giận -->
             <div class="mood-card angry">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/18a46ba70d2e22dcd7f14d6f252f6cdf532f122c91567146069b4e9b27f2d023?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        class="mood-icon" />
+                        class="mood-icon" alt="Tức giận" />
                 </div>
             </div>
-            <!-- anxiety -->
+            <!-- Lo lắng -->
             <div class="mood-card anxiety">
                 <div class="mood-icon-wrapper">
                     <img loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/ca79fb5af2e302375e06008c34767d0e50c971b995463146cc44f1d7af0af355?placeholderIfAbsent=true&apiKey=9d54f8198b4f4156bc37a6432537a657"
-                        id="anxiety" class="mood-icon" />
+                        id="anxiety" class="mood-icon" alt="Lo lắng" />
                 </div>
             </div>
         </div>

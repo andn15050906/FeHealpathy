@@ -5,32 +5,32 @@
       <h1 class="text-center text-success">Đang đợi phê duyệt...</h1>
     </div>
     <div v-else>
-      <h1 class="text-center mb-4">Request To Be An Advisor</h1>
+      <h1 class="text-center mb-4">Yêu cầu trở thành Cố vấn</h1>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Upload Your CV:</label>
+        <label class="form-label fw-bold">Tải lên CV của bạn:</label>
         <input type="file" accept=".pdf,.doc,.docx" @change="handleCVUpload" class="form-control" />
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Introduction:</label>
-        <textarea v-model="introduction" rows="4" placeholder="Write about yourself..." class="form-control"></textarea>
+        <label class="form-label fw-bold">Giới thiệu:</label>
+        <textarea v-model="introduction" rows="4" placeholder="Viết về bản thân..." class="form-control"></textarea>
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Experience:</label>
-        <textarea v-model="experience" rows="4" placeholder="Describe your experience..." class="form-control"></textarea>
+        <label class="form-label fw-bold">Kinh nghiệm:</label>
+        <textarea v-model="experience" rows="4" placeholder="Mô tả kinh nghiệm của bạn..." class="form-control"></textarea>
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Upload Your Certificates:</label>
+        <label class="form-label fw-bold">Tải lên Chứng chỉ:</label>
         <input type="file" multiple accept=".pdf,.jpg,.png" @change="handleCertificateUpload" class="form-control" />
         <ul class="list-group mt-3">
           <li v-for="(cert, index) in certificates" :key="index" class="list-group-item">{{ cert.name }}</li>
         </ul>
       </div>
 
-      <button @click="submitRequest" class="btn btn-warning w-100 py-2 fw-bold">Submit Request</button>
+      <button @click="submitRequest" class="btn btn-warning w-100 py-2 fw-bold">Gửi yêu cầu</button>
     </div>
   </div>
 </template>
@@ -67,7 +67,7 @@ export default {
 
     const submitRequest = async () => {
       if (!cvFile.value || !introduction.value.trim() || !experience.value.trim()) {
-        toast.error("Please upload CV, provide an introduction, and describe your experience.");
+        toast.error("Vui lòng tải lên CV, cung cấp phần giới thiệu và mô tả kinh nghiệm của bạn.");
         return;
       }
 
@@ -80,10 +80,8 @@ export default {
         });
         status.value = 'pending';
         localStorage.setItem('advisor_request_status', 'pending');
-        toast.success("Your request has been submitted successfully! Please wait for approval.");
+        toast.success("Yêu cầu của bạn đã được gửi thành công! Vui lòng đợi phê duyệt.");
       } catch (error) {
-        console.error("Error submitting request:", error);
-        toast.error("Error submitting request. Please try again.");
       }
     };
 

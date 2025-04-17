@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title class="d-flex align-center title-section">
                 <i class="fas fa-info-circle text-primary mr-2"></i>
-                <span class="title">Confirm Update</span>
+                <span class="title">Xác nhận cập nhật</span>
             </v-card-title>
             <v-card-text class="d-flex align-center text-section">
                 <span>{{ message }}</span>
@@ -12,7 +12,7 @@
             <v-card-actions class="justify-end action-section">
                 <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Cancel</v-btn>
                 <v-btn color="blue darken-1" class="update-btn" @click="handleClick(true)">
-                    <span class="update-text">Update</span>
+                    <span class="update-text">Cập nhật</span>
                 </v-btn>
             </v-card-actions>
         </v-card>

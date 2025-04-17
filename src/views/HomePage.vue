@@ -136,7 +136,12 @@ export default {
         }
         // handle setting up
         if (this.user.preferences && this.user.preferences.length == 0) {
-            let noti = new Noti(true, () => { }, "Mind setting up your profile?", "Set up your profile for better experience");
+            let noti = new Noti(
+                true, 
+                () => { }, 
+                "Bạn muốn thiết lập hồ sơ không?",
+                "Thiết lập hồ sơ để có trải nghiệm tốt hơn"
+            );
             noti.callback = () => this.navigateToSettingUp(noti.id);
             this.$emit('addNotification', noti);
         }

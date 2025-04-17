@@ -2,17 +2,17 @@
   <div class="forgot-password-page">
     <div class="overlay">
       <div class="forgot-password-container">
-        <h2>Forgot Your Password ?</h2>
+        <h2>Quên Mật Khẩu ?</h2>
         <form @submit.prevent="handleForgotPassword">
           <p v-if="generalError" class="error">{{ generalError }}</p>
 
           <div class="input-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" v-model="email" placeholder="Enter your email address" required />
+            <label for="email">Địa chỉ email</label>
+            <input type="email" id="email" v-model="email" placeholder="Nhập địa chỉ email của bạn" required />
           </div>
 
           <button type="submit" class="forgot-password-button" :disabled="loading">
-            {{ loading ? 'Sending...' : 'Send Password Reset Email' }}
+            {{ loading ? 'Đang gửi...' : 'Gửi đường dẫn khôi phục mật khẩu' }}
           </button>
           <div v-if="message" :class="{ 'error-message': !isSuccess, 'success-message': isSuccess }">
             {{ message }}

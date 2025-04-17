@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <header class="mb-4 text-center">
-            <h2 class="mb-2" style="font-weight: bold;">Media Manager</h2>
+            <h2 class="mb-2" style="font-weight: bold;">Quản lý phương tiện truyền thông</h2>
         </header>
 
         <LoadingSpinner ref="loadingSpinner" />
@@ -27,7 +27,7 @@
                 <div class="shadow-sm mb-3">
                     <div class="header d-flex justify-content-between align-items-center">
                         <button class="btn btn-primary mb-2" @click="toggleAddMedia">
-                            <i class="fas fa-plus me-1"></i> Add Media
+                            <i class="fas fa-plus me-1"></i> Thêm mới
                         </button>
                     </div>
                     <div class="body p-0">
@@ -39,7 +39,7 @@
             </div>
         </transition>
 
-        <DeleteConfirmPopup v-model:isVisible="showDeletePopup" message="Are you sure you want to delete this media?"
+        <DeleteConfirmPopup v-model:isVisible="showDeletePopup" message="Bạn có chắc chắn muốn xóa phương tiện truyền thông này?"
             url="" @confirmDelete="handleDeleteConfirm" />
     </div>
 </template>

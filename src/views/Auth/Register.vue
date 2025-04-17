@@ -2,38 +2,38 @@
   <div class="register-page">
     <div class="overlay">
       <div class="register-container">
-        <h2>Register</h2>
+        <h2>Đăng Ký Tài Khoản</h2>
         <form @submit.prevent="handleRegister">
           <p v-if="generalError" class="error">{{ generalError }}</p>
 
           <div class="input-group">
-            <label for="username">User Name</label>
-            <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
+            <label for="username">Tên tài khoản</label>
+            <input type="text" id="username" v-model="username" placeholder="Nhập tài khoản của bạn" required />
           </div>
 
           <div class="input-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" v-model="email" placeholder="Enter your email address" required />
+            <label for="email">Email</label>
+            <input type="email" id="email" v-model="email" placeholder="Nhập địa chỉ email của bạn" required />
           </div>
 
           <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" v-model="password" placeholder="Enter your password" required />
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu của bạn" required />
             <p v-if="passwordError" class="error">{{ passwordError }}</p>
           </div>
 
           <div class="input-group">
-            <label for="retype-password">Retype Password</label>
-            <input type="password" id="retype-password" v-model="retypePassword" placeholder="Retype your password"
+            <label for="retype-password">Nhập lại mật khẩu</label>
+            <input type="password" id="retype-password" v-model="retypePassword" placeholder="Nhập lại mật khẩu của bạn"
               required />
             <p v-if="retypePasswordError" class="error">{{ retypePasswordError }}</p>
           </div>
 
-          <button type="submit" class="register-button">Register</button>
+          <button type="submit" class="register-button">Đăng ký</button>
         </form>
 
         <p class="login">
-          Already have an account? <router-link to="/sign-in">Log in here</router-link>
+          Đã có tài khoản rồi? <router-link to="/sign-in">Đăng nhập tại đây</router-link>
         </p>
       </div>
     </div>
@@ -64,13 +64,13 @@ export default {
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password.value);
 
       if (password.value.length < minLength) {
-        passwordError.value = "Password must be at least 6 characters long.";
+        passwordError.value = "Mật khẩu phải có ít nhất 6 ký tự.";
         return false;
       } else if (!hasUpperCase) {
-        passwordError.value = "Password must include at least one uppercase letter.";
+        passwordError.value = "Mật khẩu phải có ít nhất một chữ in hoa.";
         return false;
       } else if (!hasSpecialChar) {
-        passwordError.value = "Password must include at least one special character.";
+        passwordError.value = "Mật khẩu phải có ít nhất một ký tự đặc biệt.";
         return false;
       } else {
         passwordError.value = "";
@@ -85,7 +85,7 @@ export default {
         return true;
       }
       if (password.value !== retypePassword.value) {
-        retypePasswordError.value = "Passwords do not match.";
+        retypePasswordError.value = "Mật khẩu không khớp.";
         generalError.value = "";
         return false;
       }
@@ -95,7 +95,7 @@ export default {
     const validateEmail = () => {
       const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
       if (!emailPattern.test(email.value)) {
-        generalError.value = "Email must end with .com";
+        generalError.value = "Email phải kết thúc bằng .com";
         return false;
       }
       generalError.value = "";
@@ -114,15 +114,15 @@ export default {
           }
           await register(username.value, email.value, password.value);
           retypePasswordError.value = "";
-          generalError.value = 'Registration successful';
+          generalError.value = 'Đăng ký thành công';
           setTimeout(() => router.push({ name: 'signIn' }), 2000);
         } catch (error) {
           if (error.response?.status === 409) {
             const errorMessage = error.response?.data?.message || error.response?.data;
             if (errorMessage?.toLowerCase().includes('email')) {
-              generalError.value = "This email has already been registered";
+              generalError.value = "Email này đã được đăng ký";
             } else {
-              generalError.value = "This username has already been taken";
+              generalError.value = "Tên tài khoản này đã được sử dụng";
             }
           } else if (error.response?.data?.errors) {
             let errors = error.response.data.errors;
@@ -134,7 +134,7 @@ export default {
               }
             }
           } else {
-            generalError.value = 'Network error. Please check your connection and try again.';
+            generalError.value = 'Lỗi kết nối. Vui lòng kiểm tra kết nối và thử lại.';
           }
         } finally {
           if (loadingSpinner) {

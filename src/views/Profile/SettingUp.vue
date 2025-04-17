@@ -45,12 +45,12 @@ const submitSurvey = async (survey, questionsWithAnswer) => {
 }
 const submitFirstEvaluation = async (questionsWithAnswer) => {
     await submitSurvey(firstEvaluationOptions.value.survey, questionsWithAnswer);
-    await sweetAlert.showSuccess("Keep up with Healpathy!");
+    await sweetAlert.showSuccess("Tiếp tục với Healpathy!");
     switchChild(true);
 }
 const submitWellnessSurvey = async (questionsWithAnswer) => {
     await submitSurvey(wellnessSurveyOptions.value.survey, questionsWithAnswer);
-    await sweetAlert.showSuccess("Keep up with Healpathy!");
+    await sweetAlert.showSuccess("Tiếp tục với Healpathy!");
     switchChild(true);
 }
 const submitWhatYouWantSurvey = async (selectedOptions) => {
@@ -70,7 +70,7 @@ const submitWhatYouWantSurvey = async (selectedOptions) => {
     }
     spinner.hideSpinner();
 
-    await sweetAlert.showSuccess("Hold on while we set up a roadmap for you!");
+    await sweetAlert.showSuccess("Vui lòng đợi trong khi chúng tôi thiết lập lộ trình cho bạn!");
     switchChild(true);
 }
 
@@ -84,7 +84,7 @@ onBeforeMount(async () => {
 
     firstEvaluationOptions.value = new SurveyOptions(
         surveys.items.find(item => item.name.includes("First Evaluation")),
-        '✨ Let us know about you more ✨',
+        '✨ Hãy cho chúng tôi biết thêm về bạn ✨',
         () => { switchChild(true) },
         submitFirstEvaluation,
         false,
@@ -92,7 +92,7 @@ onBeforeMount(async () => {
     );
     wellnessSurveyOptions.value = new SurveyOptions(
         surveys.items.find(survey => survey.name.includes("Wellness Assessment")),
-        '✨ Let us know about you more ✨',
+        '✨ Hãy cho chúng tôi biết thêm về bạn ✨',
         () => { switchChild(true) },
         submitWellnessSurvey,
         false,
@@ -100,7 +100,7 @@ onBeforeMount(async () => {
     );
     whatYouWantSurveyOptions.value = new SurveyOptions(
         preferencesSurveys.find(survey => survey.title.includes("What you want us to help you")),
-        "✨ What you want us to help you? ✨",
+        "✨ Bạn muốn chúng tôi giúp gì? ✨",
         null,
         submitWhatYouWantSurvey,
         false,

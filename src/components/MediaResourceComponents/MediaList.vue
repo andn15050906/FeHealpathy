@@ -4,12 +4,12 @@
             <thead class="table-primary text-center">
                 <tr>
                     <th>#</th>
-                    <th>Title</th>
-                    <th>Artist</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
+                    <th>Tiêu đề</th>
+                    <th>Tác giả</th>
+                    <th>Mô tả</th>
+                    <th>Loại</th>
+                    <th>Được đăng tải</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                     </td>
                 </tr>
                 <tr v-if="sortedMediaFiles.length === 0">
-                    <td colspan="7" class="text-center text-muted">No media files available.</td>
+                    <td colspan="7" class="text-center text-muted">Không có phương tiện truyền thông nào</td>
                 </tr>
 
             </tbody>
@@ -58,7 +58,7 @@ export default {
         },
         getTypeLabel(type) {
             const typeMap = {
-                1: "Music",
+                1: "Nhạc",
                 2: "Video"
             };
             return typeMap[type] || "Unknown";

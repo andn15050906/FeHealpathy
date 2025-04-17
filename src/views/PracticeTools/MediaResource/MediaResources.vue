@@ -1,13 +1,13 @@
 <template>
     <div class="container">
       <GlowingCard primaryColor="#4facfe" secondaryColor="#00f2fe" class="left-card">
-        <h2>MUSIC</h2>
-        <p>Immerse yourself in a world of soothing melodies and uplifting tunes to enhance your emotional well-being.</p>
+        <h2>ÂM NHẠC</h2>
+        <p>Đắm mình trong thế giới của những giai điệu nhẹ nhàng và những bản nhạc tích cực để nâng cao sức khỏe tinh thần của bạn.</p>
         <RouterLink :to="'music-library'" class="arrow-btn">→</RouterLink>
       </GlowingCard>
       <GlowingCard primaryColor="#ff4b5c" secondaryColor="#DBD65C" class="right-card">
         <h2>VIDEO</h2>
-        <p>Explore a rich collection of insightful videos designed to inspire, educate, and guide you on your journey to self-discovery.</p>
+        <p>Khám phá bộ sưu tập video phong phú được thiết kế để truyền cảm hứng, giáo dục và hướng dẫn bạn trong hành trình khám phá bản thân.</p>
         <RouterLink :to="'video-library'" class="arrow-btn">→</RouterLink>
       </GlowingCard>
     </div>

@@ -2,14 +2,14 @@
     <div class="row">
         <div class="background-white" style="width: 30%;">
             <v-breadcrumbs :items="breadcrumbs"></v-breadcrumbs>
-            <p class="text-h5 text-bold">Create Group</p>
+            <p class="text-h5 text-bold">Tạo Nhóm Mới</p>
             <div style="display: flex; margin-bottom: 10px;">
-                <v-avatar size="40px">
+                <!-- <v-avatar size="40px">
                     <img :src="userProfile.Avatar">
                 </v-avatar>
                 <div style="margin-left: 20px">
                     <span class="text-subtitle2 text-weight-bold">{{ userProfile.UserName }}</span>
-                </div>
+                </div> -->
             </div>
 
             <v-form @submit="onSubmit" style="height:80%;">
@@ -37,7 +37,7 @@
                         <i class="fa-solid fa-xmark"></i>
                     </v-btn>
                     <v-btn type="submit" :disable="groupInfo.groupName == '' || groupInfo.publicity.id != 1"
-                        color="primary" :loading="isLoadingBtn" style="margin: 10px;">Create Group</v-btn>
+                        color="primary" :loading="isLoadingBtn" style="margin: 10px;">Tạo Nhóm</v-btn>
                 </v-row>
             </v-form>
         </div>
@@ -45,23 +45,23 @@
         <div class="col background-dark-100" style="width: 70%;">
             <v-container class="group-preview">
                 <div class="text-subtitle2">
-                    <span>Preview cover image</span>
-                    <span v-if="isValidInput == false" class="text-red text-bold">Please upload cover image.</span>
+                    <span>Xem trước ảnh bìa</span>
+                    <span v-if="isValidInput == false" class="text-red text-bold">Vui lòng tải lên ảnh bìa.</span>
                 </div>
                 <div class="main-preview q-mt-md">
                     <ImageInput v-model="groupInfo.coverImage" ref="coverImageInput" />
                     <hr>
                     <div style="padding: 20px">
-                        <p v-if="groupInfo.groupName == ''" class="text-bold text-h4 preview-content">Group Name</p>
+                        <p v-if="groupInfo.groupName == ''" class="text-bold text-h4 preview-content">Tên Nhóm</p>
                         <p v-if="groupInfo.groupName != ''" class="text-bold text-h4 preview-content">
                             {{ groupInfo.groupName }}
                         </p>
-                        <span v-if="groupInfo.publicity == ''" class="preview-content">Group privacy</span>
+                        <span v-if="groupInfo.publicity == ''" class="preview-content">Quyền riêng tư nhóm</span>
                         <span v-if="groupInfo.publicity.id == 1" class="preview-content">
-                            <i class="fa-solid fa-user-group"></i>Public group</span>
+                            <i class="fa-solid fa-user-group"></i> Nhóm công khai</span>
                         <span v-if="groupInfo.publicity.id == 2" class="preview-content">
-                            <font-awesome-icon icon="fa-solid fa-lock" />Private group.</span>
-                        <span class="preview-content-1 text-weight-bold">1 member(s)</span>
+                            <font-awesome-icon icon="fa-solid fa-lock" />Nhóm riêng tư</span>
+                        <span class="preview-content-1 text-weight-bold"></span>
                         <hr>
                         <v-btn v-for="buttonText in tabButtons" :key="button" color="grey-lighten-5" style="margin: 5px"
                             outlined flat disabled no-caps>{{ buttonText }}</v-btn>
@@ -81,15 +81,15 @@ import GlobalState from '@/scripts/logic/globalState';
 const publicityOptions = [
     {
         id: 1,
-        label: 'Public',
-        description: 'Everyone can view',
+        label: 'Công khai',
+        description: 'Mọi người đều có thể xem',
         icon: 'public',
         value: true
     },
     {
         id: 2,
-        label: 'Private',
-        description: 'Only members can see',
+        label: 'Riêng tư',
+        description: 'Chỉ thành viên mới có thể xem',
         icon: 'lock',
         value: false
     }
@@ -97,23 +97,23 @@ const publicityOptions = [
 const postModeOptions = [
     {
         id: 1,
-        label: "Free post",
+        label: "Đăng bài tự do",
         value: false
     },
     {
         id: 2,
-        label: "Require approval",
+        label: "Yêu cầu phê duyệt",
         value: true
     }
 ];
 const breadcrumbs = [
     {
-        title: 'Group',
+        title: 'Nhóm',
         disabled: true,
         to: "#"
     },
     {
-        title: 'Create Group',
+        title: 'Tạo Nhóm Mới',
         disabled: true,
         to: "#"
     }
@@ -133,11 +133,11 @@ const coverImageInput = ref(null)
 let isValidInput = ref(null)
 const publicityRef = ref(null)
 const postModeRef = ref(null)
-const tabButtons = ref(["Introducion", "Posts", "Members"])
+const tabButtons = ref(["Giới thiệu", "Bài viết", "Thành viên"])
 const userProfile = ref({})
 const groupNameRules = [
-    val => val && val.length > 0 || "This field must not be empty.",
-    val => val && val.length <= 200 || "Maximum 200 characters."
+    val => val && val.length > 0 || "Trường này không được để trống.",
+    val => val && val.length <= 200 || "Tối đa 200 ký tự."
 ];
 
 onMounted(() => {
@@ -159,11 +159,11 @@ async function onSubmit() {
         );
 
         if (result.isSuccess) {
-            sweetAlert.showSuccess("Created Successfully!");
+            sweetAlert.showSuccess("Tạo nhóm thành công!");
             router.push(`/social/group/${result.responseBody}`);
         } else {
             NotificationHelper.notifyError(
-                result.message ?? "Error"
+                result.message ?? "Đã xảy ra lỗi"
             );
         }
         isLoadingBtn.value = false
