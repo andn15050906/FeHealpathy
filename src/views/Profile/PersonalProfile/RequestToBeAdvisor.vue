@@ -39,7 +39,7 @@
 import { ref, onMounted } from 'vue';
 import { submitAdvisorRequest, getNotifications } from "@/scripts/api/services/notificationService";
 import { toast } from "vue3-toastify";
-import LoadingSpinner from '@/components/common/popup/LoadingSpinner.vue';
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 
 export default {
   components: {
