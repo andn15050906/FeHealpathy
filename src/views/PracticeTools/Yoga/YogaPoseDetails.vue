@@ -2,16 +2,16 @@
     <div class="container pose-details" v-if="pose">
         <div class="mb-3">
             <router-link to="/yoga/poses" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left mr-2"></i>Back to Poses
+                <i class="fas fa-arrow-left mr-2"></i>Quay lại
             </router-link>
         </div>
         <h2 class="text-center mb-2" style="font-weight: bold;">{{ pose.name }}</h2>
-        <p class="text-center mute mb-4">{{ pose.level }}</p>
+        <p class="text-center mute mb-4">Mức độ: {{ translateLevel(pose.level) }}</p>
 
         <div class="text-center mb-4">
             <button class="btn btn-outline-secondary mr-2" :class="{ active: selectedOption === 'model' }"
                 @click="selectOption('model')">
-                <i class="fas fa-cube mr-1"></i> 3D Model
+                <i class="fas fa-cube mr-1"></i> Tương tác 3D
             </button>
             <button class="btn btn-outline-secondary" :class="{ active: selectedOption === 'video' }"
                 @click="selectOption('video')">
@@ -24,11 +24,11 @@
         </div>
         <div class="pose-details-info d-flex flex-column gap-3">
             <div class="card shadow p-4">
-                <h4 class="text-dark fw-bold mb-3">Exercise Description</h4>
+                <h4 class="text-dark fw-bold mb-3">Mô tả bài tập</h4>
                 <p class="text-muted">{{ pose.description }}</p>
             </div>
             <div class="card shadow p-4">
-                <h4 class="text-dark fw-bold mb-3">Equipment Required</h4>
+                <h4 class="text-dark fw-bold mb-3">Dụng cụ cần thiết</h4>
                 <ul class="list-unstyled mb-0">
                     <li class="d-flex align-items-center">
                         <i class="fas fa-check-circle text-success me-2"></i>
@@ -39,7 +39,7 @@
         </div>
 
         <div v-if="recommendedPoses.length" style="margin-top: 40px;">
-            <h3 class="text-center fw-bold mt-4">You May Like</h3>
+            <h3 class="text-center fw-bold mt-4">Có thể bạn sẽ thích</h3>
             <swiper :modules="swiperModules" :slides-per-view="1" :space-between="10" :navigation="true"
                 :pagination="{ clickable: true }" :breakpoints="{
                     576: { slidesPerView: 1 },
@@ -51,7 +51,7 @@
                         <img :src="item.ThumpUrl" class="img-fluid rounded mb-3"
                             style="height: 200px; object-fit: contain;" :alt="item.Name" />
                         <h5 class="fw-bold mb-1">{{ item.Name }}</h5>
-                        <p class="text-muted mb-1">Level: {{ item.Level }}</p>
+                        <p class="text-muted mb-1">Mức độ: {{ translateLevel(item.Level) }}</p>
                     </div>
                 </swiper-slide>
             </swiper>
@@ -59,12 +59,12 @@
 
         <div class="text-center mt-4 disclaimer">
             <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-            <i>Disclaimer: We do not own any of the resources provided on this page.</i>
+            <i>Lưu ý: Chúng tôi không sở hữu bất kỳ tài nguyên nào được cung cấp trên trang này.</i>
         </div>
     </div>
 
     <div v-else class="text-center mt-5">
-        <p>Loading pose details...</p>
+        <p>Đang tải thông tin tư thế...</p>
     </div>
 </template>
 
@@ -91,6 +91,16 @@ export default {
         const selectedOption = ref("model");
         const recommendedPoses = ref([]);
         const swiperModules = [Navigation, Pagination];
+
+        const translateLevel = (level) => {
+            const levelMap = {
+                'Beginner': 'Cơ bản',
+                'Intermediate': 'Trung cấp',
+                'Beginner to Intermediate': 'Cơ bản đến Trung cấp',
+                'Intermediate to Advanced': 'Trung cấp đến Nâng cao'
+            };
+            return levelMap[level] || level;
+        };
 
         const currentEmbedUrl = computed(() => {
             if (!pose.value) return "";
@@ -155,7 +165,8 @@ export default {
             selectOption,
             recommendedPoses,
             swiperModules,
-            navigateToPose
+            navigateToPose,
+            translateLevel
         };
     }
 };

@@ -1,6 +1,6 @@
 <template>
     <div class="edit-media p-4 border rounded shadow-sm bg-white">
-        <h3 class="mb-4 text-primary border-bottom pb-2">Edit Media</h3>
+        <h3 class="mb-4 text-primary border-bottom pb-2">Chỉnh Sửa Tài Nguyên</h3>
 
         <div class="dropzone p-5 text-center border rounded mb-4" :class="{
             'border-primary': isFileActive,
@@ -9,9 +9,9 @@
         }" @dragover.prevent @drop.prevent="handleFileDrop" @click="triggerFileInput">
             <div v-if="!editedMedia.file">
                 <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-secondary"></i>
-                <p class="mb-3">Drag and drop your MP3/MP4 file here or click to select</p>
+                <p class="mb-3">Kéo thả file MP3/MP4 vào đây hoặc nhấp để chọn</p>
                 <button class="btn btn-outline-primary px-4">
-                    Select File
+                    Chọn File
                 </button>
             </div>
 
@@ -20,7 +20,7 @@
                 <p class="h5 mb-1 text-primary">{{ editedMedia.file.name }}</p>
                 <p class="text-muted mb-2">{{ (editedMedia.file.size / (1024 * 1024)).toFixed(2) }} MB</p>
                 <button class="btn btn-sm btn-outline-secondary" @click.stop="editedMedia.file = null">
-                    Change File
+                    Đổi File
                 </button>
             </div>
 
@@ -31,74 +31,78 @@
         </div>
 
         <div class="mb-4">
-            <label for="mediaTitle" class="form-label fw-semibold">Title</label>
+            <label for="mediaTitle" class="form-label fw-semibold">Tiêu đề</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
                     <i class="fas fa-heading"></i>
                 </span>
                 <input v-model="editedMedia.title" type="text" class="form-control"
-                    :class="{ 'is-invalid': validationErrors.title }" id="mediaTitle" placeholder="Enter title"
+                    :class="{ 'is-invalid': validationErrors.title }" id="mediaTitle" placeholder="Nhập tiêu đề"
                     @input="validateTitle" required />
                 <div class="invalid-feedback">
                     {{ validationErrors.title }}
                 </div>
             </div>
-            <small class="text-muted">3-100 characters</small>
+            <small class="text-muted">3-100 ký tự</small>
         </div>
 
         <div class="mb-4">
-            <label for="artistName" class="form-label fw-semibold">Artist Name</label>
+            <label for="artistName" class="form-label fw-semibold">Tên nghệ sĩ</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
                     <i class="fas fa-user"></i>
                 </span>
                 <input v-model="editedMedia.artist" type="text" class="form-control"
-                    :class="{ 'is-invalid': validationErrors.artist }" id="artistName" placeholder="Enter artist name"
+                    :class="{ 'is-invalid': validationErrors.artist }" id="artistName" placeholder="Nhập tên nghệ sĩ"
                     @input="validateArtist" required />
                 <div class="invalid-feedback">
                     {{ validationErrors.artist }}
                 </div>
             </div>
-            <small class="text-muted">2-50 characters</small>
+            <small class="text-muted">2-50 ký tự</small>
         </div>
 
         <div class="mb-4">
-            <label for="description" class="form-label fw-semibold">Description</label>
+            <label for="description" class="form-label fw-semibold">Mô tả</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
                     <i class="fas fa-align-left"></i>
                 </span>
                 <textarea v-model="editedMedia.description" class="form-control"
                     :class="{ 'is-invalid': validationErrors.description }" id="description"
-                    placeholder="Enter description" @input="validateDescription" rows="3" required></textarea>
+                    placeholder="Nhập mô tả" @input="validateDescription" rows="3" required></textarea>
                 <div class="invalid-feedback">
                     {{ validationErrors.description }}
                 </div>
             </div>
-            <small class="text-muted">10-500 characters</small>
+            <small class="text-muted">10-500 ký tự</small>
         </div>
 
         <div class="d-flex justify-content-between mt-4 pt-3 border-top">
             <button class="btn btn-outline-danger px-4" @click="openCancelDialog">
-                <i class="fas fa-times me-2"></i>Cancel
+                <i class="fas fa-times me-2"></i>Hủy
             </button>
             <button @click="openSaveDialog" class="btn btn-success px-4" :disabled="loading || !isValidForm">
                 <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
                 <i v-else class="fas fa-save me-2"></i>
-                {{ loading ? 'Saving...' : 'Save Changes' }}
+                {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
             </button>
         </div>
 
         <div v-if="!isValidForm && Object.values(validationErrors).some(v => v)"
             class="mt-3 p-2 bg-danger-subtle text-danger rounded">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            Please fix the validation errors before saving
+            Vui lòng sửa các lỗi trước khi lưu
         </div>
 
-        <CancelConfirmPopup :message="cancelMessage" :isVisible="showCancelConfirm"
-            @confirmCancel="handleCancelConfirm" @update:isVisible="showCancelConfirm = $event" />
+        <CancelConfirmPopup :message="'Bạn có chắc muốn hủy? Các thay đổi sẽ không được lưu.'" 
+            :isVisible="showCancelConfirm"
+            @confirmCancel="handleCancelConfirm" 
+            @update:isVisible="showCancelConfirm = $event" />
 
-        <SaveConfirmPopUp :message="saveMessage" :isVisible="showSaveConfirm" @confirmSave="handleSaveConfirm"
+        <SaveConfirmPopUp :message="'Bạn có muốn lưu các thay đổi?'" 
+            :isVisible="showSaveConfirm" 
+            @confirmSave="handleSaveConfirm"
             @update:isVisible="showSaveConfirm = $event" />
     </div>
 </template>
@@ -159,15 +163,15 @@ export default {
     methods: {
         validateTitle() {
             if (!this.editedMedia.title) {
-                this.validationErrors.title = 'Title is required';
+                this.validationErrors.title = 'Vui lòng nhập tiêu đề';
                 return false;
             }
             if (this.editedMedia.title.length < 3) {
-                this.validationErrors.title = 'Title must be at least 3 characters';
+                this.validationErrors.title = 'Tiêu đề phải có ít nhất 3 ký tự';
                 return false;
             }
             if (this.editedMedia.title.length > 100) {
-                this.validationErrors.title = 'Title must not exceed 100 characters';
+                this.validationErrors.title = 'Tiêu đề không được vượt quá 100 ký tự';
                 return false;
             }
             this.validationErrors.title = '';
@@ -175,15 +179,15 @@ export default {
         },
         validateArtist() {
             if (!this.editedMedia.artist) {
-                this.validationErrors.artist = 'Artist name is required';
+                this.validationErrors.artist = 'Vui lòng nhập tên nghệ sĩ';
                 return false;
             }
             if (this.editedMedia.artist.length < 2) {
-                this.validationErrors.artist = 'Artist name must be at least 2 characters';
+                this.validationErrors.artist = 'Tên nghệ sĩ phải có ít nhất 2 ký tự';
                 return false;
             }
             if (this.editedMedia.artist.length > 50) {
-                this.validationErrors.artist = 'Artist name must not exceed 50 characters';
+                this.validationErrors.artist = 'Tên nghệ sĩ không được vượt quá 50 ký tự';
                 return false;
             }
             this.validationErrors.artist = '';
@@ -191,15 +195,15 @@ export default {
         },
         validateDescription() {
             if (!this.editedMedia.description) {
-                this.validationErrors.description = 'Description is required';
+                this.validationErrors.description = 'Vui lòng nhập mô tả';
                 return false;
             }
             if (this.editedMedia.description.length < 10) {
-                this.validationErrors.description = 'Description must be at least 10 characters';
+                this.validationErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
                 return false;
             }
             if (this.editedMedia.description.length > 500) {
-                this.validationErrors.description = 'Description must not exceed 500 characters';
+                this.validationErrors.description = 'Mô tả không được vượt quá 500 ký tự';
                 return false;
             }
             this.validationErrors.description = '';
@@ -215,15 +219,15 @@ export default {
             const allowedExtensions = ['.mp3', '.mp4'];
             const fileExtension = file.name.toLowerCase().slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2);
             if (!allowedExtensions.includes(`.${fileExtension}`)) {
-                this.validationErrors.file = 'Only MP3 and MP4 files are allowed';
+                this.validationErrors.file = 'Chỉ chấp nhận file MP3 và MP4';
                 return false;
             }
             if (!allowedTypes.includes(file.type)) {
-                this.validationErrors.file = 'Invalid file type';
+                this.validationErrors.file = 'Định dạng file không hợp lệ';
                 return false;
             }
             if (file.size > maxSize) {
-                this.validationErrors.file = 'File size must not exceed 50MB';
+                this.validationErrors.file = 'Kích thước file không được vượt quá 50MB';
                 return false;
             }
             this.validationErrors.file = '';
