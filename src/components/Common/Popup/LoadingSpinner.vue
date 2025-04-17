@@ -33,13 +33,13 @@ export default {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.1);
     z-index: 9999;
 }
 
 .spinner {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border: 8px solid rgba(0, 0, 0, 0.1);
     border-top: 8px solid #dc3545;
     border-radius: 50%;
