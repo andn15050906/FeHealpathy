@@ -29,9 +29,9 @@ const currentPhaseIndex = ref(1);
 const isFollowBtnGlowing = ref(false);
 const steps = ref([]);
 const text = {
-    FollowStep: "Follow step",
-    NewRoadmap: 'Start a new journey',
-    SetUpFirst: "You have no roadmap, please set up a roadmap first."
+    FollowStep: "Tiếp tục",
+    NewRoadmap: 'Bắt đầu hành trình mới',
+    SetUpFirst: "Bạn chưa có lộ trình, vui lòng thiết lập lộ trình trước."
 }
 
 onBeforeMount(async () => {
@@ -79,7 +79,7 @@ async function fetchPersonalRoadmap() {
     if (steps.value.length > 0) {
         steps.value.push({
             value: `${personalRoadmap.value.phases.length + 1}`,
-            title: 'End of roadmap',
+            title: 'Kết thúc lộ trình',
             reference: getReference()
         })
     }

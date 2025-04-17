@@ -1,6 +1,11 @@
 <template>
   <div id="app" class="container">
-    <Calendar :events="habits" :initialDate="today" @save-event="handleSaveHabit" @delete-event="handleDeleteHabit" />
+    <Calendar 
+      :events="habits" 
+      :initialDate="today" 
+      @save-event="handleSaveHabit" 
+      @delete-event="handleDeleteHabit"
+    />
   </div>
 </template>
 
@@ -9,12 +14,13 @@ import { ref, onMounted } from "vue";
 import { getPagedRoutines, createRoutine, updateRoutine, deleteRoutine } from "../../../scripts/api/services/routinesService";
 import Calendar from "@/components/Common/Misc/Calendar.vue";
 
+// Mapping màu sắc cho các thẻ thói quen
 const tagMapping = {
-  "#2ecc71": 0,
-  "#3498db": 1,
-  "#f1c40f": 2,
-  "#e67e22": 3,
-  "#e74c3c": 4
+  "#2ecc71": 0, // Xanh lá - thói quen tích cực
+  "#3498db": 1, // Xanh dương - thói quen học tập
+  "#f1c40f": 2, // Vàng - thói quen sức khỏe
+  "#e67e22": 3, // Cam - thói quen giải trí
+  "#e74c3c": 4  // Đỏ - thói quen cần cải thiện
 };
 
 export default {
@@ -25,25 +31,29 @@ export default {
     const today = new Date();
 
     const loadRoutines = async () => {
-      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      const response = await getPagedRoutines({
-        From: firstDay.toISOString(),
-        To: lastDay.toISOString()
-      });
-      habits.value = response.items.map(item => ({
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        objective: item.objective,
-        repeaterSequenceId: item.repeaterSequenceId || null,
-        date: new Date(item.startDate).toISOString().split("T")[0],
-        startTime: new Date(item.startDate).toTimeString().slice(0, 5),
-        endTime: new Date(item.endDate).toTimeString().slice(0, 5),
-        completed: item.isCompleted,
-        closed: item.isClosed,
-        tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
-      }));
+      try {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const response = await getPagedRoutines({
+          From: firstDay.toISOString(),
+          To: lastDay.toISOString()
+        });
+        habits.value = response.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description || "Chưa có mô tả",
+          objective: item.objective || "Chưa có mục tiêu",
+          repeaterSequenceId: item.repeaterSequenceId || null,
+          date: new Date(item.startDate).toISOString().split("T")[0],
+          startTime: new Date(item.startDate).toTimeString().slice(0, 5),
+          endTime: new Date(item.endDate).toTimeString().slice(0, 5),
+          completed: item.isCompleted,
+          closed: item.isClosed,
+          tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
+        }));
+      } catch (error) {
+        console.error("Lỗi khi tải thói quen:", error);
+      }
     };
 
     onMounted(() => { loadRoutines(); });
@@ -52,17 +62,13 @@ export default {
       const dateStr = typeof habit.date === 'string' ? habit.date :
         new Date(habit.date).toISOString().split('T')[0];
 
-      console.log(dateStr);
-      console.log('habit.startTime', habit.startTime);
-      console.log('habit.endTime', habit.endTime);
-
       const startDateTime = new Date(`${dateStr}T${habit.startTime}`);
       const endDateTime = new Date(`${dateStr}T${habit.endTime}`);
 
       const payload = {
         title: habit.title,
-        description: habit.description || "",
-        objective: habit.objective || "",
+        description: habit.description || "Chưa có mô tả",
+        objective: habit.objective || "Chưa có mục tiêu",
         repeater: 0,
         repeaterSequenceId: habit.repeaterSequenceId || null,
         startDate: startDateTime,
@@ -83,16 +89,14 @@ export default {
       try {
         if (habit.isUpdate) {
           const payload = createPayload(habit, true);
-          console.log(payload);
           await updateRoutine(payload);
         } else {
           const payload = createPayload(habit, false);
-          console.log(payload);
           await createRoutine(payload);
         }
         await loadRoutines();
       } catch (error) {
-        console.error("Error saving habit:", error);
+        console.error("Lỗi khi lưu thói quen:", error);
       }
     };
 
@@ -101,7 +105,7 @@ export default {
         await deleteRoutine(habitToDelete.id);
         await loadRoutines();
       } catch (error) {
-        console.error("Error deleting habit:", error);
+        console.error("Lỗi khi xóa thói quen:", error);
       }
     };
 

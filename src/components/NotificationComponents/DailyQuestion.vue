@@ -4,7 +4,7 @@
             <header class="header-section">
                 <button class="back-button" @click="$emit('close')">
                     <i class="fas fa-arrow-left"></i>
-                    <span>Back</span>
+                    <span>Quay lại</span>
                 </button>
                 <div class="date-display">
                     {{ getCurrentDate() }}
@@ -18,19 +18,19 @@
                 </div>
 
                 <div class="answer-section">
-                    <textarea v-model="answer" class="answer-input" placeholder="Share your thoughts..."
+                    <textarea v-model="answer" class="answer-input" placeholder="Chia sẻ suy nghĩ của bạn..."
                         :rows="5"></textarea>
-                    <div class="character-count">{{ answer.length }}/500 characters</div>
+                    <div class="character-count">{{ answer.length }}/500 ký tự</div>
                 </div>
 
                 <div class="action-buttons">
                     <button @click="$emit('close')" class="cancel-button">
                         <i class="fas fa-times"></i>
-                        <span>Cancel</span>
+                        <span>Hủy</span>
                     </button>
                     <button @click="saveAndClose" class="save-button">
                         <i class="fas fa-check"></i>
-                        <span>Answer</span>
+                        <span>Trả lời</span>
                     </button>
                 </div>
             </div>

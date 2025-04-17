@@ -2,40 +2,40 @@
 	<div class="login-page">
 		<div class="overlay">
 			<div class="login-container">
-				<h2>Sign in</h2>
+				<h2>Đăng Nhập</h2>
 				<form @submit.prevent="handleLogin">
 					<p v-if="generalError" class="error">{{ generalError }}</p>
 
 					<div class="input-group">
-						<label for="identifier">Email Address/User Name</label>
-						<input type="text" id="identifier" v-model="identifier" placeholder="Email Address/User Name"
+						<label for="identifier">Email/Tên tài khoản</label>
+						<input type="text" id="identifier" v-model="identifier" placeholder="Nhập email/Tên tài khoản"
 							required />
 					</div>
 					<div class="input-group">
-						<label for="password">Password</label>
-						<input type="password" id="password" v-model="password" placeholder="Password" required />
+						<label for="password">Mật khẩu</label>
+						<input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu" required />
 					</div>
 					<div class="options">
 						<label>
 							<input type="checkbox" v-model="rememberMe" />
-							Remember Me
+							Nhớ mật khẩu
 						</label>
 						<p class="register">
-							<router-link to="/forgot-password">Forgot Password ? </router-link>
+							<router-link to="/forgot-password">Quên mật khẩu ? </router-link>
 						</p>
 					</div>
-					<button type="submit" class="login-button">Log In</button>
+					<button type="submit" class="login-button">Đăng Nhập</button>
 				</form>
 
 				<div class="social-login">
-					<p>Or sign in with</p>
+					<p>Hoặc đăng nhập với</p>
 					<button class="social-button google" @click="handleGoogleOAuthRedirect">
 						<i class="fab fa-google"></i> Google
 					</button>
 				</div>
 
 				<p class="register">
-					Don't have an account? <router-link to="/register">Register here</router-link>
+					Chưa có tài khoản? <router-link to="/register">Đăng ký tại đây</router-link>
 				</p>
 			</div>
 		</div>

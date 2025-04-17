@@ -1,7 +1,7 @@
 <template>
   <div class="container py-4">
     <LoadingSpinner ref="loadingSpinner" />
-    <h1 class="text-center mb-4">Advisor Moderation</h1>
+    <h1 class="text-center mb-4">Quản lý nội dung</h1>
     <ul class="nav nav-tabs mb-4 justify-content-center">
       <li class="nav-item" v-for="tab in tabs" :key="tab.id">
         <button class="nav-link" :class="{ active: currentTab === tab.id }" @click="currentTab = tab.id">
@@ -13,31 +13,31 @@
   <!-- Courses Tab -->
     <div v-if="currentTab === 'courses'" class="tab-pane fade show active">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Your Courses</h2>
+        <h2 class="h4">Khóa học của bạn</h2>
         <router-link to="/courses/create">
-          <button class="btn btn-success">Create A Course</button>
+          <button class="btn btn-success">Tạo khóa học mới</button>
         </router-link>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <select v-model="sortOption" @change="sortCourses" class="form-select w-auto">
-          <option value="name-asc">Name A-Z</option>
-          <option value="name-desc">Name Z-A</option>
-          <option value="price-asc">Price Low-High</option>
-          <option value="price-desc">Price High-Low</option>
+          <option value="name-asc">Tên A-Z</option>
+          <option value="name-desc">Tên Z-A</option>
+          <option value="price-asc">Giá thấp đến cao</option>
+          <option value="price-desc">Giá cao đến thấp</option>
         </select>
-        <input v-model="searchQuery[currentTab]" placeholder="Search..." class="form-control w-auto"
+        <input v-model="searchQuery[currentTab]" placeholder="Tìm kiếm..." class="form-control w-auto"
           style="max-width: 300px;" />
       </div>
       <div class="table-responsive">
         <table class="table table-bordered align-middle">
           <thead class="table-light">
             <tr>
-              <th style="width: 80px;" class="text-center">Thumb</th>
-              <th class="col-title fixed-col">Title</th>
-              <th class="col-level fixed-col text-center">Level</th>
-              <th class="col-price fixed-col text-center">Price</th>
-              <th class="col-status fixed-col text-center">Status</th>
-              <th class="col-actions fixed-col text-center">Actions</th>
+              <th style="width: 80px;" class="text-center">Ảnh</th>
+              <th class="col-title fixed-col">Tiêu đề</th>
+              <th class="col-level fixed-col text-center">Cấp độ</th>
+              <th class="col-price fixed-col text-center">Giá</th>
+              <th class="col-status fixed-col text-center">Trạng thái</th>
+              <th class="col-actions fixed-col text-center">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -71,28 +71,28 @@
     <div v-if="currentTab === 'blogs'" class="tab-pane fade show active">
       <div v-if="!isEditingBlog">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="h4">Your Blogs</h2>
+          <h2 class="h4">Blog của bạn</h2>
           <router-link to="/blogs/create">
-            <button class="btn btn-success">Create A Blog</button>
+            <button class="btn btn-success">Tạo bài viết mới</button>
           </router-link>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-3">
           <select v-model="sortOption" @change="sortBlogs" class="form-select w-auto">
-            <option value="name-asc">Name A-Z</option>
-            <option value="name-desc">Name Z-A</option>
+            <option value="name-asc">Tên A-Z</option>
+            <option value="name-desc">Tên Z-A</option>
           </select>
-          <input v-model="searchQuery[currentTab]" placeholder="Search..." class="form-control w-auto"
+          <input v-model="searchQuery[currentTab]" placeholder="Tìm kiếm..." class="form-control w-auto"
             style="max-width: 300px;" />
         </div>
         <div class="table-responsive">
           <table class="table table-bordered align-middle">
             <thead class="table-light">
               <tr>
-                <th style="width: 80px;" class="text-center">Thumb</th>
-                <th class="col-title fixed-col">Title</th>
-                <th class="col-tags fixed-col">Tags</th>
-                <th class="col-status fixed-col">Status</th>
-                <th class="col-actions fixed-col text-center">Actions</th>
+                <th style="width: 80px;" class="text-center">Ảnh</th>
+                <th class="col-title fixed-col">Tiêu đề</th>
+                <th class="col-tags fixed-col">Thẻ</th>
+                <th class="col-status fixed-col">Trạng thái</th>
+                <th class="col-actions fixed-col text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -132,27 +132,27 @@
     <div v-if="currentTab === 'roadmaps'" class="tab-pane fade show active">
       <div v-if="!isEditingRoadmap">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="h4">Roadmaps</h2>
+          <h2 class="h4">Lộ trình học</h2>
           <router-link to="/roadmaps/create">
-            <button class="btn btn-success">Create A Roadmap</button>
+            <button class="btn btn-success">Tạo lộ trình mới</button>
           </router-link>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-3">
           <select v-model="sortOption" @change="sortRoadmaps" class="form-select w-auto">
-            <option value="name-asc">Name A-Z</option>
-            <option value="name-desc">Name Z-A</option>
+            <option value="name-asc">Tên A-Z</option>
+            <option value="name-desc">Tên Z-A</option>
           </select>
-          <input v-model="searchQuery[currentTab]" placeholder="Search..." class="form-control w-auto"
+          <input v-model="searchQuery[currentTab]" placeholder="Tìm kiếm..." class="form-control w-auto"
             style="max-width: 300px;" />
         </div>
         <div class="table-responsive">
           <table class="table table-bordered align-middle">
             <thead class="table-light">
               <tr>
-                <th class="col-title fixed-col">Title</th>
-                <th class="col-intro fixed-col">Intro</th>
-                <th class="col-phase fixed-col">Phase</th>
-                <th class="col-actions fixed-col text-center">Actions</th>
+                <th class="col-title fixed-col">Tiêu đề</th>
+                <th class="col-intro fixed-col">Giới thiệu</th>
+                <th class="col-phase fixed-col">Giai đoạn</th>
+                <th class="col-actions fixed-col text-center">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -210,9 +210,9 @@ export default {
       searchQuery: { courses: '', blogs: '', roadmaps: '' },
       currentTab: 'courses',
       tabs: [
-        { id: 'courses', name: 'Courses', count: 0 },
-        { id: 'blogs', name: 'Blogs', count: 0 },
-        { id: 'roadmaps', name: 'Roadmaps', count: 0 }
+        { id: 'courses', name: 'Khóa học', count: 0 },
+        { id: 'blogs', name: 'Blog', count: 0 },
+        { id: 'roadmaps', name: 'Lộ trình', count: 0 }
       ],
       courses: [],
       blogs: [],

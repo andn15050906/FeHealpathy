@@ -1,11 +1,11 @@
 <template>
   <div class="notification-settings">
-    <h3 class="section-title">Notification Settings</h3>
-    <p class="section-desc">By default, you will be notified based on your preferences.</p>
+    <h3 class="section-title">Cài đặt thông báo</h3>
+    <p class="section-desc">Mặc định, bạn sẽ nhận thông báo dựa trên tùy chọn của bạn.</p>
     <div class="notification-group" v-for="notification in notifications" :key="notification.key">
       <div class="notification-info">
         <h4>{{ notification.name }}</h4>
-        <p>Control how you receive these notifications</p>
+        <p>Kiểm soát cách bạn nhận những thông báo này</p>
       </div>
       <v-switch v-model="notification.isEnabled" @change="saveNotificationSettings(notification)" color="info" />
     </div>
@@ -20,10 +20,10 @@ interface Notification {
   name: string
 }
 const notifications = ref<Notification[]>([
-  { name: 'New post notifications', isEnabled: true, key: 'newPost' },
-  { name: 'Comment notifications', isEnabled: true, key: 'comment' },
-  { name: 'Message notifications', isEnabled: true, key: 'message' },
-  { name: 'Course update notifications', isEnabled: false, key: 'courseUpdate' }
+  { name: 'Thông báo bài viết mới', isEnabled: true, key: 'newPost' },
+  { name: 'Thông báo bình luận', isEnabled: true, key: 'comment' },
+  { name: 'Thông báo tin nhắn', isEnabled: true, key: 'message' },
+  { name: 'Thông báo cập nhật khóa học', isEnabled: false, key: 'courseUpdate' }
 ])
 const saveNotificationSettings = (notification: Notification) => {
   localStorage.setItem(`notification_${notification.key}`, notification.isEnabled.toString())

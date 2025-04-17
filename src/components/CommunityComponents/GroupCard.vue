@@ -16,7 +16,7 @@
                 <div class="group-name text-truncate">{{ groupInfo.name }}</div>
                 <div class="member-count">
                     <v-icon size="small" color="grey">mdi-account-group</v-icon>
-                    <span class="ml-1">{{ groupInfo.totalMembers }} members</span>
+                    <span class="ml-1">{{ groupInfo.totalMembers }} thành viên</span>
                 </div>
             </div>
         </div>

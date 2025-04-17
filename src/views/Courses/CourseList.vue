@@ -1,17 +1,17 @@
 <template>
   <div class="container mt-2">
-    <h2 class="fw-bold text-center mb-4 text-dark">Course Catalog</h2>
+    <h2 class="fw-bold text-center mb-4 text-dark">Khóa học</h2>
 
     <div class="row justify-content-center mb-4">
       <div class="col-md-8">
-        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Search courses..." />
+        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Tìm khóa học..." />
       </div>
     </div>
 
     <div class="sort-section">
       <select v-model="sortOption" @change="sortCourses" class="form-select sort-select">
-        <option value="name-asc">Name A-Z</option>
-        <option value="name-desc">Name Z-A</option>
+        <option value="name-asc">Tiêu đề A-Z</option>
+        <option value="name-desc">Tiêu đề Z-A</option>
       </select>
     </div>
 

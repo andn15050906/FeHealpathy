@@ -3,21 +3,21 @@
         <div class="mood-div">
             <div class="tracker-container">
                 <section class="emotion-container" role="region" aria-label="Emotional state display">
-                    <p class="emotion-pretext">I'm feeling</p>
-                    <h1 class="emotion-state">{{ selectedMood }}</h1>
+                    <p class="emotion-pretext">Tôi cảm thấy</p>
+                    <h1 class="emotion-state">Lo lắng</h1>
                 </section>
                 <div class="mood-display">
                     <img loading="lazy" :src="moodImage" class="mood-icon" />
                 </div>
                 <div class="mood-selection">
                     <div class="mood-row">
-                        <button @click="selectMood('Happy')" class="mood-button mood-happy">Happy</button>
-                        <button @click="selectMood('Eager')" class="mood-button mood-eager">Eager</button>
+                        <button @click="selectMood('Happy')" class="mood-button mood-happy">Vui vẻ</button>
+                        <button @click="selectMood('Eager')" class="mood-button mood-eager">Háo hức</button>
                     </div>
                     <div class="mood-row">
-                        <button @click="selectMood('Anxiety')" class="mood-button mood-anxiety">Anxiety</button>
-                        <button @click="selectMood('Angry')" class="mood-button mood-angry">Angry</button>
-                        <button @click="selectMood('Sad')" class="mood-button mood-sad">Sad</button>
+                        <button @click="selectMood('Anxiety')" class="mood-button mood-anxiety">Lo lắng</button>
+                        <button @click="selectMood('Angry')" class="mood-button mood-angry">Tức giận</button>
+                        <button @click="selectMood('Sad')" class="mood-button mood-sad">Buồn bã</button>
                     </div>
                 </div>
                 <DiaryButton />

@@ -12,14 +12,14 @@
           <input @change="handleAvatarChange" ref="avatarInput" type="file" hidden accept=".jpg, .jpeg, .png" />
           <div class="profile-info">
             <div class="info-item">
-              <div class="info-label">Name:</div>
+              <div class="info-label">Tên:</div>
               <div class="info-value">{{ form.fullName }}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">User name:</div>
+              <div class="info-label">Tên đăng nhập:</div>
               <div class="info-value username-container">
                 {{ form.userName }}
-                <i class="fas fa-info-circle info-icon" title="Username cannot be changed"></i>
+                <i class="fas fa-info-circle info-icon" title="Không thể thay đổi tên đăng nhập"></i>
               </div>
             </div>
             <div class="info-item">
@@ -27,12 +27,12 @@
               <div class="info-value">{{ form.email }}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Join Date:</div>
-              <div class="info-value" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.creationTime }}</div>
+              <div class="info-label">Ngày tham gia:</div>
+              <div class="info-value" style="cursor: not-allowed;" title="Không thể chỉnh sửa trường này">{{ form.creationTime }}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Courses enrolled:</div>
-              <div class="info-value" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.enrollmentCount }}</div>
+              <div class="info-label">Số khóa học đã đăng ký:</div>
+              <div class="info-value" style="cursor: not-allowed;" title="Không thể chỉnh sửa trường này">{{ form.enrollmentCount }}</div>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
           <form @submit.prevent="handleSubmit" novalidate>
             <div class="form-row">
               <div class="form-group">
-                <label for="fullName">Full Name <span class="required">*</span></label>
+                <label for="fullName">Họ và tên <span class="required">*</span></label>
                 <input 
                   type="text" 
                   id="fullName" 
@@ -53,14 +53,14 @@
                 <span class="error-message" v-if="errors.fullName">{{ errors.fullName }}</span>
               </div>
               <div class="form-group">
-                <label for="userName">User Name</label>
+                <label for="userName">Tên đăng nhập</label>
                 <input type="text" id="userName" v-model="form.userName" maxlength="50" readonly class="form-control" />
-                <span class="info-text">Username cannot be changed</span>
+                <span class="info-text">Không thể thay đổi tên đăng nhập</span>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="email">Email Address</label>
+                <label for="email">Địa chỉ email</label>
                 <input 
                   type="email" 
                   id="email" 
@@ -73,7 +73,7 @@
                 <span class="error-message" v-if="errors.email">{{ errors.email }}</span>
               </div>
               <div class="form-group">
-                <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+                <label for="dateOfBirth">Ngày sinh <span class="required">*</span></label>
                 <input 
                   type="date" 
                   id="dateOfBirth" 
@@ -88,27 +88,27 @@
             </div>
             <div class="form-row">
               <div class="form-group full-width">
-                <label for="bio">About Me <span class="optional">(optional)</span></label>
+                <label for="bio">Giới thiệu về bản thân <span class="optional">(không bắt buộc)</span></label>
                 <textarea 
                   id="bio" 
                   v-model="form.bio" 
                   maxlength="1000" 
                   class="form-control"
-                  placeholder="Tell us about yourself..."
+                  placeholder="Hãy chia sẻ về bản thân..."
                 ></textarea>
                 <span class="char-count">{{ form.bio ? form.bio.length : 0 }}/1000</span>
               </div>
             </div>
             <div class="form-buttons">
-              <button type="submit" class="btn btn-save" :disabled="!isFormValid">SAVE</button>
-              <button type="button" class="btn btn-cancel" @click="openCancelPopup">CANCEL</button>
+              <button type="submit" class="btn btn-save" :disabled="!isFormValid">LƯU</button>
+              <button type="button" class="btn btn-cancel" @click="openCancelPopup">HỦY</button>
             </div>
           </form>
         </div>
       </div>
       <div class="password-change-btn">
         <button class="btn btn-warning white-text">
-          <RouterLink :to="'change-password'">Change Password</RouterLink>
+          <RouterLink :to="'change-password'">Đổi mật khẩu</RouterLink>
         </button>
       </div>
       <div class="premium-upgrade">
@@ -117,14 +117,14 @@
     </div>
     <UpdateConfirmPopup 
       :isVisible="confirmDialogVisible" 
-      message="Are you sure you want to update your profile?"
+      message="Bạn có chắc chắn muốn cập nhật thông tin cá nhân?"
       url="dummyUrl" 
       @confirmUpdate="handleConfirmUpdate" 
       @update:isVisible="confirmDialogVisible = $event" 
     />
     <CancelConfirmPopup 
       :isVisible="cancelDialogVisible" 
-      message="Are you sure to cancel your changes?"
+      message="Bạn có chắc chắn muốn hủy các thay đổi?"
       @confirmCancel="handleConfirmCancel" 
       @update:isVisible="cancelDialogVisible = $event" 
     />
@@ -172,7 +172,7 @@ export default {
     // Validate fullname
     const validateFullName = () => {
       if (!form.value.fullName.trim()) {
-        errors.value.fullName = 'Full name is required';
+        errors.value.fullName = 'Vui lòng nhập họ và tên';
         return false;
       }
       errors.value.fullName = '';
@@ -184,7 +184,7 @@ export default {
       if (!form.value.email) return true; // Email is optional in edit
       const gmailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
       if (!gmailRegex.test(form.value.email)) {
-        errors.value.email = 'Please enter a valid Email address';
+        errors.value.email = 'Vui lòng nhập địa chỉ email hợp lệ';
         return false;
       }
       errors.value.email = '';
@@ -194,7 +194,7 @@ export default {
     // Validate date of birth
     const validateDateOfBirth = () => {
       if (!form.value.dateOfBirth) {
-        errors.value.dateOfBirth = 'Date of birth is required';
+        errors.value.dateOfBirth = 'Vui lòng nhập ngày sinh';
         return false;
       }
       
@@ -209,17 +209,17 @@ export default {
       maxAge.setFullYear(today.getFullYear() - 100);
 
       if (birthDate > today) {
-        errors.value.dateOfBirth = 'Date of birth cannot be in the future';
+        errors.value.dateOfBirth = 'Ngày sinh không thể là ngày trong tương lai';
         return false;
       }
 
       if (birthDate > minAge) {
-        errors.value.dateOfBirth = 'You must be at least 12 years old';
+        errors.value.dateOfBirth = 'Bạn phải từ 12 tuổi trở lên';
         return false;
       }
 
       if (birthDate < maxAge) {
-        errors.value.dateOfBirth = 'Age cannot exceed 100 years';
+        errors.value.dateOfBirth = 'Tuổi không thể vượt quá 100';
         return false;
       }
 
@@ -243,9 +243,9 @@ export default {
     const sweetAlert = inject('sweetAlert');
     const text = dict['en'];
     const roleMapping = {
-      0: 'Member',
-      1: 'Advisor',
-      2: 'Admin'
+      0: 'Thành viên',
+      1: 'Cố vấn',
+      2: 'Quản trị viên'
     };
     const fetchProfile = async () => {
       try {
@@ -260,7 +260,7 @@ export default {
         originalForm.value = { ...form.value };
       } catch (error) {
         console.error(error);
-        await sweetAlert.showError('Failed to retrieve profile');
+        await sweetAlert.showError('Không thể tải thông tin cá nhân');
       } finally {
         loadingSpinner.hideSpinner();
       }
@@ -324,12 +324,12 @@ export default {
         loadingSpinner.hideSpinner();
         await sweetAlert.showAlert({
           icon: 'success',
-          title: 'Profile Updated',
-          text: 'Your profile has been successfully updated!'
+          title: 'Đã cập nhật thông tin',
+          text: 'Thông tin cá nhân của bạn đã được cập nhật thành công!'
         });
       } catch (error) {
         console.error(error);
-        sweetAlert.showError('Error updating profile.');
+        sweetAlert.showError('Có lỗi khi cập nhật thông tin.');
       }
     };
     const handleSubmit = () => {
