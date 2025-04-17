@@ -1,5 +1,3 @@
-<!-- TODO: Update MEDIAS for courses and lectures -->
-
 <template>
   <div class="container">
     <LoadingSpinner ref="loadingSpinner" />
@@ -328,7 +326,7 @@ export default {
             isDeleted: false
           })),
           addedMedias: [],
-          removedMediaIds: [],
+          removedMedias: [],
           isNew: false
         }));
 
@@ -355,7 +353,7 @@ export default {
         isPreviewable: false,
         medias: [],
         addedMedias: [],
-        removedMediaIds: [],
+        removedMedias: [],
         isNew: true
       });
       this.lectureErrors.push({
@@ -376,7 +374,7 @@ export default {
       const media = this.course.lectures[lectureIndex].medias[mediaIndex];
 
       if (media.id) {
-        this.course.lectures[lectureIndex].removedMediaIds.push(media.id);
+        this.course.lectures[lectureIndex].removedMedias.push(media.id);
       }
 
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
@@ -479,9 +477,6 @@ export default {
         for (const lectureId of this.deletedLectureIds) {
           await deleteLecture(lectureId);
         }
-
-        console.log("Deleted lecture IDs:", this.deletedLectureIds);
-
         const existingLectures = this.course.lectures.filter(lecture => !lecture.isNew);
         const newLectures = this.course.lectures.filter(lecture => lecture.isNew);
 
@@ -494,8 +489,8 @@ export default {
           formData.append("ContentSummary", lecture.contentSummary);
           formData.append("IsPreviewable", lecture.isPreviewable);
 
-          lecture.removedMediaIds.forEach((id, index) => {
-            formData.append(`RemovedMediaIds[${index}]`, id);
+          lecture.removedMedias.forEach((id, index) => {
+            formData.append(`RemovedMedias[${index}]`, id);
           });
 
           if (lecture.addedMedias.length > 0) {
