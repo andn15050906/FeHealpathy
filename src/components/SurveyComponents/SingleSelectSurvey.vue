@@ -78,7 +78,7 @@ const props = defineProps({
 });
 
 const text = {
-    result: "Kết Quả Test",
+    result: "Kết Quả Kiểm Tra",
     score: "Điểm của bạn:",
     currentQuestion: "Câu hỏi",
     submit: "Gửi kết quả",
@@ -137,29 +137,45 @@ const setSurveyAndAnswers = (options, choices) => {
     });
     submission.value = answerArr;
 
+    // Sử dụng Set để lưu trữ các band name đã xử lý
+    const processedBandNames = new Set();
     let matchingBands = [];
+
     for (let band of optionsRef.value.survey.bands) {
         if (band.minScore <= score && band.maxScore >= score) {
-            if (['normal', 'mild'].includes(band.bandRating.toLowerCase())) {
-                matchingBands.push({
-                    name: band.bandName,
-                    rating: 'Tốt',
-                    ratingClass: 'good'
-                });
-            }
-            else if (['moderate'].includes(band.bandRating.toLowerCase())) {
-                matchingBands.push({
-                    name: band.bandName,
-                    rating: 'Trung bình',
-                    ratingClass: 'average'
-                });
-            }
-            else if (['severe', 'examplely severe'].includes(band.bandRating.toLowerCase())) {
-                matchingBands.push({
-                    name: band.bandName,
-                    rating: 'Tệ',
-                    ratingClass: 'bad'
-                });
+            const bandNameMapping = {
+                'Depression': 'Trầm cảm',
+                'Stress': 'Căng thẳng',
+                'Anxiety': 'Lo âu',
+            };
+
+            const bandNameInVietnamese = bandNameMapping[band.bandName] || band.bandName;
+
+            // Kiểm tra nếu band name này đã được xử lý
+            if (!processedBandNames.has(bandNameInVietnamese)) {
+                processedBandNames.add(bandNameInVietnamese);
+
+                if (['normal', 'mild'].includes(band.bandRating.toLowerCase())) {
+                    matchingBands.push({
+                        name: bandNameInVietnamese,
+                        rating: 'Tốt',
+                        ratingClass: 'good'
+                    });
+                }
+                else if (['moderate'].includes(band.bandRating.toLowerCase())) {
+                    matchingBands.push({
+                        name: bandNameInVietnamese,
+                        rating: 'Trung bình',
+                        ratingClass: 'average'
+                    });
+                }
+                else if (['severe', 'examplely severe'].includes(band.bandRating.toLowerCase())) {
+                    matchingBands.push({
+                        name: bandNameInVietnamese,
+                        rating: 'Tệ',
+                        ratingClass: 'bad'
+                    });
+                }
             }
         }
     }

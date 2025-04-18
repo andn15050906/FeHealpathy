@@ -147,6 +147,25 @@
         <button class="btn-back" @click="goBack">⬅️ Quay lại khóa học</button>
       </div>
     </div>
+    
+    <DeleteConfirmPopup
+      :isVisible="showDeleteConfirm"
+      v-model:visible="showDeleteConfirm"
+      title="Xác nhận xóa bình luận"
+      message="Bạn có chắc chắn muốn xóa bình luận này không?"
+      @confirm="handleDeleteConfirm"
+      @cancel="handleDeleteCancel"
+    />
+
+    <UpdateConfirmPopup
+      :isVisible="showUpdateConfirm"
+      v-model:visible="showUpdateConfirm"
+      :url="`/api/Comments/${commentToUpdate?.id}`"
+      title="Xác nhận cập nhật"
+      message="Bạn có chắc chắn muốn cập nhật bình luận này không?"
+      @confirm="handleUpdateConfirm"
+      @cancel="handleUpdateCancel"
+    />
   </div>
 </template>
 
@@ -163,11 +182,15 @@ import {
 } from "@/scripts/api/services/commentService";
 import { getUserProfile } from "@/scripts/api/services/authService";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
+import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
+import UpdateConfirmPopup from '@/components/Common/Popup/UpdateConfirmPopup.vue';
 
 export default {
   name: "LectureDetail",
   components: {
-    LoadingSpinner
+    LoadingSpinner,
+    DeleteConfirmPopup,
+    UpdateConfirmPopup
   },
   setup() {
     const router = useRouter();
@@ -280,22 +303,39 @@ export default {
       }
     };
 
+    const showUpdateConfirm = ref(false);
+    const commentToUpdate = ref(null);
+
     const saveCommentEdit = async (commentId) => {
       if (!editCommentContent.value.trim()) return;
       
+      commentToUpdate.value = {
+        id: commentId,
+        content: editCommentContent.value
+      };
+      showUpdateConfirm.value = true;
+    };
+
+    const handleUpdateConfirm = async () => {
+      if (!commentToUpdate.value) return;
+      
       try {
-        await updateLectureComment(commentId, editCommentContent.value);
-        
-        // Làm mới danh sách bình luận
+        await updateLectureComment(commentToUpdate.value.id, commentToUpdate.value.content);
         await fetchComments();
-        
-        // Reset form
         cancelCommentEdit();
         
       } catch (error) {
-        console.error('Lỗi khi sửa bình luận:', error);
-        alert('Không thể sửa bình luận. Vui lòng thử lại sau.');
+        console.error('Lỗi khi cập nhật bình luận:', error);
+        toast.error('Không thể cập nhật bình luận. Vui lòng thử lại sau.');
+      } finally {
+        showUpdateConfirm.value = false;
+        commentToUpdate.value = null;
       }
+    };
+
+    const handleUpdateCancel = () => {
+      showUpdateConfirm.value = false;
+      commentToUpdate.value = null;
     };
 
     const cancelCommentEdit = () => {
@@ -303,37 +343,40 @@ export default {
       editCommentContent.value = '';
     };
 
+    const showDeleteConfirm = ref(false);
+    const commentToDelete = ref(null);
+
     const confirmDeleteComment = (commentId) => {
-      if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
-        deleteCommentById(commentId);
-      }
+      commentToDelete.value = commentId;
+      showDeleteConfirm.value = true;
     };
 
-    const deleteCommentById = async (commentId) => {
+    const handleDeleteConfirm = async () => {
+      if (!commentToDelete.value) return;
+      
       try {
-        await deleteComment(commentId);
-        
-        // Làm mới danh sách bình luận
+        await deleteComment(commentToDelete.value);
         await fetchComments();
-        
       } catch (error) {
-        console.error('Lỗi khi xóa bình luận:', error); // Log lỗi gốc
+        console.error('Lỗi khi xóa bình luận:', error);
         if (error.response) {
-          // Lỗi có response từ server (4xx, 5xx)
           console.error('Server Response Data:', error.response.data);
           console.error('Server Response Status:', error.response.status);
           console.error('Server Response Headers:', error.response.headers);
-          alert(`Không thể xóa bình luận. Lỗi: ${error.response.status} - ${error.response.data?.message || error.response.data || 'Lỗi không xác định từ server'}`);
         } else if (error.request) {
-          // Request đã được gửi nhưng không nhận được response
           console.error('No response received:', error.request);
-          alert('Không thể kết nối đến máy chủ để xóa bình luận.');
         } else {
-          // Lỗi xảy ra khi thiết lập request
           console.error('Error setting up request:', error.message);
-          alert('Đã xảy ra lỗi khi chuẩn bị xóa bình luận.');
         }
+      } finally {
+        showDeleteConfirm.value = false;
+        commentToDelete.value = null;
       }
+    };
+
+    const handleDeleteCancel = () => {
+      showDeleteConfirm.value = false;
+      commentToDelete.value = null;
     };
 
     const fetchLecture = async () => {
@@ -484,7 +527,14 @@ export default {
       confirmDeleteComment,
       pageSize,
       formatCommentDate,
-      editInput
+      editInput,
+      showDeleteConfirm,
+      handleDeleteConfirm,
+      handleDeleteCancel,
+      showUpdateConfirm,
+      handleUpdateConfirm,
+      handleUpdateCancel,
+      commentToUpdate
     };
   }
 };

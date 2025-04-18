@@ -2,10 +2,10 @@
     <div class="community-container pa-6">
         <div class="d-flex justify-space-between align-center mb-6">
             <h2 class="text-h5 font-weight-bold">
-                Your Groups ({{ joinedGroups.length }})
+                Nhóm Của Bạn ({{ joinedGroups.length }})
             </h2>
             <v-btn color="primary" variant="elevated" :to="'/create-group'" prepend-icon="mdi-plus">
-                Create New Group
+                Tạo Nhóm Mới
             </v-btn>
         </div>
 
@@ -16,7 +16,7 @@
         </v-row>
 
         <h2 class="text-h5 font-weight-bold mt-8 mb-6">
-            Recommended Groups
+            Nhóm Được Đề Xuất
         </h2>
 
         <v-row>

@@ -1,18 +1,18 @@
 <template>
   <div class="diary-container">
     <header class="header-section">
-      <h1 class="diary-title">📖 My Diary Entries</h1>
+      <h1 class="diary-title">📖 Nhật Ký Của Tôi</h1>
     </header>
 
     <div class="book">
       <div class="page cover">
-        <h2 class="cover-title">📕 My Diary</h2>
+        <h2 class="cover-title">📕 Nhật Ký Của Tôi</h2>
         <v-calendar v-model="selectedDate" @dayclick="goToNearestEntry" :attributes="calendarAttributes"
           class="custom-calendar" />
         <div class="write-note-container">
           <div class="arrow-animation">➡️</div>
           <router-link to="/diary/diary-writing">
-            <button class="new-entry-button">Write a diary note for today</button>
+            <button class="new-entry-button">Viết nhật ký hôm nay</button>
           </router-link>
         </div>
       </div>
@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return new Date(date).toLocaleDateString("en-US", {
+      return new Date(date).toLocaleDateString("vi-VN", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -78,7 +78,7 @@ export default {
         const data = await getPagedDiaryNotes({ CreatorId: user.id });
         this.entries = data.items || [];
       } catch (error) {
-        Swal.fire("Error", "Failed to fetch diary entries.", "error");
+        Swal.fire("Lỗi", "Không thể tải danh sách nhật ký.", "error");
       }
     },
     nextPage() {
@@ -98,7 +98,7 @@ export default {
       if (index !== -1) {
         this.currentPageIndex = index;
       } else {
-        Swal.fire("Not Found", "No diary entry found for this date.", "info");
+        Swal.fire("Không tìm thấy", "Không có nhật ký nào vào ngày này.", "info");
       }
     },
     async updateDiary() {
@@ -116,12 +116,12 @@ export default {
     },
     async confirmDelete(entryId) {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to recover this diary entry!",
+        title: "Bạn có chắc chắn?",
+        text: "Bạn sẽ không thể khôi phục lại nhật ký này!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
+        confirmButtonText: "Có, xóa nó!",
+        cancelButtonText: "Hủy bỏ",
       });
 
       if (result.isConfirmed) {
@@ -132,9 +132,9 @@ export default {
       try {
         await deleteDiaryNote(entryId);
         this.entries = this.entries.filter((entry) => entry.id !== entryId);
-        Swal.fire("Deleted!", "Your diary entry has been deleted.", "success");
+        Swal.fire("Đã xóa!", "Nhật ký của bạn đã được xóa.", "success");
       } catch (error) {
-        Swal.fire("Error", "Failed to delete diary entry.", "error");
+        Swal.fire("Lỗi", "Không thể xóa nhật ký.", "error");
       }
     },
   },

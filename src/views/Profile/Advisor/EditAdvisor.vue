@@ -7,43 +7,43 @@
           <form @submit.prevent="handleSubmit">
             <div class="form-row">
               <div class="form-group">
-                <label for="creationTime">Join Date</label>
-                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.creationTime }}</span>
+                <label for="creationTime">Ngày tham gia</label>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.creationTime }}</span>
               </div>
               <div class="form-group">
-                <label for="balance">Balance</label>
-                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.balance }}</span>
+                <label for="balance">Số dư</label>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.balance }}</span>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="courseCount">Course Count</label>
-                <span class="form-control readonly-field" style="cursor: not-allowed;" title="This field cannot be edited">{{ form.courseCount }}</span>
+                <label for="courseCount">Số khóa học</label>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.courseCount }}</span>
               </div>
               <div class="form-group">
-                <label for="experience">Experience</label>
+                <label for="experience">Kinh nghiệm</label>
                 <input type="text" id="experience" v-model="form.experience" class="form-control" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group full-width">
-                <label for="intro">Introduction</label>
+                <label for="intro">Giới thiệu</label>
                 <textarea id="intro" v-model="form.intro" maxlength="1000" class="form-control"></textarea>
               </div>
             </div>
             <div class="form-buttons">
-              <button type="submit" class="btn btn-save">SAVE</button>
+              <button type="submit" class="btn btn-save">LƯU</button>
               <button type="button" class="btn btn-cancel" @click="openCancelPopup">
-                CANCEL
+                HỦY
               </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-    <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Are you sure you want to update your advisor profile?"
+    <UpdateConfirmPopup :isVisible="confirmDialogVisible" message="Bạn có chắc chắn muốn cập nhật thông tin cố vấn của mình?"
       url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
-    <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Are you sure to cancel your changes?"
+    <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Bạn có chắc chắn muốn hủy các thay đổi?"
       @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
   </div>
   <div>
@@ -70,16 +70,6 @@
             <button @click="joinMeeting(meeting.id)" class="btn btn-success">
               Tham gia cuộc gọi
             </button>
-            <!--<button v-if="meeting.status === 'pending'" 
-                    @click="cancelMeeting(meeting.id)" 
-                    class="btn btn-danger">
-              Hủy lịch
-            </button>
-            <button v-if="meeting.status === 'confirmed'" 
-                    @click="joinMeeting(meeting.id)" 
-                    class="btn btn-success">
-              Tham gia
-            </button>-->
           </div>
         </div>
       </div>
@@ -137,7 +127,7 @@ export default {
         originalForm.value = { ...form.value };
       } catch (error) {
         console.error(error);
-        await sweetAlert.showError('Failed to retrieve advisor profile');
+        await sweetAlert.showError('Không thể tải thông tin cố vấn');
       } finally {
         loadingSpinner?.hideSpinner();
       }
@@ -158,44 +148,44 @@ export default {
           loadingSpinner.hideSpinner();
           await sweetAlert.showAlert({
             icon: 'success',
-            title: 'Profile Updated',
-            text: 'Your advisor profile has been successfully updated!'
+            title: 'Cập nhật thành công',
+            text: 'Thông tin cố vấn của bạn đã được cập nhật thành công!'
           });
         } else {
-          throw new Error(response?.message || 'Update failed.');
+          throw new Error(response?.message || 'Cập nhật thất bại.');
         }
       } catch (error) {
-        sweetAlert.showError('Error updating advisor profile.');
+        sweetAlert.showError('Lỗi khi cập nhật thông tin cố vấn.');
       } finally {
         loadingSpinner?.hideSpinner();
       }
     };
 
-const validateExperience = () => {
-  const wordCount = form.value.experience.trim().split(/\s+/).length;
-  console.log('Experience word count:', wordCount);
-  if (wordCount < 5) {
-    sweetAlert.showError('Experience must be at least 5 words.');
-    return false;
-  }
-  return true;
-};
+    const validateExperience = () => {
+      const wordCount = form.value.experience.trim().split(/\s+/).length;
+      console.log('Experience word count:', wordCount);
+      if (wordCount < 5) {
+        sweetAlert.showError('Kinh nghiệm phải có ít nhất 5 từ.');
+        return false;
+      }
+      return true;
+    };
 
-const validateIntroduction = () => {
-  const wordCount = form.value.intro.trim().split(/\s+/).length;
-  console.log('Introduction word count:', wordCount);
-  if (wordCount < 5) {
-    sweetAlert.showError('Introduction must be at least 5 words.');
-    return false;
-  }
-  return true;
-};
+    const validateIntroduction = () => {
+      const wordCount = form.value.intro.trim().split(/\s+/).length;
+      console.log('Introduction word count:', wordCount);
+      if (wordCount < 5) {
+        sweetAlert.showError('Giới thiệu phải có ít nhất 5 từ.');
+        return false;
+      }
+      return true;
+    };
 
-const handleSubmit = () => {
-  if (validateExperience() && validateIntroduction()) {
-    confirmDialogVisible.value = true;
-  }
-};
+    const handleSubmit = () => {
+      if (validateExperience() && validateIntroduction()) {
+        confirmDialogVisible.value = true;
+      }
+    };
 
     const handleConfirmUpdate = (confirm) => {
       if (confirm) {
@@ -238,7 +228,6 @@ const handleSubmit = () => {
 
     const joinMeeting = async (meetingId) => {
       try {
-        //await joinMeetingApi(meetingId);
         router.push(`/call/${meetingId}`);
       } catch (error) {
         console.log(error);

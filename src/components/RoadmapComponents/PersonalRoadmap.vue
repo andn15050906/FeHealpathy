@@ -5,9 +5,9 @@
             {{ introText }}
         </div>
         <div class="highlighted-note">
-            📌 Cognitive Behavioral Therapy (CBT) has been recognized by many professional associations, notably the 
-            <strong>American Psychological Association (APA)</strong>, as one of the most effective psychological therapies. 
-            <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank">Learn more</a>.
+            📌 Liệu pháp Nhận thức Hành vi (CBT) đã được nhiều hiệp hội chuyên môn công nhận, đặc biệt là 
+            <strong>Hiệp hội Tâm lý học Hoa Kỳ (APA)</strong>, là một trong những phương pháp trị liệu tâm lý hiệu quả nhất. 
+            <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank">Tìm hiểu thêm</a>.
         </div>
     </div>
     <Roadmap :timelineItems="roadmap?.timelineItems ?? []" :interactive="true"></Roadmap>
@@ -45,17 +45,17 @@ export default {
     data() {
         return {
             text: {
-                nextScreen: "Next"
+                nextScreen: "Tiếp theo"
             },
             isTourEnabled: false,
             isTourActive: true,
             tourOptions: {
                 highlight: true,
                 labels: {
-                    buttonSkip: "Skip",
-                    buttonPrevious: "Back",
-                    buttonNext: "Next",
-                    buttonStop: "Finish",
+                    buttonSkip: "Bỏ qua",
+                    buttonPrevious: "Quay lại",
+                    buttonNext: "Tiếp theo",
+                    buttonStop: "Hoàn thành"
                 }
             },
             roadmap: roadmaps["mental-roadmap"],
@@ -89,7 +89,7 @@ export default {
                 steps: personalRoadmap.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
                     return {
                         target: `#roadmap-step-${index + 1}`,
-                        header: { title: `Step ${index + 1}: ${_.title}` },
+                        header: { title: `Bước ${index + 1}: ${_.title}` },
                         content: _.description
                     }
                 }) ?? [],

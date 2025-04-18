@@ -104,7 +104,7 @@ watch(sortOption, () => {
 // Fetch all blogs and sort them
 async function fetchAndSortBlogs() {
   try {
-    const response = await getPagedArticles({ pageIndex: 0, pageSize: 1000 }); // Fetch a large number to cover all blogs
+    const response = await getPagedArticles({ pageIndex: 0, pageSize: 120 }); // Fetch a large number to cover all blogs
     blogs.value = response.items || [];
     
     // Sort blogs by title

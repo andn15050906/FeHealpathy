@@ -24,7 +24,7 @@
                     </div>
                     <span class="rating-text ms-2">
                         <span v-if="course.ratingCount > 0">({{ course.ratingCount }})</span>
-                        <span v-else>No rating yet</span>
+                        <span v-else>Chưa có đánh giá</span>
                     </span>
                 </div>
             </div>
@@ -54,9 +54,9 @@ const formatDate = (dateString) => {
 };
 
 const getLevelText = (level) => {
-    if (level === 0) return "Beginner";
-    if (level === 1) return "Intermediate";
-    if (level === 2) return "Advanced";
+    if (level === 0) return "Mới bắt đầu";
+    if (level === 1) return "Trung cấp";
+    if (level === 2) return "Nâng cao";
     return "Unknown";
 };
 

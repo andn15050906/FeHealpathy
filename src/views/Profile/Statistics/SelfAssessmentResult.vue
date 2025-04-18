@@ -6,7 +6,7 @@
     <h1 class="title">📊 Survey Statistics (Self Assessment)</h1>
 
     <div class="section">
-      <h2>📅 Survey History</h2>
+      <h2>📅 Lịch sử khảo sát</h2>
       <table>
         <thead>
           <tr>

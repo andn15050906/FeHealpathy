@@ -2,7 +2,7 @@
   <div class="diary-button-container" @click="navigateToDiary">
     <button class="diary-button" :title="'Writing diary'">
       <i class="fa-solid fa-pen-clip"></i>
-      <span class="diary-text">Writing diary</span>
+      <span class="diary-text">Viết nhật ký</span>
     </button>
   </div>
 </template>

@@ -11,7 +11,7 @@
             <div v-if="!hasImage" class="flex column text-weight-bold" style="z-index: 1;">
                 <v-btn class="upload-button" color="primary">
                     <label for="coverImage" class="flex cursor-hover">
-                        <span style="margin-right: 10px">{{ text["Upload Image"] }}</span>
+                        <span style="margin-right: 10px">{{ text["Tải ảnh lên"] }}</span>
                         <i class="fa-solid fa-image"></i>
                     </label>
                 </v-btn>
@@ -53,7 +53,10 @@ export default {
     },
     data() {
         return {
-            text: dict[GlobalState.getLang()],
+            text: {
+                "Tải ảnh lên": "Tải ảnh lên",
+                // Thêm các text khác nếu cần
+            },
             coverImageInput: null,
             imageFile: null,
             imageSrc: null,
@@ -66,13 +69,13 @@ export default {
     mounted() {
         this.coverImageInput = this.$refs.coverImageInput;
 
-        // Pre-load the image src if it is specified.
+        // Tải trước ảnh nếu có đường dẫn
         if (this.presetImageSrc) {
             this.imageSrc = this.presetImageSrc;
             this.hasImage = true;
         }
 
-        // Emit the verifyInput event contains this instance for later validation callback.
+        // Gửi sự kiện verifyInput chứa instance này để kiểm tra sau
         this.$emit("verifyInput", this);
         if (this.isEditGroupImage)
             this.$refs.coverImageInput.click()
@@ -86,23 +89,21 @@ export default {
                 return;
             }
 
-            // Check if the upload file is image file or not.
+            // Kiểm tra file tải lên có phải là ảnh không
             if (!FileHelper.isImageFile(uploadImageFile)) {
                 this.isInvalid = true;
                 this.invalidMessage = invalidFormatMessage;
-
                 return;
             }
 
-            // Check if the uploaded image file exceed the maximum size or not.
+            // Kiểm tra kích thước file ảnh có vượt quá giới hạn không
             if (FileHelper.isImageFileExceedMaximumSize(uploadImageFile)) {
                 this.isInvalid = true;
                 this.invalidMessage = invalidFileSizeMessage;
-
                 return;
             }
 
-            // Preview the upload image file to the user.
+            // Xem trước ảnh đã tải lên
             this.imageSrc = URL.createObjectURL(uploadImageFile);
             this.imageFile = uploadImageFile;
             this.hasImage = true;
@@ -116,17 +117,15 @@ export default {
             this.coverImageInput.value = null;
         },
         emitImageUpdateEvent() {
-            // Emit the event(update:modelValue) to update the image file.
+            // Gửi sự kiện cập nhật file ảnh
             this.$emit("update:modelValue", this.imageFile);
             this.$emit("hasChange", inputName, true);
 
             this.verifyInput();
         },
         verifyInput() {
-            // If image is empty (false), then has error is true.
+            // Nếu không có ảnh thì báo lỗi
             this.hasError = !this.hasImage;
-
-            // If has error is true, then return false.
             return !this.hasError;
         },
     },
@@ -139,7 +138,6 @@ export default {
                 uploadImageFile = null;
                 return;
             }
-
         }
     },
 };

@@ -12,23 +12,23 @@
                       <form @submit.prevent="handleSubmit">
                       <div class="form-row">
                           <div class="form-group">
-                          <label for="creationTime">Join Date</label>
+                          <label for="creationTime">Ngày tham gia</label>
                           <span class="form-control readonly-field">{{ form.creationTime }}</span>
                           </div>
                       </div>
                       <div class="form-row">
                           <div class="form-group">
-                          <label for="courseCount">Course Count</label>
+                          <label for="courseCount">Số khóa học</label>
                           <span class="form-control readonly-field">{{ form.courseCount }}</span>
                           </div>
                           <div class="form-group">
-                          <label for="experience">Experience</label>
+                          <label for="experience">Kinh nghiệm</label>
                           <input type="text" readonly id="experience" v-model="form.experience" class="form-control" />
                           </div>
                       </div>
                       <div class="form-row">
                           <div class="form-group full-width">
-                          <label for="intro">Introduction</label>
+                          <label for="intro">Giới thiệu</label>
                           <textarea readonly id="intro" v-model="form.intro" maxlength="1000" class="form-control"></textarea>
                           </div>
                       </div>

@@ -7,18 +7,18 @@
                         <div
                             class="text-start v-card--material__heading mb-n6 v-sheet theme--dark elevation-6 success pa-7">
                             <!--If current user => Personal Profile-->
-                            <h4 class="white-text">View Profile</h4>
+                            <h4 class="white-text">Xem hồ sơ</h4>
                         </div>
                     </div>
                     <v-form>
                         <v-container class="py-0">
                             <v-row>
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="Full Name" v-model="UserProfile.UserInfo.FullName"
+                                    <v-text-field label="Họ và tên" v-model="UserProfile.UserInfo.FullName"
                                         maxlength="50" readonly class="purple-input" persistent-placeholder />
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="Email Address" v-model="UserProfile.UserInfo.Email"
+                                    <v-text-field label="Địa chỉ email" v-model="UserProfile.UserInfo.Email"
                                         type="email" maxlength="50" readonly class="purple-input"
                                         persistent-placeholder />
                                 </v-col>
@@ -26,27 +26,27 @@
                             <v-row>
                                 <!--Hidden if not current user-->
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="User Name" v-model="UserProfile.UserInfo.UserName"
+                                    <v-text-field label="Tên đăng nhập" v-model="UserProfile.UserInfo.UserName"
                                         maxlength="50" readonly class="purple-input" persistent-placeholder />
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="Date of Birth" v-model="UserProfile_UserInfo_DateOfBirth"
+                                    <v-text-field label="Ngày sinh" v-model="UserProfile_UserInfo_DateOfBirth"
                                         readonly type="date" class="purple-input" persistent-placeholder />
                                 </v-col></v-row>
                             <v-row>
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="Join Date" v-model="UserProfile_UserInfo_JoinDate" type="date"
+                                    <v-text-field label="Ngày tham gia" v-model="UserProfile_UserInfo_JoinDate" type="date"
                                         readonly class="purple-input" persistent-placeholder />
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <v-text-field label="Enrollment Count"
+                                    <v-text-field label="Số khóa học đã đăng ký"
                                         v-model="UserProfile.UserInfo.EnrollmentCount" type="number" readonly
                                         class="purple-input" value="1231" persistent-placeholder />
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col cols="12">
-                                    <v-textarea label="About Me" v-model="UserProfile.UserInfo.Description" readonly
+                                    <v-textarea label="Giới thiệu về tôi" v-model="UserProfile.UserInfo.Description" readonly
                                         maxlength="1000" class="purple-input" persistent-placeholder />
                                 </v-col>
                             </v-row>

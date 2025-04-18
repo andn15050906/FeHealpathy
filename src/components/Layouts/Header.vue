@@ -5,55 +5,55 @@
       <button class="menu-toggle" @click="toggleMenu">☰</button>
       <div class="menu">
         <ul>
-          <li><router-link class="hovered-link" to="/">Home</router-link></li>
-          <li><router-link class="hovered-link" to="/practice">Practice</router-link></li>
-          <li><router-link class="hovered-link" to="/blogs">Blogs</router-link></li>
-          <li><router-link class="hovered-link" to="/courses">Courses</router-link></li>
-          <li><router-link class="hovered-link" to="/community">Community</router-link></li>
+          <li><router-link class="hovered-link" to="/">Trang Chủ</router-link></li>
+          <li><router-link class="hovered-link" to="/practice">Công Cụ</router-link></li>
+          <li><router-link class="hovered-link" to="/blogs">Bài Viết</router-link></li>
+          <li><router-link class="hovered-link" to="/courses">Khóa Học</router-link></li>
+          <li><router-link class="hovered-link" to="/community">Cộng Đồng</router-link></li>
           <li><router-link class="hovered-link" to="/faq">FAQ</router-link></li>
         </ul>
       </div>
       <div class="user-actions">
         <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
         <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
-          <span>Hi, {{ user.userName }}</span>
+          <span>Chào, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
-            <li><router-link to="/profile">Personal Profile</router-link></li>
-            <li><router-link to="/statistics/self-assessment">Statistics</router-link></li>
-            <li><router-link to="/settings">Settings</router-link></li>
+            <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
+            <li><router-link to="/statistics/self-assessment">Thống Kê</router-link></li>
+            <li><router-link to="/settings">Cài Đặt</router-link></li>
             
             <hr class="menu-divider" />
-            <li><router-link to="/meetings/schedule">Meetings</router-link></li>
-            <li><router-link to="/courses/enrolled">Enrolled courses</router-link></li>
+            <li><router-link to="/meetings/schedule">Họp Với Cố Vấn</router-link></li>
+            <li><router-link to="/courses/enrolled">Các Khóa Học Đã Tham Gia</router-link></li>
 
             <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
-              <router-link to="/request-advisor">Request to be an advisor</router-link>
+              <router-link to="/request-advisor">Xét Duyệt Làm Cố Vấn</router-link>
             </li>
 
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
-              <router-link to="/advisor/edit-profile">Advisor Profile</router-link>
-              <router-link to="/advisor/content">Advisor Content</router-link>
-              <router-link to="/media/manage">Manage Media</router-link>
+              <router-link to="/advisor/edit-profile">Quản Lý Thông Tin Cố Vấn</router-link>
+              <router-link to="/advisor/content">Quản Lý Nội Dung Cố Vấn</router-link>
+              <router-link to="/media/manage">Quản Lý Tài Nguyên</router-link>
             </li>
             
             <li v-if="user.role === 2">
               <hr class="menu-divider" />
-              <router-link to="/admin">Admin</router-link>
-              <router-link to="/advisor/content">Moderate Advisor</router-link>
-              <router-link to="/yogas/manage">Yoga Lessons</router-link>
+              <router-link to="/admin">Quản Trị Viên</router-link>
+              <router-link to="/advisor/content">Quản Lý Nội Dung Cố Vấn</router-link>
+              <router-link to="/yogas/manage">Yoga</router-link>
             </li>
 
             <li>
               <hr class="menu-divider" />
-              <button style="width: 100%;" @click="signOut">Sign Out</button>
+              <button style="width: 100%;" @click="signOut">Đăng Xuất</button>
             </li>
           </ul>
         </div>
         <router-link v-else to="/sign-in">
-          <div class="text-dark login-btn">Login</div>
+          <div class="text-dark login-btn">Đăng Nhập</div>
         </router-link>
       </div>
     </div>

@@ -1,32 +1,32 @@
 <template>
   <div class="change-password-container">
-    <h2 style="font-size: 30px;font-weight: bold;">Change Password</h2>
+    <h2 style="font-size: 30px;font-weight: bold;">Đổi mật khẩu</h2>
     <form @submit.prevent="handleChangePassword">
       <div class="form-group">
-        <label>Current Password</label>
+        <label>Mật khẩu hiện tại</label>
         <div class="password-input">
-          <input :type="showCurrentPassword ? 'text' : 'password'" v-model="currentPassword" required placeholder="Enter current password"/>
+          <input :type="showCurrentPassword ? 'text' : 'password'" v-model="currentPassword" required placeholder="Nhập mật khẩu hiện tại"/>
           <span @click="toggleShowCurrentPassword" class="toggle-icon">{{ showCurrentPassword ? '🙈' : '👁️' }}</span>
         </div>
       </div>
       <div class="form-group">
-        <label>New Password</label>
+        <label>Mật khẩu mới</label>
         <div class="password-input">
-          <input :type="showNewPassword ? 'text' : 'password'" v-model="newPassword" required placeholder="Enter new password"/>
+          <input :type="showNewPassword ? 'text' : 'password'" v-model="newPassword" required placeholder="Nhập mật khẩu mới"/>
           <span @click="toggleShowNewPassword" class="toggle-icon">{{ showNewPassword ? '🙈' : '👁️' }}</span>
         </div>
       </div>
       <div class="form-group">
-        <label>Confirm New Password</label>
+        <label>Xác nhận mật khẩu mới</label>
         <div class="password-input">
-          <input :type="showConfirmPassword ? 'text' : 'password'" v-model="confirmPassword" required placeholder="Confirm new password"/>
+          <input :type="showConfirmPassword ? 'text' : 'password'" v-model="confirmPassword" required placeholder="Xác nhận mật khẩu mới"/>
           <span @click="toggleShowConfirmPassword" class="toggle-icon">{{ showConfirmPassword ? '🙈' : '👁️' }}</span>
         </div>
       </div>
       <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <button type="submit" :disabled="loading" class="submit-btn">
-        {{ loading ? "Updating..." : "Change Password" }}
+        {{ loading ? "Đang cập nhật..." : "Đổi mật khẩu" }}
       </button>
     </form>
   </div>
@@ -61,12 +61,12 @@ export default {
     const validatePassword = (password) => {
       const conditions = [];
 
-        if (!/.{6,}/.test(password)) conditions.push("at least 6 characters");
-        if (!/[A-Z]/.test(password)) conditions.push("at least one uppercase letter");
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) conditions.push("one special character");
+        if (!/.{6,}/.test(password)) conditions.push("ít nhất 6 ký tự");
+        if (!/[A-Z]/.test(password)) conditions.push("ít nhất một chữ in hoa");
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) conditions.push("một ký tự đặc biệt");
 
         return conditions.length > 0 
-          ? `Password must contain ${conditions.join(", ")}.` 
+          ? `Mật khẩu phải chứa ${conditions.join(", ")}.` 
           : "";
       };
 
@@ -76,7 +76,7 @@ export default {
       successMessage.value = "";
 
       if (newPassword.value !== confirmPassword.value) {
-        errorMessage.value = "New password not match";
+        errorMessage.value = "Mật khẩu mới không khớp";
         return;
       }
 
@@ -90,9 +90,9 @@ export default {
 
       try {
         await changePassword(currentPassword.value, newPassword.value);
-        successMessage.value = "Change passwood successful!";
+        successMessage.value = "Đổi mật khẩu thành công!";
       } catch (error) {
-        errorMessage.value = "Current password is wrong";
+        errorMessage.value = "Mật khẩu hiện tại không đúng";
       } finally {
         loading.value = false;
       }

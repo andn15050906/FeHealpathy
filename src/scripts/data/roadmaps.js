@@ -1,33 +1,33 @@
 export const mentalRoadmap = {
-    name: "Mental Roadmap",
+    name: "Lộ Trình Sức Khỏe Tinh Thần",
     tourName: "mental-roadmap-tour",
     introTexts: [
-        "CBT is a gentle therapeutic approach that equips individuals with the tools to understand and manage their thoughts and behaviors at a comfortable pace.",
-        "At Healpathy, we are committed to guiding you through this roadmap, ensuring that you have the support and resources necessary for your mental health journey.",
-        "Embrace the process, and take the first step toward a healthier mindset today! Remember, small steps lead to significant changes."
+        "CBT là phương pháp trị liệu nhẹ nhàng giúp mọi người có được công cụ để hiểu và kiểm soát suy nghĩ, hành vi của mình theo tốc độ thoải mái.",
+        "Tại Healpathy, chúng tôi cam kết hướng dẫn bạn qua lộ trình này, đảm bảo bạn có được sự hỗ trợ và nguồn lực cần thiết cho hành trình sức khỏe tinh thần của mình.",
+        "Hãy đón nhận quá trình này và bắt đầu bước đầu tiên hướng tới tư duy lành mạnh hơn ngay hôm nay! Hãy nhớ rằng, những bước nhỏ sẽ dẫn đến những thay đổi lớn."
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Identify the Problem" }, content: "Gently define your emotions and issues to understand what you are feeling." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Stabilize Your Mind" }, content: "Practice relaxation techniques to reduce stress before entering the change process." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Build Positive Habits" }, content: "Create a foundation for long-term mental health by establishing small, positive routines." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Manage Stress & Emotions" }, content: "Learn to maintain a positive mindset and expand your skills through gentle practices." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Evaluate & Continue Maintenance" }, content: "Check your improvement and continue the process at your own pace." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Nhận Diện Vấn Đề" }, content: "Nhẹ nhàng xác định cảm xúc và vấn đề để hiểu những gì bạn đang cảm nhận." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Ổn Định Tâm Trí" }, content: "Thực hành các kỹ thuật thư giãn để giảm căng thẳng trước khi bắt đầu quá trình thay đổi." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Xây Dựng Thói Quen Tích Cực" }, content: "Tạo nền tảng cho sức khỏe tinh thần lâu dài bằng cách thiết lập các thói quen nhỏ, tích cực." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Quản Lý Stress & Cảm Xúc" }, content: "Học cách duy trì tư duy tích cực và mở rộng kỹ năng thông qua các thực hành nhẹ nhàng." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Đánh Giá & Duy Trì" }, content: "Kiểm tra sự tiến bộ và tiếp tục quá trình theo tốc độ của riêng bạn." }
     ],
     timelineItems: [
         // Prioritize issues to address based on their impact on your life.
         // Gain knowledge about your specific mental health concerns.
         // Discuss how CBT has helped others with similar issues.
-        { color: '#6c757d', icon: 'mdi-account-heart', title: 'Identify the Problem', content: 'Utilize tools to define your emotions and issues clearly. This step is crucial for understanding the root causes of your feelings and behaviors, allowing for effective strategies to be developed.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-account-heart', title: 'Nhận Diện Vấn Đề', content: 'Sử dụng các công cụ để xác định rõ cảm xúc và vấn đề của bạn. Bước này rất quan trọng để hiểu được nguồn gốc của cảm xúc và hành vi, từ đó phát triển các chiến lược hiệu quả.', link: '/practice' },
         //Practice relaxation techniques such as deep breathing and mindfulness.
         //Identify activities that bring joy or a sense of accomplishment.
         //Gradually incorporate these activities into your routine to improve mood.
-        { color: '#6c757d', icon: 'mdi-bullseye', title: 'Stabilize Your Mind', content: 'Learn techniques to reduce stress and prepare for change. This includes mindfulness practices and relaxation techniques that can help you regain control over your thoughts and emotions.', link: '/practice' },
-        { color: '#6c757d', icon: 'mdi-clock-outline', title: 'Build Positive Habits', content: 'Establish routines that support long-term mental health. This step focuses on creating daily habits that promote well-being and resilience, ensuring a healthier lifestyle.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-bullseye', title: 'Ổn Định Tâm Trí', content: 'Học các kỹ thuật giảm căng thẳng và chuẩn bị cho sự thay đổi. Bao gồm các thực hành chánh niệm và kỹ thuật thư giãn có thể giúp bạn lấy lại kiểm soát suy nghĩ và cảm xúc.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-clock-outline', title: 'Xây Dựng Thói Quen Tích Cực', content: 'Thiết lập các thói quen hỗ trợ sức khỏe tinh thần lâu dài. Bước này tập trung vào việc tạo ra các thói quen hàng ngày thúc đẩy sự khỏe mạnh và khả năng phục hồi.', link: '/practice' },
         //Keep a journal to track negative thoughts and their triggers.
         //Challenge and reframe negative thoughts using evidence-based techniques.
         //Replace distorted thoughts with more balanced, realistic ones.
-        { color: '#6c757d', icon: 'mdi-emoticon-happy', title: 'Manage Stress & Emotions', content: 'Develop skills to maintain a positive mindset and emotional balance. This involves learning coping strategies and emotional regulation techniques to handle life’s challenges effectively.', link: '/practice' },
-        { color: '#6c757d', icon: 'mdi-rocket-launch', title: 'Evaluate & Continue Maintenance', content: 'Regularly assess your progress and adjust your strategies as needed. This step emphasizes the importance of reflection and adaptation in your mental health journey.', link: '/practice' }
+        { color: '#6c757d', icon: 'mdi-emoticon-happy', title: 'Quản Lý Stress & Cảm Xúc', content: 'Phát triển kỹ năng duy trì tư duy tích cực và cân bằng cảm xúc. Điều này bao gồm học các chiến lược đối phó và kỹ thuật điều chỉnh cảm xúc để xử lý hiệu quả các thách thức trong cuộc sống.', link: '/practice' },
+        { color: '#6c757d', icon: 'mdi-rocket-launch', title: 'Đánh Giá & Duy Trì', content: 'Thường xuyên đánh giá tiến độ và điều chỉnh chiến lược khi cần thiết. Bước này nhấn mạnh tầm quan trọng của việc phản ánh và thích nghi trong hành trình sức khỏe tinh thần của bạn.', link: '/practice' }
     ]
 };
 
@@ -112,122 +112,122 @@ export const mentalRoadmap = {
     margin-bottom: 24px; 
 } */
 export const strictMentalRoadmap = {
-    name: "Strict Mental Roadmap",
+    name: "Lộ Trình Sức Khỏe Tinh Thần Chuyên Sâu",
     tourName: "strict-mental-roadmap-tour",
     introTexts: [
-        "This roadmap is designed to challenge you and push you towards significant personal growth and self-discovery through disciplined actions.",
-        "At Healpathy, we believe in the power of discipline and commitment to achieve mental wellness and emotional stability.",
-        "Follow each step diligently, and hold yourself accountable for your progress to ensure a transformative experience. Remember, consistency is key to success."
+        "Lộ trình này được thiết kế để thách thức và thúc đẩy bạn hướng tới sự phát triển cá nhân và khám phá bản thân thông qua các hành động có kỷ luật.",
+        "Tại Healpathy, chúng tôi tin vào sức mạnh của kỷ luật và cam kết để đạt được sự ổn định về tinh thần và cảm xúc.",
+        "Hãy thực hiện từng bước một cách cẩn thận và chịu trách nhiệm về tiến độ của bạn để đảm bảo một trải nghiệm chuyển đổi. Hãy nhớ rằng, tính nhất quán là chìa khóa của thành công."
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Self-Discipline" }, content: "Set strict personal goals and stick to them." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Routine Building" }, content: "Develop a morning and night routine for consistency." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Mindful Practices" }, content: "Incorporate mindfulness techniques into your daily life." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Accountability" }, content: "Find a mentor or friend to hold you accountable." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Long-Term Vision" }, content: "Create a roadmap for your personal growth over the next year." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Kỷ Luật Bản Thân" }, content: "Đặt ra các mục tiêu cá nhân nghiêm túc và kiên định thực hiện." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Xây Dựng Thói Quen" }, content: "Phát triển thói quen buổi sáng và buổi tối để duy trì tính nhất quán." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Thực Hành Chánh Niệm" }, content: "Đưa các kỹ thuật chánh niệm vào cuộc sống hàng ngày." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Trách Nhiệm" }, content: "Tìm một người cố vấn hoặc bạn bè để giúp bạn duy trì trách nhiệm." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Tầm Nhìn Dài Hạn" }, content: "Tạo lộ trình cho sự phát triển cá nhân trong năm tới." }
     ],
     timelineItems: [
-        { color: '#F28076', icon: 'mdi-brain', title: 'Self-Discipline', content: 'Identify and write down the specific challenges you face in your daily life. This is the first step towards overcoming them.', link: '/practice' },
-        { color: '#FFB6AF', icon: 'mdi-calendar-check', title: 'Routine Building', content: 'Define measurable and achievable goals to overcome these challenges effectively. Clear goals provide direction.', link: '/practice' },
-        { color: '#FAE0C7', icon: 'mdi-meditation', title: 'Mindful Practices', content: 'Establish a strict daily routine that includes time for self-care and reflection. Consistency is crucial.', link: '/practice' },
-        { color: '#FBC193', icon: 'mdi-account-group', title: 'Accountability', content: 'Keep a daily journal to track your feelings and progress towards your goals. Reflection helps you stay accountable.', link: '/practice' },
-        { color: '#4EB09B', icon: 'mdi-road', title: 'Long-Term Vision', content: 'Share your goals with a trusted friend or therapist to hold yourself accountable. This support is vital for success.', link: '/practice' }
+        { color: '#F28076', icon: 'mdi-brain', title: 'Kỷ Luật Bản Thân', content: 'Xác định và ghi lại những thách thức cụ thể bạn gặp phải trong cuộc sống hàng ngày. Đây là bước đầu tiên để vượt qua chúng.', link: '/practice' },
+        { color: '#FFB6AF', icon: 'mdi-calendar-check', title: 'Xây Dựng Thói Quen', content: 'Xác định các mục tiêu có thể đo lường và đạt được để vượt qua những thách thức này một cách hiệu quả. Mục tiêu rõ ràng sẽ cung cấp định hướng.', link: '/practice' },
+        { color: '#FAE0C7', icon: 'mdi-meditation', title: 'Thực Hành Chánh Niệm', content: 'Thiết lập thói quen hàng ngày nghiêm ngặt bao gồm thời gian cho việc tự chăm sóc bản thân và suy ngẫm. Tính nhất quán là điều quan trọng.', link: '/practice' },
+        { color: '#FBC193', icon: 'mdi-account-group', title: 'Trách Nhiệm', content: 'Duy trì nhật ký hàng ngày để theo dõi cảm xúc và tiến độ hướng tới mục tiêu của bạn. Sự phản ánh giúp bạn duy trì trách nhiệm.', link: '/practice' },
+        { color: '#4EB09B', icon: 'mdi-road', title: 'Tầm Nhìn Dài Hạn', content: 'Chia sẻ mục tiêu của bạn với một người bạn đáng tin cậy hoặc nhà trị liệu để duy trì trách nhiệm. Sự hỗ trợ này rất quan trọng cho thành công.', link: '/practice' }
     ]
 };
 
 export const skillRoadmap = {
-    name: "Skill Roadmap",
+    name: "Lộ Trình Phát Triển Kỹ Năng",
     tourName: "skill-roadmap-tour",
     introTexts: [
-        "This roadmap helps you enhance your skills systematically.",
-        "At Healpathy, we believe learning is a lifelong process.",
-        "Start your journey today and enjoy the learning experience!"
+        "Lộ trình này giúp bạn nâng cao kỹ năng một cách có hệ thống.",
+        "Tại Healpathy, chúng tôi tin rằng học tập là một quá trình suốt đời.",
+        "Hãy bắt đầu hành trình của bạn ngay hôm nay và tận hưởng trải nghiệm học tập!"
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Identify Strengths" }, content: "Understand what you're good at and build on it." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Set Learning Goals" }, content: "Define clear skill-building goals." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Daily Practice" }, content: "Dedicate at least 30 minutes daily to practice." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Apply Knowledge" }, content: "Use your new skills in real projects." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Continuous Improvement" }, content: "Seek feedback and refine your skills." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Xác Định Điểm Mạnh" }, content: "Hiểu những gì bạn giỏi và phát triển từ đó." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Đặt Mục Tiêu Học Tập" }, content: "Xác định rõ mục tiêu phát triển kỹ năng." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Thực Hành Hàng Ngày" }, content: "Dành ít nhất 30 phút mỗi ngày để thực hành." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Áp Dụng Kiến Thức" }, content: "Sử dụng kỹ năng mới trong các dự án thực tế." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Cải Thiện Liên Tục" }, content: "Tìm kiếm phản hồi và hoàn thiện kỹ năng." }
     ],
     timelineItems: [
-        { color: '#FF6384', icon: 'mdi-star', title: 'Identify Strengths', content: 'This roadmap is designed to help you develop essential skills at a comfortable pace.', link: '/practice' },
-        { color: '#FF9F40', icon: 'mdi-target', title: 'Set Learning Goals', content: 'At Healpathy, we believe that learning should be enjoyable and gradual. Embrace the process and take your time to master each skill.', link: '/practice' },
-        { color: '#FFCD56', icon: 'mdi-clock', title: 'Daily Practice', content: 'Dedicate at least 30 minutes daily to practice.', link: '/practice' },
-        { color: '#4BC0C0', icon: 'mdi-lightbulb-on', title: 'Apply Knowledge', content: 'Use your new skills in real projects.', link: '/practice' },
-        { color: '#36A2EB', icon: 'mdi-refresh', title: 'Continuous Improvement', content: 'Seek feedback and refine your skills.', link: '/practice' }
+        { color: '#FF6384', icon: 'mdi-star', title: 'Xác Định Điểm Mạnh', content: 'Lộ trình này được thiết kế để giúp bạn phát triển các kỹ năng thiết yếu với tốc độ thoải mái.', link: '/practice' },
+        { color: '#FF9F40', icon: 'mdi-target', title: 'Đặt Mục Tiêu Học Tập', content: 'Tại Healpathy, chúng tôi tin rằng việc học tập nên thú vị và từ từ. Hãy đón nhận quá trình và dành thời gian để thành thạo từng kỹ năng.', link: '/practice' },
+        { color: '#FFCD56', icon: 'mdi-clock', title: 'Thực Hành Hàng Ngày', content: 'Dành ít nhất 30 phút mỗi ngày để thực hành.', link: '/practice' },
+        { color: '#4BC0C0', icon: 'mdi-lightbulb-on', title: 'Áp Dụng Kiến Thức', content: 'Sử dụng kỹ năng mới trong các dự án thực tế.', link: '/practice' },
+        { color: '#36A2EB', icon: 'mdi-refresh', title: 'Cải Thiện Liên Tục', content: 'Tìm kiếm phản hồi và hoàn thiện kỹ năng.', link: '/practice' }
     ]
 };
 
 export const strictSkillRoadmap = {
-    name: "Strict Skill Roadmap",
+    name: "Lộ Trình Phát Triển Kỹ Năng Chuyên Sâu",
     tourName: "strict-skill-roadmap-tour",
     introTexts: [
-        "This roadmap is designed to challenge you and push you towards mastering essential skills with discipline.",
-        "At Healpathy, we believe in the importance of commitment and consistency in achieving your skill development goals.",
-        "Follow each step diligently, and hold yourself accountable for your progress to ensure a transformative experience."
+        "Lộ trình này được thiết kế để thách thức và thúc đẩy bạn hướng tới việc thành thạo các kỹ năng thiết yếu với kỷ luật.",
+        "Tại Healpathy, chúng tôi tin vào tầm quan trọng của cam kết và tính nhất quán trong việc đạt được mục tiêu phát triển kỹ năng của bạn.",
+        "Hãy thực hiện từng bước một cách cẩn thận và chịu trách nhiệm về tiến độ của bạn để đảm bảo một trải nghiệm chuyển đổi."
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Skill Foundation" }, content: "Master the basics before moving forward." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Advanced Learning" }, content: "Dive deep into complex concepts and theories." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Project Development" }, content: "Create projects to apply what you've learned." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Expert Feedback" }, content: "Seek guidance from industry professionals." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Mastery & Teaching" }, content: "Teach others to solidify your knowledge." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Nền Tảng Kỹ Năng" }, content: "Thành thạo các kiến thức cơ bản trước khi tiến lên." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Học Tập Nâng Cao" }, content: "Đi sâu vào các khái niệm và lý thuyết phức tạp." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Phát Triển Dự Án" }, content: "Tạo các dự án để áp dụng những gì đã học." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Phản Hồi Chuyên Gia" }, content: "Tìm kiếm hướng dẫn từ các chuyên gia trong ngành." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Thành Thạo & Giảng Dạy" }, content: "Dạy người khác để củng cố kiến thức của bạn." }
     ],
     timelineItems: [
-        { color: '#E57373', icon: 'mdi-book-open', title: 'Skill Foundation', content: 'Clearly define the skills you want to master and set specific, measurable goals.', link: '/practice' },
-        { color: '#FF8A65', icon: 'mdi-school', title: 'Advanced Learning', content: 'Develop a structured plan that outlines the steps you need to take to achieve your goals.', link: '/practice' },
-        { color: '#FFD54F', icon: 'mdi-laptop', title: 'Project Development', content: 'Dedicate time each day to practice and refine your skills.', link: '/practice' },
-        { color: '#81C784', icon: 'mdi-account-check', title: 'Expert Feedback', content: 'Find a mentor or expert who can provide guidance and feedback on your progress.', link: '/practice' },
-        { color: '#64B5F6', icon: 'mdi-teach', title: 'Mastery & Teaching', content: 'Regularly evaluate your progress and adjust your plan as needed to stay on track.', link: '/practice' }
+        { color: '#E57373', icon: 'mdi-book-open', title: 'Nền Tảng Kỹ Năng', content: 'Xác định rõ các kỹ năng bạn muốn thành thạo và đặt ra các mục tiêu cụ thể, có thể đo lường được.', link: '/practice' },
+        { color: '#FF8A65', icon: 'mdi-school', title: 'Học Tập Nâng Cao', content: 'Phát triển kế hoạch có cấu trúc phác thảo các bước bạn cần thực hiện để đạt được mục tiêu.', link: '/practice' },
+        { color: '#FFD54F', icon: 'mdi-laptop', title: 'Phát Triển Dự Án', content: 'Dành thời gian mỗi ngày để thực hành và hoàn thiện kỹ năng của bạn.', link: '/practice' },
+        { color: '#81C784', icon: 'mdi-account-check', title: 'Phản Hồi Chuyên Gia', content: 'Tìm một người cố vấn hoặc chuyên gia có thể cung cấp hướng dẫn và phản hồi về tiến độ của bạn.', link: '/practice' },
+        { color: '#64B5F6', icon: 'mdi-teach', title: 'Thành Thạo & Giảng Dạy', content: 'Thường xuyên đánh giá tiến độ và điều chỉnh kế hoạch khi cần thiết để duy trì đúng hướng.', link: '/practice' }
     ]
 };
 
 export const physicalRoadmap = {
-    name: "Physical Roadmap",
+    name: "Lộ Trình Sức Khỏe Thể Chất",
     tourName: "physical-roadmap-tour",
     introTexts: [
-        "This roadmap is designed to guide you towards a healthier lifestyle through gentle physical activities. We believe that small, consistent changes can lead to significant improvements in your overall well-being.",
-        "At Healpathy, we emphasize the importance of balance and gradual progress in your physical health journey. Remember, every step counts, and it's essential to listen to your body as you embark on this journey.",
-        "Embrace the journey, and take the first step towards a healthier body today! Your commitment to these activities will pave the way for a more vibrant and energetic life."
+        "Lộ trình này được thiết kế để hướng dẫn bạn đến một lối sống khỏe mạnh hơn thông qua các hoạt động thể chất nhẹ nhàng. Chúng tôi tin rằng những thay đổi nhỏ, nhất quán có thể dẫn đến những cải thiện đáng kể trong sức khỏe tổng thể của bạn.",
+        "Tại Healpathy, chúng tôi nhấn mạnh tầm quan trọng của sự cân bằng và tiến bộ từ từ trong hành trình sức khỏe thể chất của bạn. Hãy nhớ rằng, mỗi bước đều quan trọng, và việc lắng nghe cơ thể khi bạn bắt đầu hành trình này là điều cần thiết.",
+        "Hãy đón nhận hành trình và bắt đầu bước đầu tiên hướng tới một cơ thể khỏe mạnh hơn ngay hôm nay! Cam kết của bạn với các hoạt động này sẽ mở đường cho một cuộc sống năng động và tràn đầy năng lượng hơn."
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Daily Movement" }, content: "Incorporate at least 30 minutes of exercise daily." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Healthy Eating" }, content: "Follow a balanced diet with proper nutrition." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Hydration & Sleep" }, content: "Stay hydrated and get enough rest." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Strength & Endurance" }, content: "Focus on building muscle strength and stamina." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Long-Term Wellness" }, content: "Maintain consistency and track your progress." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Vận Động Hàng Ngày" }, content: "Tích hợp ít nhất 30 phút tập thể dục mỗi ngày." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Ăn Uống Lành Mạnh" }, content: "Theo dõi chế độ ăn uống cân bằng với dinh dưỡng phù hợp." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Nước & Giấc Ngủ" }, content: "Duy trì đủ nước và nghỉ ngơi đầy đủ." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Sức Mạnh & Sức Bền" }, content: "Tập trung vào việc xây dựng sức mạnh cơ bắp và sức bền." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Sức Khỏe Dài Hạn" }, content: "Duy trì tính nhất quán và theo dõi tiến độ." }
     ],
     timelineItems: [
-        { color: '#FF5252', icon: 'mdi-run', title: 'Daily Movement', content: 'Exercise for at least 30 minutes a day.', link: '/practice' },
-        { color: '#FFB74D', icon: 'mdi-food-apple', title: 'Healthy Eating', content: 'Follow a nutritious diet for better health.', link: '/practice' },
-        { color: '#4DB6AC', icon: 'mdi-water', title: 'Hydration & Sleep', content: 'Stay hydrated and rest well.', link: '/practice' },
-        { color: '#7986CB', icon: 'mdi-weight-lifter', title: 'Strength & Endurance', content: 'Build muscle and improve stamina.', link: '/practice' },
-        { color: '#64B5F6', icon: 'mdi-heart', title: 'Long-Term Wellness', content: 'Maintain consistency for lifelong health.', link: '/practice' }
+        { color: '#FF5252', icon: 'mdi-run', title: 'Vận Động Hàng Ngày', content: 'Tập thể dục ít nhất 30 phút mỗi ngày.', link: '/practice' },
+        { color: '#FFB74D', icon: 'mdi-food-apple', title: 'Ăn Uống Lành Mạnh', content: 'Theo dõi chế độ ăn uống dinh dưỡng để có sức khỏe tốt hơn.', link: '/practice' },
+        { color: '#4DB6AC', icon: 'mdi-water', title: 'Nước & Giấc Ngủ', content: 'Duy trì đủ nước và nghỉ ngơi tốt.', link: '/practice' },
+        { color: '#7986CB', icon: 'mdi-weight-lifter', title: 'Sức Mạnh & Sức Bền', content: 'Xây dựng cơ bắp và cải thiện sức bền.', link: '/practice' },
+        { color: '#64B5F6', icon: 'mdi-heart', title: 'Sức Khỏe Dài Hạn', content: 'Duy trì tính nhất quán cho sức khỏe suốt đời.', link: '/practice' }
     ]
 };
 
 export const strictPhysicalRoadmap = {
-    name: "Strict Physical Roadmap",
+    name: "Lộ Trình Sức Khỏe Thể Chất Chuyên Sâu",
     tourName: "strict-physical-roadmap-tour",
     introTexts: [
-        "This roadmap is designed to challenge you and push you towards significant physical improvement and discipline.",
-        "At Healpathy, we believe in the importance of commitment and consistency in achieving your physical health goals.",
-        "Follow each step diligently, and hold yourself accountable for your progress to ensure a transformative experience."
+        "Lộ trình này được thiết kế để thách thức và thúc đẩy bạn hướng tới sự cải thiện thể chất đáng kể và kỷ luật.",
+        "Tại Healpathy, chúng tôi tin vào tầm quan trọng của cam kết và tính nhất quán trong việc đạt được mục tiêu sức khỏe thể chất của bạn.",
+        "Hãy thực hiện từng bước một cách cẩn thận và chịu trách nhiệm về tiến độ của bạn để đảm bảo một trải nghiệm chuyển đổi."
     ],
     steps: [
-        { target: "#roadmap-step-1", header: { title: "Step 1: Intense Training" }, content: "Follow a structured training program." },
-        { target: "#roadmap-step-2", header: { title: "Step 2: Optimized Nutrition" }, content: "Track macros and optimize diet for performance." },
-        { target: "#roadmap-step-3", header: { title: "Step 3: Recovery & Regeneration" }, content: "Prioritize muscle recovery and injury prevention." },
-        { target: "#roadmap-step-4", header: { title: "Step 4: Mental Toughness" }, content: "Train your mind along with your body." },
-        { target: "#roadmap-step-5", header: { title: "Step 5: Peak Performance" }, content: "Aim for continuous improvement and peak health." }
+        { target: "#roadmap-step-1", header: { title: "Bước 1: Tập Luyện Chuyên Sâu" }, content: "Theo một chương trình tập luyện có cấu trúc." },
+        { target: "#roadmap-step-2", header: { title: "Bước 2: Dinh Dưỡng Tối Ưu" }, content: "Theo dõi macros và tối ưu hóa chế độ ăn uống cho hiệu suất." },
+        { target: "#roadmap-step-3", header: { title: "Bước 3: Phục Hồi & Tái Tạo" }, content: "Ưu tiên phục hồi cơ bắp và phòng ngừa chấn thương." },
+        { target: "#roadmap-step-4", header: { title: "Bước 4: Sức Mạnh Tinh Thần" }, content: "Rèn luyện tâm trí cùng với cơ thể." },
+        { target: "#roadmap-step-5", header: { title: "Bước 5: Hiệu Suất Đỉnh Cao" }, content: "Hướng tới cải thiện liên tục và sức khỏe đỉnh cao." }
     ],
     timelineItems: [
-        { color: '#D32F2F', icon: 'mdi-dumbbell', title: 'Intense Training', content: 'Incorporate rigorous stretching into your daily routine to enhance flexibility and prevent injuries.', link: '/practice' },
-        { color: '#FFA000', icon: 'mdi-food', title: 'Optimized Nutrition', content: 'Commit to at least 30 minutes of cardio each day to boost your endurance and overall fitness.', link: '/practice' },
-        { color: '#388E3C', icon: 'mdi-bed', title: 'Recovery & Regeneration', content: 'Engage in strength training exercises at least three times a week to build muscle and improve strength.', link: '/practice' },
-        { color: '#1976D2', icon: 'mdi-brain', title: 'Mental Toughness', content: 'Maintain hydration by drinking sufficient water throughout the day. Proper hydration is crucial for performance.', link: '/practice' },
-        { color: '#512DA8', icon: 'mdi-trophy', title: 'Peak Performance', content: 'Regularly assess your physical activities and make necessary adjustments to stay on track.', link: '/practice' }
+        { color: '#D32F2F', icon: 'mdi-dumbbell', title: 'Tập Luyện Chuyên Sâu', content: 'Tích hợp các bài tập kéo giãn nghiêm ngặt vào thói quen hàng ngày để tăng tính linh hoạt và phòng ngừa chấn thương.', link: '/practice' },
+        { color: '#FFA000', icon: 'mdi-food', title: 'Dinh Dưỡng Tối Ưu', content: 'Cam kết tập cardio ít nhất 30 phút mỗi ngày để tăng cường sức bền và thể lực tổng thể.', link: '/practice' },
+        { color: '#388E3C', icon: 'mdi-bed', title: 'Phục Hồi & Tái Tạo', content: 'Tham gia tập luyện sức mạnh ít nhất ba lần một tuần để xây dựng cơ bắp và cải thiện sức mạnh.', link: '/practice' },
+        { color: '#1976D2', icon: 'mdi-brain', title: 'Sức Mạnh Tinh Thần', content: 'Duy trì đủ nước bằng cách uống đủ nước trong ngày. Việc cung cấp đủ nước rất quan trọng cho hiệu suất.', link: '/practice' },
+        { color: '#512DA8', icon: 'mdi-trophy', title: 'Hiệu Suất Đỉnh Cao', content: 'Thường xuyên đánh giá các hoạt động thể chất và thực hiện các điều chỉnh cần thiết để duy trì đúng hướng.', link: '/practice' }
     ]
 };
 

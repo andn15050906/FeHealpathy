@@ -4,16 +4,16 @@
         <v-card>
             <v-card-title class="d-flex align-center title-section">
                 <i class="fas fa-exclamation-circle text-danger mr-2"></i>
-                <span class="title">Confirm Delete</span>
+                <span class="title">Xác nhận xóa</span>
             </v-card-title>
             <v-card-text class="d-flex align-center text-section">
                 <span>{{ message }}</span>
             </v-card-text>
 
             <v-card-actions class="justify-end action-section">
-                <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Cancel</v-btn>
+                <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Hủy</v-btn>
                 <v-btn color="red darken-1" class="delete-btn" @click="handleClick(true)">
-                    <span class="delete-text">Delete</span>
+                    <span class="delete-text">Xóa</span>
                 </v-btn>
             </v-card-actions>
         </v-card>

@@ -5,10 +5,10 @@
       <button class="back-button" @click="handleBack">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/d9b58e3b5db27ef7508f6ec31fd50ca2a91cd5f71d18910c95741bcb028f9bba"
-          alt="Back arrow"
+          alt="Quay lại"
           class="back-icon"
         />
-        <span>Back</span>
+        <span>Quay lại</span>
       </button>
     </header>
 
@@ -16,22 +16,22 @@
       type="text"
       class="memory-title-input"
       v-model="memoryTitle"
-      aria-label="Memory title"
-      placeholder="My Memory #1"
+      aria-label="Tiêu đề nhật ký"
+      placeholder="Nhật ký của tôi #1"
     />
 
     <input
       type="date"
       class="memory-date-input"
       v-model="memoryDate"
-      aria-label="Memory date"
+      aria-label="Ngày viết"
     />
 
     <div class="content-section">
       <div class="content-header">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c"
-          alt="Upload image"
+          alt="Tải ảnh lên"
           class="upload-icon"
           tabindex="0"
           @click="triggerFileInput"
@@ -47,9 +47,9 @@
       </div>
       <textarea
         class="memory-content"
-        placeholder="Type anything.."
+        placeholder="Viết bất cứ điều gì..."
         v-model="memoryContent"
-        aria-label="Memory content"
+        aria-label="Nội dung nhật ký"
       ></textarea>
 
       <div class="preview-section">
@@ -58,7 +58,7 @@
           :key="index"
           class="preview-item"
         >
-          <img :src="file.preview" alt="Preview" class="preview-image" />
+          <img :src="file.preview" alt="Xem trước" class="preview-image" />
           <button
             type="button"
             @click="removeFile(file.id)"
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <button type="submit" class="save-button">Save</button>
+    <button type="submit" class="save-button">Lưu lại</button>
   </form>
 </template>
 
@@ -134,7 +134,7 @@ export default {
           sweetAlert.showError("Diary not found.");
         }
       } catch (error) {
-        sweetAlert.showError("Failed to load diary. Please try again.");
+        sweetAlert.showError("Không thể tải nhật ký. Vui lòng thử lại.");
       }
     }
 
@@ -171,7 +171,7 @@ export default {
 
     async function handleSubmit() {
       if (!memoryTitle.value || !memoryDate.value || !memoryContent.value) {
-        sweetAlert.showError("Please fill in all fields before saving.");
+        sweetAlert.showError("Vui lòng điền đầy đủ thông tin trước khi lưu.");
         return;
       }
 
@@ -183,16 +183,16 @@ export default {
       try {
         if (isEdit.value && diaryNoteId.value) {
           await updateDiaryNote(formData);
-          sweetAlert.showSuccess("Diary updated successfully!");
+          sweetAlert.showSuccess("Cập nhật nhật ký thành công!");
         } else {
           const response = await createDiaryNote(formData);
           diaryNoteId.value = response.id;
-          sweetAlert.showSuccess("Created diary successfully!");
+          sweetAlert.showSuccess("Tạo nhật ký thành công!");
         }
         router.push({ name: "diaryList" });
       } catch (error) {
         console.error("Error saving memory:", error);
-        sweetAlert.showError("Failed to save diary. Please try again.");
+        sweetAlert.showError("Không thể lưu nhật ký. Vui lòng thử lại.");
       }
     }
 

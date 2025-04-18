@@ -22,27 +22,27 @@ export default {
             notification: new Noti(false, () => { }, '', ''),
             showModal: false,
             questions: [
-                'What do you usually do when you have trouble sleeping?',
-                'What brings you the most peace?',
-                'How do you deal with stress?',
-                'What made you smile today?',
-                'Have you done something for yourself today?',
-                'What are you most grateful for?',
-                'What makes you feel most alive?',
-                'How do you recharge when feeling overwhelmed?',
-                'What small thing brought you joy today?',
-                'What helps you stay motivated?'
+                'Bạn thường làm gì khi khó ngủ?',
+                'Điều gì mang lại cho bạn sự bình yên nhất?',
+                'Bạn đối phó với căng thẳng như thế nào?',
+                'Điều gì khiến bạn mỉm cười hôm nay?',
+                'Hôm nay bạn đã làm gì cho bản thân chưa?',
+                'Bạn biết ơn điều gì nhất?',
+                'Điều gì khiến bạn cảm thấy sống động nhất?',
+                'Bạn nạp lại năng lượng như thế nào khi cảm thấy quá tải?',
+                'Điều nhỏ nhặt nào mang lại niềm vui cho bạn hôm nay?',
+                'Điều gì giúp bạn duy trì động lực?'
             ],
             greetings: [
-                'got a minute?',
-                'I have a question',
-                'can I ask you something?',
-                'are you free?',
-                'I was wondering',
-                'what do you think about this?',
-                'mind if I ask?',
-                'quick question',
-                'care to share?'
+                'bạn có rảnh một chút không?',
+                'tôi có một câu hỏi',
+                'tôi có thể hỏi bạn một điều không?',
+                'bạn có rảnh không?',
+                'tôi đang thắc mắc',
+                'bạn nghĩ gì về điều này?',
+                'bạn có phiền nếu tôi hỏi không?',
+                'câu hỏi nhanh nhé',
+                'bạn có muốn chia sẻ không?'
             ]
         }
     },

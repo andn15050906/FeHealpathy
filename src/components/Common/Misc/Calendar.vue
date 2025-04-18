@@ -31,7 +31,7 @@
         <transition name="fade">
           <div class="events-list" key="eventList">
             <div v-if="currentEvents.length === 0" class="no-events">
-              No events for this day
+              Không có sự kiện nào trong ngày này
             </div>
             <div v-else v-for="(event, idx) in currentEvents" :key="event.id || idx"
               class="event-item holding-wrapper mt-1"
@@ -56,10 +56,10 @@
                   </div>
                   <div class="event-extra" v-if="event.objective || (event.startTime && event.endTime)">
                     <div v-if="event.objective" class="objective-text">
-                      <strong>Objective:</strong> {{ event.objective }}
+                      <strong>Mục tiêu:</strong> {{ event.objective }}
                     </div>
                     <div v-if="event.startTime && event.endTime" class="timeline-label">
-                      <strong>Timeline:</strong> {{ event.startTime }} - {{ event.endTime }}
+                      <strong>Thời gian:</strong> {{ event.startTime }} - {{ event.endTime }}
                     </div>
                   </div>
                 </template>
@@ -84,7 +84,7 @@
           </div>
         </transition>
         <button class="add-event-btn" @click="openNewEventForm">
-          <i class="fa-solid fa-plus"></i> Add Event
+          <i class="fa-solid fa-plus"></i> Thêm Sự Kiện
         </button>
       </div>
     </div>
@@ -96,23 +96,23 @@
     <transition name="fade">
       <div v-if="showEventForm" class="event-form-modal">
         <div class="modal-content add-event-form">
-          <h3>{{ isEditing ? "Edit Event" : "New Event" }}</h3>
+          <h3>{{ isEditing ? "Chỉnh Sửa Sự Kiện" : "Sự Kiện Mới" }}</h3>
           <div class="form-group">
-            <label for="title">Title</label>
-            <input id="title" v-model="newEvent.title" class="form-input" placeholder="Enter event title" />
+            <label for="title">Tiêu đề</label>
+            <input id="title" v-model="newEvent.title" class="form-input" placeholder="Nhập tiêu đề sự kiện" />
           </div>
           <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">Mô tả</label>
             <textarea id="description" v-model="newEvent.description" class="form-input"
-              placeholder="Enter event description"></textarea>
+              placeholder="Nhập mô tả sự kiện"></textarea>
           </div>
           <div class="form-group">
-            <label for="objective">Objective</label>
+            <label for="objective">Mục tiêu</label>
             <input id="objective" v-model="newEvent.objective" class="form-input"
-              placeholder="Enter objective (optional)" />
+              placeholder="Nhập mục tiêu (không bắt buộc)" />
           </div>
           <div class="form-group">
-            <label>Tag</label>
+            <label>Nhãn</label>
             <div class="tag-options">
               <div v-for="(preset, idx) in tagPresets" :key="idx" class="tag-option"
                 @click="newEvent.tag = preset.color">
@@ -125,33 +125,33 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="repeat">Repeat</label>
+            <label for="repeat">Lặp lại</label>
             <select id="repeat" v-model="newEvent.repeat" class="form-input">
-              <option value="none">None</option>
-              <option value="weekday">Weekday (Mon-Fri)</option>
-              <option value="allMonth">All Month</option>
-              <option value="weekends">Weekends (Sat, Sun)</option>
+              <option value="none">Không lặp lại</option>
+              <option value="weekday">Ngày trong tuần (T2-T6)</option>
+              <option value="allMonth">Cả tháng</option>
+              <option value="weekends">Cuối tuần (T7, CN)</option>
             </select>
           </div>
           <div class="form-group time-group">
             <div>
-              <label for="startTime">Start Time</label>
+              <label for="startTime">Thời gian bắt đầu</label>
               <input id="startTime" type="time" v-model="newEvent.startTime" class="form-input" />
             </div>
             <div>
-              <label for="endTime">End Time</label>
+              <label for="endTime">Thời gian kết thúc</label>
               <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
             </div>
           </div>
           <div v-if="timeError" class="error-message">{{ timeError }}</div>
           <div class="modal-actions">
-            <button class="btn cancel-btn" @click="cancelEvent">Cancel</button>
-            <button class="btn save-btn" @click="saveEvent" :disabled="!!timeError">Save</button>
+            <button class="btn cancel-btn" @click="cancelEvent">Hủy bỏ</button>
+            <button class="btn save-btn" @click="saveEvent" :disabled="!!timeError">Lưu lại</button>
           </div>
         </div>
       </div>
     </transition>
-    <DeleteConfirmPopup :message="`Are you sure you want to delete this habit?`" :isVisible="showDeletePopup"
+    <DeleteConfirmPopup :message="`Bạn có chắc chắn muốn xóa thói quen này?`" :isVisible="showDeletePopup"
       @confirmDelete="handleDeleteConfirm" @update:isVisible="showDeletePopup = false" />
   </div>
 </template>
@@ -240,11 +240,11 @@ export default {
       showDeletePopup: false,
       isEditing: false,
       tagPresets: [
-        { color: "#2ecc71", label: "Low" },
-        { color: "#3498db", label: "Medium" },
-        { color: "#f1c40f", label: "Moderate" },
-        { color: "#e67e22", label: "High" },
-        { color: "#e74c3c", label: "Critical" }
+        { color: "#2ecc71", label: "Thấp" },
+        { color: "#3498db", label: "Trung bình" },
+        { color: "#f1c40f", label: "Vừa phải" },
+        { color: "#e67e22", label: "Cao" },
+        { color: "#e74c3c", label: "Quan trọng" }
       ],
       holdTimer: null,
       chartInstance: null
@@ -281,7 +281,7 @@ export default {
   },
   computed: {
     daysOfWeek() {
-      return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      return ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
     },
     currentMonth() {
       return format(this.currentDate, "MMMM");
@@ -364,12 +364,12 @@ export default {
       const [endHour, endMinute] = endTime.split(':').map(Number);
 
       if (startHour > endHour || (startHour === endHour && startMinute >= endMinute)) {
-        this.timeError = "Start time must be earlier than end time";
+        this.timeError = "Thời gian bắt đầu phải sớm hơn thời gian kết thúc";
         return;
       }
 
       if (endHour === 0 && endMinute === 0) {
-        this.timeError = "End time cannot be midnight (00:00)";
+        this.timeError = "Thời gian kết thúc không thể là nửa đêm (00:00)";
         return;
       }
 
@@ -524,7 +524,7 @@ export default {
         event.isUpdate = true;
         event.holding = false;
         toast.success(
-          event.completed ? "Event marked as done!" : "Event marked as undone!",
+          event.completed ? "Đã đánh dấu hoàn thành!" : "Đã bỏ đánh dấu hoàn thành!",
           { position: "bottom-center" }
         );
         this.$emit("save-event", event);
@@ -553,7 +553,7 @@ export default {
       this.chartInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Completed", "Remaining", "Closed"],
+          labels: ["Đã hoàn thành", "Còn lại", "Đã đóng"],
           datasets: [
             {
               data: progressData,
@@ -567,7 +567,7 @@ export default {
           maintainAspectRatio: false,
           plugins: {
             legend: { position: "bottom" },
-            title: { display: true, text: "Task Progress Today" }
+            title: { display: true, text: "Tiến độ công việc hôm nay" }
           }
         }
       });

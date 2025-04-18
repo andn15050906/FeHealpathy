@@ -9,7 +9,7 @@
     <transition name="fade">
       <div v-if="isDropdownVisible" class="notification-dropdown">
         <div v-if="notifications.length === 0" class="no-notifications">
-          No notifications
+          Không có thông báo
         </div>
         <div v-else>
           <div
@@ -24,7 +24,7 @@
               v-if="!notification.read"
               @click="markAsRead(index)"
             >
-              Mark as read
+              Đánh dấu đã đọc
             </button>
           </div>
         </div>
@@ -55,8 +55,9 @@ export default {
   },
   computed: {
     unreadCount() {
-      return this.notifications.filter((notification) => !notification.read)
-        .length;
+      return 0;
+      //return this.notifications.filter((notification) => !notification.read)
+      //  .length;
     },
   },
   methods: {

@@ -1,66 +1,61 @@
 {
     "HomePage": {
-        "Title": "Healpathy - Where your mind revives",
-        "SubTitle": "Nurture the spirit, unleash the potential.",
-        "TryIt": "Try Healpathy for Free",
-        "AlreadyHaveAccount": "Already have an account?",
+        "Title": "Healpathy - Nơi tâm trí được hồi sinh",
+        "SubTitle": "Nuôi dưỡng tinh thần, khơi dậy tiềm năng.",
+        "TryIt": "Dùng thử Healpathy miễn phí",
+        "AlreadyHaveAccount": "Đã có tài khoản?",
         "Section1": {
-            "Title": "We're here to help you feel better.",
-            "SubTitle": "Live mindfully.",
-            "Description": "Navigate life's ups and downs with resilience, confidence and guided support.",
-            "LearnMore": "Learn More"
+            "Title": "Chúng tôi ở đây để giúp bạn cảm thấy tốt hơn.",
+            "SubTitle": "Sống có chánh niệm.",
+            "Description": "Vượt qua thăng trầm cuộc sống với sự kiên cường, tự tin và hỗ trợ được định hướng.",
+            "LearnMore": "Tìm hiểu thêm"
         },
         "Section2": {
-            "Title": "Empower skills.",
-            "SubTitle": "",
-            "Description": "Master skills that will help you conquer your life objectives",
-            "LearnMore": "Learn More"
+            "Title": "Phát triển kỹ năng.",
+            "Description": "Làm chủ những kỹ năng giúp bạn chinh phục mục tiêu cuộc sống",
+            "LearnMore": "Tìm hiểu thêm"
         },
         "Section3": {
-            "Title": "Strengthen body.",
-            "SubTitle": "",
-            "Description": "Build your strength in motion and growth in action",
-            "LearnMore": "Learn More"
+            "Title": "Tăng cường sức khỏe.",
+            "Description": "Xây dựng sức mạnh trong vận động và phát triển trong hành động",
+            "LearnMore": "Tìm hiểu thêm"
         },
         "Section4": {
-            "Title": "Over two thousand 5-star reviews.",
-            "SubTitle": "",
-            "Description": "",
-            "LearnMore": "Learn More"
+            "Title": "Hơn hai nghìn đánh giá 5 sao."
         },
         "Testimonial": [
             {
-                "Text": "When I cannot fall asleep, I turn on this app and am out within 5 minutes.",
-                "UserText": "A from America"
+                "Text": "Khi tôi không thể ngủ được, tôi mở ứng dụng này và chỉ sau 5 phút là ngủ thiếp đi.",
+                "UserText": "A từ Mỹ"
             },
             {
-                "Text": "I have a very busy brain and can find it hard to unwind. Now a daily practice is actually so wonderful and healing for me.",
-                "UserText": "B from Viet Nam"
+                "Text": "Tôi có một bộ não rất bận rộn và thường khó thư giãn. Giờ đây việc luyện tập hàng ngày thực sự tuyệt vời và chữa lành cho tôi.",
+                "UserText": "B từ Việt Nam"
             },
             {
-                "Text": "Healpathy has changed my life in immeasurable ways. I am more resilient and feel so much more connected to myself.",
-                "UserText": "C from England"
+                "Text": "Healpathy đã thay đổi cuộc sống của tôi theo những cách không thể đo đếm. Tôi trở nên kiên cường hơn và cảm thấy kết nối với bản thân nhiều hơn.",
+                "UserText": "C từ Anh"
             }
         ],
         "Pricing": {
-            "Title": "Start your free trial of Healpathy Premium.",
+            "Title": "Bắt đầu sử dụng chuyên sâu với Healpathy Premium.",
             "Yearly": {
-                "Text": "Yearly",
-                "Price": "300.000 VND/yr."
+                "Text": "Gói năm",
+                "Price": "300.000 VND/năm"
             },
             "Trial": {
-                "Text": "On Discount",
-                "Price": "240.000 VND/yr."
+                "Text": "Đang giảm giá",
+                "Price": "240.000 VND/năm"
             },
             "Monthly": {
-                "Text": "Monthly",
-                "Price": "25.000 VND/mo."
+                "Text": "Gói tháng",
+                "Price": "25.000 VND/tháng"
             },
             "Terms": {
-                "Text": "",
-                "Title": "Terms",
-                "CancelText": "Cancel anytime",
-                "Continue": "Continue"
+                "Text": "Bằng việc đăng ký, bạn đồng ý với",
+                "Title": "Điều khoản sử dụng",
+                "CancelText": "Hủy bất cứ lúc nào",
+                "Continue": "Tiếp tục"
             }
         }
     },
@@ -94,39 +89,39 @@
         "Categories": [
             {
                 "Id": "meditation",
-                "Title": "Meditation & Mindfulness"
+                "Title": "Thiền & Chánh niệm"
             },
             {
                 "Id": "stress",
-                "Title": "Stress & Anxiety"
+                "Title": "Căng thẳng & Lo âu"
             },
             {
                 "Id": "sleep",
-                "Title": "Sleep"
+                "Title": "Giấc ngủ"
             },
             {
                 "Id": "mental",
-                "Title": "Mental Health"
+                "Title": "Sức khỏe Tinh thần"
             },
             {
                 "Id": "growth",
-                "Title": "Personal Growth"
+                "Title": "Phát triển Cá nhân"
             }
         ],
         "FeaturedArticles": [
             {
                 "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/49610b6b6a4b1b09706ea4c3d5d179b3b5d83006d10efb22887d03def1fc6c5b?apiKey=581cb509eedd462787009da53a17f69a&",
                 "Tags": [
-                    "News",
-                    "Mental Health",
-                    "Mediation",
-                    "Mindfulness",
-                    "Personal Growth",
-                    "Sleep",
-                    "Stress & Anxiety"
+                    "Tin tức",
+                    "Sức khỏe Tinh thần",
+                    "Thiền",
+                    "Chánh niệm",
+                    "Phát triển Cá nhân",
+                    "Giấc ngủ",
+                    "Căng thẳng & Lo âu"
                 ],
-                "Title": "Start the new year on the right foot with 'Just One Step' — a 30-day New Year Reset for your wellbeing",
-                "Excerpt": "Healpathy's 'New Year Reset' is a 30-day mental health journey to help you recharge, restore, refresh & reconnect. All it takes is Just One Step each day for 30 days."
+                "Title": "Bắt đầu năm mới đúng hướng với 'Chỉ Một Bước' — 30 ngày làm mới bản thân cho sức khỏe tinh thần",
+                "Excerpt": "Chương trình 'Làm mới năm mới' của Healpathy là hành trình 30 ngày cho sức khỏe tinh thần giúp bạn nạp năng lượng, phục hồi, làm mới và kết nối lại. Tất cả những gì bạn cần là Một Bước mỗi ngày trong 30 ngày."
             },
             {
                 "Thumb": "https://cdn.builder.io/api/v1/image/assets/TEMP/16a730674da83ae93a1649184c08b7a13cbb35ade295530aa913f1471c4f098f?apiKey=581cb509eedd462787009da53a17f69a&",
@@ -379,11 +374,11 @@
         "Lessons": [
             {
                 "id": 1,
-                "title": "Transition to Camel",
+                "title": "Chuyển tiếp tới tư thế Con lạc đà",
                 "instructor": "Anna Arkan",
                 "thumbnail": "/assets/images/yoga/yoga-thumb-1.jpg",
                 "duration": "47:57",
-                "level": "Intermediate",
+                "level": "Trung cấp",
                 "ratingCount": 245
             },
             {
@@ -573,103 +568,103 @@
             "Joined": [
                 {
                     "id": "1",
-                    "name": "Name1",
+                    "name": "Chia Sẻ Cảm Xúc",
                     "isPublic": true,
-                    "description": "Description1",
+                    "description": "Nơi an toàn để chia sẻ và thấu hiểu cảm xúc của nhau. Cùng nhau lắng nghe và đồng cảm trong hành trình chữa lành.",
                     "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
-                    "totalMembers": 1,
+                    "totalMembers": 120,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "1",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 45
                 },
                 {
                     "id": "2",
-                    "name": "Name2",
+                    "name": "Cùng Nhau Vượt Qua",
                     "isPublic": true,
-                    "description": "Description2",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
-                    "totalMembers": 2,
+                    "description": "Hỗ trợ và động viên nhau trong hành trình vượt qua trầm cảm. Chia sẻ kinh nghiệm và phương pháp đối mặt tích cực.",
+                    "coverImgUrl": "https://picsum.photos/seed/picsum/200/300",
+                    "totalMembers": 85,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "2",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 32
                 },
                 {
                     "id": "3",
-                    "name": "Name3",
+                    "name": "Ánh Sáng Hy Vọng",
                     "isPublic": true,
-                    "description": "Description3",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-                    "totalMembers": 3,
+                    "description": "Nơi thắp sáng niềm tin và hy vọng. Cùng nhau chia sẻ những câu chuyện tích cực và hành trình vươn lên.",
+                    "coverImgUrl": "https://picsum.photos/200/300",
+                    "totalMembers": 95,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "3",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 28
                 },
                 {
                     "id": "4",
-                    "name": "Name4",
+                    "name": "Hành Trình Chữa Lành",
                     "isPublic": true,
-                    "description": "Description4",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-                    "totalMembers": 4,
+                    "description": "Cùng nhau trên con đường chữa lành tâm hồn. Chia sẻ những phương pháp và hoạt động giúp cải thiện sức khỏe tinh thần.",
+                    "coverImgUrl": "https://picsum.photos/400/500",
+                    "totalMembers": 75,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "4",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 25
                 }
             ],
             "Recommended": [
                 {
                     "id": "1",
-                    "name": "Name1",
+                    "name": "Yoga & Thiền Cho Tâm Hồn",
                     "isPublic": true,
-                    "description": "Description1",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/115/200/200.jpg?hmac=rb32z_z70PD8yz0Z-aLmi9hL72NZny0rmG2LzKmNKV4",
-                    "totalMembers": 1,
+                    "description": "Khám phá sức mạnh của yoga và thiền định trong việc cải thiện sức khỏe tinh thần. Chia sẻ các bài tập và kỹ thuật thư giãn.",
+                    "coverImgUrl": "https://picsum.photos/300/400",
+                    "totalMembers": 150,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "1",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 55
                 },
                 {
                     "id": "2",
-                    "name": "Name2",
+                    "name": "Nghệ Thuật Trị Liệu",
                     "isPublic": true,
-                    "description": "Description2",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/216/200/300.jpg?hmac=c3OXbiUxWPMgwnaFpX8ZAfBL5TZzWjnof6mb4OwuSPs",
-                    "totalMembers": 2,
+                    "description": "Khám phá sức mạnh chữa lành của nghệ thuật. Chia sẻ các hoạt động sáng tạo giúp giải tỏa cảm xúc và tìm lại niềm vui.",
+                    "coverImgUrl": "https://picsum.photos/600/700",
+                    "totalMembers": 110,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "2",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 42
                 },
                 {
                     "id": "3",
-                    "name": "Name3",
+                    "name": "Âm Nhạc & Tâm Hồn",
                     "isPublic": true,
-                    "description": "Description3",
-                    "coverImgUrl": "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-                    "totalMembers": 3,
+                    "description": "Chia sẻ và khám phá sức mạnh chữa lành của âm nhạc. Cùng nhau tạo playlist và chia sẻ những bài hát mang lại năng lượng tích cực.",
+                    "coverImgUrl": "https://picsum.photos/800/900",
+                    "totalMembers": 130,
                     "requireApprovedWhenPost": true,
                     "groupStatus": 1,
                     "createdBy": "3",
                     "createdAt": "22/12/2024",
                     "activityTime": "0001-01-01T00:00:00",
-                    "totalPosts": 0
+                    "totalPosts": 38
                 }
             ]
         }
@@ -988,8 +983,8 @@
                             "High school diploma or equivalent",
                             "Some college, no degree",
                             "Associate degree",
-                            "Bachelor’s degree",
-                            "Master’s degree",
+                            "Bachelor's degree",
+                            "Master's degree",
                             "Doctorate or professional degree"
                         ]
                     },
@@ -1265,7 +1260,7 @@
                         ]
                     },
                     {
-                        "text": "Do you enjoy developing and nurturing others’ talents?",
+                        "text": "Do you enjoy developing and nurturing others' talents?",
                         "options": [
                             "Strongly agree",
                             "Agree",
