@@ -55,8 +55,9 @@ export default {
   },
   computed: {
     unreadCount() {
-      return this.notifications.filter((notification) => !notification.read)
-        .length;
+      return 0;
+      //return this.notifications.filter((notification) => !notification.read)
+      //  .length;
     },
   },
   methods: {
