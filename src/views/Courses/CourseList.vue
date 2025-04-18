@@ -17,7 +17,7 @@
 
     <div class="courses-container">
       <div class="course-grid">
-        <courseCard v-for="course in courses" :key="course.id" :course="course" />
+        <CourseCard v-for="course in courses" :key="course.id" :course="course" />
       </div>
     </div>
 
@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref, watch, onBeforeMount } from 'vue';
-import courseCard from '@/components/courseComponents/courseCard.vue';
+import CourseCard from '@/components/CourseComponents/CourseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 import { getCourses } from '@/scripts/api/services/courseService.js';
 

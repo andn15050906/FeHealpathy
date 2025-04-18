@@ -156,6 +156,16 @@
       @confirm="handleDeleteConfirm"
       @cancel="handleDeleteCancel"
     />
+
+    <UpdateConfirmPopup
+      :isVisible="showUpdateConfirm"
+      v-model:visible="showUpdateConfirm"
+      :url="`/api/Comments/${commentToUpdate?.id}`"
+      title="Xác nhận cập nhật"
+      message="Bạn có chắc chắn muốn cập nhật bình luận này không?"
+      @confirm="handleUpdateConfirm"
+      @cancel="handleUpdateCancel"
+    />
   </div>
 </template>
 
@@ -173,12 +183,14 @@ import {
 import { getUserProfile } from "@/scripts/api/services/authService";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
+import UpdateConfirmPopup from '@/components/Common/Popup/UpdateConfirmPopup.vue';
 
 export default {
   name: "LectureDetail",
   components: {
     LoadingSpinner,
-    DeleteConfirmPopup
+    DeleteConfirmPopup,
+    UpdateConfirmPopup
   },
   setup() {
     const router = useRouter();
@@ -291,22 +303,39 @@ export default {
       }
     };
 
+    const showUpdateConfirm = ref(false);
+    const commentToUpdate = ref(null);
+
     const saveCommentEdit = async (commentId) => {
       if (!editCommentContent.value.trim()) return;
       
+      commentToUpdate.value = {
+        id: commentId,
+        content: editCommentContent.value
+      };
+      showUpdateConfirm.value = true;
+    };
+
+    const handleUpdateConfirm = async () => {
+      if (!commentToUpdate.value) return;
+      
       try {
-        await updateLectureComment(commentId, editCommentContent.value);
-        
-        // Làm mới danh sách bình luận
+        await updateLectureComment(commentToUpdate.value.id, commentToUpdate.value.content);
         await fetchComments();
-        
-        // Reset form
         cancelCommentEdit();
         
       } catch (error) {
-        console.error('Lỗi khi sửa bình luận:', error);
-        alert('Không thể sửa bình luận. Vui lòng thử lại sau.');
+        console.error('Lỗi khi cập nhật bình luận:', error);
+        toast.error('Không thể cập nhật bình luận. Vui lòng thử lại sau.');
+      } finally {
+        showUpdateConfirm.value = false;
+        commentToUpdate.value = null;
       }
+    };
+
+    const handleUpdateCancel = () => {
+      showUpdateConfirm.value = false;
+      commentToUpdate.value = null;
     };
 
     const cancelCommentEdit = () => {
@@ -501,7 +530,11 @@ export default {
       editInput,
       showDeleteConfirm,
       handleDeleteConfirm,
-      handleDeleteCancel
+      handleDeleteCancel,
+      showUpdateConfirm,
+      handleUpdateConfirm,
+      handleUpdateCancel,
+      commentToUpdate
     };
   }
 };

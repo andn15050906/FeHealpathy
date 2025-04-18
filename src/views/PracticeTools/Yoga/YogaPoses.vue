@@ -1,6 +1,6 @@
 <template>
     <div class="container mt-5">
-        <h2 class="mb-4" style="font-weight: bold;">Yoga Poses</h2>
+        <h2 class="mb-4" style="font-weight: bold;">Các tư thế Yoga</h2>
         <div class="row">
             <div class="col-12">
                 <div v-for="(pose, index) in yogaPoses" :key="index"
@@ -10,12 +10,12 @@
                             v-if="pose.thumpUrl" />
                         <div>
                             <span class="pose-name">{{ pose.name }}</span>
-                            <p class="pose-level">Level: {{ pose.level }}</p>
+                            <p class="pose-level">Mức: {{ translateLevel(pose.level) }}</p>
                         </div>
                     </div>
                     <router-link :to="{ name: 'YogaPoseDetails', params: { id: pose.id } }"
                         class="btn btn-outline-primary btn-lg">
-                        Try it now! <i class="fas fa-chevron-right ml-2"></i>
+                        Thực hành ngay <i class="fas fa-chevron-right ml-2"></i>
                     </router-link>
                 </div>
             </div>
@@ -37,6 +37,16 @@ export default {
         const currentPage = ref(1);
         const totalPages = ref(1);
 
+        const translateLevel = (level) => {
+            const levelMap = {
+                'Beginner': 'Cơ bản',
+                'Intermediate': 'Trung cấp',
+                'Beginner to Intermediate': 'Cơ bản đến Trung cấp',
+                'Intermediate to Advanced': 'Trung cấp đến Nâng cao'
+            };
+            return levelMap[level] || level;
+        };
+
         const loadYogaPoses = async () => {
             try {
                 const response = await getPagedYogaPoses({ pageIndex: currentPage.value - 1 , pageSize: 10});
@@ -56,7 +66,13 @@ export default {
             loadYogaPoses();
         });
 
-        return { yogaPoses, currentPage, totalPages, goToPage };
+        return { 
+            yogaPoses, 
+            currentPage, 
+            totalPages, 
+            goToPage,
+            translateLevel 
+        };
     }
 };
 </script>

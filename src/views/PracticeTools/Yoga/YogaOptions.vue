@@ -2,7 +2,7 @@
     <div class="container mt-5">
       <div class="text-center mb-4">
         <h1 style="font-weight: bold;">
-          Choose your preferred way to experience yoga.
+          Chọn cách bạn thích để trải nghiệm yoga.
         </h1>
       </div>
       <div class="row">
@@ -11,9 +11,9 @@
             <div class="card text-center h-100 shadow-sm hover-scale card-try">
               <div class="card-overlay"></div>
               <div class="card-body d-flex flex-column justify-content-center">
-                <h1 class="card-title">Try it Yourself</h1>
+                <h1 class="card-title">Hãy tự mình thử nhé</h1>
                 <p class="card-text">
-                  Practice yoga exercises on your own with guided instructions.
+                  Tự tập các bài tập yoga theo hướng dẫn.
                 </p>
               </div>
             </div>
@@ -24,9 +24,9 @@
             <div class="card text-center h-100 shadow-sm hover-scale card-video">
               <div class="card-overlay"></div>
               <div class="card-body d-flex flex-column justify-content-center">
-                <h1 class="card-title">Learn by Video</h1>
+                <h1 class="card-title">Học qua video</h1>
                 <p class="card-text">
-                  Watch step-by-step tutorials to master each pose.
+                  Xem hướng dẫn từng bước để thành thạo từng tư thế.
                 </p>
               </div>
             </div>

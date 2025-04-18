@@ -121,7 +121,7 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getCourseById } from "@/scripts/api/services/CourseService"; 
+import { getCourseById } from "@/scripts/api/services/courseService"; 
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";

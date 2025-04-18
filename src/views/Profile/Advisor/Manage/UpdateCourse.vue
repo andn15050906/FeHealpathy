@@ -241,7 +241,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
 import SaveConfirmPopUp from "@/components/Common/Popup/SaveConfirmPopUp.vue";
-import DeleteConfirmPopUp from "@/components/Common/Popup/DeleteConfirmPopUp.vue";
+import DeleteConfirmPopUp from "@/components/Common/Popup/DeleteConfirmPopup.vue";
 
 export default {
   name: "UpdateCourse",
