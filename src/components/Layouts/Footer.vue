@@ -6,16 +6,16 @@
           <a class="nav-link text-secondary px-2" href="#"><strong>Trang Chủ</strong></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-secondary px-2" href="#"><strong>Tin Tức</strong></a>
+          <a class="nav-link text-secondary px-2" href="/blogs"><strong>Blog</strong></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-secondary px-2" href="#"><strong>Về Chúng Tôi</strong></a>
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Về Chúng Tôi</strong></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-secondary px-2" href="#"><strong>Liên Hệ</strong></a>
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Liên Hệ</strong></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-secondary px-2" href="#"><strong>Đội Nhóm</strong></a>
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Đội Nhóm</strong></a>
         </li>
       </ul>
 
