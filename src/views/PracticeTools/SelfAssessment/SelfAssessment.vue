@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-2">
-    <h2 class="fw-bold text-center mb-5 text-dark">Mental Health Assessments</h2>
+    <h2 class="fw-bold text-center mb-5 text-dark">Đánh Giá Sức Khỏe Tinh Thần</h2>
     <div class="survey-grid">
       <SurveyCard v-for="(item, index) in surveys" :key="item.id" :survey="item" @click="openTest(item.id)" />
     </div>
@@ -50,21 +50,56 @@ const props = defineProps({
 });
 
 const surveysMapping = {
-  "BSI": "Survey_BSI-18.jfif",
-  "CD-RISC": "Survey_CD-RISC-10.png",
-  "DASS": "Survey_DASS21.png",
-  "GAD": "Survey_GAD-7.png",
-  "RSE": "Survey_RSE.png",
-  "WHO-5": "Survey_WHO-5.png"
+  "BSI": {
+    image: "Survey_BSI-18.jfif",
+    description: "Đánh giá các triệu chứng tâm lý phổ biến như lo âu, trầm cảm và các vấn đề thể chất"
+  },
+  "CD-RISC": {
+    image: "Survey_CD-RISC-10.png",
+    description: "Đánh giá khả năng phục hồi và đối phó với stress trong cuộc sống"
+  },
+  "DASS": {
+    image: "Survey_DASS21.png",
+    description: "Đánh giá mức độ trầm cảm, lo âu và stress trong 7 ngày qua"
+  },
+  "GAD": {
+    image: "Survey_GAD-7.png",
+    description: "Đánh giá mức độ lo âu tổng quát trong 2 tuần gần đây"
+  },
+  "RSE": {
+    image: "Survey_RSE.png",
+    description: "Đánh giá mức độ tự trọng và cách nhìn nhận bản thân"
+  },
+  "WHO-5": {
+    image: "Survey_WHO-5.png",
+    description: "Đánh giá mức độ hạnh phúc và sức khỏe tinh thần tổng quát"
+  }
+}
+
+const getSurveyInfo = (name) => {
+  for (let key in surveysMapping) {
+    if (name.includes(key)) {
+      return {
+        icon: "/assets/images/surveys/" + surveysMapping[key].image,
+        description: surveysMapping[key].description
+      };
+    }
+  }
+  return {
+    icon: "/assets/images/surveys/Survey_Demographic.png",
+    description: "Bài đánh giá tổng quát"
+  };
 }
 
 onBeforeMount(async () => {
   surveys.value = (await getPagedSurveys()).items
     .filter(item => !item.name.includes("Wellness") && !item.name.includes("First"))
     .map(item => {
+      const info = getSurveyInfo(item.name);
       return {
         ...item,
-        icon: getSurveyImage(item.name)
+        icon: info.icon,
+        description: info.description
       }
     });
 
@@ -72,15 +107,6 @@ onBeforeMount(async () => {
     openTest(props.id);
   }
 })
-
-const getSurveyImage = (name) => {
-  for (let key in surveysMapping) {
-    if (name.includes(key)) {
-      return "/assets/images/surveys/" + surveysMapping[key];
-    }
-  }
-  return "/assets/images/surveys/Survey_Demographic.png";
-}
 
 const currentSurveyOptions = computed(() => new SurveyOptions(
   currentSurvey.value,
@@ -199,5 +225,24 @@ const submitCallback = async (questionsWithAnswer) => {
 
 .survey-inner-container {
   width: 100%;
+}
+
+.survey-card {
+  position: relative;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.survey-card:hover {
+  transform: translateY(-5px);
+}
+
+.survey-description {
+  margin-top: 10px;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+  padding: 0 10px;
 }
 </style>
