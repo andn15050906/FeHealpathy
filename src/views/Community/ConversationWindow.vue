@@ -35,32 +35,23 @@
             :current-user-id="currentUser.id" :room-id="roomId" :rooms="JSON.stringify(loadedRooms)"
             :loading-rooms="loadingRooms" :rooms-loaded="roomsLoaded" :messages="JSON.stringify(messages)"
             :messages-loaded="messagesLoaded" :room-message="roomMessage" :room-actions="JSON.stringify(roomActions)"
-            :menu-actions="JSON.stringify(menuActions)"
-            :message-actions="JSON.stringify(messageActions)"
+            :menu-actions="JSON.stringify(menuActions)" :message-actions="JSON.stringify(messageActions)"
             :templates-text="JSON.stringify(templatesText)" @fetch-more-rooms="fetchMoreRooms"
             @fetch-messages="fetchMessages($event.detail[0])" @send-message="sendMessage($event.detail[0])"
             @edit-message="editMessage($event.detail[0])" @delete-message="deleteMessage($event.detail[0])"
-            @open-file="openFile($event.detail[0])"
-            @add-room="addRoom($event.detail[0])" @room-action-handler="menuActionHandler($event.detail[0])"
+            @open-file="openFile($event.detail[0])" @add-room="addRoom($event.detail[0])"
+            @room-action-handler="menuActionHandler($event.detail[0])"
             @menu-action-handler="menuActionHandler($event.detail[0])"
-            @send-message-reaction="sendMessageReaction($event.detail[0])"
-            :show-files="false"
-            :show-new-messages-divider="false"
-            :single-room="singleRoom">
+            @send-message-reaction="sendMessageReaction($event.detail[0])" :show-files="false"
+            :show-new-messages-divider="false" :single-room="singleRoom">
             <!--@open-user-tag="openUserTag($event.detail[0])"-->
             <!--@typing-message="typingMessage($event.detail[0])"-->
             <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
             <!--@show-audio="false"-->
         </vue-advanced-chat>
         <teleport to="body">
-            <InviteUser
-                v-if="showInviteModal"
-                :conversationId="inviteRoomId"
-                :current-user="currentUser"
-                :current-room-members="currentRoomMembers"
-                @created="fetchRooms"
-                @close="showInviteModal = false"
-            />
+            <InviteUser v-if="showInviteModal" :conversationId="inviteRoomId" :current-user="currentUser"
+                :current-room-members="currentRoomMembers" @created="fetchRooms" @close="showInviteModal = false" />
         </teleport>
     </div>
 </template>
@@ -160,6 +151,7 @@ export default {
             roomActions: [],
             menuActions: [],
             showInviteModal: false,
+            showMembersTooltip: false,
             messageActions: [
                 { name: 'editMessage', title: 'Edit Message', onlyMe: true },
                 { name: 'deleteMessage', title: 'Delete Message', onlyMe: true }
@@ -258,7 +250,7 @@ export default {
                 this.roomsLoaded = true;
                 return;
             }
-            
+
             let userPromise = getUsers().then(pagedUsers => {
                 this.allUsers = Array.from(pagedUsers.items.map(item => {
                     return {
@@ -271,7 +263,7 @@ export default {
             });
 
             let fetchedRooms = [];
-            let conversationPromise = getPagedConversations({ Members: /*[*/this.currentUser.id/*]*/})
+            let conversationPromise = getPagedConversations({ Members: /*[*/this.currentUser.id/*]*/ })
                 .then(pagedConversations => {
                     fetchedRooms = Array.from(pagedConversations.items
                         .filter(item => item.id != this.currentUser.id)                             //exclude partner chat
@@ -279,6 +271,7 @@ export default {
                             return {
                                 id: item.id,
                                 roomId: item.id,
+                                title: item.title,
                                 roomName: item.title,
                                 avatar: item.avatarUrl,
                                 unreadCount: 0,                                                     //...
@@ -322,12 +315,19 @@ export default {
 
                 // re-assign room name
                 const otherRoomUsers = room.users.filter(user => user && user._id !== this.currentUser.id);
-                //room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Myself'
-                room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner'
+                if (otherRoomUsers.length === 1) {
+                    // 1-1 chat: use the partner's username and avatar
+                    room.roomName = otherRoomUsers.map(user => user.username).join(', ') || 'Your AI Partner';
+                    room.avatar = otherRoomUsers[0].avatar || '';
+                } else {
+                    // Group chat: use the room title and avatarUrl from server
+                    room.roomName = room.title || 'Group Chat'; // Use the title from the room
+                    room.avatar = room.avatar || ''; // Use the avatarUrl from the room
+                    room.membersCount = otherRoomUsers.length + 1;
+                }
                 formattedRooms.push({
                     ...room,
                     roomId: room.id,
-                    avatar: otherRoomUsers.length === 1 && otherRoomUsers[0].avatar ? otherRoomUsers[0].avatar : '',
                     index: room.lastUpdated.seconds,
                     lastMessage: {
                         content: '',
@@ -398,7 +398,7 @@ export default {
 
             this.selectedRoom = room.roomId;
             this.roomId = room.roomId;
-            getPagedChatMessages({conversationId : room.roomId}).then(response => {
+            getPagedChatMessages({ conversationId: room.roomId }).then(response => {
                 if (this.selectedRoom !== room.roomId || !response.items)
                     return;
 
@@ -495,7 +495,7 @@ export default {
 
             this.messagingHandler.addListener(MESSAGE_TYPES.CreateChatMessage.callback, response => {
                 if (!this.fetchedMessagesData.items) {
-                    this.fetchMessages({ room: { roomId: this.roomId }});
+                    this.fetchMessages({ room: { roomId: this.roomId } });
                     return;
                 }
 
@@ -564,7 +564,7 @@ export default {
                     }
                 })
             })
-            
+
             this.messagingHandler.addListener(MESSAGE_TYPES.DeleteMessageReaction.callback, response => {
                 this.messages.forEach((item, index) => {
                     if (item._id == response.sourceId) {
@@ -579,7 +579,7 @@ export default {
                     }
                 })
             })
-            
+
             this.messagingHandler.startListening();
         },
 
@@ -751,7 +751,7 @@ export default {
 
         inviteUser(roomId) {
             this.resetForms(),
-            this.showInviteModal = true;
+                this.showInviteModal = true;
             console.log("showInviteModal:", this.showInviteModal);
             this.inviteRoomId = roomId
         },
@@ -765,7 +765,7 @@ export default {
             await firestoreService.updateUser(id, { _id: id })
         
             await firestoreService.addRoomUser(this.inviteRoomId, id)*/
-            
+
             this.inviteRoomId = null
             this.invitedUsername = ''
             this.fetchRooms()

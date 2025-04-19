@@ -23,6 +23,16 @@
         </strong>
       </div>
 
+      <!-- Add input for Title and Avatar -->
+      <div class="form-group">
+        <label for="title">Conversation Title</label>
+        <input v-model="conversationInfo.title" placeholder="Enter conversation title" class="input" />
+      </div>
+      <div class="form-group">
+        <label for="avatar">Upload Avatar</label>
+        <input type="file" @change="handleFileChange" accept="image/*" class="input" />
+      </div>
+
       <div class="modal-footer">
         <button @click="inviteUsers" :disabled="!selectedUsers.length || isSubmitting" class="btn primary">
           {{ isSubmitting ? "Inviting..." : "Invite" }}
@@ -52,6 +62,12 @@ const searchResults = ref([]);
 const selectedUsers = ref([]);
 const isSubmitting = ref(false);
 
+const conversationInfo = ref({
+  title: "",
+  avatarUrl: null,
+  isPrivate: false
+});
+
 const handleSearch = async () => {
   const keyword = search.value.trim();
   if (keyword.length < 2) return;
@@ -70,6 +86,13 @@ const toggleUser = (user) => {
     selectedUsers.value.push(user);
     search.value = "";
     searchResults.value = [];
+  }
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    conversationInfo.value.avatarUrl = file;
   }
 };
 
@@ -99,29 +122,26 @@ const inviteUsers = async () => {
       isAdmin: id === props.currentUser.id,
     }));
 
+    const formData = new FormData();
+    formData.append('Title', conversationInfo.value.title);
+    formData.append('IsPrivate', conversationInfo.value.isPrivate);
+
+    // If avatar file is provided, add it to formData
+    if (conversationInfo.value.avatarUrl) {
+      const file = conversationInfo.value.avatarUrl;
+      formData.append('Thumb.File', file);
+      formData.append('Thumb.Title', file.name);
+    }
+
+    members.forEach((member, index) => {
+      formData.append(`Members[${index}].UserId`, member.userId);
+      formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
+    });
+
     if ((props.currentRoomMembers?.length || 0) >= 3) {
-      const formData = new FormData();
       formData.append("Id", props.conversationId);
-      formData.append("Title", "Updated Group");
-      formData.append("IsPrivate", "false");
-
-      selectedUsers.value.forEach((user, index) => {
-        formData.append(`AddedMembers[${index}].UserId`, user.id);
-        formData.append(`AddedMembers[${index}].IsAdmin`, false);
-      });
-
       await updateConversation(formData);
-
     } else {
-      const formData = new FormData();
-      formData.append("Title", "New Group");
-      formData.append("IsPrivate", "false");
-
-      members.forEach((member, index) => {
-        formData.append(`Members[${index}].UserId`, member.userId);
-        formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
-      });
-
       await createConversation(formData);
     }
 
@@ -130,13 +150,14 @@ const inviteUsers = async () => {
     selectedUsers.value = [];
     search.value = "";
     searchResults.value = [];
+    conversationInfo.value.title = "";
+    conversationInfo.value.avatarUrl = null;
   } catch (error) {
     console.error("Invite failed:", error);
   } finally {
     isSubmitting.value = false;
   }
 };
-
 </script>
 
 <style scoped>
@@ -191,6 +212,10 @@ const inviteUsers = async () => {
   border-radius: 6px;
   margin-top: 16px;
   font-size: 1rem;
+}
+
+.form-group {
+  margin-top: 16px;
 }
 
 .user-list {
