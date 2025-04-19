@@ -3,20 +3,20 @@
         <div style="flex-grow: 1;">
             <div class="excercise-thumbnail">
                 <RouterLink :to="`/yoga/${excercise.id}`">
-                    <img :src="excercise.thumbnail" :alt="excercise.title">
+                    <img :src="excercise.thumpUrl" :alt="excercise.title">
                 </RouterLink>
-                <span class="duration">{{ excercise.duration }}</span>
+                <!--<span class="duration">{{ excercise.duration }}</span>-->
                 <span class="level-badge">{{ excercise.level }}</span>
             </div>
-            <p class="excercise-title">{{ excercise.title }}</p>
+            <p class="excercise-title">{{ excercise.name }}</p>
         </div>
-        <div>
+        <!--<div>
             <span class="instructor">{{ excercise.instructor }}</span>
             <span class="rating">
                 <span v-for="n in 5" :key="n" class="star">★</span>
                 <span class="rating-count">({{ excercise.ratingCount }})</span>
             </span>
-        </div>
+        </div>-->
     </GlowingCard>
 </template>
 
