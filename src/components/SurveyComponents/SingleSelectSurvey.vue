@@ -1,7 +1,7 @@
 <template>
     <v-container :class="optionsRef.isTransparentStyle ? 'quiz-container' : 'quiz-container quiz-background'" :style="{padding: padding}">
         <v-card v-if="optionsRef.title" class="title-card">
-            <h2> Kết quả đánh giá {{ optionsRef.title }}</h2>
+            <h2> {{ optionsRef.title }}</h2>
             <h6>{{ getDescription(optionsRef.title) }}</h6>
         </v-card>
         <v-card v-if="optionsRef.isReadOnly && result">
@@ -210,7 +210,7 @@ const getDescription = (surveyName) => {
         "GAD-7": "GAD-7 đánh giá mức độ lo âu tổng quát và khả năng kiểm soát lo lắng của người dùng."
     };
 
-    return surveyDescriptions[surveyName] || "Không có mô tả cho bài kiểm tra này.";
+    return surveyDescriptions[surveyName] || "";
 }
 
 // do not update props
