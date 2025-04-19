@@ -20,8 +20,8 @@
                 <span class="price-label">Giá:</span>
                 <span class="price" v-if="course.discount > 0">
                   <del>{{ course.price?.toLocaleString('vi-VN') }} VND</del>
-                  <strong>{{ discountedPrice.toLocaleString('vi-VN') }} VND</strong>
-                  <span class="discount-badge">{{ course.discount }}% OFF</span>
+                  <strong>{{ discountedPrice == 0 ? 'Miễn phí' : discountedPrice.toLocaleString('vi-VN') + ' VND' }}</strong>
+                  <span class="discount-badge">{{ Math.floor(course.discount * 100) }}% OFF</span>
                 </span>
                 <span class="price" v-else>
                   <strong>{{ course.price?.toLocaleString('vi-VN') }} VND</strong>
@@ -257,7 +257,7 @@ export default {
        if (!course.value) return 0;
        const discount = Number(course.value.discount) || 0;
        const price = Number(course.value.price) || 0;
-       return discount > 0 ? price * (1 - discount / 100) : price;
+       return Math.floor(discount > 0 ? price * (1 - discount) : price);
     });
 
     const averageRating = computed(() => {
