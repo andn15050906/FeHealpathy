@@ -2,40 +2,29 @@
   <div class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Invite user to conversation</h2>
-        <p class="subtitle">Select a user to invite</p>
+        <h2>Invite users to conversation</h2>
+        <p class="subtitle">Select users to invite</p>
       </div>
 
       <div class="modal-body">
-        <input
-          v-model="search"
-          placeholder="Search user..."
-          @input="handleSearch"
-          class="input"
-        />
+        <input v-model="search" placeholder="Search user..." @input="handleSearch" class="input" />
         <ul v-if="searchResults.length" class="user-list">
-          <li
-            v-for="user in searchResults"
-            :key="user.id"
-            @click="selectUser(user)"
-            class="user-item"
-          >
+          <li v-for="user in searchResults" :key="user.id" @click="toggleUser(user)" class="user-item">
             <span class="user-name">{{ user.fullName }}</span>
             <span class="user-email">({{ user.email }})</span>
           </li>
         </ul>
       </div>
 
-      <div v-if="selectedUser" class="selected-user">
-        ✅ Selected: <strong>{{ selectedUser.fullName }}</strong>
+      <div v-if="selectedUsers.length" class="selected-user">
+        ✅ Selected:
+        <strong v-for="(user, idx) in selectedUsers" :key="user.id">
+          {{ user.fullName }}<span v-if="idx < selectedUsers.length - 1">, </span>
+        </strong>
       </div>
 
       <div class="modal-footer">
-        <button
-          @click="inviteUser"
-          :disabled="!selectedUser || isSubmitting"
-          class="btn primary"
-        >
+        <button @click="inviteUsers" :disabled="!selectedUsers.length || isSubmitting" class="btn primary">
           {{ isSubmitting ? "Inviting..." : "Invite" }}
         </button>
         <button @click="$emit('close')" class="btn secondary">Cancel</button>
@@ -48,9 +37,9 @@
 import { ref } from "vue";
 import { getUsers } from "@/scripts/api/services/userService";
 import { submitInviteMember } from "@/scripts/api/services/notificationService";
-import { createConversation } from "@/scripts/api/services/conversationService";
+import { createConversation, updateConversation } from "@/scripts/api/services/conversationService";
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "created"]);
 
 const props = defineProps({
   conversationId: String,
@@ -60,78 +49,94 @@ const props = defineProps({
 
 const search = ref("");
 const searchResults = ref([]);
-const selectedUser = ref(null);
+const selectedUsers = ref([]);
 const isSubmitting = ref(false);
 
 const handleSearch = async () => {
   const keyword = search.value.trim();
   if (keyword.length < 2) return;
 
-  let res = [];
   try {
-    res = (await getUsers({ name: keyword })).items;
-  } catch (err) {}
-  searchResults.value = res;
+    const res = (await getUsers({ name: keyword })).items || [];
+    searchResults.value = res.filter(u => !selectedUsers.value.some(s => s.id === u.id));
+  } catch (err) {
+    console.error("Search error:", err);
+  }
 };
 
-const selectUser = (user) => {
-  selectedUser.value = user;
-  searchResults.value = [];
-  search.value = user.fullName;
+const toggleUser = (user) => {
+  const exists = selectedUsers.value.find(u => u.id === user.id);
+  if (!exists) {
+    selectedUsers.value.push(user);
+    search.value = "";
+    searchResults.value = [];
+  }
 };
 
-const inviteUser = async () => {
-  if (!selectedUser.value || !props.conversationId) return;
+const inviteUsers = async () => {
+  if (!selectedUsers.value.length || !props.currentUser) return;
 
   isSubmitting.value = true;
 
   try {
-    const payload = {
-      conversationId: props.conversationId,
-      userIds: [selectedUser.value.id],
-    };
+    const userIds = selectedUsers.value.map(u => u.id);
 
-    await submitInviteMember(payload);
+    await submitInviteMember({
+      conversationId: props.conversationId,
+      userIds,
+    });
 
     const memberIds = [
       ...(props.currentRoomMembers || []),
-      props.currentUser?.id,
-      selectedUser.value.id,
+      props.currentUser.id,
+      ...userIds,
     ];
 
     const uniqueIds = [...new Set(memberIds.filter(Boolean))];
 
     const members = uniqueIds.map((id) => ({
       userId: id,
-      isAdmin: id === props.currentUser?.id,
+      isAdmin: id === props.currentUser.id,
     }));
 
-    const formData = new FormData();
-    formData.append("Title", "New Group");
-    formData.append("IsPrivate", "false");
+    if ((props.currentRoomMembers?.length || 0) >= 3) {
+      const formData = new FormData();
+      formData.append("Id", props.conversationId);
+      formData.append("Title", "Updated Group");
+      formData.append("IsPrivate", "false");
 
-    members.forEach((member, index) => {
-      formData.append(`Members[${index}].UserId`, member.userId);
-      formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
-    });
+      selectedUsers.value.forEach((user, index) => {
+        formData.append(`AddedMembers[${index}].UserId`, user.id);
+        formData.append(`AddedMembers[${index}].IsAdmin`, false);
+      });
 
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
+      await updateConversation(formData);
+
+    } else {
+      const formData = new FormData();
+      formData.append("Title", "New Group");
+      formData.append("IsPrivate", "false");
+
+      members.forEach((member, index) => {
+        formData.append(`Members[${index}].UserId`, member.userId);
+        formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
+      });
+
+      await createConversation(formData);
     }
-
-    // Gọi API tạo nhóm mới
-    await createConversation(formData);
 
     emit("created");
     emit("close");
-    selectedUser.value = null;
+    selectedUsers.value = [];
     search.value = "";
+    searchResults.value = [];
   } catch (error) {
     console.error("Invite failed:", error);
   } finally {
     isSubmitting.value = false;
   }
 };
+
 </script>
 
 <style scoped>
@@ -160,6 +165,7 @@ const inviteUser = async () => {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
