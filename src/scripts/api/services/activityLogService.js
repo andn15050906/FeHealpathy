@@ -161,22 +161,25 @@ export const getLinkByEventLabel = (label) => {
     return '#'; 
 };
 
-export const getLinkByRecommendation = (label, recommendationId) => {
+export const getLinkByObjectId = (label, entityObj) => {
     const event = TRACKED_EVENTS[label];
+    if (!entityObj)
+        entityObj = { id: '' }
+
     if (event) {
         switch (label) {
             case 'Mood_Updated':
                 return '/mood-cart'; 
             case 'Course_Completed':
-                return '/courses'; 
+                return `/courses/${entityObj.id ?? ''}`; 
             case 'Conversation_Joined':
                 return '/community'; 
             case 'Yoga_Practiced':
-                return '/yoga'; 
+                return `/yoga/poses/${entityObj.id ?? ''}`; 
             case 'Media_Viewed':
-                return '/media-resources'; 
+                return `/media-resources?id=${entityObj.id ?? ''}`; 
             case 'Submission_Created':
-                return `/self-assessment/${recommendationId}`; 
+                return `/self-assessment/${entityObj.id ?? ''}`; 
             case 'Routine_Created':
                 return '/habit-tracking'; 
             case 'DiaryNote_Created':
@@ -184,9 +187,11 @@ export const getLinkByRecommendation = (label, recommendationId) => {
             case 'Article_Created':
                 return '/blogs/create'; 
             case 'Conversation_Created':
-                return '/community'; 
+                return `/community?id=${entityObj ?? ''}`; 
             case 'ChatMessage_Created':
-                return '/chat'; 
+                if (entityObj.id)
+                    return `/chat?conversationId=${entityObj.id ?? ''}`;
+                return `/chat?id=${entityObj.id ?? ''}`;
             case 'MessageReaction_Created':
                 return '/chat'; 
             case 'Meeting_Created':

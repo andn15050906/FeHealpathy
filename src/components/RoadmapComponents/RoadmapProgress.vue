@@ -48,7 +48,7 @@
 
 <script>
 import { getProgress } from '@/scripts/api/services/statisticsService';
-import { getLinkByEventLabel, getLinkByRecommendation } from '@/scripts/api/services/activityLogService';
+import { getLinkByEventLabel, getLinkByObjectId } from '@/scripts/api/services/activityLogService';
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
@@ -204,9 +204,7 @@ export default {
         },
         gotoLinkByEvent(milestone) {
             if (milestone.recommendations?.length > 0) {
-                //console.log(milestone.eventName, milestone.recommendations[0].targetEntityId);
-                //console.log(getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId));
-                this.$router.push({ path: getLinkByRecommendation(milestone.eventName, milestone.recommendations[0].targetEntityId) });
+                this.$router.push({ path: getLinkByObjectId(milestone.eventName, milestone.recommendations[0].targetEntityId) });
             }
             else {
                 this.$router.push({ path: getLinkByEventLabel(milestone.eventName) });

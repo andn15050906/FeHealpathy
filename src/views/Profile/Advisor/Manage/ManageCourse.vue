@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="container">
     <h2 class="mb-3">
       <i class="fas fa-chalkboard-teacher me-2"></i>Course Management
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import moment from 'moment';
 import { getCourses, deleteCourse } from '@/scripts/api/services/courseService';
 import UpdateCourse from './UpdateCourse.vue';
@@ -59,6 +60,7 @@ export default {
   components: { UpdateCourse, DeleteConfirmPopup, Pagination },
   data() {
     return {
+	  sweetAlert: inject('sweetAlert'),
       courses: [],
       currentPage: 1,
       itemsPerPage: 20,
@@ -78,6 +80,7 @@ export default {
           await deleteCourse(this.courseToDelete.id);
           this.fetchCourses();
         } catch (error) {
+          await sweetAlert.showError('Không thể xóa khóa học này!');
         } finally {
           this.isDeletePopupVisible = false;
           this.courseToDelete = null;

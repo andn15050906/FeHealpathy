@@ -1,10 +1,10 @@
 <template>
   <div class="container mt-2">
-    <h2 class="fw-bold text-center mb-4 text-dark">Blog Catalog</h2>
+    <h2 class="fw-bold text-center mb-4 text-dark">Danh sách blog</h2>
 
     <div class="row justify-content-center mb-4">
       <div class="col-md-8">
-        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Search blogs..." />
+        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Tìm kiếm blog..." />
       </div>
     </div>
 
@@ -17,8 +17,8 @@
 
     <div class="sort-section">
       <select v-model="sortOption" @change="sortBlogs" class="form-select sort-select">
-        <option value="name-asc">Name A-Z</option>
-        <option value="name-desc">Name Z-A</option>
+        <option value="name-asc">Xếp theo tên A-Z</option>
+        <option value="name-desc">Xếp theo tên Z-A</option>
       </select>
     </div>
 
@@ -55,7 +55,8 @@ async function loadBlogs(page = 1) {
   try {
     const params = {
       pageIndex: currentPage.value - 1,
-      pageSize: itemsPerPage
+      pageSize: itemsPerPage,
+      tags: selectedTags.value
     };
 
     const response = await getPagedArticles(params);

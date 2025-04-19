@@ -3,7 +3,13 @@ import { get, postForm, patchForm, del } from '../apiClients';
 const API_BASE_URL = '/DiaryNotes';
 
 export const getPagedDiaryNotes = async (queryParams = {}) => {
-    return await get(`${API_BASE_URL}`, queryParams);
+    let response = await get(`${API_BASE_URL}`, queryParams);
+
+    for (let note of response?.items) {
+        note.creationTime = new Date(new Date(note.creationTime).getTime() + 11 * 60 * 60 * 1000).toISOString();
+    }
+
+    return response;
 };
 
 export const createDiaryNote = async (diaryNoteData) => {
