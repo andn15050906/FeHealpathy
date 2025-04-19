@@ -1,10 +1,10 @@
 <template>
   <div class="container mt-2">
-    <h2 class="fw-bold text-center mb-4 text-dark">Blog Catalog</h2>
+    <h2 class="fw-bold text-center mb-4 text-dark">Danh sách blog</h2>
 
     <div class="row justify-content-center mb-4">
       <div class="col-md-8">
-        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Search blogs..." />
+        <input v-model="searchQuery" type="text" class="form-control search-bar" placeholder="Tìm kiếm blog..." />
       </div>
     </div>
 
@@ -17,8 +17,8 @@
 
     <div class="sort-section">
       <select v-model="sortOption" @change="sortBlogs" class="form-select sort-select">
-        <option value="name-asc">Name A-Z</option>
-        <option value="name-desc">Name Z-A</option>
+        <option value="name-asc">Xếp theo tên A-Z</option>
+        <option value="name-desc">Xếp theo tên Z-A</option>
       </select>
     </div>
 
@@ -56,8 +56,7 @@ async function loadBlogs(page = 1) {
     const params = {
       pageIndex: currentPage.value - 1,
       pageSize: itemsPerPage,
-      search: searchQuery.value.trim() || undefined,
-      tags: selectedTags.value.length ? selectedTags.value.join(',') : undefined
+      tags: selectedTags.value
     };
 
     const response = await getPagedArticles(params);
@@ -85,54 +84,13 @@ function toggleTag(tagId) {
   loadBlogs(1);
 }
 
-// Sắp xếp blogs theo thứ tự A-Z hoặc Z-A
 function sortBlogs() {
-  blogs.value.sort((a, b) => {
-    if (sortOption.value === 'name-asc') {
-      return a.title.localeCompare(b.title);
-    } else {
-      return b.title.localeCompare(a.title);
-    }
-  });
-}
-
-// Gọi hàm sortBlogs khi thay đổi tùy chọn sắp xếp
-watch(sortOption, () => {
-  sortBlogs();
-});
-
-// Fetch all blogs and sort them
-async function fetchAndSortBlogs() {
-  try {
-    const response = await getPagedArticles({ pageIndex: 0, pageSize: 120 }); // Fetch a large number to cover all blogs
-    blogs.value = response.items || [];
-    
-    // Sort blogs by title
-    blogs.value.sort((a, b) => {
-      if (sortOption.value === 'name-asc') {
-        return a.title.localeCompare(b.title);
-      } else {
-        return b.title.localeCompare(a.title);
-      }
-    });
-
-    // Paginate sorted blogs
-    paginateBlogs();
-  } catch (e) {
-    console.error('Failed to fetch and sort blogs', e);
-  }
-}
-
-// Paginate the sorted blogs
-function paginateBlogs() {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  blogs.value = blogs.value.slice(start, end);
+  loadBlogs(1);
 }
 
 onBeforeMount(async () => {
   await loadTags();
-  fetchAndSortBlogs();
+  loadBlogs();
 });
 
 let searchTimeout;
@@ -144,9 +102,6 @@ function onSearchChange() {
 }
 
 watch(searchQuery, onSearchChange);
-
-// Update pagination when page changes
-watch(currentPage, paginateBlogs);
 </script>
 
 <style scoped>
