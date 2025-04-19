@@ -31,24 +31,28 @@
         <transition name="fade">
           <div class="events-list" key="eventList">
             <div v-if="currentEvents.length === 0" class="no-events">
-              Không có sự kiện nào trong ngày này
+              Không có thói quen nào trong ngày này
             </div>
             <div v-else v-for="(event, idx) in currentEvents" :key="event.id || idx"
               class="event-item holding-wrapper mt-1"
-              :class="{ collapsed: event.completed || event.closed, holding: event.holding }"
+              :class="{ collapsed: event.completed || event.closed, holding: event.holding, 'repeating-event': event.repeaterSequenceId || event.repeat !== 'none' }"
               :style="[{ borderLeft: '4px solid ' + (event.completed || event.closed ? '#bbb' : event.tag) }, { '--event-color': event.tag }]"
               @mousedown="startHold(event)" @mouseup="cancelHold" @mouseleave="cancelHold">
               <div class="event-info">
                 <div class="event-title" :class="{ collapsed: event.completed || event.closed }">
                   <span class="title-text" :class="{ collapsed: event.completed || event.closed }">
                     {{ event.title }}
+                    <i v-if="event.repeaterSequenceId" class="fa-solid fa-repeat repeat-icon"
+                      :style="{ color: event.tag }"></i>
                   </span>
-                  <template v-if="event.closed">
-                    <i class="fa-solid fa-ban closed-icon"></i>
-                  </template>
-                  <template v-else-if="event.completed">
-                    <i class="fa-solid fa-check completed-icon"></i>
-                  </template>
+                  <div class="event-status-icons">
+                    <template v-if="event.closed">
+                      <i class="fa-solid fa-ban closed-icon"></i>
+                    </template>
+                    <template v-else-if="event.completed">
+                      <i class="fa-solid fa-check completed-icon"></i>
+                    </template>
+                  </div>
                 </div>
                 <template v-if="!event.completed && !event.closed">
                   <div class="event-description">
@@ -84,7 +88,7 @@
           </div>
         </transition>
         <button class="add-event-btn" @click="openNewEventForm">
-          <i class="fa-solid fa-plus"></i> Thêm Sự Kiện
+          <i class="fa-solid fa-plus"></i> Thêm thói quen mới
         </button>
       </div>
     </div>
@@ -96,15 +100,18 @@
     <transition name="fade">
       <div v-if="showEventForm" class="event-form-modal">
         <div class="modal-content add-event-form">
-          <h3>{{ isEditing ? "Chỉnh Sửa Sự Kiện" : "Sự Kiện Mới" }}</h3>
+          <h3>{{ isEditing ? "Chỉnh Sửa Thói Quen" : "Thêm Thói Quen mới" }}</h3>
           <div class="form-group">
             <label for="title">Tiêu đề</label>
-            <input id="title" v-model="newEvent.title" class="form-input" placeholder="Nhập tiêu đề sự kiện" />
+            <input id="title" v-model="newEvent.title" class="form-input" placeholder="Nhập tiêu đề thói quen"
+              @input="validateTitleConstraints" />
+            <div v-if="titleError" class="error-message" style="color: #e74c3c;">{{ titleError }}</div>
           </div>
           <div class="form-group">
             <label for="description">Mô tả</label>
             <textarea id="description" v-model="newEvent.description" class="form-input"
-              placeholder="Nhập mô tả sự kiện"></textarea>
+              placeholder="Nhập mô tả Thói quen" @input="validateDescriptionConstraints"></textarea>
+            <div v-if="descriptionError" class="error-message" style="color: #e74c3c;">{{ descriptionError }}</div>
           </div>
           <div class="form-group">
             <label for="objective">Mục tiêu</label>
@@ -124,14 +131,23 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="!isEditing">
             <label for="repeat">Lặp lại</label>
             <select id="repeat" v-model="newEvent.repeat" class="form-input">
               <option value="none">Không lặp lại</option>
               <option value="weekday">Ngày trong tuần (T2-T6)</option>
-              <option value="allMonth">Cả tháng</option>
               <option value="weekends">Cuối tuần (T7, CN)</option>
+              <option value="allWeek">Cả tuần</option>
+              <option value="allMonth">Cả tháng</option>
             </select>
+          </div>
+          <div v-if="isEditing && newEvent.repeaterSequenceId" class="form-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="updateAllInSequence" v-model="newEvent.updateAllInSequence"
+                class="styled-checkbox" />
+              <label for="updateAllInSequence" class="checkbox-label">Áp dụng thay đổi cho những thói quen lặp
+                lại?</label>
+            </div>
           </div>
           <div class="form-group time-group">
             <div>
@@ -143,16 +159,36 @@
               <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
             </div>
           </div>
-          <div v-if="timeError" class="error-message">{{ timeError }}</div>
+          <div v-if="timeError" class="error-message" style="color: #e74c3c;">{{ timeError }}</div>
           <div class="modal-actions">
             <button class="btn cancel-btn" @click="cancelEvent">Hủy bỏ</button>
-            <button class="btn save-btn" @click="saveEvent" :disabled="!!timeError">Lưu lại</button>
+            <button class="btn save-btn" @click="saveEvent"
+              :disabled="!!timeError || !!titleError || !!descriptionError">Lưu lại</button>
           </div>
         </div>
       </div>
     </transition>
-    <DeleteConfirmPopup :message="`Bạn có chắc chắn muốn xóa thói quen này?`" :isVisible="showDeletePopup"
-      @confirmDelete="handleDeleteConfirm" @update:isVisible="showDeletePopup = false" />
+    <DeleteConfirmPopup :message="deleteMessage" :isVisible="showDeletePopup" @confirmDelete="handleDeleteConfirm"
+      @update:isVisible="showDeletePopup = false" />
+    <div v-if="showDeleteOptions" class="event-form-modal">
+      <div class="modal-content delete-options-modal">
+        <h3>Xóa thói quen lặp lại</h3>
+        <p>Thói quen này là một phần của chuỗi thói quen lặp lại. Bạn muốn xóa:</p>
+        <div class="delete-options">
+          <button class="btn delete-option-btn" @click="deleteCurrentEvent">
+            <i class="fa-solid fa-calendar-day"></i>
+            Chỉ thói quen này
+          </button>
+          <button class="btn delete-option-btn delete-all" @click="deleteAllEvents">
+            <i class="fa-solid fa-calendar-week"></i>
+            Tất cả thói quen
+          </button>
+        </div>
+        <div class="modal-actions mt-4">
+          <button class="btn cancel-btn" @click="showDeleteOptions = false">Hủy bỏ</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -232,13 +268,18 @@ export default {
         tag: "#3498db",
         repeat: "none",
         startTime,
-        endTime
+        endTime,
+        updateAllInSequence: true
       },
       timeError: "",
+      titleError: "",
+      descriptionError: "",
       eventToDelete: null,
       showEventForm: false,
       showDeletePopup: false,
+      showDeleteOptions: false,
       isEditing: false,
+      deleteMessage: "Bạn có chắc chắn muốn xóa thói quen này?",
       tagPresets: [
         { color: "#2ecc71", label: "Thấp" },
         { color: "#3498db", label: "Trung bình" },
@@ -277,6 +318,12 @@ export default {
     },
     'newEvent.endTime': function () {
       this.validateTimeConstraints();
+    },
+    'newEvent.title': function () {
+      this.validateTitleConstraints();
+    },
+    'newEvent.description': function () {
+      this.validateDescriptionConstraints();
     }
   },
   computed: {
@@ -375,6 +422,46 @@ export default {
 
       this.timeError = "";
     },
+    validateTitleConstraints() {
+      if (!this.newEvent.title || this.newEvent.title.trim() === "") {
+        this.titleError = "Tiêu đề không được để trống";
+        return;
+      }
+
+      const title = this.newEvent.title.trim();
+
+      if (title.length > 30) {
+        this.titleError = "Tiêu đề không được vượt quá 30 ký tự";
+        return;
+      }
+
+      if (title.length < 3) {
+        this.titleError = "Tiêu đề phải có ít nhất 3 ký tự";
+        return;
+      }
+
+      this.titleError = "";
+    },
+    validateDescriptionConstraints() {
+      if (!this.newEvent.description || this.newEvent.description.trim() === "") {
+        this.descriptionError = "Mô tả không được để trống";
+        return;
+      }
+
+      const description = this.newEvent.description.trim();
+
+      if (description.length > 200) {
+        this.descriptionError = "Mô tả không được vượt quá 200 ký tự";
+        return;
+      }
+
+      if (description.length < 10) {
+        this.descriptionError = "Mô tả phải có ít nhất 10 ký tự";
+        return;
+      }
+
+      this.descriptionError = "";
+    },
     dayClasses(day) {
       return {
         "calendar-day": true,
@@ -404,9 +491,11 @@ export default {
     },
     prevMonth() {
       this.currentDate = subMonths(this.currentDate, 1);
+      this.$emit('month-changed', this.currentDate);
     },
     nextMonth() {
       this.currentDate = addMonths(this.currentDate, 1);
+      this.$emit('month-changed', this.currentDate);
     },
     selectDay(day) {
       this.selectedDate = day.date;
@@ -417,84 +506,15 @@ export default {
     openNewEventForm() {
       this.isEditing = false;
       this.timeError = "";
-      this.showEventForm = true;
-    },
-    editEvent(event) {
-      this.isEditing = true;
-      this.newEvent = { ...event, isUpdate: true };
-      this.timeError = "";
-      this.showEventForm = true;
-      this.validateTimeConstraints();
-    },
-    saveAddEvent() {
-      if (!this.newEvent.title) return;
-
-      this.validateTimeConstraints();
-      if (this.timeError) return;
-
-      let savedEvent = {
-        ...this.newEvent,
-        id: Date.now().toString(),
-        date: format(this.selectedDate, "yyyy-MM-dd"),
-        completed: false,
-        closed: false
-      };
-
-      const exists = this.localEvents.some(e =>
-        dfIsSameDay(new Date(e.date), this.selectedDate) &&
-        e.title === savedEvent.title &&
-        e.startTime === savedEvent.startTime
-      );
-
-      if (!exists) {
-        this.localEvents.push(savedEvent);
-      }
-
-      this.$emit("save-event", savedEvent);
-      this.cancelEvent();
-      setTimeout(() => {
-        this.renderChart();
-      }, 1000);
-    },
-    saveUpdateEvent() {
-      if (!this.newEvent.title) return;
-
-      this.validateTimeConstraints();
-      if (this.timeError) return;
-
-      const index = this.localEvents.findIndex(e => e.id === this.newEvent.id);
-      if (index !== -1) {
-        const updatedEvent = {
-          ...this.newEvent,
-          date: format(this.selectedDate, "yyyy-MM-dd")
-        };
-
-        this.localEvents.splice(index, 1, updatedEvent);
-        this.$emit("save-event", updatedEvent);
-      }
-
-      this.cancelEvent();
-      setTimeout(() => {
-        this.renderChart();
-      }, 1000);
-    },
-    saveEvent() {
-      if (this.isEditing) {
-        this.saveUpdateEvent();
-      } else {
-        this.saveAddEvent();
-      }
-    },
-    cancelEvent() {
-      this.showEventForm = false;
-      this.isEditing = false;
-      this.timeError = "";
+      this.titleError = "";
+      this.descriptionError = "";
       const now = new Date();
       const startTime = getRoundedTime(now);
       const [startHour, startMinute] = startTime.split(":").map(Number);
       const endDate = new Date(now);
       endDate.setHours(startHour + 1, startMinute, 0, 0);
       const endTime = formatTime(endDate);
+
       this.newEvent = {
         title: "",
         description: "",
@@ -502,20 +522,121 @@ export default {
         tag: "#3498db",
         repeat: "none",
         startTime,
-        endTime
+        endTime,
+        updateAllInSequence: true
+      };
+
+      this.showEventForm = true;
+    },
+    editEvent(event) {
+      this.isEditing = true;
+      this.newEvent = {
+        ...event,
+        isUpdate: true,
+        updateAllInSequence: true,
+        repeat: event.repeaterSequenceId ? "custom" : "none"
+      };
+      this.timeError = "";
+      this.titleError = "";
+      this.descriptionError = "";
+      this.showEventForm = true;
+      this.validateTimeConstraints();
+      this.validateTitleConstraints();
+      this.validateDescriptionConstraints();
+    },
+    saveEvent() {
+      this.validateTitleConstraints();
+      this.validateDescriptionConstraints();
+      this.validateTimeConstraints();
+
+      if (this.titleError || this.descriptionError || this.timeError) {
+        return;
+      }
+
+      // For new events
+      if (!this.isEditing) {
+        const savedEvent = {
+          ...this.newEvent,
+          id: Date.now().toString(),
+          date: format(this.selectedDate, "yyyy-MM-dd"),
+          completed: false,
+          closed: false
+        };
+
+        this.$emit("save-event", savedEvent);
+      }
+      else {
+        const updatedEvent = {
+          ...this.newEvent,
+          date: format(this.selectedDate, "yyyy-MM-dd")
+        };
+
+        this.$emit("save-event", updatedEvent);
+      }
+
+      this.showEventForm = false;
+      this.isEditing = false;
+
+      setTimeout(() => {
+        this.renderChart();
+      }, 1000);
+    },
+    cancelEvent() {
+      this.showEventForm = false;
+      this.isEditing = false;
+      this.timeError = "";
+      this.titleError = "";
+      this.descriptionError = "";
+
+      const now = new Date();
+      const startTime = getRoundedTime(now);
+      const [startHour, startMinute] = startTime.split(":").map(Number);
+      const endDate = new Date(now);
+      endDate.setHours(startHour + 1, startMinute, 0, 0);
+      const endTime = formatTime(endDate);
+
+      this.newEvent = {
+        title: "",
+        description: "",
+        objective: "",
+        tag: "#3498db",
+        repeat: "none",
+        startTime,
+        endTime,
+        updateAllInSequence: true
       };
     },
-    confirmDeleteEvent(e) {
-      this.eventToDelete = e;
+    confirmDeleteEvent(event) {
+      this.eventToDelete = event;
+
+      if (event.repeaterSequenceId) {
+        this.showDeleteOptions = true;
+      } else {
+        this.deleteMessage = "Bạn có chắc chắn muốn xóa thói quen này?";
+        this.showDeletePopup = true;
+      }
+    },
+    deleteCurrentEvent() {
+      this.showDeleteOptions = false;
+      this.eventToDelete.deleteAllInSequence = false;
+      this.deleteMessage = "Bạn có chắc chắn muốn xóa chỉ thói quen này?";
       this.showDeletePopup = true;
     },
-    handleDeleteConfirm(c) {
-      if (c) {
+    deleteAllEvents() {
+      this.showDeleteOptions = false;
+      this.eventToDelete.deleteAllInSequence = true;
+      this.deleteMessage = "Bạn có chắc chắn muốn xóa tất cả các thói quen lặp lại này?";
+      this.showDeletePopup = true;
+    },
+    handleDeleteConfirm(confirmed) {
+      if (confirmed && this.eventToDelete) {
         this.$emit("delete-event", this.eventToDelete);
       }
       this.showDeletePopup = false;
       this.eventToDelete = null;
-      this.renderChart();
+      setTimeout(() => {
+        this.renderChart();
+      }, 1000);
     },
     startHold(event) {
       if (event.closed) return;
@@ -567,7 +688,7 @@ export default {
           maintainAspectRatio: false,
           plugins: {
             legend: { position: "bottom" },
-            title: { display: true, text: "Tiến độ công việc hôm nay" }
+            title: { display: true, text: "Tiến độ đạt được hôm nay" }
           }
         }
       });
@@ -851,7 +972,7 @@ export default {
   padding: 30px;
   border-radius: 10px;
   width: 90%;
-  max-width: 500px;
+  max-width: 650px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -1008,5 +1129,124 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.event-status-icons {
+  display: flex;
+  align-items: center;
+}
+
+.delete-confirm-popup,
+.event-form-modal.delete-confirm-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-confirm-popup .modal-content,
+.modal-content.delete-options-modal {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.delete-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.delete-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.delete-option-btn i {
+  flex-shrink: 0;
+}
+
+.delete-option-btn:hover {
+  background: #e2e6ea;
+}
+
+.delete-option-btn.delete-all {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.delete-option-btn.delete-all:hover {
+  background: #c0392b;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  display: flex;
+  gap: 10px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  margin-top: 5px;
+}
+
+.styled-checkbox {
+  position: relative;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3498db;
+  border-radius: 4px;
+  background: #fff;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.styled-checkbox:checked {
+  background: #3498db;
+}
+
+.styled-checkbox:checked::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+}
+
+.checkbox-label {
+  font-size: 0.95rem;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.styled-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 </style>
