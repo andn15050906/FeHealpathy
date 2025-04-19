@@ -230,7 +230,7 @@ export default {
                 },
                 {
                     _id: "00000000-0000-0000-0000-000000000001",
-                    username: "Người bạn AI đồng hành",
+                    username: "Hapi",
                     avatar: 'https://img.freepik.com/free-vector/cartoon-style-robot-vectorart_78370-4103.jpg?t=st=1738321862~exp=1738325462~hmac=b560fdb38b0ed4d909df8515962e618b4608320fd6b2997b8773c39d498f10d4&w=826'
                 }
             ];
