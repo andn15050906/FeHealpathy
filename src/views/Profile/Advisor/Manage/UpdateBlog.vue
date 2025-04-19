@@ -176,8 +176,14 @@ onMounted(async () => {
         header: section.header || section.title,
         content: section.content,
         thumb: null,
-        previewImage: section.media?.url || section.thumb?.url,
-        thumbTitle: section.media?.title || section.thumb?.title,
+        addedMedia: null,
+        removedMedia: null,
+        previewImage: section.thumb?.url || null,
+        existingThumb: section.thumb ? {
+          id: section.thumb.id,
+          url: section.thumb.url,
+          title: section.thumb.title
+        } : null
       })),
     };
 
@@ -225,7 +231,11 @@ const handleSectionThumbUpload = (event, index) => {
         ...blog.value.sections[index],
         thumb: file,
         previewImage: e.target.result,
+        addedMedia: file
       };
+      if (blog.value.sections[index].existingThumb?.id) {
+        blog.value.sections[index].removedMedia = blog.value.sections[index].existingThumb.id;
+      }
       errors.sections[index].thumb = "";
     };
     reader.readAsDataURL(file);
@@ -238,6 +248,8 @@ const addSection = () => {
     thumb: null,
     previewImage: null,
     content: "",
+    addedMedia: null,
+    removedMedia: null
   });
   errors.sections.push({ header: "", content: "", thumb: "" });
 };
@@ -296,15 +308,21 @@ const submitBlogInternal = async () => {
     if (blog.value.sections && blog.value.sections.length > 0) {
       blog.value.sections.forEach((section, index) => {
         formData.append(`Sections[${index}].Id`, section.id || "");
-        formData.append(`Sections[${index}].Title`, section.header);
+        formData.append(`Sections[${index}].Header`, section.header);
         formData.append(`Sections[${index}].Content`, section.content);
 
-        if (section.thumb instanceof File) {
-          formData.append(`Sections[${index}].Thumb.File`, section.thumb);
-          formData.append(`Sections[${index}].Thumb.Title`, section.thumb.name);
-        } else if (section.previewImage) {
-          formData.append(`Sections[${index}].Thumb.Url`, section.previewImage);
-          formData.append(`Sections[${index}].Thumb.Title`, section.thumbTitle);
+        if (section.removedMedia) {
+          formData.append(`Sections[${index}].RemovedMedia`, section.removedMedia);
+        }
+
+        if (section.addedMedia instanceof File) {
+          formData.append(`Sections[${index}].AddedMedia.File`, section.addedMedia);
+          formData.append(`Sections[${index}].AddedMedia.Title`, section.addedMedia.name);
+          formData.append(`Sections[${index}].AddedMedia.Type`, 1); // 1 for image type
+        } else if (section.existingThumb && !section.removedMedia) {
+          formData.append(`Sections[${index}].Thumb.Id`, section.existingThumb.id || "");
+          formData.append(`Sections[${index}].Thumb.Url`, section.existingThumb.url);
+          formData.append(`Sections[${index}].Thumb.Title`, section.existingThumb.title || "Section Image");
         }
       });
     }
