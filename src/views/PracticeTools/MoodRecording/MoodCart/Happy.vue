@@ -100,7 +100,7 @@ export default {
                     await updateDiaryNote(formData);
                 } else {
                     formData.append("mood", mood);
-                    await createDiaryNoteWithMood(formData);
+                    await createDiaryNote(formData);
                     diaryNoteId.value = response.id;
                 }
             } catch (error) {
