@@ -8,7 +8,7 @@
                     style="background-image: url(/assets/images/10.jpg);"></div>
             </RouterLink>
             <span class="level">{{ getLevelText(course.level) }}</span>
-            <span v-if="course.discount > 0" class="discount-badge">-{{ course.discount }}%</span>
+            <span v-if="course.discount > 0" class="discount-badge">-{{ Math.floor(course.discount * 100) }}%</span>
         </div>
         <div class="course-content p-3 d-flex flex-column">
             <h3 class="course-title mb-2">{{ course.title }}</h3>
