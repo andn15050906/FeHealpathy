@@ -76,7 +76,7 @@ export default {
       try {
         var user = await getUserProfile();
         const data = await getPagedDiaryNotes({ CreatorId: user.id });
-        this.entries = data.items || [];
+        this.entries = (data.items || []).filter(entry => !!entry.title);
       } catch (error) {
         Swal.fire("Lỗi", "Không thể tải danh sách nhật ký.", "error");
       }
