@@ -10,6 +10,7 @@
             <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
         </v-stepper-vertical-item>
     </v-stepper-vertical>
+    <div v-else-if="loading"></div>
     <v-card v-else>
         <v-card-title class="d-flex align-center title-section">
             <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
@@ -25,6 +26,7 @@ import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapSer
 
 const router = useRouter();
 const personalRoadmap = ref({});
+const loading = ref(true);
 const currentPhaseIndex = ref(1);
 const isFollowBtnGlowing = ref(false);
 const steps = ref([]);
@@ -65,6 +67,7 @@ function goToStep(index) {
 }
 
 async function fetchPersonalRoadmap() {
+    loading.value = true;
     personalRoadmap.value = await getCurrentRoadmapWithProgress();
     steps.value = personalRoadmap.value?.phases?.sort((a, b) => a.index - b.index).map((_, index) => {
         if (personalRoadmap.value.currentPhase?.id == _.id)
@@ -83,6 +86,7 @@ async function fetchPersonalRoadmap() {
             reference: getReference()
         })
     }
+    loading.value = false;
 
     if (personalRoadmap.value?.isCompleted)
         currentPhaseIndex.value = personalRoadmap.value.phases.length + 1;

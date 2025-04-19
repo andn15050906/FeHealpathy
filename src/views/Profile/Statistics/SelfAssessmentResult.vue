@@ -3,7 +3,7 @@
     :centered="true"></StatisticsTabs>
 
   <div class="container">
-    <h1 class="title">📊 Survey Statistics (Self Assessment)</h1>
+    <h1 class="title">📊 Kết quả tự đánh giá</h1>
 
     <div class="section">
       <h2>📅 Lịch sử khảo sát</h2>
@@ -14,16 +14,25 @@
             <th>Score</th>
             <th>Evaluation</th>
             <th>Date</th>
+            <th>Review</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(result, index) in surveyResults" :key="index">
             <td>{{ result.surveyTitle }}</td>
-            <td>{{ result.score }} / {{ result.maxScore }}</td>
-            <td :class="result.bands[0].ratingClass">
+            <!--...-->
+            <td>{{ result.score <= result.maxScore ? result.score : result.maxScore }} / {{ result.maxScore }}</td>
+            <td v-if="result.bands.length > 0" :class="result.bands[0].ratingClass">
+              {{ getEvaluation(result) }}
+            </td>
+            <td v-else :class="
+              getChartColor(result) == '#e91e63' ? 'bad':
+              getChartColor(result) == '#ffc107' ? 'average':
+              'good'">
               {{ getEvaluation(result) }}
             </td>
             <td>{{ localFormatISODate(result.creationTime) }}</td>
+            <td><RouterLink :to="{ name: 'SubmissionReview', params: { id: result.id} }">Review</RouterLink></td>
           </tr>
         </tbody>
       </table>
@@ -80,8 +89,21 @@ export default {
         else if (band.ratingClass == 'good')
           return "Positive 👍"
       }
-      return "Neutral ⚠️";
+      return result.score > (result.maxScore / 2) ? "Negative 😔" : "Positive 👍";
     };
+
+    const getChartColor = (result) => {
+      let band = result.bands[0];
+      if (band) {
+        if (band.ratingClass == 'bad')
+          return "#e91e63";
+        else if (band.ratingClass == 'average')
+          return "#ffc107"
+        else if (band.ratingClass == 'good')
+          return "#4caf50"
+      }
+      return result.score > (result.maxScore / 2) ? "#e91e63" : "#4caf50";
+    }
 
     const renderCharts = () => {
       new Chart(pieChart.value, {
@@ -104,8 +126,8 @@ export default {
           datasets: [
             {
               label: "Survey Score (based on Score scale = 100)",
-              data: surveyResults.value.map((r) => (r.score / r.maxScore) * 100),    // r.maxScore > 0
-              backgroundColor: ["#4CAF50", "#FFC107", "#E91E63", "#03A9F4", "#8E44AD"],
+              data: surveyResults.value.map(r => (r.score / r.maxScore) * 100),    // r.maxScore > 0
+              backgroundColor: surveyResults.value.map(r => getChartColor(r)),
               borderWidth: 1,
             },
           ],
@@ -133,6 +155,7 @@ export default {
         if (survey) {
           let result = calcSurveyResult(survey, submission.choices);
           resultArr.push({
+            id: submission.id,
             surveyTitle: survey.name,
             creationTime: submission.creationTime,
             score: result.score,
@@ -156,6 +179,10 @@ export default {
           else if (band.ratingClass == 'good')
             positive.value++;
         }
+        else if (result.score > (result.maxScore / 2))
+          negative.value++;
+        else
+          positive.value++;
       });
 
       renderCharts();
@@ -164,6 +191,7 @@ export default {
     return {
       surveyResults,
       getEvaluation,
+      getChartColor,
       pieChart,
       barChart,
       renderCharts

@@ -1,15 +1,20 @@
 <template>
     <v-container :class="optionsRef.isTransparentStyle ? 'quiz-container' : 'quiz-container quiz-background'" :style="{padding: padding}">
-        <v-card v-if="optionsRef.title" class="title-card">{{ optionsRef.title }}</v-card>
+        <v-card v-if="optionsRef.title" class="title-card">
+            <h2> Kết quả đánh giá {{ optionsRef.title }}</h2>
+            <h6>{{ getDescription(optionsRef.title) }}</h6>
+        </v-card>
         <v-card v-if="optionsRef.isReadOnly && result">
             <v-card-title><h4>{{ text.result }}</h4></v-card-title>
             <v-card-text class="test-result">
-                <p>{{ text.score }} <strong>{{ result.score }}</strong></p>
-                <p v-for="(band) in result.bands">
-                    {{ band.name }}: 
+                <p>{{ text.score }} <strong>{{ result.score }} / {{ result.maxScore }}</strong></p>
+                <span v-for="(band) in result.bands">
+                    {{ renderBandName(band.name) }}: 
                     <span :class="`score-${band.ratingClass}`">{{ band.rating }}</span>
-                </p>
+                    <p>{{ text.advice }} <strong>{{ getMentalHealthAdvice(band.name, band.ratingClass) }}</strong></p>
+                </span>
             </v-card-text>
+            <v-card-text><h4>Kiểm tra câu trả lời của bạn:</h4></v-card-text>
         </v-card>
         <div v-if="isSinglePage" class="progress mb-4" style="height: 30px;">
           <div class="progress-bar progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"
@@ -62,6 +67,7 @@
 import { ref, watch } from 'vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import { SurveyOptions } from '@/scripts/types/SurveyOptions';
+import { calcSurveyResult } from '@/scripts/logic/utils';
 
 const props = defineProps({
     options: {
@@ -124,66 +130,87 @@ const resetSurvey = () => {
 }
 
 const setSurveyAndAnswers = (options, choices) => {
-    let answerArr = [];
-    let score = 0;
     optionsRef.value = options;
-    optionsRef.value.survey.questions.forEach((question, index) => {
-        let choice = choices.find(choice => choice.mcqQuestionId == question.id);
-        if (choice) {
-            answerArr[index] = choice.mcqAnswerId;
-            let answer = question.answers.find(answer => answer.id == choice.mcqAnswerId)
-            score += answer.score;
-        }
-    });
-    submission.value = answerArr;
-
-    // Sử dụng Set để lưu trữ các band name đã xử lý
-    const processedBandNames = new Set();
-    let matchingBands = [];
-
-    for (let band of optionsRef.value.survey.bands) {
-        if (band.minScore <= score && band.maxScore >= score) {
-            const bandNameMapping = {
-                'Depression': 'Trầm cảm',
-                'Stress': 'Căng thẳng',
-                'Anxiety': 'Lo âu',
-            };
-
-            const bandNameInVietnamese = bandNameMapping[band.bandName] || band.bandName;
-
-            // Kiểm tra nếu band name này đã được xử lý
-            if (!processedBandNames.has(bandNameInVietnamese)) {
-                processedBandNames.add(bandNameInVietnamese);
-
-                if (['normal', 'mild'].includes(band.bandRating.toLowerCase())) {
-                    matchingBands.push({
-                        name: bandNameInVietnamese,
-                        rating: 'Tốt',
-                        ratingClass: 'good'
-                    });
-                }
-                else if (['moderate'].includes(band.bandRating.toLowerCase())) {
-                    matchingBands.push({
-                        name: bandNameInVietnamese,
-                        rating: 'Trung bình',
-                        ratingClass: 'average'
-                    });
-                }
-                else if (['severe', 'examplely severe'].includes(band.bandRating.toLowerCase())) {
-                    matchingBands.push({
-                        name: bandNameInVietnamese,
-                        rating: 'Tệ',
-                        ratingClass: 'bad'
-                    });
-                }
-            }
-        }
-    }
-
+    var calcResult = calcSurveyResult(optionsRef.value.survey, choices)
+    console.log(calcResult);
+    submission.value = calcResult.answers;
     result.value = {
-        score: score,
-        bands: matchingBands
+        score: calcResult.score,
+        maxScore: calcResult.maxScore,
+        bands: calcResult.bands
     }
+}
+
+const renderBandName = (text) => {
+    if (text == 'Anxiety')
+        return 'Đánh giá tình trạng Lo lắng';
+    if (text == 'Depression')
+        return 'Đánh giá tình trạng Trầm cảm';
+    if (text == 'Stress')
+        return 'Đánh giá tình trạng Căng thẳng';
+    if (text == 'Body Disorder')
+        return 'Đánh giá tình trạng Rối loạn chuyển hóa';
+    if (text == 'Self-Esteem')
+        return 'Đánh giá Mức độ tự trọng';
+    if (text == 'Well-being')
+        return 'Đánh giá Tình trạng ổn định';
+    return text;
+}
+
+const getMentalHealthAdvice = (text, value) => {
+  const adviceMap = {
+    'Anxiety': {
+      'bad': 'Hãy thử các kỹ thuật thư giãn như thở sâu hoặc thiền để giảm căng thẳng.',
+      'average': 'Bạn đang đi đúng hướng, duy trì thói quen thư giãn đều đặn nhé.',
+      'good': 'Bạn đang kiểm soát tốt lo lắng, hãy giữ vững phong độ này!'
+    },
+    'Depression': {
+      'bad': 'Đừng ngần ngại tìm sự giúp đỡ từ người thân hoặc chuyên gia tâm lý.',
+      'average': 'Hãy cố gắng duy trì hoạt động tích cực hàng ngày để nâng cao tâm trạng.',
+      'good': 'Bạn đang làm rất tốt trong việc giữ tinh thần lạc quan, hãy tiếp tục nhé!'
+    },
+    'Stress': {
+      'bad': 'Hãy dành thời gian nghỉ ngơi và thư giãn để giảm bớt stress.',
+      'average': 'Bạn đã có những cách xử lý stress, hãy cố gắng duy trì nhé.',
+      'good': 'Bạn kiểm soát tốt căng thẳng, giữ vững phong độ này!'
+    },
+    'Body Disorder': {
+      'bad': 'Hãy tìm kiếm sự giúp đỡ chuyên nghiệp để xử lý các vấn đề về hình thể.',
+      'average': 'Bạn đang cố gắng cải thiện, hãy kiên trì hơn nữa.',
+      'good': 'Bạn đang có thái độ tích cực trong việc chăm sóc bản thân, hãy tiếp tục!'
+    },
+    'Self-Esteem': {
+      'bad': 'Hãy tập trung vào những điểm mạnh của bản thân để nâng cao tự tin.',
+      'average': 'Bạn đã có những bước tiến, hãy tự tin hơn nữa.',
+      'good': 'Bạn tự tin và yêu quý chính mình, hãy giữ vững điều đó!'
+    },
+    'Well-being': {
+      'bad': 'Hãy chú ý đến sức khỏe tinh thần bằng cách duy trì thói quen sinh hoạt lành mạnh.',
+      'average': 'Bạn đang duy trì cuộc sống tốt, hãy cố gắng hơn nữa.',
+      'good': 'Bạn đang có phong cách sống tích cực, hãy tiếp tục nhé!'
+    }
+  };
+
+  if (adviceMap[text] && adviceMap[text][value]) {
+    return adviceMap[text][value];
+  } else {
+    return '';
+  }
+}
+
+const getDescription = (surveyName) => {
+    const surveyDescriptions = {
+        "CD-RISC-10": "CD-RISC-10 đánh giá khả năng thích nghi và khả năng chống chịu căng thẳng của cá nhân.",
+        "Wellness Assessment": "Wellness Assessment đánh giá tổng thể về trạng thái sức khỏe tâm thần và thể chất của người dùng.",
+        "BSI-18": "BSI-18 đo lường các triệu chứng tâm thần chính như lo âu, trầm cảm và rối loạn tâm thần tổng quát.",
+        "DASS-21": "DASS-21 đánh giá mức độ căng thẳng, lo âu và trầm cảm trong cộng đồng hoặc cá nhân.",
+        "First Evaluation": "First Evaluation là đánh giá ban đầu về trạng thái tâm lý, cảm xúc và các yếu tố liên quan.",
+        "RSE": "RSE (Rosenberg Self-Esteem Scale) đo lường mức độ tự trọng và tự đánh giá bản thân.",
+        "WHO-5": "WHO-5 là thang đo hạnh phúc tổng thể, phản ánh trạng thái cảm xúc tích cực và tâm trạng chung.",
+        "GAD-7": "GAD-7 đánh giá mức độ lo âu tổng quát và khả năng kiểm soát lo lắng của người dùng."
+    };
+
+    return surveyDescriptions[surveyName] || "Không có mô tả cho bài kiểm tra này.";
 }
 
 // do not update props
