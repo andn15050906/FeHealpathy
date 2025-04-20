@@ -16,7 +16,7 @@
       <div class="user-actions">
         <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
         <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
-          <span>Chào, {{ user.userName }}</span>
+          <span>Xin chào, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Thông tin cá nhân</router-link></li>

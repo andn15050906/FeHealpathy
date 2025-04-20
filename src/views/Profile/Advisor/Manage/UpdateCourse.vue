@@ -236,7 +236,7 @@
 
 <script>
 import { getCourseById, updateCourse } from "@/scripts/api/services/courseService";
-import { getLectures } from "@/scripts/api/services/lectureService";
+import { getLectures, updateLecture, createLecture, deleteLecture } from "@/scripts/api/services/lectureService";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
@@ -282,7 +282,9 @@ export default {
         requirements: "",
         thumb: ""
       },
-      lectureErrors: []
+      lectureErrors: [],
+      originalLectures: [],
+      deletedLectureIds: []
     };
   },
   methods: {
@@ -315,12 +317,20 @@ export default {
           contentSummary: l.contentSummary,
           isPreviewable: l.isPreviewable,
           medias: (l.materials || l.medias || []).map(m => ({
-            ...m,
+            id: m.id,
+            type: m.type,
             preview: m.type === 1 || m.type === 2 ? m.url : "",
-            file: null
-          }))
+            url: m.url,
+            title: m.title,
+            file: null,
+            isDeleted: false
+          })),
+          addedMedias: [],
+          removedMedias: [],
+          isNew: false
         }));
 
+        this.originalLectures = JSON.parse(JSON.stringify(this.course.lectures));
         this.initializeLectureErrors();
       } catch (error) {
         toast.error("Unable to load course data.");
@@ -337,12 +347,14 @@ export default {
     },
     addLecture() {
       this.course.lectures.push({
-        id: "",
         title: "",
         content: "",
         contentSummary: "",
         isPreviewable: false,
-        medias: []
+        medias: [],
+        addedMedias: [],
+        removedMedias: [],
+        isNew: true
       });
       this.lectureErrors.push({
         title: "",
@@ -351,10 +363,20 @@ export default {
       });
     },
     removeLecture(index) {
+      const lecture = this.course.lectures[index];
+      if (lecture.id && !lecture.isNew) {
+        this.deletedLectureIds.push(lecture.id);
+      }
       this.course.lectures.splice(index, 1);
       this.lectureErrors.splice(index, 1);
     },
     removeLectureMedia(lectureIndex, mediaIndex) {
+      const media = this.course.lectures[lectureIndex].medias[mediaIndex];
+
+      if (media.id) {
+        this.course.lectures[lectureIndex].removedMedias.push(media.id);
+      }
+
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
 
       if (this.course.lectures[lectureIndex].medias.length === 0) {
@@ -400,13 +422,16 @@ export default {
             : 3;
         const reader = new FileReader();
         reader.onload = e => {
-          this.course.lectures[lectureIndex].medias.push({
+          const newMedia = {
             type,
             file,
             preview: type < 3 ? e.target.result : "",
             url: "",
             title: file.name
-          });
+          };
+
+          this.course.lectures[lectureIndex].medias.push(newMedia);
+          this.course.lectures[lectureIndex].addedMedias.push(newMedia);
         };
         reader.readAsDataURL(file);
       });
@@ -425,51 +450,81 @@ export default {
 
       this.$refs.loadingSpinner.showSpinner();
       try {
-        const formData = new FormData();
-        formData.append("Id", this.course.id);
-        formData.append("Title", this.course.title);
-        formData.append("Intro", this.course.intro);
-        formData.append("Description", this.course.description);
-        formData.append("Status", this.course.status);
-        formData.append("Price", this.course.price);
-        formData.append("Discount", this.course.discount / 100);
-        formData.append("DiscountExpiry", this.course.discountExpiry);
-        formData.append("Level", this.course.level);
-        formData.append("Outcomes", this.course.outcomes);
-        formData.append("Requirements", this.course.requirements);
-        formData.append("LeafCategoryId", this.course.leafCategoryId);
+        const courseFormData = new FormData();
+        courseFormData.append("Id", this.course.id);
+        courseFormData.append("Title", this.course.title);
+        courseFormData.append("Intro", this.course.intro);
+        courseFormData.append("Description", this.course.description);
+        courseFormData.append("Status", this.course.status);
+        courseFormData.append("Price", this.course.price);
+        courseFormData.append("Discount", this.course.discount / 100);
+        courseFormData.append("DiscountExpiry", this.course.discountExpiry);
+        courseFormData.append("Level", this.course.level);
+        courseFormData.append("Outcomes", this.course.outcomes);
+        courseFormData.append("Requirements", this.course.requirements);
+        courseFormData.append("LeafCategoryId", this.course.leafCategoryId);
 
         if (this.course.thumb.file) {
-          formData.append("Thumb.File", this.course.thumb.file);
-          formData.append("Thumb.Title", this.course.thumb.title);
+          courseFormData.append("Thumb.File", this.course.thumb.file);
+          courseFormData.append("Thumb.Title", this.course.thumb.title);
         } else if (this.course.thumb.url) {
-          formData.append("Thumb.Title", this.course.title);
-          formData.append("Thumb.Url", this.course.thumb.url);
+          courseFormData.append("Thumb.Title", this.course.title);
+          courseFormData.append("Thumb.Url", this.course.thumb.url);
         }
 
-        for (let i = 0; i < this.course.lectures.length; i++) {
-          const lec = this.course.lectures[i];
-          formData.append(`Lectures[${i}].Id`, lec.id || "");
-          formData.append(`Lectures[${i}].Title`, lec.title);
-          formData.append(`Lectures[${i}].Content`, lec.content);
-          formData.append(`Lectures[${i}].ContentSummary`, lec.contentSummary);
-          formData.append(`Lectures[${i}].IsPreviewable`, lec.isPreviewable);
+        await updateCourse(courseFormData);
 
-          for (let mi = 0; mi < lec.medias.length; mi++) {
-            const m = lec.medias[mi];
-            if (m.file) {
-              formData.append(`Lectures[${i}].Medias[${mi}].File`, m.file);
-              formData.append(`Lectures[${i}].Medias[${mi}].Title`, m.title);
-              formData.append(`Lectures[${i}].Medias[${mi}].Type`, m.type);
-            } else if (m.url) {
-              formData.append(`Lectures[${i}].Medias[${mi}].Url`, m.url);
-              formData.append(`Lectures[${i}].Medias[${mi}].Title`, m.title);
-              formData.append(`Lectures[${i}].Medias[${mi}].Type`, m.type);
-            }
+        for (const lectureId of this.deletedLectureIds) {
+          await deleteLecture(lectureId);
+        }
+        const existingLectures = this.course.lectures.filter(lecture => !lecture.isNew);
+        const newLectures = this.course.lectures.filter(lecture => lecture.isNew);
+
+        for (const lecture of existingLectures) {
+          const formData = new FormData();
+          formData.append("Id", lecture.id);
+          formData.append("CourseId", this.course.id);
+          formData.append("Title", lecture.title);
+          formData.append("Content", lecture.content);
+          formData.append("ContentSummary", lecture.contentSummary);
+          formData.append("IsPreviewable", lecture.isPreviewable);
+
+          lecture.removedMedias.forEach((id, index) => {
+            formData.append(`RemovedMedias[${index}]`, id);
+          });
+
+          if (lecture.addedMedias.length > 0) {
+            lecture.addedMedias.forEach((media, index) => {
+              if (media.file) {
+                formData.append(`AddedMedias[${index}].File`, media.file);
+                formData.append(`AddedMedias[${index}].Title`, media.title);
+                formData.append(`AddedMedias[${index}].Type`, media.type);
+              }
+            });
           }
+
+          await updateLecture(formData);
         }
 
-        await updateCourse(formData);
+        for (const lecture of newLectures) {
+          const formData = new FormData();
+          formData.append("CourseId", this.course.id);
+          formData.append("Title", lecture.title);
+          formData.append("Content", lecture.content);
+          formData.append("ContentSummary", lecture.contentSummary);
+          formData.append("IsPreviewable", lecture.isPreviewable);
+
+          lecture.addedMedias.forEach((media, index) => {
+            if (media.file) {
+              formData.append(`AddedMedias[${index}].File`, media.file);
+              formData.append(`AddedMedias[${index}].Title`, media.title);
+              formData.append(`AddedMedias[${index}].Type`, media.type);
+            }
+          });
+
+          await createLecture(formData);
+        }
+
         toast.success("Course updated successfully!", { autoClose: 3000 });
         this.$router.push({
           path: "/advisor/content",

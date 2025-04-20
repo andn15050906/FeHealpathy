@@ -6,9 +6,14 @@ const API_ARTICAL_RECOMMENDATION = "you-may-like/articles"
 
 export const getPagedArticles = async (params = { pageIndex: 0, pageSize: 20 }) => {
   try {
-    const response = await apiClient.get(`${API_BASE_URL}`, {
-      params: params,
-    });
+    const response = await apiClient.get(`${API_BASE_URL}`,
+      {
+        params: {
+          pageIndex: params.pageIndex,
+          pageSize: params.pageSize,
+          tags: params.tags ? params.tags[0] : null
+        }
+      });
     return response.data;
   } catch (error) {
     console.error('Error fetching blog:', error);

@@ -9,3 +9,7 @@ export const getProgress = async () => {
 export const getSentimentAnalysis = async () => {
   return await get(`${API_BASE_URL}/sentiment`);
 }
+
+export const getUserStatistics = async () => {
+  return await get(`${API_BASE_URL}/report/general`);
+}

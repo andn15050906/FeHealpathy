@@ -3,12 +3,12 @@
     <span class="total-count">{{ totalLessons }} lessons</span>
     <h1 class="page-title">Yoga Practice</h1>
 
-    <div class="filter-section">
+    <!-- <div class="filter-section">
       <button v-for="filter in filters" :key="filter.value"
         :class="['filter-btn', currentFilter === filter.value ? 'active' : '']" @click="applyFilter(filter.value)">
         {{ filter.label }}
       </button>
-    </div>
+    </div> -->
 
     <div class="excercise-grid">
       <YogaExerciseCard v-for="excercise in paginatedLessons" :key="excercise.id" :excercise="excercise" />
@@ -26,7 +26,7 @@
 <script>
 import GlowingCard from '@/components/Common/GlowingCard.vue';
 import YogaExerciseCard from '@/components/YogaComponents/YogaExerciseCard.vue';
-import { getCourses } from '@/scripts/api/services/courseService';
+import { getPagedYogaPoses } from '@/scripts/api/services/yogaService';
 
 
 export default {
@@ -49,7 +49,7 @@ export default {
   },
   computed: {
     yogaLessons() {
-      return this.allLessons.filter(course => course.leafCategoryId === '4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac');
+      return this.allLessons;
     },
     totalLessons() {
       return this.yogaLessons.length;
@@ -81,7 +81,7 @@ export default {
   methods: {
     async fetchYogaCourses() {
       try {
-        const response = await getCourses({ pageIndex: 0, pageSize: 100 }); // hoặc lớn hơn nếu cần
+        const response = await getPagedYogaPoses({ pageIndex: 0, pageSize: 100 }); // hoặc lớn hơn nếu cần
         this.allLessons = response.items || [];
       } catch (error) {
         console.error('⚠️ Lỗi khi lấy course yoga:', error);

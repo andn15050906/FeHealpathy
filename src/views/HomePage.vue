@@ -139,8 +139,8 @@ export default {
             let noti = new Noti(
                 true, 
                 () => { }, 
-                "Bạn muốn thiết lập hồ sơ không?",
-                "Thiết lập hồ sơ để có trải nghiệm tốt hơn"
+                "Bạn muốn thiết lập lộ trình mới không?",
+                "Đánh giá lại bản thân có thể giúp bạn có một lộ trình phù hợp hơn"
             );
             noti.callback = () => this.navigateToSettingUp(noti.id);
             this.$emit('addNotification', noti);

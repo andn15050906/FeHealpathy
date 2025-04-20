@@ -1,141 +1,44 @@
 <template>
   <div :class="['admin-dashboard', {'dark-mode': isDarkMode}]">
-    <!-- Header Section -->
     <div class="dashboard-header">
       <div class="welcome-section">
         <h1 class="title">
-          <i class="fas fa-tachometer-alt mr-2"></i>
-          Admin Dashboard
+          <i class="fas fa-tachometer-alt mr-2"></i> Dashboard quản trị viên
         </h1>
-        <p class="subtitle">Welcome back, Admin</p>
+        <p class="subtitle">Chào mừng trở lại, Admin</p>
       </div>
       <div class="header-actions">
-        <!-- Dark Mode Toggle -->
-        <button class="btn-icon" @click="toggleDarkMode">
+        <!--<button class="btn-icon" @click="toggleDarkMode">
           <i :class="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
-        </button>
-        
-        <!-- Notifications Dropdown -->
-        <div class="notifications-dropdown" v-click-outside="closeNotifications">
-          <button class="btn-icon" @click="toggleNotifications">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge" v-if="unreadNotifications">{{ unreadNotifications }}</span>
-          </button>
-          <div class="dropdown-content" v-show="showNotifications">
-            <div class="dropdown-header">
-              <h3>Notifications</h3>
-              <button class="btn-text">Mark all as read</button>
-            </div>
-            <div class="notifications-list">
-              <div v-for="notification in notifications" :key="notification.id" 
-                   :class="['notification-item', { 'unread': !notification.read }]">
-                <div class="notification-icon" :class="notification.type">
-                  <i :class="getNotificationIcon(notification.type)"></i>
-                </div>
-                <div class="notification-content">
-                  <div class="notification-title">{{ notification.title }}</div>
-                  <div class="notification-desc">{{ notification.description }}</div>
-                  <div class="notification-time">{{ notification.time }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        </button>-->
         <button class="btn-action">
-          <i class="fas fa-download mr-2"></i>
-          Export Report
-        </button>
-        <button class="btn-action primary">
-          <i class="fas fa-plus mr-2"></i>
-          New Announcement
+          <i class="fas fa-download mr-2"></i> Xuất báo cáo
         </button>
       </div>
     </div>
 
-    <!-- Overview Stats -->
-    <div class="stats-grid">
-      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
-        <div class="stat-icon purple">
-          <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-details">
-          <h3>Total Users</h3>
-          <div class="stat-number">
-            <template v-if="!loading.stats">{{ userStats.totalUsers }}</template>
-            <div v-else class="skeleton-loader"></div>
-          </div>
-          <div class="stat-change positive" v-if="!loading.stats">
-            <i class="fas fa-arrow-up"></i>
-            <span>15% vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
-        <div class="stat-icon blue">
-          <i class="fas fa-chart-line"></i>
-        </div>
-        <div class="stat-details">
-          <h3>Active Users</h3>
-          <div class="stat-number">
-            <template v-if="!loading.stats">{{ userStats.activeUsers }}</template>
-            <div v-else class="skeleton-loader"></div>
-          </div>
-          <div class="stat-change positive" v-if="!loading.stats">
-            <i class="fas fa-arrow-up"></i>
-            <span>12% vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
-        <div class="stat-icon green">
-          <i class="fas fa-dollar-sign"></i>
-        </div>
-        <div class="stat-details">
-          <h3>Revenue</h3>
-          <div class="stat-number">
-            <template v-if="!loading.stats">{{ userStats.revenue }}</template>
-            <div v-else class="skeleton-loader"></div>
-          </div>
-          <div class="stat-change positive" v-if="!loading.stats">
-            <i class="fas fa-arrow-up"></i>
-            <span>18% vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
-        <div class="stat-icon orange">
-          <i class="fas fa-flag"></i>
-        </div>
-        <div class="stat-details">
-          <h3>Reports</h3>
-          <div class="stat-number">
-            <template v-if="!loading.stats">{{ userStats.reports }}</template>
-            <div v-else class="skeleton-loader"></div>
-          </div>
-          <div class="stat-change negative" v-if="!loading.stats">
-            <i class="fas fa-arrow-down"></i>
-            <span>5% vs last month</span>
-          </div>
-        </div>
+    <div class="quick-actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="actions-grid">
+        <button class="action-card" @click="navigateTo('/admin/create-admin')">
+          <i class="fas fa-user-cog"></i>
+          <span>Manage Users</span>
+        </button>
+        <button class="action-card" @click="navigateTo('/admin/moderate-content')">
+          <i class="fas fa-tasks"></i>
+          <span>Moderate Content</span>
+        </button>
+        <button class="action-card" @click="navigateTo('/admin/moderate-users')">
+          <i class="fas fa-shield-alt"></i>
+          <span>Moderate Users</span>
+        </button>
       </div>
     </div>
 
-    <!-- Charts Section -->
     <div class="charts-section">
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
         <div class="chart-header">
           <h3>User Growth</h3>
-          <div class="chart-actions">
-            <select v-model="userChartPeriod" class="select-period" :disabled="loading.charts">
-              <option value="week">Last Week</option>
-              <option value="month">Last Month</option>
-              <option value="year">Last Year</option>
-            </select>
-          </div>
         </div>
         <div v-if="loading.charts" class="loading-overlay">
           <div class="spinner">
@@ -149,13 +52,6 @@
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
         <div class="chart-header">
           <h3>Revenue Analytics</h3>
-          <div class="chart-actions">
-            <select v-model="revenueChartPeriod" class="select-period" :disabled="loading.charts">
-              <option value="week">Last Week</option>
-              <option value="month">Last Month</option>
-              <option value="year">Last Year</option>
-            </select>
-          </div>
         </div>
         <div v-if="loading.charts" class="loading-overlay">
           <div class="spinner">
@@ -167,29 +63,96 @@
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h2 class="section-title">Quick Actions</h2>
-      <div class="actions-grid">
-        <button class="action-card" @click="navigateTo('/admin/create-admin')">
-          <i class="fas fa-user-cog"></i>
-          <span>Manage Users</span>
-        </button>
-        <button class="action-card" @click="navigateTo('/admin/moderate-content')">
-          <i class="fas fa-tasks"></i>
-          <span>Moderate Content</span>
-        </button>
-        <button class="action-card" @click="navigateTo('/admin/view-reports')">
-          <i class="fas fa-chart-bar"></i>
-          <span>View Reports</span>
-        </button>
-        <button class="action-card" @click="navigateTo('/admin/moderate-users')">
-          <i class="fas fa-shield-alt"></i>
-          <span>Moderate Users</span>
-        </button>
+    <div class="stats-grid">
+      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
+        <div class="stat-icon purple">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Total Users</h3>
+          <div class="stat-number">
+            <template v-if="!loading.stats">{{ generalReport.totalUserCount }}</template>
+            <div v-else class="skeleton-loader"></div>
+          </div>
+          <div class="stat-change positive" v-if="!loading.stats">
+            <i class="fas fa-arrow-up"></i>
+            <span>{{ Math.floor((generalReport.totalUserCount / userCountLastMonth - 1) * 100) }} % so với tháng trước</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
+        <div class="stat-icon blue">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Active Users</h3>
+          <div class="stat-number">
+            <template v-if="!loading.stats">{{ generalReport.recentlyActiveUserCount }}</template>
+            <div v-else class="skeleton-loader"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
+        <div class="stat-icon green">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Revenue</h3>
+          <div class="stat-number">
+            <template v-if="!loading.stats">{{ generalReport.revenue }}</template>
+            <div v-else class="skeleton-loader"></div>
+          </div>
+          <div class="stat-change positive" v-if="!loading.stats">
+            <i class="fas fa-arrow-up"></i>
+            <span>{{
+              revenueLastMonth > 0
+                ? Math.floor((generalReport.revenue / revenueLastMonth - 1) * 100) + '% so với tháng trước'
+                : generalReport.revenue + ' VND so với tháng trước'
+             }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
+        <div class="stat-icon orange">
+          <i class="fas fa-flag"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Reports</h3>
+          <div class="stat-number">
+            <template v-if="!loading.stats">{{ generalReport.reports }}</template>
+            <div v-else class="skeleton-loader"></div>
+          </div>
+          <div class="stat-change negative" v-if="!loading.stats">
+            <i class="fas fa-arrow-down"></i>
+            <span>{{ Math.floor((5 / generalReport.reports - 1) * 100) }} % vs last month</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card" :class="{ 'is-loading': loading.stats }">
+        <div class="stat-icon purple">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Premimum Users</h3>
+          <div class="stat-number">
+            <template v-if="!loading.stats">{{ generalReport.totalPremiumUserCount }}</template>
+            <div v-else class="skeleton-loader"></div>
+          </div>
+          <div class="stat-change positive" v-if="!loading.stats">
+            <i class="fas fa-arrow-up"></i>
+            <span>{{ Math.floor((generalReport.totalPremiumUserCount / premiumUserCountLastMonth - 1) * 100) }} % so với tháng trước</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!--<ViewReports></ViewReports>-->
+
+    <!--
     <div class="recent-activity">
       <div class="section-header">
         <h2 class="section-title">Recent Activity</h2>
@@ -216,19 +179,21 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
   </div>
 </template>
 
 <script>
 import { Line as LineChart, Bar as BarChart } from 'vue-chartjs'
-import { ref, computed } from 'vue'
+import { getUserStatistics } from '@/scripts/api/services/statisticsService'
+import ViewReports from './ViewReports.vue'
 
 export default {
   name: 'AdminDashboard',
   components: {
     LineChart,
     BarChart,
+    ViewReports
   },
   data() {
     return {
@@ -259,38 +224,17 @@ export default {
           time: '5 minutes ago'
         },
       ],
-      userGrowthData: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'New Users',
-          data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          borderColor: '#4299e1',
-          tension: 0.1
-        }]
-      },
-      revenueData: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Revenue',
-          data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
-          backgroundColor: '#48bb78'
-        }]
-      },
+      userGrowthData: {},
       chartOptions: {
-        responsive: true
+        responsive: true,
+        devicePixelRatio: 4
       },
       loading: {
         stats: true,
         charts: true,
         activities: true
       },
-      userStats: {
-        totalUsers: 12345,
-        activeUsers: 8892,
-        revenue: '$45,678',
-        reports: 23
-      }
+      generalReport: {}
     }
   },
   computed: {
@@ -301,6 +245,46 @@ export default {
         const matchesFilter = this.activityFilter === 'all' || activity.type === this.activityFilter
         return matchesSearch && matchesFilter
       })
+    },
+    userCountLastMonth() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1; // Months are zero-based
+
+      let totalUsersLastMonth = 0;
+      for (let entry of this.generalReport.totalUserCountOverMonths) {
+        if (entry.year < year || entry.year == year && entry.month < month) {
+          totalUsersLastMonth += entry.count;
+        }
+      }
+
+      return totalUsersLastMonth;
+    },
+    premiumUserCountLastMonth() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1; // Months are zero-based
+
+      let totalUsersLastMonth = 0;
+      for (let entry of this.generalReport.totalPremiumUserCountOverMonths) {
+        if (entry.year < year || entry.year == year && entry.month < month) {
+          totalUsersLastMonth += entry.count;
+        }
+      }
+
+      return totalUsersLastMonth;
+    },
+    revenueLastMonth() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1; // Months are zero-based
+
+      for (let entry of this.generalReport.revenueOverWeeks) {
+        if (entry.year < year || entry.year == year && entry.month < month) {
+          return entry.sum;
+        }
+      }
+      return 0;
     }
   },
   methods: {
@@ -341,16 +325,12 @@ export default {
         this.loading.charts = true
         this.loading.activities = true
 
-        // Simulate API calls
         await Promise.all([
-          this.fetchStats(),
-          this.fetchChartData(),
-          this.fetchActivities()
+          this.fetchStats()
         ])
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error)
-      } finally {
-        // Add slight delay to show loading animation
+      }
+      catch (error) { }
+      finally {
         setTimeout(() => {
           this.loading.stats = false
           this.loading.charts = false
@@ -359,19 +339,34 @@ export default {
       }
     },
     async fetchStats() {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      // Update stats...
-    },
-    async fetchChartData() {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      // Update chart data...
-    },
-    async fetchActivities() {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      // Update activities...
+      this.generalReport = await getUserStatistics();
+      this.generalReport.reports = 4;
+
+      this.userGrowthData = {
+        labels: this.generalReport.totalUserCountOverMonths.map(item => {
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          return `${monthNames[item.month - 1]} ${item.year}`;
+        }),
+        datasets: [{
+          label: 'New Users',
+          data: this.generalReport.totalUserCountOverMonths.map(item => item.count),
+          fill: false,
+          borderColor: '#4299e1',
+          tension: 0.1
+        }]
+      }
+            
+      this.revenueData = {
+        labels: this.generalReport.revenueOverWeeks.map(item => {
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          return `${monthNames[item.month - 1]} ${item.year}`;
+        }),
+        datasets: [{
+          label: 'Revenue',
+          data: this.generalReport.revenueOverWeeks.map(item => item.sum),
+          backgroundColor: '#48bb78'
+        }]
+      }
     },
     navigateTo(path) {
       this.$router.push(path).catch(err => {
@@ -381,7 +376,7 @@ export default {
       });
     }
   },
-  mounted() {
+  beforeMount() {
     this.fetchDashboardData()
     if (!document.querySelector('link[href*="font-awesome"]')) {
       const link = document.createElement('link')
