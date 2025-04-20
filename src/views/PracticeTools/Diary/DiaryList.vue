@@ -78,70 +78,74 @@ export default {
         const data = await getPagedDiaryNotes({ CreatorId: user.id });
         this.entries = (data.items || []).filter(entry => !!entry.title);
       } catch (error) {
-        Swal.fire("Lỗi", "Không thể tải danh sách nhật ký.", "error");
+        if (error.response?.status === 404) {
+          this.entries = [];
+        } else {
+          Swal.fire("Lỗi", "Không thể tải danh sách nhật ký.", "error");
+        }
       }
     },
-    nextPage() {
-      if (this.currentPageIndex < this.orderedEntries.length - 1) {
-        this.isFlippingRight = true;
-        setTimeout(() => {
-          this.currentPageIndex++;
-          this.isFlippingRight = false;
-        }, 700);
-      }
-    },
-    goToNearestEntry(day) {
-      const selectedDate = new Date(day.id).toISOString().split("T")[0];
-      const index = this.orderedEntries.findIndex((entry) =>
-        entry.creationTime.startsWith(selectedDate)
-      );
-      if (index !== -1) {
-        this.currentPageIndex = index;
-      } else {
-        Swal.fire("Không tìm thấy", "Không có nhật ký nào vào ngày này.", "info");
-      }
-    },
+      nextPage() {
+        if (this.currentPageIndex < this.orderedEntries.length - 1) {
+          this.isFlippingRight = true;
+          setTimeout(() => {
+            this.currentPageIndex++;
+            this.isFlippingRight = false;
+          }, 700);
+        }
+      },
+      goToNearestEntry(day) {
+        const selectedDate = new Date(day.id).toISOString().split("T")[0];
+        const index = this.orderedEntries.findIndex((entry) =>
+          entry.creationTime.startsWith(selectedDate)
+        );
+        if (index !== -1) {
+          this.currentPageIndex = index;
+        } else {
+          Swal.fire("Không tìm thấy", "Không có nhật ký nào vào ngày này.", "info");
+        }
+      },
     async updateDiary() {
-      if (!this.currentEntry) return;
-      const formData = new FormData();
-      formData.append("Id", this.currentEntry.id);
-      formData.append("Title", this.currentEntry.title);
-      formData.append("Content", this.currentEntry.content);
+        if (!this.currentEntry) return;
+        const formData = new FormData();
+        formData.append("Id", this.currentEntry.id);
+        formData.append("Title", this.currentEntry.title);
+        formData.append("Content", this.currentEntry.content);
 
-      try {
-        await updateDiaryNote(formData);
-      } catch (error) {
-        console.error("Error updating diary:", error);
-      }
-    },
+        try {
+          await updateDiaryNote(formData);
+        } catch (error) {
+          console.error("Error updating diary:", error);
+        }
+      },
     async confirmDelete(entryId) {
-      const result = await Swal.fire({
-        title: "Bạn có chắc chắn?",
-        text: "Bạn sẽ không thể khôi phục lại nhật ký này!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Có, xóa nó!",
-        cancelButtonText: "Hủy bỏ",
-      });
+        const result = await Swal.fire({
+          title: "Bạn có chắc chắn?",
+          text: "Bạn sẽ không thể khôi phục lại nhật ký này!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Có, xóa nó!",
+          cancelButtonText: "Hủy bỏ",
+        });
 
-      if (result.isConfirmed) {
-        await this.deleteDiary(entryId);
-      }
-    },
+        if (result.isConfirmed) {
+          await this.deleteDiary(entryId);
+        }
+      },
     async deleteDiary(entryId) {
-      try {
-        await deleteDiaryNote(entryId);
-        this.entries = this.entries.filter((entry) => entry.id !== entryId);
-        Swal.fire("Đã xóa!", "Nhật ký của bạn đã được xóa.", "success");
-      } catch (error) {
-        Swal.fire("Lỗi", "Không thể xóa nhật ký.", "error");
-      }
+        try {
+          await deleteDiaryNote(entryId);
+          this.entries = this.entries.filter((entry) => entry.id !== entryId);
+          Swal.fire("Đã xóa!", "Nhật ký của bạn đã được xóa.", "success");
+        } catch (error) {
+          Swal.fire("Lỗi", "Không thể xóa nhật ký.", "error");
+        }
+      },
     },
-  },
-  mounted() {
-    this.fetchDiaryNotes();
-  },
-};
+    mounted() {
+      this.fetchDiaryNotes();
+    },
+  };
 </script>
 
 <style scoped>
