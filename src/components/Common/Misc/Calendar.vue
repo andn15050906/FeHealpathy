@@ -87,7 +87,7 @@
             </div>
           </div>
         </transition>
-        <button class="add-event-btn" @click="openNewEventForm">
+        <button v-if="!isDateBeforeToday" class="add-event-btn" @click="openNewEventForm">
           <i class="fa-solid fa-plus"></i> Thêm thói quen mới
         </button>
       </div>
@@ -205,7 +205,10 @@ import {
   addMonths,
   isSameDay as dfIsSameDay,
   isSameMonth,
-  format
+  format,
+  isAfter,
+  isBefore,
+  startOfDay
 } from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 import { Chart, registerables } from "chart.js";
@@ -379,6 +382,11 @@ export default {
     },
     remainingCount() {
       return this.currentEvents.filter(task => !task.completed && !task.closed).length;
+    },
+    isDateBeforeToday() {
+      const today = startOfDay(new Date());
+      const selectedDay = startOfDay(this.selectedDate);
+      return isBefore(selectedDay, today);
     }
   },
   mounted() {
@@ -504,6 +512,8 @@ export default {
       });
     },
     openNewEventForm() {
+      if (this.isDateBeforeToday) return;
+
       this.isEditing = false;
       this.timeError = "";
       this.titleError = "";
@@ -674,7 +684,7 @@ export default {
       this.chartInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Đã hoàn thành", "Còn lại", "Đã đóng"],
+          labels: ["Đã hoàn thành", "Còn lại", "Chưa hoàn thành"],
           datasets: [
             {
               data: progressData,
