@@ -278,14 +278,13 @@ const router = createRouter({
       path: '/habit-tracking',
       name: 'habitTracking',
       component: HabitTracking,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresPremium : true }
     },
     // Practice - Media Resources
     {
       path: '/media-resources',
       name: 'MediaResources',
-      component: MediaResources,
-      meta: { requiresPremium : true }
+      component: MediaResources
     },
     {
       path: '/music-library',
