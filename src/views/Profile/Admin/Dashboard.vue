@@ -6,6 +6,7 @@
           <i class="fas fa-tachometer-alt mr-2"></i> Dashboard quản trị viên
         </h1>
         <p class="subtitle">Chào mừng trở lại, Admin</p>
+        <p class="subtitle">Chào mừng trở lại, Admin</p>
       </div>
       <div class="header-actions">
         <!--<button class="btn-icon" @click="toggleDarkMode">
@@ -69,7 +70,7 @@
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-details">
-          <h3>Total Users</h3>
+          <h3>Tổng số người dùng</h3>
           <div class="stat-number">
             <template v-if="!loading.stats">{{ generalReport.totalUserCount }}</template>
             <div v-else class="skeleton-loader"></div>
@@ -86,7 +87,7 @@
           <i class="fas fa-chart-line"></i>
         </div>
         <div class="stat-details">
-          <h3>Active Users</h3>
+          <h3>Người dùng hoạt động</h3>
           <div class="stat-number">
             <template v-if="!loading.stats">{{ generalReport.recentlyActiveUserCount }}</template>
             <div v-else class="skeleton-loader"></div>
@@ -99,7 +100,7 @@
           <i class="fas fa-dollar-sign"></i>
         </div>
         <div class="stat-details">
-          <h3>Revenue</h3>
+          <h3>Doanh thu</h3>
           <div class="stat-number">
             <template v-if="!loading.stats">{{ generalReport.revenue }}</template>
             <div v-else class="skeleton-loader"></div>
@@ -120,7 +121,7 @@
           <i class="fas fa-flag"></i>
         </div>
         <div class="stat-details">
-          <h3>Reports</h3>
+          <h3>Báo cáo</h3>
           <div class="stat-number">
             <template v-if="!loading.stats">{{ generalReport.reports }}</template>
             <div v-else class="skeleton-loader"></div>
@@ -155,12 +156,12 @@
     <!--
     <div class="recent-activity">
       <div class="section-header">
-        <h2 class="section-title">Recent Activity</h2>
+        <h2 class="section-title">Hoạt động gần đây</h2>
         <div class="activity-filters">
           <input 
             type="text" 
             v-model="activitySearch" 
-            placeholder="Search activities..."
+            placeholder="Tìm kiếm hoạt động..."
             class="search-input"
           >
         </div>
@@ -208,9 +209,9 @@ export default {
         {
           id: 1,
           type: 'warning',
-          title: 'System Update',
-          description: 'System maintenance scheduled for tonight',
-          time: '2 hours ago',
+          title: 'Cập nhật hệ thống',
+          description: 'Bản cập nhật hệ thống được lên lịch tối nay',
+          time: '2 giờ trước',
           read: false
         },
         
@@ -219,9 +220,9 @@ export default {
         {
           id: 1,
           type: 'user',
-          title: 'New User Registration',
-          description: 'John Doe has registered as a new user',
-          time: '5 minutes ago'
+          title: 'Đăng ký người dùng mới',
+          description: 'John Doe đã đăng ký là người dùng mới',
+          time: '5 phút trước'
         },
       ],
       userGrowthData: {},

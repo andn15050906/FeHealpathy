@@ -53,7 +53,7 @@ export default {
                 yogaPoses.value = response.items;
                 totalPages.value = response.pageCount;
             } catch (error) {
-                console.error("Error loading yoga poses:", error);
+                console.error("Lỗi khi tải bài tập yoga:", error);
             }
         };
 

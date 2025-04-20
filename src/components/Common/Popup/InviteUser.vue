@@ -37,7 +37,7 @@
         <button @click="inviteUsers" :disabled="!selectedUsers.length || isSubmitting" class="btn primary">
           {{ isSubmitting ? "Inviting..." : "Invite" }}
         </button>
-        <button @click="$emit('close')" class="btn secondary">Cancel</button>
+        <button @click="$emit('close')" class="btn secondary">Hủy</button>
       </div>
     </div>
   </div>

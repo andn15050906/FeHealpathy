@@ -1,7 +1,7 @@
 <template>
   <div class="yoga-container">
     <span class="total-count">{{ totalLessons }} lessons</span>
-    <h1 class="page-title">Yoga Practice</h1>
+    <h1 class="page-title">Thực hành Yoga</h1>
 
     <!-- <div class="filter-section">
       <button v-for="filter in filters" :key="filter.value"

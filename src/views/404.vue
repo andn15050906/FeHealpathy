@@ -4,7 +4,7 @@
 <template>
   <div class="flex flex-col justify-center items-center bg-[var(--va-background-secondary)]">
     <div class="flex flex-col items-center gap-6 px-4 my-8 text-center">
-      <h1 class="va-h1 sm:text-5xl text-4xl">Page not found</h1>
+      <h1 class="va-h1 sm:text-5xl text-4xl">Trang không tồn tại</h1>
 
       <svg fill="none" height="200" viewBox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
         <path clip-rule="evenodd"
@@ -21,9 +21,9 @@
           fill="var(--va-danger)" fill-rule="evenodd"></path>
       </svg>
 
-      <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+      <p>Trang bạn đang tìm kiếm có thể đã bị xóa, đã đổi tên hoặc tạm thời không khả dụng.</p>
       <RouterLink to="/" class="va-button va-button--primary">
-        Go to Homepage
+        Đi đến trang chủ
       </RouterLink>
     </div>
   </div>

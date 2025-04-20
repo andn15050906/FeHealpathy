@@ -51,7 +51,7 @@ const handleForgotPassword = async () => {
 
     // Kiểm tra định dạng email
     if (!validateEmail(email.value)) {
-      generalError.value = 'Please enter a valid Email address (e.g., example@gmail.com)';
+      generalError.value = 'Hãy nhập địa chỉ email hợp lệ (ví dụ: example@gmail.com)';
       return;
     }
 
@@ -62,7 +62,7 @@ const handleForgotPassword = async () => {
     const emailExists = await checkEmailExists(email.value);
     
     if (!emailExists) {
-      generalError.value = 'This email is not registered in our system.';
+      generalError.value = 'Email này không tồn tại trong hệ thống.';
       return;
     }
     
@@ -70,16 +70,16 @@ const handleForgotPassword = async () => {
     await forgotPassword(email.value);
     
     // Hiển thị thông báo thành công
-    await sweetAlert.showSuccess('Password reset email has been sent to your email!');
+    await sweetAlert.showSuccess('Email khôi phục mật khẩu đã được gửi đến email của bạn!');
     setTimeout(() => router.push({ name: 'signIn' }), 2000);
   } catch (error) {
-    console.error('Error in forgot password:', error);
+    console.error('Lỗi trong quá trình khôi phục mật khẩu:', error);
     if (error.response?.status === 404) {
-      generalError.value = 'This email is not registered in our system.';
+      generalError.value = 'Email này không tồn tại trong hệ thống.';
     } else if (error.response?.data?.message) {
       generalError.value = error.response.data.message;
     } else {
-      generalError.value = 'Failed to process your request. Please try again.';
+      generalError.value = 'Không thể xử lý yêu cầu của bạn. Vui lòng thử lại.';
     }
   } finally {
     loading.value = false;

@@ -5,7 +5,7 @@
       <div class="card-header bg-primary text-white text-center py-3">
         <h1 class="h3 mb-0">
           <i class="fas fa-book-open me-2 bold-icon"></i>
-          <span class="bold-text">Create New Course</span>
+          <span class="bold-text">Tạo khóa học mới</span>
         </h1>
       </div>
       <div class="card-body">
@@ -13,31 +13,31 @@
           <div class="mb-3">
             <label for="title" class="form-label required">
               <i class="fas fa-pen-nib me-1 bold-icon"></i>
-              <span class="bold-text">Course Title</span>
+              <span class="bold-text">Tiêu đề khóa học</span>
             </label>
-            <input type="text" id="title" v-model="course.title" class="form-control" placeholder="Insert course title"
+            <input type="text" id="title" v-model="course.title" class="form-control" placeholder="Nhập tiêu đề khóa học"
               required />
           </div>
           <div class="mb-3">
             <label for="intro" class="form-label required">
               <i class="fas fa-book me-1 bold-icon"></i>
-              <span class="bold-text">Course Intro</span>
+              <span class="bold-text">Giới thiệu khóa học</span>
             </label>
             <textarea id="intro" v-model="course.intro" class="form-control"
-              placeholder="Write a short intro for the course" rows="3" required></textarea>
+              placeholder="Viết một giới thiệu ngắn cho khóa học" rows="3" required></textarea>
           </div>
           <div class="mb-3">
             <label for="description" class="form-label required">
               <i class="fas fa-align-left me-1 bold-icon"></i>
-              <span class="bold-text">Course Description</span>
+              <span class="bold-text">Mô tả chi tiết khóa học</span>
             </label>
             <textarea id="description" v-model="course.description" class="form-control"
-              placeholder="Detailed course description" rows="5" required></textarea>
+              placeholder="Mô tả chi tiết khóa học" rows="5" required></textarea>
           </div>
           <div class="mb-3">
             <label for="thumb" class="form-label required">
               <i class="fas fa-image me-1 bold-icon"></i>
-              <span class="bold-text">Course Thumbnail</span>
+              <span class="bold-text">Hình ảnh khóa học</span>
             </label>
             <input type="file" id="thumb" @change="handleImageUpload" class="form-control" accept="image/*"
               required />
@@ -61,81 +61,81 @@
           <div class="mb-3">
             <label for="price" class="form-label required">
               <i class="fas fa-dollar-sign me-1 bold-icon"></i>
-              <span class="bold-text">Course Price</span>
+              <span class="bold-text">Giá khóa học</span>
             </label>
             <input type="number" id="price" v-model="course.price" class="form-control" 
-              placeholder="Enter price (VND)" min="10000" required />
+              placeholder="Nhập giá (VND)" min="10000" required />
           </div>
           <div class="mb-3">
             <label for="level" class="form-label required">
               <i class="fas fa-signal me-1 bold-icon"></i>
-              <span class="bold-text">Course Level</span>
+              <span class="bold-text">Cấp độ khóa học</span>
             </label>
             <select id="level" v-model="course.level" class="form-select" required>
-              <option value="" disabled>Select level</option>
-              <option value="0">Beginner</option>
-              <option value="1">Intermediate</option>
-              <option value="2">Advanced</option>
+              <option value="" disabled>Chọn cấp độ</option>
+              <option value="0">Người mới bắt đầu</option>
+              <option value="1">Trung bình</option>
+              <option value="2">Nâng cao</option>
             </select>
           </div>
           <div class="mb-3">
             <label for="outcomes" class="form-label required">
               <i class="fas fa-award me-1 bold-icon"></i>
-              <span class="bold-text">Course Outcomes</span>
+              <span class="bold-text">Kết quả học tập</span>
             </label>
             <textarea id="outcomes" v-model="course.outcomes" class="form-control"
-              placeholder="Expected learning outcomes" rows="3" required></textarea>
+              placeholder="Kết quả học tập mong đợi" rows="3" required></textarea>
           </div>
           <div class="mb-3">
             <label for="requirements" class="form-label required">
               <i class="fas fa-info-circle me-1 bold-icon"></i>
-              <span class="bold-text">Course Requirements</span>
+              <span class="bold-text">Yêu cầu khóa học</span>
             </label>
             <textarea id="requirements" v-model="course.requirements" class="form-control"
-              placeholder="Course prerequisites" rows="3" required></textarea>
+              placeholder="Điều kiện tiên quyết" rows="3" required></textarea>
           </div>
           <div class="mb-4">
             <h2 class="h5 mb-3">
               <i class="fas fa-list-ul me-1 bold-icon"></i>
-              <span class="bold-text">Course Lectures</span>
+              <span class="bold-text">Bài giảng khóa học</span>
             </h2>
             <div class="mb-4 border rounded p-3" v-for="(lecture, index) in course.lectures" :key="index">
               <div class="mb-3">
                 <label class="form-label required">
                   <i class="fas fa-sticky-note me-1 bold-icon"></i>
-                  <span class="bold-text">Lecture Title {{ index + 1 }}</span>
+                  <span class="bold-text">Tiêu đề bài giảng {{ index + 1 }}</span>
                 </label>
                 <input type="text" v-model="lecture.title" class="form-control" 
-                  placeholder="Lecture title" required />
+                  placeholder="Tiêu đề bài giảng" required />
               </div>
               <div class="mb-3">
                 <label class="form-label required">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
-                  <span class="bold-text">Lecture Content</span>
+                  <span class="bold-text">Nội dung bài giảng</span>
                 </label>
                 <textarea v-model="lecture.content" class="form-control" 
-                  placeholder="Lecture content" rows="4" required></textarea>
+                  placeholder="Nội dung bài giảng" rows="4" required></textarea>
               </div>
               <div class="mb-3">
                 <label class="form-label required">
                   <i class="fas fa-align-left me-1 bold-icon"></i>
-                  <span class="bold-text">Content Summary</span>
+                  <span class="bold-text">Tóm tắt nội dung</span>
                 </label>
                 <textarea v-model="lecture.contentSummary" class="form-control" 
-                  placeholder="Lecture content summary" rows="4" required></textarea>
+                  placeholder="Tóm tắt nội dung bài giảng" rows="4" required></textarea>
               </div>
               <div class="form-check form-switch mb-3">
                 <input type="checkbox" class="form-check-input" 
                   v-model="lecture.isPreviewable" :id="'previewable-' + index" />
                 <label class="form-check-label bold-text" :for="'previewable-' + index">
                   <i class="fas fa-eye me-1 bold-icon"></i>
-                  <span class="bold-text">Is Previewable</span>
+                  <span class="bold-text">Có thể xem trước</span>
                 </label>
               </div>
               <div class="mb-3">
                 <label class="form-label required">
                   <i class="fas fa-upload me-1 bold-icon"></i>
-                  <span class="bold-text">Upload Lecture Materials</span>
+                  <span class="bold-text">Tải lên tài liệu bài giảng</span>
                 </label>
                 <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
                   accept="image/*,video/*,application/pdf" multiple required />
@@ -164,24 +164,24 @@
               </div>
               <button class="btn btn-danger btn-sm" @click="removeLecture(index)">
                 <i class="fas fa-trash-alt me-1 bold-icon"></i>
-                <span class="bold-text">Remove Lecture</span>
+                <span class="bold-text">Xóa bài giảng</span>
               </button>
             </div>
             <button class="btn btn-secondary custom-btn" @click="addLecture">
               <i class="fas fa-plus me-1 bold-icon"></i>
-              <span class="bold-text">Add Lecture</span>
+              <span class="bold-text">Thêm bài giảng</span>
             </button>
           </div>
           <div class="d-grid">
             <button type="submit" class="btn btn-success custom-btn-lg">
               <i class="fas fa-check me-1 bold-icon"></i>
-              <span class="bold-text">Create Course</span>
+              <span class="bold-text">Tạo khóa học</span>
             </button>
           </div>
         </form>
       </div>
     </div>
-    <SaveConfirmPopUp :message="'Are you sure you want to save this course?'" :isVisible="showSavePopup"
+    <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn tạo khóa học này?'" :isVisible="showSavePopup"
       @confirmSave="handleSave" @update:isVisible="showSavePopup = $event" />
   </div>
 </template>

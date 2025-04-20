@@ -32,6 +32,7 @@
 
         <div class="mb-4">
             <label for="mediaTitle" class="form-label fw-semibold">Tiêu đề</label>
+            <label for="mediaTitle" class="form-label fw-semibold">Tiêu đề</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
                     <i class="fas fa-heading"></i>
@@ -44,9 +45,11 @@
                 </div>
             </div>
             <small class="text-muted">3-100 ký tự</small>
+            <small class="text-muted">3-100 ký tự</small>
         </div>
 
         <div class="mb-4">
+            <label for="artistName" class="form-label fw-semibold">Tên nghệ sĩ</label>
             <label for="artistName" class="form-label fw-semibold">Tên nghệ sĩ</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
@@ -60,9 +63,11 @@
                 </div>
             </div>
             <small class="text-muted">2-50 ký tự</small>
+            <small class="text-muted">2-50 ký tự</small>
         </div>
 
         <div class="mb-4">
+            <label for="description" class="form-label fw-semibold">Mô tả</label>
             <label for="description" class="form-label fw-semibold">Mô tả</label>
             <div class="input-group has-validation">
                 <span class="input-group-text bg-light">
@@ -76,6 +81,7 @@
                 </div>
             </div>
             <small class="text-muted">10-500 ký tự</small>
+            <small class="text-muted">10-500 ký tự</small>
         </div>
 
         <div class="d-flex justify-content-between mt-4 pt-3 border-top">
@@ -85,6 +91,7 @@
             <button @click="openSaveDialog" class="btn btn-success px-4" :disabled="loading || !isValidForm">
                 <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
                 <i v-else class="fas fa-save me-2"></i>
+                {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
                 {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
             </button>
         </div>
@@ -142,8 +149,8 @@ export default {
             },
             showCancelConfirm: false,
             showSaveConfirm: false,
-            cancelMessage: "Are you sure you want to cancel? Your changes will not be saved.",
-            saveMessage: "Do you want to save changes?"
+            cancelMessage: "Bạn có chắc chắn muốn hủy bỏ? Thay đổi của bạn sẽ không được lưu.",
+            saveMessage: "Bạn có muốn lưu thay đổi?"
         };
     },
     computed: {
@@ -168,9 +175,11 @@ export default {
             }
             if (this.editedMedia.title.length < 3) {
                 this.validationErrors.title = 'Tiêu đề phải có ít nhất 3 ký tự';
+                this.validationErrors.title = 'Tiêu đề phải có ít nhất 3 ký tự';
                 return false;
             }
             if (this.editedMedia.title.length > 100) {
+                this.validationErrors.title = 'Tiêu đề không được vượt quá 100 ký tự';
                 this.validationErrors.title = 'Tiêu đề không được vượt quá 100 ký tự';
                 return false;
             }
@@ -184,9 +193,11 @@ export default {
             }
             if (this.editedMedia.artist.length < 2) {
                 this.validationErrors.artist = 'Tên nghệ sĩ phải có ít nhất 2 ký tự';
+                this.validationErrors.artist = 'Tên nghệ sĩ phải có ít nhất 2 ký tự';
                 return false;
             }
             if (this.editedMedia.artist.length > 50) {
+                this.validationErrors.artist = 'Tên nghệ sĩ không được vượt quá 50 ký tự';
                 this.validationErrors.artist = 'Tên nghệ sĩ không được vượt quá 50 ký tự';
                 return false;
             }
@@ -200,9 +211,11 @@ export default {
             }
             if (this.editedMedia.description.length < 10) {
                 this.validationErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
+                this.validationErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
                 return false;
             }
             if (this.editedMedia.description.length > 500) {
+                this.validationErrors.description = 'Mô tả không được vượt quá 500 ký tự';
                 this.validationErrors.description = 'Mô tả không được vượt quá 500 ký tự';
                 return false;
             }

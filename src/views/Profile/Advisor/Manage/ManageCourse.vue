@@ -1,18 +1,18 @@
 ﻿<template>
   <div class="container">
     <h2 class="mb-3">
-      <i class="fas fa-chalkboard-teacher me-2"></i>Course Management
+      <i class="fas fa-chalkboard-teacher me-2"></i>Quản lý khóa học
     </h2>
     <div v-if="!isEditingCourse" class="card shadow">
       <div class="card-body">
         <div class="text-center mb-4">
           <router-link to="/courses/create">
             <button class="btn btn-success">
-              <i class="fas fa-plus me-1"></i>Create Course
+              <i class="fas fa-plus me-1"></i>Tạo khóa học
             </button>
           </router-link>
         </div>
-        <p v-if="isLoading" class="text-center">Loading ...</p>
+        <p v-if="isLoading" class="text-center">Đang tải...</p>
         <div v-if="!isLoading">
           <div v-if="courses.length > 0" class="list-group">
             <div class="list-group-item list-group-item-action mb-2" v-for="course in courses" :key="course.id">
@@ -23,26 +23,26 @@
                 </div>
                 <div class="col-md-6">
                   <h5 class="mb-1">{{ course.title }}</h5>
-                  <small class="text-muted">Date: {{ formattedDate(course.creationTime) }}</small>
+                  <small class="text-muted">Ngày tạo: {{ formattedDate(course.creationTime) }}</small>
                 </div>
                 <div class="col-md-3 text-end">
                   <button class="btn btn-warning btn-sm me-2" @click="editcourse(course)">
-                    <i class="fas fa-edit me-1"></i>Update
+                    <i class="fas fa-edit me-1"></i>Cập nhật
                   </button>
                   <button class="btn btn-danger btn-sm" @click="openDeletePopup(course)">
-                    <i class="fas fa-trash-alt me-1"></i>Delete
+                    <i class="fas fa-trash-alt me-1"></i>Xóa
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <p v-if="courses.length === 0" class="text-center text-muted">No courses available!</p>
+          <p v-if="courses.length === 0" class="text-center text-muted">Không có khóa học nào được tạo!</p>
         </div>
       </div>
     </div>
     <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages" @GoToPage="changePage" />
     <UpdateCourse v-if="isEditingcourse" :courseData="selectedcourse" @courseUpdated="handlecourseUpdated" />
-    <DeleteConfirmPopup message="Delete this course?" :isVisible="isDeletePopupVisible"
+    <DeleteConfirmPopup message="Xóa khóa học này?" :isVisible="isDeletePopupVisible"
       @confirmDelete="handleDeleteConfirm" @update:isVisible="isDeletePopupVisible = $event" />
   </div>
 </template>
@@ -108,7 +108,7 @@ export default {
           this.totalPages = 1;
         }
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("Lỗi tải khóa học:", error);
         this.courses = [];
         this.totalCount = 0;
         this.totalPages = 1;

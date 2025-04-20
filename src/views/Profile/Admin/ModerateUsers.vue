@@ -1,6 +1,6 @@
 <template>
     <div class="moderate-users">
-      <h1 class="title">Content Moderation</h1>
+      <h1 class="title">Kiểm duyệt nội dung</h1>
   
       <div class="tabs">
         <button 
@@ -16,11 +16,11 @@
 
       <div v-if="currentTab === 'notifications'" class="tab-content">
         <div class="content-header">
-          <h2>Pending Notifications</h2>
+          <h2>Thông báo chờ duyệt</h2>
           <input
             type="text"
             v-model="searchQuery"
-            placeholder="Search notifications..."
+            placeholder="Tìm kiếm thông báo..."
             class="search-input"
           />
         </div>
@@ -28,11 +28,11 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Title</th>
-              <th>Creator</th>
-              <th>Time</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Tiêu đề</th>
+              <th>Người tạo</th>
+              <th>Thời gian</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -64,11 +64,11 @@
 
       <div v-if="currentTab === 'blogs'" class="tab-content">
         <div class="content-header">
-          <h2>Pending Blog Posts</h2>
+          <h2>Bài viết chờ duyệt</h2>
           <input
             type="text"
             v-model="searchQuery"
-            placeholder="Search blog posts..."
+            placeholder="Tìm kiếm bài viết..."
             class="search-input"
           />
         </div>
@@ -76,11 +76,11 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Tiêu đề</th>
+              <th>Tác giả</th>
+              <th>Danh mục</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -113,11 +113,11 @@
       <!-- Tab Groups -->
       <div v-if="currentTab === 'groups'" class="tab-content">
         <div class="content-header">
-          <h2>Pending Groups</h2>
+          <h2>Nhóm chờ duyệt</h2>
           <input
             type="text"
             v-model="searchQuery"
-            placeholder="Search groups..."
+            placeholder="Tìm kiếm nhóm..."
             class="search-input"
           />
         </div>
@@ -125,11 +125,11 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Group Name</th>
-              <th>Creator</th>
-              <th>Members</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Tên nhóm</th>
+              <th>Người tạo</th>
+              <th>Thành viên</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -168,14 +168,14 @@
         currentTab: 'notifications',
         searchQuery: "",
         tabs: [
-          { id: 'notifications', name: 'Notifications', count: 5 },
-          { id: 'blogs', name: 'Blog Posts', count: 12 },
-          { id: 'groups', name: 'Groups', count: 3 }
+          { id: 'notifications', name: 'Thông báo', count: 5 },
+          { id: 'blogs', name: 'Bài viết', count: 12 },
+          { id: 'groups', name: 'Nhóm', count: 3 }
         ],
         notifications: [
           { 
             id: 1, 
-            title: 'System Maintenance Notice', 
+            title: 'Thông báo bảo trì hệ thống', 
             creator: 'Admin', 
             createdAt: '2024-03-15 10:30',
             status: 'pending' 
@@ -184,16 +184,16 @@
         blogs: [
           {
             id: 1,
-            title: 'Daily Health Tips',
+            title: 'Mẹo sức khỏe hàng ngày',
             author: 'John Smith',
-            category: 'Health',
+            category: 'Sức khỏe',
             status: 'pending'
           },
         ],
         groups: [
           {
             id: 1,
-            name: 'Sports Community',
+            name: 'Cộng đồng thể thao',
             creator: 'Jane Wilson',
             memberCount: 150,
             status: 'pending'
@@ -203,13 +203,13 @@
     },
     methods: {
       viewContent(item) {
-        console.log('View details:', item);
+        console.log('Xem chi tiết:', item);
       },
       approveContent(item) {
-        console.log('Approve:', item);
+        console.log('Duyệt:', item);
       },
       rejectContent(item) {
-        console.log('Reject:', item);
+        console.log('Từ chối:', item);
       }
     },
     mounted() {

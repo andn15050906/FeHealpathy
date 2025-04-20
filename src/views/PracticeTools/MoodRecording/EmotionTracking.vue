@@ -95,35 +95,52 @@
 import { defineComponent } from 'vue'
 import Chart from 'chart.js/auto'
 
+interface MoodLevels {
+  [key: string]: number;
+  Happy: number;
+  Eager: number;
+  Angry: number;
+  Anxiety: number;
+  Sad: number;
+}
+
+interface ChartData {
+  week: number[];
+  month: number[];
+  year: number[];
+}
+
 export default defineComponent({
   name: 'EmotionDashboard',
   data() {
     return {
       selectedPeriod: 'Week',
-      periods: ['Week', 'Month', 'Year'],
-      chart: null,
+      periods: ['Week', 'Month', 'Year'] as const,
+      chart: null as any,
       moodLevels: {
         'Happy': 5,
         'Eager': 4,
         'Angry': 3,
         'Anxiety': 2,
         'Sad': 1
-      },
+      } as MoodLevels,
       chartData: {
         week: [4, 3, 5, 4, 5, 3, 4],
         month: Array.from({ length: 30 }, () => Math.floor(Math.random() * 5) + 1),
         year: Array.from({ length: 12 }, () => Math.floor(Math.random() * 5) + 1)
-      }
+      } as ChartData
     }
   },
   methods: {
     initChart() {
-      const ctx = this.$refs.emotionChart.getContext('2d')
+      const canvas = this.$refs.emotionChart as HTMLCanvasElement
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
 
       this.chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: this.getLabels('Week'),
+          labels: this.getLabels('Week') as string[],
           datasets: [{
             label: 'Mood Level',
             data: this.chartData.week,
@@ -147,7 +164,8 @@ export default defineComponent({
               ticks: {
                 stepSize: 1,
                 callback: (value) => {
-                  return Object.keys(this.moodLevels).find(key => this.moodLevels[key] === value) || ''
+                  const numValue = value as number
+                  return Object.keys(this.moodLevels).find(key => this.moodLevels[key] === numValue) || ''
                 }
               },
               grid: {
@@ -167,7 +185,7 @@ export default defineComponent({
             tooltip: {
               callbacks: {
                 label: (context) => {
-                  const value = context.raw
+                  const value = context.raw as number
                   const moodName = Object.keys(this.moodLevels).find(key => this.moodLevels[key] === value)
                   return `Mood: ${moodName}`
                 }
@@ -177,31 +195,34 @@ export default defineComponent({
         }
       })
     },
-    getLabels(period) {
+    getLabels(period: 'Week' | 'Month' | 'Year'): string[] {
       switch (period) {
         case 'Week':
           return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         case 'Month':
-          return Array.from({ length: 30 }, (_, i) => i + 1)
+          return Array.from({ length: 30 }, (_, i) => (i + 1).toString())
         case 'Year':
           return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         default:
           return []
       }
     },
-    updateChart(period) {
-      if (this.chart) {
-        this.chart.data.labels = this.getLabels(period)
-        this.chart.data.datasets[0].data = this.chartData[period.toLowerCase()]
-        this.chart.update()
-      }
+    updateChart(period: 'Week' | 'Month' | 'Year') {
+      if (!this.chart) return
+
+      const labels = this.getLabels(period)
+      const data = this.chartData[period.toLowerCase() as keyof ChartData]
+      
+      this.chart.data.labels = labels
+      this.chart.data.datasets[0].data = data
+      this.chart.update()
     }
   },
   mounted() {
     this.initChart()
   },
   watch: {
-    selectedPeriod(newPeriod) {
+    selectedPeriod(newPeriod: 'Week' | 'Month' | 'Year') {
       this.updateChart(newPeriod)
     }
   }

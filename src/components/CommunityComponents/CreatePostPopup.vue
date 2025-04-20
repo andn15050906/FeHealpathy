@@ -138,7 +138,7 @@ export default {
                     type: "negative",
                     message: "Có lỗi xảy ra khi đăng bài.",
                 });
-                console.error("Submit post error:", error);
+                console.error("Submit post error :", error);
             } finally {
                 this.isSubmitting = false; // Reset loading state
             }

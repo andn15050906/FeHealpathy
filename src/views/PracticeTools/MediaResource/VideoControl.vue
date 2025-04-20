@@ -70,7 +70,7 @@ export default {
                     currentPage.value = page;
                 }
             } catch (error) {
-                console.error("Failed to fetch medias", error);
+                console.error("Lỗi khi tải phương tiện truyền thông", error);
             } finally {
                 isLoading.value = false;
             }

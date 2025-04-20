@@ -1,23 +1,23 @@
 <template>
   <div class="container">
     <LoadingSpinner ref="loadingSpinner" />
-    <h1 class="title text-center mb-4">Update Blog</h1>
+    <h1 class="title text-center mb-4">Cập nhật bài viết</h1>
 
     <form @submit.prevent="openSaveConfirm" class="blog-form">
       <div class="card mb-4">
         <div class="card-body">
           <div class="mb-3">
             <label for="title" class="form-label">
-              <i class="fas fa-pen"></i> Blog Title
+              <i class="fas fa-pen"></i> Tiêu đề bài viết
             </label>
-            <input type="text" class="form-control" id="title" v-model="blog.title" placeholder="Enter blog title"
+            <input type="text" class="form-control" id="title" v-model="blog.title" placeholder="Nhập tiêu đề bài viết"
               @blur="validateTitle" required />
             <div v-if="errors.title" class="text-danger small mt-1">{{ errors.title }}</div>
           </div>
 
           <div class="mb-3">
             <label for="thumb" class="form-label">
-              <i class="fas fa-image"></i> Blog Image
+              <i class="fas fa-image"></i> Hình ảnh bài viết
             </label>
             <input type="file" class="form-control" id="thumb" @change="handleThumbUpload" accept="image/*" />
             <div v-if="errors.thumb" class="text-danger small mt-1">{{ errors.thumb }}</div>
@@ -28,12 +28,12 @@
 
           <div class="mb-3">
             <label for="keywords" class="form-label">
-              <i class="fas fa-tags"></i> Related Keywords
+              <i class="fas fa-tags"></i> Từ khóa liên quan
             </label>
             <multiselect v-model="blog.selectedKeywords" :options="availableKeywords" :multiple="true"
               :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select keywords"
               label="name" track-by="id" class="multiselect" />
-            <small class="form-text text-muted">You can select multiple keywords from the list.</small>
+            <small class="form-text text-muted">Bạn có thể chọn nhiều từ khóa từ danh sách.</small>
             <div v-if="errors.selectedKeywords" class="text-danger small mt-1">
               {{ errors.selectedKeywords }}
             </div>
@@ -44,7 +44,7 @@
       <div class="card mb-4">
         <div class="card-header bg-light">
           <h2 class="mb-0 fs-5">
-            <i class="fas fa-book"></i> Add Optional Sections
+            <i class="fas fa-book"></i> Thêm phần tùy chọn
           </h2>
         </div>
         <div class="card-body">
@@ -53,9 +53,9 @@
               <div class="card-body">
                 <div class="mb-3">
                   <label class="form-label">
-                    <i class="fas fa-heading"></i> Section Title {{ index + 1 }}
+                    <i class="fas fa-heading"></i> Tiêu đề phần {{ index + 1 }}
                   </label>
-                  <input type="text" class="form-control" v-model="section.header" placeholder="Enter section title"
+                  <input type="text" class="form-control" v-model="section.header" placeholder="Nhập tiêu đề phần"
                     @blur="() => validateSection(index)" required />
                   <div v-if="errors.sections[index]?.header" class="text-danger small mt-1">
                     {{ errors.sections[index].header }}
@@ -64,7 +64,7 @@
 
                 <div class="mb-3">
                   <label class="form-label">
-                    <i class="fas fa-image"></i> Section Image {{ index + 1 }}
+                    <i class="fas fa-image"></i> Hình ảnh phần {{ index + 1 }}
                   </label>
                   <input type="file" class="form-control" @change="(e) => handleSectionThumbUpload(e, index)"
                     accept="image/*" />
@@ -74,14 +74,14 @@
                   <div v-if="section.previewImage" class="image-preview mt-2">
                     <img :src="section.previewImage" alt="Section image" class="img-thumbnail" />
                   </div>
-                  <small class="form-text text-muted">Optional: upload a related image.</small>
+                  <small class="form-text text-muted">Tùy chọn: tải lên hình ảnh liên quan.</small>
                 </div>
 
                 <div class="mb-3">
                   <label class="form-label">
-                    <i class="fas fa-align-left"></i> Section Content {{ index + 1 }}
+                    <i class="fas fa-align-left"></i> Nội dung phần {{ index + 1 }}
                   </label>
-                  <textarea class="form-control" v-model="section.content" placeholder="Enter detailed content" rows="4"
+                  <textarea class="form-control" v-model="section.content" placeholder="Nhập nội dung chi tiết" rows="4"
                     @blur="() => validateSection(index)" required></textarea>
                   <div v-if="errors.sections[index]?.content" class="text-danger small mt-1">
                     {{ errors.sections[index].content }}
@@ -90,14 +90,14 @@
 
                 <button class="btn btn-danger" @click.prevent="openDeleteConfirm(index)">
                   <i class="fas fa-trash-alt me-1 bold-icon"></i>
-                  <span class="bold-text">Remove Section</span>
+                  <span class="bold-text">Xóa phần</span>
                 </button>
               </div>
             </div>
 
             <button class="btn btn-secondary custom-btn mt-5" @click.prevent="addSection">
               <i class="fas fa-plus me-1 bold-icon"></i>
-              <span class="bold-text">Add Section</span>
+              <span class="bold-text">Thêm phần</span>
             </button>
           </div>
         </div>
@@ -106,15 +106,15 @@
       <div class="form-actions text-center d-grid">
         <button class="btn btn-success custom-btn-lg">
           <i class="fas fa-check me-1 bold-icon"></i>
-          <span class="bold-text">Update Blog</span>
+          <span class="bold-text">Cập nhật bài viết</span>
         </button>
       </div>
     </form>
 
-    <DeleteConfirmPopup v-model:isVisible="deleteDialogVisible" message="Are you sure you want to delete this section?"
+    <DeleteConfirmPopup v-model:isVisible="deleteDialogVisible" message="Bạn có chắc chắn muốn xóa phần này?"
       @confirmDelete="handleConfirmDelete" />
 
-    <SaveConfirmPopUp v-model:isVisible="saveDialogVisible" message="Are you sure you want to save the changes?"
+    <SaveConfirmPopUp v-model:isVisible="saveDialogVisible" message="Bạn có chắc chắn muốn lưu thay đổi?"
       @confirmSave="handleConfirmSave" />
   </div>
 </template>
@@ -203,7 +203,7 @@ onMounted(async () => {
       name: keyword.title,
     }));
   } catch (error) {
-    toast.error("Unable to load blog data.");
+    toast.error("Không thể tải dữ liệu bài viết.");
   } finally {
     loadingSpinner.value.hideSpinner();
   }
@@ -327,11 +327,11 @@ const submitBlogInternal = async () => {
       });
     }
     const response = await updateArticle(formData);
-    toast.success("Blog updated successfully!");
+    toast.success("Bài viết đã được cập nhật thành công!");
     router.push("/advisor/content");
   } catch (error) {
-    console.error("Error updating blog:", error);
-    toast.error("Blog update failed! Please try again.");
+    console.error("Lỗi cập nhật bài viết:", error);
+    toast.error("Cập nhật bài viết thất bại! Vui lòng thử lại.");
   } finally {
     loadingSpinner.value.hideSpinner();
   }
@@ -339,11 +339,11 @@ const submitBlogInternal = async () => {
 
 const validateTitle = () => {
   if (!blog.value.title.trim()) {
-    errors.title = "Please enter the blog title.";
+    errors.title = "Vui lòng nhập tiêu đề bài viết.";
   } else if (blog.value.title.trim().length < 3) {
-    errors.title = "Blog title must be at least 3 characters.";
+    errors.title = "Tiêu đề bài viết phải có ít nhất 3 ký tự.";
   } else if (blog.value.title.trim().length > 100) {
-    errors.title = "Blog title must be less than 100 characters.";
+    errors.title = "Tiêu đề bài viết phải nhỏ hơn 100 ký tự.";
   } else {
     errors.title = "";
   }
@@ -351,7 +351,7 @@ const validateTitle = () => {
 
 const validateThumb = () => {
   if (!blog.value.thumb && !previewImage.value) {
-    errors.thumb = "Please select or keep the featured image.";
+    errors.thumb = "Vui lòng chọn hoặc giữ nguyên hình ảnh nổi bật.";
   } else {
     errors.thumb = "";
   }
@@ -359,7 +359,7 @@ const validateThumb = () => {
 
 const validateKeywords = () => {
   if (!blog.value.selectedKeywords || blog.value.selectedKeywords.length === 0) {
-    errors.selectedKeywords = "Please select at least one keyword.";
+    errors.selectedKeywords = "Vui lòng chọn ít nhất một từ khóa.";
   } else {
     errors.selectedKeywords = "";
   }
@@ -371,12 +371,12 @@ const validateSection = (index) => {
     errors.sections[index] = { header: "", content: "", thumb: "" };
   }
   if (!section.header || !section.header.trim()) {
-    errors.sections[index].header = `Section ${index + 1} is missing a title.`;
+    errors.sections[index].header = `Phần ${index + 1} thiếu tiêu đề.`;
   } else {
     errors.sections[index].header = "";
   }
   if (!section.content || !section.content.trim()) {
-    errors.sections[index].content = `Section ${index + 1} is missing content.`;
+    errors.sections[index].content = `Phần ${index + 1} thiếu nội dung.`;
   } else {
     errors.sections[index].content = "";
   }
@@ -392,12 +392,12 @@ const validateForm = () => {
   });
 
   if (errors.title || errors.thumb || errors.selectedKeywords) {
-    toast.error("Please fix the errors in the form.");
+    toast.error("Vui lòng sửa lỗi trong biểu mẫu.");
     return false;
   }
   for (const secError of errors.sections) {
     if (secError.header || secError.content || secError.thumb) {
-      toast.error("Please fix the errors in the sections.");
+      toast.error("Vui lòng sửa lỗi trong các phần.");
       return false;
     }
   }

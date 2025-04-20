@@ -11,7 +11,7 @@
                 <div class="user-name font-weight-bold">{{ comment.username }}</div>
                 <div class="post-time">({{ comment.postDate }})</div>
             </div>
-            <v-btn v-if="comment.isAuthor" color="red" small>Author</v-btn>
+            <v-btn v-if="comment.isAuthor" color="red" small>Tác giả</v-btn>
             <v-spacer></v-spacer>
 
             <v-menu v-if="comment.isCommentAuthor" offset-y>
@@ -22,10 +22,10 @@
                 </template>
                 <v-list>
                     <v-list-item @click="isEdit = !isEdit">
-                        <v-list-item-title>Edit</v-list-item-title>
+                        <v-list-item-title>Chỉnh sửa</v-list-item-title>
                     </v-list-item>
                     <v-list-item @click="isDelete = !isDelete">
-                        <v-list-item-title>Delete</v-list-item-title>
+                        <v-list-item-title>Xóa</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -57,7 +57,7 @@
         </div>
 
         <popup-login-required :open="openLoginPopup" />
-        <confirm-popup v-if="isDelete" message="Do you want to delete this comment?" @popupClick="popupClickHandler" />
+        <confirm-popup v-if="isDelete" message="Bạn có muốn xóa bình luận này không?" @popupClick="popupClickHandler" />
     </div>
 </template>
 
@@ -74,7 +74,7 @@ const props = defineProps({
             avatar: "https://cdn.quasar.dev/img/boy-avatar.png",
             username: "username",
             postDate: "today",
-            content: "Sample comment content here.",
+            content: "Nội dung bình luận ở đây.",
             likeCount: 0,
             totalReplies: 0,
             isAuthor: false,
@@ -118,7 +118,7 @@ function popupClickHandler(isDeleteClicked) {
 }
 
 async function deleteComment() {
-    console.log(`Deleting comment with ID: ${props.comment.id}`);
+    console.log(`Xóa bình luận với ID: ${props.comment.id}`);
 }
 
 function editCommentHandler(newComment) {

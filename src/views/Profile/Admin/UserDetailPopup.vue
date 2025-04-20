@@ -2,7 +2,7 @@
   <div v-if="show" class="popup-overlay">
     <div class="popup-content">
       <div class="popup-header">
-        <h2>User Information</h2>
+        <h2>Thông tin người dùng</h2>
         <button class="close-button" @click="close">×</button>
       </div>
       <div class="user-info">
@@ -15,16 +15,16 @@
             <span>{{ user.email }}</span>
           </div>
           <div class="info-row">
-            <label>Last visited:</label>
-            <span>Apr 15, 2023 18:09:19</span>
+            <label>Lần cuối truy cập:</label>
+            <span>15/04/2023 18:09:19</span>
           </div>
           <div class="info-row">
-            <label>Roles:</label>
-            <span class="role-badge">{{ user.role === 0 ? 'Member' : user.role === 1 ? 'Advisor' : 'Admin' }}</span>
+            <label>Vai trò:</label>
+            <span class="role-badge">{{ user.role === 0 ? 'Thành viên' : user.role === 1 ? 'Tư vấn viên' : 'Admin' }}</span>
           </div>
           <div class="info-row">
-            <label>Status:</label>
-            <span class="status-badge active">Active</span>
+            <label>Trạng thái:</label>
+            <span class="status-badge active">Hoạt động</span>
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@
 import { getUserAvatar } from '@/scripts/api/services/userService';
 
 export default {
-  name: 'UserDetailPopup',
+  name: 'Chi tiết người dùng',
   props: {
     show: {
       type: Boolean,

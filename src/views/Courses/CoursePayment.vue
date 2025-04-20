@@ -1,9 +1,9 @@
 <template>
-  <h1 class="page-title">Payment methods</h1>
+  <h1 class="page-title">Phương thức thanh toán</h1>
 
   <VaCard class="mb-6">
     <VaCardContent>
-      <div class="text-2xl font-bold leading-5 mb-6">My cards</div>
+      <div class="text-2xl font-bold leading-5 mb-6">Thẻ của tôi</div>
 
       <PaymentCardList />
     </VaCardContent>
@@ -11,7 +11,7 @@
 
   <VaCard class="mb-6">
     <VaCardContent>
-      <div class="text-2xl font-bold leading-5 mb-6">Billing address</div>
+      <div class="text-2xl font-bold leading-5 mb-6">Địa chỉ thanh toán</div>
 
       <BillingAddressList />
     </VaCardContent>

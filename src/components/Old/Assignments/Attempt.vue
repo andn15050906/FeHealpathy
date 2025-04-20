@@ -1,6 +1,6 @@
 <template>
-  <div v-if="loading">Loading...</div>
-  <div v-else-if="error">Error: {{ error.message }}</div>
+  <div v-if="loading">Đang tải...</div>
+  <div v-else-if="error">Lỗi: {{ error.message }}</div>
   <div v-else>
     <header id="page-header" class="row" style="margin-top: 100px; margin-bottom: 20px;">
       <div class="col-12 pt-3 pb-3">
@@ -43,7 +43,7 @@
                   <div>
                     <div v-for="(question, index) in assignment.questions" :key="question.id" class="que multichoice">
                       <div class="info">
-                        <h3 class="no">Question <span class="qno">{{ index + 1 }}</span></h3>
+                        <h3 class="no">Câu hỏi <span class="qno">{{ index + 1 }}</span></h3>
                       </div>
                       <div class="content">
                         <div class="formulation clearfix">
@@ -66,9 +66,9 @@
                   </div>
                 </form>
                 <div class="submission-area">
-                  <button @click="submitAssignment" id="finish-btn">Finish attempt</button>
+                  <button @click="submitAssignment" id="finish-btn">Hoàn thành</button>
                   <div id="quiz-timer" role="timer">
-                    Time left: <span id="quiz-time-left">{{ timeLeft }}</span>
+                    Thời gian còn lại: <span id="quiz-time-left">{{ timeLeft }}</span>
                   </div>
                 </div>
               </div>

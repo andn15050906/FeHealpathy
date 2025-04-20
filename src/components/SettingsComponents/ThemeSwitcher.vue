@@ -1,6 +1,6 @@
 <template>
   <div class="theme-switcher">
-    <h3 class="section-title">Theme Settings</h3>
+    <h3 class="section-title">Cài đặt chủ đề</h3>
     <div class="theme-toggle">
       <va-button-toggle v-model="currentTheme" :options="options" color="primary" @change="toggleTheme" />
     </div>

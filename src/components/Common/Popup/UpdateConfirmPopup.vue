@@ -10,7 +10,7 @@
             </v-card-text>
 
             <v-card-actions class="justify-end action-section">
-                <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Cancel</v-btn>
+                <v-btn color="grey" text class="cancel-btn" @click="handleClick(false)">Hủy</v-btn>
                 <v-btn color="blue darken-1" class="update-btn" @click="handleClick(true)">
                     <span class="update-text">Cập nhật</span>
                 </v-btn>

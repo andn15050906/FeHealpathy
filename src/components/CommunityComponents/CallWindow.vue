@@ -587,12 +587,6 @@ onMounted(() => {
             _participants[participant.connectionId].videoHandler = new VideoHandler(videoContainer, participant.connectionId);
         }
     }
-
-
-
-
-
-
     async function getMediaStream(mediaType) {
         switch (mediaType) {
             case MEDIA_TYPE.DISPLAY_MEDIA:

@@ -40,12 +40,12 @@
 
     <div class="charts-container">
       <div :style="{ width: '30%' }">
-        <h2>🎯 Survey Result Ratio</h2>
+        <h2>🎯 Tỷ lệ kết quả đánh giá</h2>
         <canvas ref="pieChart"></canvas>
       </div>
 
       <div :style="{ width: '60%' }">
-        <h2>📊 Survey Scores Over Time</h2>
+        <h2>📊 Điểm số đánh giá theo thời gian</h2>
         <canvas ref="barChart"></canvas>
       </div>
     </div>
@@ -83,11 +83,11 @@ export default {
       let band = result.bands[0];
       if (band) {
         if (band.ratingClass == 'bad')
-          return "Negative 😔";
+          return "Tiêu cực 😔";
         else if (band.ratingClass == 'average')
-          return "Neutral ⚠️"
+          return "Trung bình ⚠️"
         else if (band.ratingClass == 'good')
-          return "Positive 👍"
+          return "Tích cực 👍"
       }
       return result.score > (result.maxScore / 2) ? "Negative 😔" : "Positive 👍";
     };
@@ -109,7 +109,7 @@ export default {
       new Chart(pieChart.value, {
         type: "pie",
         data: {
-          labels: ["Positive", "Neutral", "Negative"],
+          labels: ["Tích cực", "Trung bình", "Tiêu cực"],
           datasets: [
             {
               data: [positive.value, neutral.value, negative.value],

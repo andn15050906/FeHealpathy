@@ -13,8 +13,8 @@
             tabs: {
                 type: Array,
                 default: [
-                    { label: 'Self Assessment', link: '/statistics/self-assessment', target: '_blank' },
-                    { label: 'Your Activities', link: '/statistics/user-activity', target: '_blank' }
+                    { label: 'Tự đánh giá', link: '/statistics/self-assessment', target: '_blank' },
+                    { label: 'Hoạt động của bạn', link: '/statistics/user-activity', target: '_blank' }
                 ],
                 validator: (value) => {
                     return value.every(tab =>

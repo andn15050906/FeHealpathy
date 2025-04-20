@@ -68,10 +68,10 @@ export default {
 			if (verifiedEmail && token) {
 				try {
 					await verifyEmail(verifiedEmail, token);
-					await sweetAlert.showSuccess("Verified Email Successfully!");
+					await sweetAlert.showSuccess("Xác thực email thành công!");
 				}
 				catch (error) {
-					await sweetAlert.showError('Invalid email validation request!');
+					await sweetAlert.showError('Yêu cầu xác thực email không hợp lệ!');
 				}
 			}
 		}

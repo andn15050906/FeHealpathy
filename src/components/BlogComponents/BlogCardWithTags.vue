@@ -1,7 +1,7 @@
 <template>
     <div class="glowing" padding="10px">
         <RouterLink :to="`/blogs/${article.Link ? article.Link : 1}`" class="article-link">
-            <img :src="article.Thumb" alt="Featured" class="article-image" loading="lazy" />
+            <img :src="article.Thumb" alt="Ảnh nổi bật" class="article-image" loading="lazy" />
         </RouterLink>
         <div class="article-content">
             <RouterLink :to="`/blogs/${article.Link ? article.Link : 1}`" class="article-link">
