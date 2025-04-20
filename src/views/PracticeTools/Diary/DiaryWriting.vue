@@ -5,65 +5,31 @@
       <button class="back-button" @click="handleBack">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/d9b58e3b5db27ef7508f6ec31fd50ca2a91cd5f71d18910c95741bcb028f9bba"
-          alt="Quay lại"
-          class="back-icon"
-        />
+          alt="Quay lại" class="back-icon" />
         <span>Quay lại</span>
       </button>
     </header>
 
-    <input
-      type="text"
-      class="memory-title-input"
-      v-model="memoryTitle"
-      aria-label="Tiêu đề nhật ký"
-      placeholder="Nhật ký của tôi #1"
-    />
+    <input type="text" class="memory-title-input" v-model="memoryTitle" aria-label="Tiêu đề nhật ký"
+      placeholder="Nhật ký của tôi #1" />
 
-    <input
-      type="date"
-      class="memory-date-input"
-      v-model="memoryDate"
-      aria-label="Ngày viết"
-    />
+    <input type="date" class="memory-date-input" v-model="memoryDate" aria-label="Ngày viết" />
 
     <div class="content-section">
       <div class="content-header">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c"
-          alt="Tải ảnh lên"
-          class="upload-icon"
-          tabindex="0"
-          @click="triggerFileInput"
-        />
-        <input
-          type="file"
-          ref="fileInput"
-          class="visually-hidden"
-          @change="handleFileChange"
-          multiple
-          accept="image/*"
-        />
+          alt="Tải ảnh lên" class="upload-icon" tabindex="0" @click="triggerFileInput" />
+        <input type="file" ref="fileInput" class="visually-hidden" @change="handleFileChange" multiple
+          accept="image/*" />
       </div>
-      <textarea
-        class="memory-content"
-        placeholder="Viết bất cứ điều gì..."
-        v-model="memoryContent"
-        aria-label="Nội dung nhật ký"
-      ></textarea>
+      <textarea class="memory-content" placeholder="Viết bất cứ điều gì..." v-model="memoryContent"
+        aria-label="Nội dung nhật ký"></textarea>
 
       <div class="preview-section">
-        <div
-          v-for="(file, index) in mediaFiles"
-          :key="index"
-          class="preview-item"
-        >
+        <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
           <img :src="file.preview" alt="Xem trước" class="preview-image" />
-          <button
-            type="button"
-            @click="removeFile(file.id)"
-            class="remove-button"
-          >
+          <button type="button" @click="removeFile(file.id)" class="remove-button">
             <i class="fa fa-trash"></i>
           </button>
         </div>
@@ -83,6 +49,7 @@ import {
 } from "@/scripts/api/services/diaryNoteService";
 import { ConvertTo_yyyy_mm_dd } from "../../../scripts/logic/common";
 import { useRoute, useRouter } from "vue-router";
+import { getUserProfile } from '@/scripts/api/services/authService';
 
 export default {
   name: "DiaryWriting",
@@ -140,7 +107,12 @@ export default {
 
     async function fetchTodayDiary() {
       const today = ConvertTo_yyyy_mm_dd(new Date());
-      const queryParams = { StartAfter: today };
+      const now = new Date();
+      now.setHours(now.getHours() - 8); // Trừ 8 tiếng để khớp UTC
+      const startAfter = now.toISOString(); // Định dạng đúng cả ngày + giờ
+
+      var user = await getUserProfile();
+      const queryParams = { StartAfter: startAfter, CreatorId: user.id };
 
       try {
         const response = await getPagedDiaryNotes(queryParams);
