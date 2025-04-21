@@ -39,10 +39,10 @@ export default {
       itemsPerPage: 12,
       currentFilter: 'newest',
       filters: [
-        { label: 'Newest to Oldest', value: 'newest' },
-        { label: 'Oldest to Newest', value: 'oldest' },
-        { label: 'Rating', value: 'rating' },
-        { label: 'Title', value: 'title' }
+        { label: 'Mới nhất tới cũ nhất', value: 'newest' },
+        { label: 'Cũ nhất tới mới nhất', value: 'oldest' },
+        { label: 'Đánh giá', value: 'rating' },
+        { label: 'Tiêu đề', value: 'title' }
       ],
       allLessons: []
     }

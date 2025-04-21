@@ -19,19 +19,19 @@
     </div>
 
     <div class="quick-actions">
-      <h2 class="section-title">Quick Actions</h2>
+      <h2 class="section-title">Hành động nhanh</h2>
       <div class="actions-grid">
         <button class="action-card" @click="navigateTo('/admin/create-admin')">
           <i class="fas fa-user-cog"></i>
-          <span>Manage Users</span>
+          <span>Quản lý người dùng</span>
         </button>
         <button class="action-card" @click="navigateTo('/admin/moderate-content')">
           <i class="fas fa-tasks"></i>
-          <span>Moderate Content</span>
+          <span>Kiểm duyệt nội dung</span>
         </button>
         <button class="action-card" @click="navigateTo('/admin/moderate-users')">
           <i class="fas fa-shield-alt"></i>
-          <span>Moderate Users</span>
+          <span>Kiểm duyệt người dùng</span>
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@
     <div class="charts-section">
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
         <div class="chart-header">
-          <h3>User Growth</h3>
+          <h3>Tăng trưởng người dùng</h3>
         </div>
         <div v-if="loading.charts" class="loading-overlay">
           <div class="spinner">
@@ -52,7 +52,7 @@
       
       <div class="chart-container" :class="{ 'is-loading': loading.charts }">
         <div class="chart-header">
-          <h3>Revenue Analytics</h3>
+          <h3>Phân tích doanh thu</h3>
         </div>
         <div v-if="loading.charts" class="loading-overlay">
           <div class="spinner">
@@ -138,7 +138,7 @@
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-details">
-          <h3>Premimum Users</h3>
+          <h3>Người dùng Premium</h3>
           <div class="stat-number">
             <template v-if="!loading.stats">{{ generalReport.totalPremiumUserCount }}</template>
             <div v-else class="skeleton-loader"></div>

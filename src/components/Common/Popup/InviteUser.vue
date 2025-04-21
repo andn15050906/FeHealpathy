@@ -2,12 +2,12 @@
   <div class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Invite users to conversation</h2>
-        <p class="subtitle">Select users to invite</p>
+        <h2>Mời người dùng vào cuộc hội thoại</h2>
+        <p class="subtitle">Chọn người dùng để mời</p>
       </div>
 
       <div class="modal-body">
-        <input v-model="search" placeholder="Search user..." @input="handleSearch" class="input" />
+        <input v-model="search" placeholder="Tìm kiếm người dùng..." @input="handleSearch" class="input" />
         <ul v-if="searchResults.length" class="user-list">
           <li v-for="user in searchResults" :key="user.id" @click="toggleUser(user)" class="user-item">
             <span class="user-name">{{ user.fullName }}</span>
@@ -17,7 +17,7 @@
       </div>
 
       <div v-if="selectedUsers.length" class="selected-user">
-        ✅ Selected:
+        ✅ Đã chọn:
         <strong v-for="(user, idx) in selectedUsers" :key="user.id">
           {{ user.fullName }}<span v-if="idx < selectedUsers.length - 1">, </span>
         </strong>
@@ -25,17 +25,17 @@
 
       <!-- Add input for Title and Avatar -->
       <div class="form-group">
-        <label for="title">Conversation Title</label>
-        <input v-model="conversationInfo.title" placeholder="Enter conversation title" class="input" />
+        <label for="title">Tiêu đề cuộc hội thoại</label>
+        <input v-model="conversationInfo.title" placeholder="Nhập tiêu đề cuộc hội thoại" class="input" />
       </div>
       <div class="form-group">
-        <label for="avatar">Upload Avatar</label>
+        <label for="avatar">Tải lên ảnh đại diện</label>
         <input type="file" @change="handleFileChange" accept="image/*" class="input" />
       </div>
 
       <div class="modal-footer">
         <button @click="inviteUsers" :disabled="!selectedUsers.length || isSubmitting" class="btn primary">
-          {{ isSubmitting ? "Inviting..." : "Invite" }}
+          {{ isSubmitting ? "Đang mời..." : "Mời" }}
         </button>
         <button @click="$emit('close')" class="btn secondary">Hủy</button>
       </div>
@@ -76,7 +76,7 @@ const handleSearch = async () => {
     const res = (await getUsers({ name: keyword })).items || [];
     searchResults.value = res.filter(u => !selectedUsers.value.some(s => s.id === u.id));
   } catch (err) {
-    console.error("Search error:", err);
+    console.error("Lỗi tìm kiếm:", err);
   }
 };
 
@@ -153,7 +153,7 @@ const inviteUsers = async () => {
     conversationInfo.value.title = "";
     conversationInfo.value.avatarUrl = null;
   } catch (error) {
-    console.error("Invite failed:", error);
+    console.error("Lỗi mời:", error);
   } finally {
     isSubmitting.value = false;
   }

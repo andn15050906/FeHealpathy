@@ -113,7 +113,7 @@ export default {
   methods: {
     async submitAssignment() {
       // ...
-      console.log('Submitting assignment', this.answers);
+      console.log('Nộp bài thi', this.answers);
 
       clearInterval(this.timerInterval);
     },

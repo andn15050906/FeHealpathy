@@ -338,7 +338,7 @@ export default {
             this.fetchRoadmaps()
           ]);
         } catch (error) {
-          console.error('Error deleting content:', error);
+          console.error('Không thể xóa nội dung:', error);
           toast.error("Không thể xóa nội dung. Vui lòng thử lại.");
         } finally {
           this.$refs.loadingSpinner.hideSpinner();
@@ -362,7 +362,7 @@ export default {
 
         this.sortBlogs();
       } catch (error) {
-        console.error('Error fetching blogs:', error);
+        console.error('Không thể tải bài viết:', error);
         toast.error("Không thể tải bài viết. Vui lòng thử lại.");
         this.blogs = [];
       } finally {
@@ -385,7 +385,7 @@ export default {
 
         this.sortRoadmaps();
       } catch (error) {
-        console.error('Error fetching roadmaps:', error);
+        console.error('Không thể tải lộ trình:', error);
         toast.error("Không thể tải lộ trình. Vui lòng thử lại.");
         this.roadmaps = [];
       } finally {
@@ -408,7 +408,7 @@ export default {
 
         this.sortCourses();
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error('Không thể tải khóa học:', error);
         toast.error("Không thể tải khóa học. Vui lòng thử lại.");
         this.courses = [];
       } finally {
