@@ -8,7 +8,7 @@
 
     <div class="video-container">
       <iframe class="video" src="https://www.youtube.com/embed/iSS4asEmIfE"
-        title="Yoga For Beginners | Day 01 | Hye Yoga" frameborder="0"
+        title="Yoga cho người bắt đầu | Ngày 01 | Hye Yoga" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe>
     </div>

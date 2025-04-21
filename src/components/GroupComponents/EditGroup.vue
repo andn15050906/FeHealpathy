@@ -26,7 +26,7 @@
 
                 <!-- Image Preview -->
                 <div v-if="previewImage" class="image-preview">
-                    <img :src="previewImage" alt="Avatar Preview" class="preview-img" />
+                    <img :src="previewImage" alt="Ảnh đại diện" class="preview-img" />
                 </div>
             </div>
 

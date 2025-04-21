@@ -71,9 +71,9 @@
                                     <i class="fas fa-thumbs-up me-1"></i>{{ comment.likes }}
                                 </button>
                                 <span style="display: none">
-                                    Current User ID: {{ currentUserId }} ({{ typeof currentUserId }})
-                                    Creator ID: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
-                                    Is Owner: {{ currentUserId === comment.creatorId }}
+                                    Người dùng hiện tại: {{ currentUserId }} ({{ typeof currentUserId }})
+                                    ID người tạo bình luận: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
+                                    Là người tạo bình luận: {{ currentUserId === comment.creatorId }}
                                 </span>
                                 <template v-if="isCommentOwner(comment)">
                                     <button class="btn btn-link p-0 text-secondary" @click="toggleEditComment(comment)">

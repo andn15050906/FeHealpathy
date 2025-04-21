@@ -2,7 +2,7 @@
     <div class="window-container">
         <div v-if="singleRoom">
             <form v-if="addNewRoom" @submit.prevent="createRoom">
-                <input v-model="addRoomUsername" type="text" placeholder="Add username" />
+                <input v-model="addRoomUsername" type="text" placeholder="thêm tên người dùng" />
                 <button type="submit" :disabled="disableForm || !addRoomUsername">
                     Tạo cuộc trò chuyện
                 </button>
@@ -10,7 +10,7 @@
             </form>
 
             <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
-                <input v-model="invitedUsername" type="text" placeholder="Add username" />
+                <input v-model="invitedUsername" type="text" placeholder="thêm tên người dùng" />
                 <button type="submit" :disabled="disableForm || !invitedUsername">
                     Thêm người dùng
                 </button>

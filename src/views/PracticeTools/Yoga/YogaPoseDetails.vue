@@ -3,7 +3,6 @@
         <div class="mb-3">
             <router-link to="/yoga/poses" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left mr-2"></i>Quay lại
-                <i class="fas fa-arrow-left mr-2"></i>Quay lại
             </router-link>
         </div>
         <h2 class="text-center mb-2" style="font-weight: bold;">{{ pose.name }}</h2>
@@ -25,7 +24,6 @@
         </div>
         <div class="pose-details-info d-flex flex-column gap-3">
             <div class="card shadow p-4">
-                <h4 class="text-dark fw-bold mb-3">Mô tả bài tập</h4>
                 <h4 class="text-dark fw-bold mb-3">Mô tả bài tập</h4>
                 <p class="text-muted">{{ pose.description }}</p>
             </div>
@@ -122,7 +120,7 @@ export default {
                     window.scrollTo(0, 0);
                 }
             } catch (error) {
-                console.error("Error loading pose details:", error);
+                console.error("Lỗi tải thông tin tư thế:", error);
             }
         };
 
@@ -131,7 +129,7 @@ export default {
                 const res = await getRecommendationPoses();
                 recommendedPoses.value = res || [];
             } catch (error) {
-                console.error("Error fetching recommended poses:", error);
+                console.error("Lỗi tải tư thế khuyến nghị:", error);
             }
         };
 

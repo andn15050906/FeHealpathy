@@ -119,13 +119,13 @@ async function onUserSearch(event) {
             userSearchResults.value = [];
         }
     } catch (error) {
-        console.error("Failed to fetch users", error);
+        console.error("Lỗi tìm kiếm người dùng:", error);
     }
 }
 
 function addMember() {
     if (newMemberName.value) {
-        console.log("Selected User:", newMemberName.value);
+        console.log("Người dùng đã chọn:", newMemberName.value);
         members.value.push({
             id: newMemberName.value.id,
             name: newMemberName.value.fullName,

@@ -195,12 +195,12 @@ export default defineComponent({
         }
       })
     },
-    getLabels(period: 'Week' | 'Month' | 'Year'): string[] {
+    getLabels(period: 'Week' | 'Month' | 'Year'): string[] | number[] {
       switch (period) {
         case 'Week':
           return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         case 'Month':
-          return Array.from({ length: 30 }, (_, i) => (i + 1).toString())
+          return Array.from({ length: 30 }, (_, i) => i + 1)
         case 'Year':
           return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         default:

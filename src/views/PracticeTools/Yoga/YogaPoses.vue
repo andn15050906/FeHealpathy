@@ -6,7 +6,7 @@
                 <div v-for="(pose, index) in yogaPoses" :key="index"
                     class="pose-row d-flex justify-content-between align-items-center mb-4 p-4 shadow-sm hover-row">
                     <div class="d-flex align-items-center">
-                        <img :src="pose.thumpUrl" alt="Pose Thumbnail" class="pose-thumbnail mr-4"
+                        <img :src="pose.thumpUrl" alt="Ảnh đại diện" class="pose-thumbnail mr-4"
                             v-if="pose.thumpUrl" />
                         <div>
                             <span class="pose-name">{{ pose.name }}</span>
