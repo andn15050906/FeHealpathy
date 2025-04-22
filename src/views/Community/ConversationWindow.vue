@@ -1,59 +1,97 @@
 <template>
-    <div class="window-container">
-        <div v-if="singleRoom">
-            <form v-if="addNewRoom" @submit.prevent="createRoom">
-                <input v-model="addRoomUsername" type="text" placeholder="thêm tên người dùng" />
-                <button type="submit" :disabled="disableForm || !addRoomUsername">
-                    Tạo cuộc trò chuyện
-                </button>
-                <button class="button-cancel" @click="addNewRoom = false">Hủy bỏ</button>
-            </form>
+  <div class="window-container">
+    <div v-if="singleRoom">
+      <form v-if="addNewRoom" @submit.prevent="createRoom">
+        <input
+          v-model="addRoomUsername"
+          type="text"
+          placeholder="thêm tên người dùng"
+        />
+        <button type="submit" :disabled="disableForm || !addRoomUsername">
+          Tạo cuộc trò chuyện
+        </button>
+        <button class="button-cancel" @click="addNewRoom = false"
+          >Hủy bỏ</button
+        >
+      </form>
 
-            <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
-                <input v-model="invitedUsername" type="text" placeholder="thêm tên người dùng" />
-                <button type="submit" :disabled="disableForm || !invitedUsername">
-                    Thêm người dùng
-                </button>
-                <button class="button-cancel" @click="inviteRoomId = null">Hủy bỏ</button>
-            </form>
+      <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
+        <input
+          v-model="invitedUsername"
+          type="text"
+          placeholder="thêm tên người dùng"
+        />
+        <button type="submit" :disabled="disableForm || !invitedUsername">
+          Thêm người dùng
+        </button>
+        <button class="button-cancel" @click="inviteRoomId = null"
+          >Hủy bỏ</button
+        >
+      </form>
 
-            <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
-                <select v-model="removeUserId">
-                    <option default value="">Chọn người dùng</option>
-                    <option v-for="user in removeUsers" :key="user._id" :value="user._id">
-                        {{ user.username }}
-                    </option>
-                </select>
-                <button type="submit" :disabled="disableForm || !removeUserId">
-                    Xóa người dùng
-                </button>
-                <button class="button-cancel" @click="removeRoomId = null">Hủy bỏ</button>
-            </form>
-        </div>
-
-        <vue-advanced-chat ref="chatWindow" :height="screenHeight" :theme="'light'" :styles="JSON.stringify(styles)"
-            :current-user-id="currentUser.id" :room-id="roomId" :rooms="JSON.stringify(loadedRooms)"
-            :loading-rooms="loadingRooms" :rooms-loaded="roomsLoaded" :messages="JSON.stringify(messages)"
-            :messages-loaded="messagesLoaded" :room-message="roomMessage" :room-actions="JSON.stringify(roomActions)"
-            :menu-actions="JSON.stringify(menuActions)" :message-actions="JSON.stringify(messageActions)"
-            :templates-text="JSON.stringify(templatesText)" @fetch-more-rooms="fetchMoreRooms"
-            @fetch-messages="fetchMessages($event.detail[0])" @send-message="sendMessage($event.detail[0])"
-            @edit-message="editMessage($event.detail[0])" @delete-message="deleteMessage($event.detail[0])"
-            @open-file="openFile($event.detail[0])" @add-room="addRoom($event.detail[0])"
-            @room-action-handler="menuActionHandler($event.detail[0])"
-            @menu-action-handler="menuActionHandler($event.detail[0])"
-            @send-message-reaction="sendMessageReaction($event.detail[0])" :show-files="false"
-            :show-new-messages-divider="false" :single-room="singleRoom">
-            <!--@open-user-tag="openUserTag($event.detail[0])"-->
-            <!--@typing-message="typingMessage($event.detail[0])"-->
-            <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
-            <!--@show-audio="false"-->
-        </vue-advanced-chat>
-        <teleport to="body">
-            <InviteUser v-if="showInviteModal" :conversationId="inviteRoomId" :current-user="currentUser"
-                :current-room-members="currentRoomMembers" @created="fetchRooms" @close="showInviteModal = false" />
-        </teleport>
+      <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
+        <select v-model="removeUserId">
+          <option default value="">Chọn người dùng</option>
+          <option v-for="user in removeUsers" :key="user._id" :value="user._id">
+            {{ user.username }}
+          </option>
+        </select>
+        <button type="submit" :disabled="disableForm || !removeUserId">
+          Xóa người dùng
+        </button>
+        <button class="button-cancel" @click="removeRoomId = null"
+          >Hủy bỏ</button
+        >
+      </form>
     </div>
+
+    <vue-advanced-chat
+      ref="chatWindow"
+      :height="screenHeight"
+      :theme="'light'"
+      :styles="JSON.stringify(styles)"
+      :current-user-id="currentUser.id"
+      :room-id="roomId"
+      :rooms="JSON.stringify(loadedRooms)"
+      :loading-rooms="loadingRooms"
+      :rooms-loaded="roomsLoaded"
+      :messages="JSON.stringify(messages)"
+      :messages-loaded="messagesLoaded"
+      :room-message="roomMessage"
+      :room-actions="JSON.stringify(roomActions)"
+      :menu-actions="JSON.stringify(menuActions)"
+      :message-actions="JSON.stringify(messageActions)"
+      :templates-text="JSON.stringify(templatesText)"
+      @fetch-more-rooms="fetchMoreRooms"
+      @fetch-messages="fetchMessages($event.detail[0])"
+      @send-message="sendMessage($event.detail[0])"
+      @edit-message="editMessage($event.detail[0])"
+      @delete-message="deleteMessage($event.detail[0])"
+      @open-file="openFile($event.detail[0])"
+      @add-room="addRoom($event.detail[0])"
+      @room-action-handler="menuActionHandler($event.detail[0])"
+      @menu-action-handler="menuActionHandler($event.detail[0])"
+      @send-message-reaction="sendMessageReaction($event.detail[0])"
+      :show-files="false"
+      :show-new-messages-divider="false"
+      :single-room="singleRoom"
+    >
+      <!--@open-user-tag="openUserTag($event.detail[0])"-->
+      <!--@typing-message="typingMessage($event.detail[0])"-->
+      <!--@toggle-rooms-list="$emit('show-demo-options', $event.detail[0].opened)"-->
+      <!--@show-audio="false"-->
+    </vue-advanced-chat>
+    <teleport to="body">
+      <InviteUser
+        v-if="showInviteModal"
+        :conversationId="inviteRoomId"
+        :current-user="currentUser"
+        :current-room-members="currentRoomMembers"
+        @created="fetchRooms"
+        @close="showInviteModal = false"
+      />
+    </teleport>
+  </div>
 </template>
 
 <script>
@@ -282,6 +320,30 @@ export default {
                         })
                     );
                 })
+                .catch(async error => {
+                console.warn("Không tìm được room với Members. Thử lấy tất cả room.");
+
+                if (error.response && error.response.status === 404) {
+                    const fallback = await getPagedConversations();
+
+                    const fallbackItem = fallback.items?.[0];
+                    if (fallbackItem) {
+                        fetchedRooms = [{
+                            id: fallbackItem.id,
+                            roomId: fallbackItem.id,
+                            title: fallbackItem.title,
+                            roomName: fallbackItem.title,
+                            avatar: fallbackItem.avatarUrl,
+                            unreadCount: 0,
+                            lastMessage: {},
+                            users: Array.from(fallbackItem.members.map(item => item.creatorId)),
+                            lastUpdated: fallbackItem.creationTime
+                        }];
+                    }
+                    } else {
+                        console.error("Lỗi khác khi lấy conversation:", error);
+                    }
+                });
 
             await Promise.all([userPromise, conversationPromise]);
 
@@ -373,7 +435,7 @@ export default {
                     })
                     if (this.loadingLastMessageByRoom < this.rooms.length) {
                         this.loadingLastMessageByRoom++
-        
+
                         if (this.loadingLastMessageByRoom === this.rooms.length) {
                             this.loadingRooms = false
                             this.roomsLoadedCount = this.rooms.length
@@ -381,7 +443,7 @@ export default {
                     }
                 }
             )
-        
+
             this.roomsListeners.push(listener)*/
         },
 
@@ -590,7 +652,7 @@ export default {
                     await this.uploadFile({ file: files[index], messageId: id, roomId })
                 }
             }
-            
+
             if (replyMessage) {
                 message.replyMessage = {
                     _id: replyMessage._id,
@@ -734,7 +796,7 @@ export default {
                 username: this.addRoomUsername
             })
             await firestoreService.updateUser(id, { _id: id })
-        
+
             await firestoreService.addRoom({
                 users: [id, this.currentUser.id],
                 lastUpdated: new Date()
@@ -763,7 +825,7 @@ export default {
                 username: this.invitedUsername
             })
             await firestoreService.updateUser(id, { _id: id })
-        
+
             await firestoreService.addRoomUser(this.inviteRoomId, id)*/
 
             this.inviteRoomId = null
@@ -805,63 +867,63 @@ export default {
 
 <style scoped>
 form {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 input {
-    padding: 5px;
-    width: 140px;
-    height: 21px;
-    border-radius: 4px;
-    border: 1px solid #d2d6da;
-    outline: none;
-    font-size: 14px;
-    vertical-align: middle;
+  padding: 5px;
+  width: 140px;
+  height: 21px;
+  border-radius: 4px;
+  border: 1px solid #d2d6da;
+  outline: none;
+  font-size: 14px;
+  vertical-align: middle;
 }
 
 input::placeholder {
-    color: #9ca6af;
+  color: #9ca6af;
 }
 
 button {
-    background: #1976d2;
-    color: #fff;
-    outline: none;
-    cursor: pointer;
-    border-radius: 4px;
-    padding: 8px 12px;
-    margin-left: 10px;
-    border: none;
-    font-size: 14px;
-    transition: 0.3s;
-    vertical-align: middle;
+  background: #1976d2;
+  color: #fff;
+  outline: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-left: 10px;
+  border: none;
+  font-size: 14px;
+  transition: 0.3s;
+  vertical-align: middle;
 }
 
 button:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
 button:active {
-    opacity: 0.6;
+  opacity: 0.6;
 }
 
 button:disabled {
-    cursor: initial;
-    background: #c6c9cc;
-    opacity: 0.6;
+  cursor: initial;
+  background: #c6c9cc;
+  opacity: 0.6;
 }
 
 .button-cancel {
-    color: #a8aeb3;
-    background: none;
-    margin-left: 5px;
+  color: #a8aeb3;
+  background: none;
+  margin-left: 5px;
 }
 
 select {
-    vertical-align: middle;
-    height: 33px;
-    width: 152px;
-    font-size: 13px;
-    margin: 0 !important;
+  vertical-align: middle;
+  height: 33px;
+  width: 152px;
+  font-size: 13px;
+  margin: 0 !important;
 }
 </style>
