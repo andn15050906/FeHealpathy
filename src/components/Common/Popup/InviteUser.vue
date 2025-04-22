@@ -7,9 +7,19 @@
       </div>
 
       <div class="modal-body">
-        <input v-model="search" placeholder="Tìm kiếm người dùng..." @input="handleSearch" class="input" />
+        <input
+          v-model="search"
+          placeholder="Tìm kiếm người dùng..."
+          @input="handleSearch"
+          class="input"
+        />
         <ul v-if="searchResults.length" class="user-list">
-          <li v-for="user in searchResults" :key="user.id" @click="toggleUser(user)" class="user-item">
+          <li
+            v-for="user in searchResults"
+            :key="user.id"
+            @click="toggleUser(user)"
+            class="user-item"
+          >
             <span class="user-name">{{ user.fullName }}</span>
             <span class="user-email">({{ user.email }})</span>
           </li>
@@ -19,22 +29,43 @@
       <div v-if="selectedUsers.length" class="selected-user">
         ✅ Đã chọn:
         <strong v-for="(user, idx) in selectedUsers" :key="user.id">
-          {{ user.fullName }}<span v-if="idx < selectedUsers.length - 1">, </span>
+          {{ user.fullName
+          }}<span v-if="idx < selectedUsers.length - 1">, </span>
         </strong>
       </div>
 
       <!-- Add input for Title and Avatar -->
-      <div class="form-group">
+      <div
+        class="form-group"
+        v-if="isCreatingNewRoom || (currentRoomMembers?.length || 0) < 3"
+      >
         <label for="title">Tiêu đề cuộc hội thoại</label>
-        <input v-model="conversationInfo.title" placeholder="Nhập tiêu đề cuộc hội thoại" class="input" />
+        <input
+          v-model="conversationInfo.title"
+          placeholder="Nhập tiêu đề cuộc hội thoại"
+          class="input"
+        />
       </div>
-      <div class="form-group">
+
+      <div
+        class="form-group"
+        v-if="isCreatingNewRoom || (currentRoomMembers?.length || 0) < 3"
+      >
         <label for="avatar">Tải lên ảnh đại diện</label>
-        <input type="file" @change="handleFileChange" accept="image/*" class="input" />
+        <input
+          type="file"
+          @change="handleFileChange"
+          accept="image/*"
+          class="input"
+        />
       </div>
 
       <div class="modal-footer">
-        <button @click="inviteUsers" :disabled="!selectedUsers.length || isSubmitting" class="btn primary">
+        <button
+          @click="inviteUsers"
+          :disabled="!selectedUsers.length || isSubmitting"
+          class="btn primary"
+        >
           {{ isSubmitting ? "Đang mời..." : "Mời" }}
         </button>
         <button @click="$emit('close')" class="btn secondary">Hủy</button>
@@ -47,7 +78,10 @@
 import { ref } from "vue";
 import { getUsers } from "@/scripts/api/services/userService";
 import { submitInviteMember } from "@/scripts/api/services/notificationService";
-import { createConversation, updateConversation } from "@/scripts/api/services/conversationService";
+import {
+  createConversation,
+  updateConversation,
+} from "@/scripts/api/services/conversationService";
 
 const emit = defineEmits(["close", "created"]);
 
@@ -55,6 +89,10 @@ const props = defineProps({
   conversationId: String,
   currentUser: Object,
   currentRoomMembers: Array,
+  isCreatingNewRoom: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const search = ref("");
@@ -65,7 +103,7 @@ const isSubmitting = ref(false);
 const conversationInfo = ref({
   title: "",
   avatarUrl: null,
-  isPrivate: false
+  isPrivate: false,
 });
 
 const handleSearch = async () => {
@@ -74,14 +112,16 @@ const handleSearch = async () => {
 
   try {
     const res = (await getUsers({ name: keyword })).items || [];
-    searchResults.value = res.filter(u => !selectedUsers.value.some(s => s.id === u.id));
+    searchResults.value = res.filter(
+      (u) => !selectedUsers.value.some((s) => s.id === u.id)
+    );
   } catch (err) {
     console.error("Lỗi tìm kiếm:", err);
   }
 };
 
 const toggleUser = (user) => {
-  const exists = selectedUsers.value.find(u => u.id === user.id);
+  const exists = selectedUsers.value.find((u) => u.id === user.id);
   if (!exists) {
     selectedUsers.value.push(user);
     search.value = "";
@@ -102,12 +142,7 @@ const inviteUsers = async () => {
   isSubmitting.value = true;
 
   try {
-    const userIds = selectedUsers.value.map(u => u.id);
-
-    await submitInviteMember({
-      conversationId: props.conversationId,
-      userIds,
-    });
+    const userIds = selectedUsers.value.map((u) => u.id);
 
     const memberIds = [
       ...(props.currentRoomMembers || []),
@@ -123,14 +158,13 @@ const inviteUsers = async () => {
     }));
 
     const formData = new FormData();
-    formData.append('Title', conversationInfo.value.title);
-    formData.append('IsPrivate', conversationInfo.value.isPrivate);
+    formData.append("Title", conversationInfo.value.title);
+    formData.append("IsPrivate", conversationInfo.value.isPrivate);
 
-    // If avatar file is provided, add it to formData
     if (conversationInfo.value.avatarUrl) {
       const file = conversationInfo.value.avatarUrl;
-      formData.append('Thumb.File', file);
-      formData.append('Thumb.Title', file.name);
+      formData.append("Thumb.File", file);
+      formData.append("Thumb.Title", file.name);
     }
 
     members.forEach((member, index) => {
@@ -138,11 +172,21 @@ const inviteUsers = async () => {
       formData.append(`Members[${index}].IsAdmin`, member.isAdmin);
     });
 
-    if ((props.currentRoomMembers?.length || 0) >= 3) {
+    let createdConversationId = props.conversationId;
+
+    if (props.isCreatingNewRoom || (props.currentRoomMembers?.length || 0) < 3) {
+      const result = await createConversation(formData);
+      createdConversationId = result?.data?.id;
+    } else {
       formData.append("Id", props.conversationId);
       await updateConversation(formData);
-    } else {
-      await createConversation(formData);
+    }
+
+    if (createdConversationId) {
+      await submitInviteMember({
+        conversationId: createdConversationId,
+        userIds,
+      });
     }
 
     emit("created");
