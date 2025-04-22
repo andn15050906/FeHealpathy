@@ -87,9 +87,18 @@
         :conversationId="inviteRoomId"
         :current-user="currentUser"
         :current-room-members="currentRoomMembers"
+        :isCreatingNewRoom="inviteForNewRoom"
         @created="fetchRooms"
         @close="showInviteModal = false"
       />
+
+      <ConversationInfoModal
+        v-if="showConversationInfoModal"
+        :conversation="selectedConversation"
+        @close="showConversationInfoModal  = false"
+         @updated="() => { fetchRooms(); showConversationInfoModal = false }"
+      />
+
     </teleport>
   </div>
 </template>
@@ -103,12 +112,14 @@ import { getPagedConversations } from '@/scripts/api/services/conversationServic
 import { getPagedChatMessages } from '@/scripts/api/services/chatMessageService';
 import { HubConnection, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
 import InviteUser from "@/components/Common/Popup/InviteUser.vue";
+import ConversationInfoModal from "@/components/Common/Popup/ConversationInfoModal.vue";
 
 register();
 
 export default {
     components: {
         InviteUser,
+        ConversationInfoModal
     },
     props: {
         singleRoom: {
@@ -146,7 +157,9 @@ export default {
         else {
             this.menuActions = [
                 { name: 'inviteUser', title: 'Thêm người dùng' },
-                { name: 'removeUser', title: 'Xóa người dùng' }
+                { name: 'removeUser', title: 'Xóa người dùng' },
+                { name: 'createRoom', title: 'Tạo cuộc trò chuyện mới' },
+                { name: 'viewConversationInfo', title: 'Xem thông tin cuộc trò chuyện' }  
             ];
             this.fetchRooms();
         }
@@ -190,6 +203,9 @@ export default {
             menuActions: [],
             showInviteModal: false,
             showMembersTooltip: false,
+            showInfo: false,
+            showConversationInfoModal: false,
+            selectedConversation: { id: "", title: "", avatarUrl: "", members: [] },
             messageActions: [
                 { name: 'editMessage', title: 'Chỉnh sửa tin nhắn', onlyMe: true },
                 { name: 'deleteMessage', title: 'Xóa tin nhắn', onlyMe: true }
@@ -210,6 +226,11 @@ export default {
         },
         currentRoomMembers() {
             return Array.from(this.currentRoom.users.map(user => user._id));
+        },
+        currentConversation() {
+            return this.selectedConversation || { 
+            id: "", title: "", avatarUrl: "", members: [] 
+            };
         }
     },
     methods: {
@@ -781,7 +802,25 @@ export default {
                     return this.inviteUser(roomId)
                 case 'removeUser':
                     return this.removeUser(roomId)
+                case 'createRoom':
+                    return this.openCreateRoomModal();
+                case 'viewConversationInfo':
+                    return this.viewConversationInfo(roomId);
             }
+        },
+
+        async viewConversationInfo(roomId) {
+            const conversation = this.rooms.find(r => r.id === roomId);
+
+            if (conversation) {
+            this.selectedConversation = conversation;
+            this.showConversationInfoModal = true;
+            }
+        },
+
+        openCreateRoomModal() {
+            this.showInviteModal = true;
+            this.inviteForNewRoom = true;
         },
 
         addRoom() {
@@ -791,7 +830,7 @@ export default {
 
         async createRoom() {
             this.disableForm = true
-
+            this.showInviteModal = true
             /*const { id } = await firestoreService.addUser({
                 username: this.addRoomUsername
             })
