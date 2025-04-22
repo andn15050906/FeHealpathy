@@ -203,7 +203,6 @@ export default {
             menuActions: [],
             showInviteModal: false,
             showMembersTooltip: false,
-            showInfo: false,
             showConversationInfoModal: false,
             selectedConversation: { id: "", title: "", avatarUrl: "", members: [] },
             messageActions: [
@@ -341,30 +340,26 @@ export default {
                         })
                     );
                 })
-                .catch(async error => {
-                console.warn("Không tìm được room với Members. Thử lấy tất cả room.");
+                .catch(error => { });
+            
+            if (fetchedRooms.length == 0) {
+                const fallback = await getPagedConversations();
 
-                if (error.response && error.response.status === 404) {
-                    const fallback = await getPagedConversations();
-
-                    const fallbackItem = fallback.items?.[0];
-                    if (fallbackItem) {
-                        fetchedRooms = [{
-                            id: fallbackItem.id,
-                            roomId: fallbackItem.id,
-                            title: fallbackItem.title,
-                            roomName: fallbackItem.title,
-                            avatar: fallbackItem.avatarUrl,
-                            unreadCount: 0,
-                            lastMessage: {},
-                            users: Array.from(fallbackItem.members.map(item => item.creatorId)),
-                            lastUpdated: fallbackItem.creationTime
-                        }];
-                    }
-                    } else {
-                        console.error("Lỗi khác khi lấy conversation:", error);
-                    }
-                });
+                const fallbackItem = fallback.items?.filter(item => item.id != this.currentUser.id)?.[0];    //exclude partner chat
+                if (fallbackItem) {
+                    fetchedRooms = [{
+                        id: fallbackItem.id,
+                        roomId: fallbackItem.id,
+                        title: fallbackItem.title,
+                        roomName: fallbackItem.title,
+                        avatar: fallbackItem.avatarUrl,
+                        unreadCount: 0,
+                        lastMessage: {},
+                        users: Array.from(fallbackItem.members.map(item => item.creatorId)),
+                        lastUpdated: fallbackItem.creationTime
+                    }];
+                }
+            }
 
             await Promise.all([userPromise, conversationPromise]);
 
