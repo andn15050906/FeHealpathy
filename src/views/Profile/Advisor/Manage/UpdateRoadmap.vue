@@ -1,7 +1,7 @@
 <template>
     <div class="roadmap-creation">
       <LoadingSpinner ref="loadingSpinner" />
-      <h1 class="title">✨ Update Roadmap ✨</h1>
+      <h1 class="title">✨ Cập nhật Roadmap ✨</h1>
       <form @submit.prevent="submitRoadmap" class="roadmap-form">
         <div class="form-group">
           <label for="title">🖋️ Tiêu đề Roadmap</label>
@@ -153,9 +153,9 @@
         introText: response.introText,
         phases: response.phases || [],
       };
-      console.log("Roadmap Data:", roadmap.value);
+      console.log("Dữ liệu roadmap:", roadmap.value);
     } catch (error) {
-      console.error("Error fetching roadmap:", error);
+      console.error("Lỗi tải dữ liệu roadmap:", error);
       toast.error("Không thể tải dữ liệu roadmap");
     }
   }
@@ -204,7 +204,7 @@
       }
       milestone.recommendations.push(newRecommendation);
     } else {
-      console.error("Invalid phaseIndex or milestoneIndex");
+      console.error("Pha hoặc mốc không hợp lệ");
     }
   }
 
@@ -230,7 +230,7 @@
             }
         });
     } catch (error) {
-        console.error('Error updating roadmap:', error);
+        console.error('Lỗi cập nhật roadmap:', error);
         toast.error("Cập nhật roadmap thất bại! " + (error.message || ''), toastConfig);
     } finally {
         loadingSpinner.value.hideSpinner();

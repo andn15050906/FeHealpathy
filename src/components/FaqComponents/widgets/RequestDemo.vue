@@ -2,9 +2,9 @@
   <VaCard class="help-card">
     <VaCardContent class="help-content">
       <div class="help-text">
-        <h2 class="help-title">Need help?</h2>
-        <p class="help-description">Contact our health experts for personalized guidance.</p>
-        <VaButton @click="showModal = true">Contact Expert</VaButton>
+        <h2 class="help-title">Cần trợ giúp?</h2>
+        <p class="help-description">Liên hệ chuyên gia khỏe mạnh của chúng tôi để nhận hướng dẫn cá nhân.</p>
+        <VaButton @click="showModal = true">Liên hệ chuyên gia</VaButton>
       </div>
     </VaCardContent>
   </VaCard>
@@ -22,8 +22,8 @@ const submit = async () => {
   if (!validate()) return
 
   init({
-    title: 'Demo Request Submitted!',
-    message: 'An expert will get in touch soon',
+    title: 'Yêu cầu demo đã được gửi!',
+    message: 'Một chuyên gia sẽ liên hệ sớm',
     color: 'success',
   })
 

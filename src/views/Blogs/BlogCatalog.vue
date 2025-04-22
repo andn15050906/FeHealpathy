@@ -64,7 +64,7 @@ async function loadBlogs(page = 1) {
     totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
     totalItems.value = response.totalCount || 0;
   } catch (e) {
-    console.error('Failed to fetch blogs', e);
+    console.error('Không thể tải bài viết', e);
   }
 }
 
@@ -73,7 +73,7 @@ async function loadTags() {
     const tagResp = await getPagedTags();
     filters.value = tagResp.map(tag => ({ value: tag.id, label: tag.title }));
   } catch (e) {
-    console.error('Failed to fetch tags', e);
+    console.error('Không thể tải tags', e);
   }
 }
 

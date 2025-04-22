@@ -4,7 +4,7 @@
       <div class="profile-card">
         <div class="profile-image-section">
           <div class="avatar-container" @click="triggerAvatarUpload">
-            <img :src="form.avatarUrl" alt="User Avatar" class="avatar-image" />
+            <img :src="form.avatarUrl" alt="Ảnh đại diện" class="avatar-image" />
             <div class="camera-icon">
               <i class="fas fa-camera"></i>
             </div>

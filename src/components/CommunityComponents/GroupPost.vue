@@ -147,16 +147,16 @@ const removePost = async (postId) => {
             posts.value = posts.value.filter((post) => post.id !== postId);
             Notify.create({
                 type: 'positive',
-                message: 'Post removed successfully.',
+                message: 'Xóa bài đăng thành công.',
             });
         } else {
-            throw new Error('Failed to remove post');
+            throw new Error('Không thể xóa bài đăng.');
         }
     } catch (error) {
-        console.error("Error deleting post:", error);
+        console.error("Không thể xóa bài đăng :", error);
         Notify.create({
             type: 'negative',
-            message: 'Failed to remove post. Please try again later.',
+            message: 'Không thể xóa bài đăng. Vui lòng thử lại sau.',
         });
     }
 };

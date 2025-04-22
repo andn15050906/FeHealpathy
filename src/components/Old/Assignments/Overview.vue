@@ -9,34 +9,34 @@
               <span id="maincontent"></span>
               <h2>{{ assignment.name }}</h2>
               <div class="box quizinfo py-3">
-                <p>Time limit: {{ assignment.duration }} seconds</p>
-                <p>Grade to pass: {{ passGrade }} / 10</p>
+                <p>Thời gian giới hạn: {{ assignment.duration }} giây</p>
+                <p>Điểm để đạt: {{ passGrade }} / 10</p>
               </div>
 
               <div v-if="submissions.length > 0">
-                <h3 style="text-align: center; font-weight: bold;">Summary of your previous attempts</h3>
+                <h3 style="text-align: center; font-weight: bold;">Tóm tắt các lần cố gắng trước đây</h3>
                 <table class="generaltable quizattemptsummary">
                   <thead>
                     <tr>
-                      <th class="header c0" style="text-align:center;">Attempt</th>
-                      <th class="header c1" style="text-align:left;">State</th>
-                      <th class="header c2" style="text-align:center;">Grade</th>
-                      <th class="header c3" style="text-align:center;">Time Spent</th>
-                      <th class="header c4 lastcol" style="text-align:center;">Review</th>
+                      <th class="header c0" style="text-align:center;">Lần cố gắng</th>
+                      <th class="header c1" style="text-align:left;">Trạng thái</th>
+                      <th class="header c2" style="text-align:center;">Điểm</th>
+                      <th class="header c3" style="text-align:center;">Thời gian</th>
+                      <th class="header c4 lastcol" style="text-align:center;">Đánh giá</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(submission, index) in submissions" :key="submission.id" class="bestrow">
                       <td class="cell c0" style="text-align:center;">{{ index + 1 }}</td>
                       <td class="cell c1" style="text-align:left;">
-                        <span class="statedetails">Submitted at {{ submission.lastModificationTime }}</span>
+                        <span class="statedetails">Đã gửi lúc {{ submission.lastModificationTime }}</span>
                       </td>
                       <td class="cell c3" style="text-align:center;">{{ submission.mark }}</td>
-                      <td class="cell c3" style="text-align:center;">{{ submission.timeSpentInSec }} seconds</td>
+                      <td class="cell c3" style="text-align:center;">{{ submission.timeSpentInSec }} giây</td>
                       <td class="cell c4 lastcol" style="text-align:center;">
                         <router-link
                           :to="{ name: 'ReviewAssignment', params: { assignmentId: assignment.id, submissionId: submission.id } }">
-                          Review
+                          Đánh giá
                         </router-link>
                       </td>
                     </tr>
@@ -45,10 +45,10 @@
 
                 <div v-if="submissions.length > 0" id="feedback" class="box generalbox py-3"
                   style="text-align: center; margin-top: 40px;">
-                  <h3>Highest grade: {{ highestGrade.toFixed(2) }} / 10.00.</h3>
-                  <h3>Status:
+                  <h3>Điểm cao nhất: {{ highestGrade.toFixed(2) }} / 10.00.</h3>
+                  <h3>Trạng thái:
                     <span :style="{ color: highestGrade < passGrade ? 'red' : 'forestgreen' }">
-                      {{ highestGrade < passGrade ? 'Not Passed' : 'Passed' }} </span>
+                      {{ highestGrade < passGrade ? 'Không đạt' : 'Đạt' }} </span>
                   </h3>
                 </div>
               </div>
@@ -57,7 +57,7 @@
                 <div class="singlebutton quizstartbuttondiv">
                   <router-link :to="{ name: 'AttemptAssignment', params: { id: assignment.id } }"
                     class="btn btn-secondary">
-                    Attempt quiz
+                    Cố gắng bài tập
                   </router-link>
                 </div>
               </div>

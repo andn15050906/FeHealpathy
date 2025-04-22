@@ -101,7 +101,7 @@ export default {
           };
         });
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        console.error("Lỗi khi lấy thông báo:", error);
       }
     },
   },

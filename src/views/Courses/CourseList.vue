@@ -53,7 +53,7 @@ async function loadCourses(page = 1) {
     totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
     totalItems.value = response.totalCount || 0;
   } catch (e) {
-    console.error('Failed to fetch courses', e);
+    console.error('Không thể tải khóa học', e);
   }
 }
 

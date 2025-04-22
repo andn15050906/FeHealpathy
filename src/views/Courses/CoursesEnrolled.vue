@@ -43,7 +43,7 @@
                     @error="handleImageError"
                   />
                 </td>
-                <td>{{ courseDetails[enrollment.courseId]?.title || 'Loading...' }}</td>
+                <td>{{ courseDetails[enrollment.courseId]?.title || 'Đang tải...' }}</td>
                 <td>{{ getAuthorName(courseDetails[enrollment.courseId]?.creatorId) }}</td>
                 <td>{{ formatDate(enrollment.creationTime) }}</td>
                 <td class="text-center">
@@ -114,7 +114,7 @@ const handleImageError = (event) => {
 
 const getAuthorName = (creatorId) => {
   if (!creatorId) return 'N/A';
-  return authorDetails.value[creatorId]?.fullName || 'Loading...';
+  return authorDetails.value[creatorId]?.fullName || 'Đang tải...';
 };
 
 const fetchAuthorDetails = async (creatorId) => {
@@ -122,20 +122,20 @@ const fetchAuthorDetails = async (creatorId) => {
     const user = await getUserById(creatorId);
     authorDetails.value[creatorId] = user;
   } catch (error) {
-    console.error(`Error fetching author details for ${creatorId}:`, error);
+    console.error(`Không thể tải chi tiết tác giả cho ${creatorId}:`, error);
   }
 };
 
 const fetchCourseDetails = async (courseId) => {
   if (!courseId) {
-    console.error('Invalid courseId');
+    console.error('Không hợp lệ courseId');
     return;
   }
 
   try {
     const course = await getCourseById(courseId);
     if (!course) {
-      console.error(`No course found for id ${courseId}`);
+      console.error(`Không tìm thấy khóa học với id ${courseId}`);
       return;
     }
     
@@ -144,7 +144,7 @@ const fetchCourseDetails = async (courseId) => {
       await fetchAuthorDetails(course.creatorId);
     }
   } catch (error) {
-    console.error(`Error fetching course details for ${courseId}:`, error);
+    console.error(`Không thể tải chi tiết khóa học cho ${courseId}:`, error);
   }
 };
 
@@ -158,7 +158,7 @@ const fetchEnrollments = async (page) => {
     });
 
     if (!response || !response.items) {
-      console.error('Invalid response format');
+      console.error('Định dạng phản hồi không hợp lệ');
       enrollments.value = [];
       totalPages.value = 0;
       return;
@@ -172,7 +172,7 @@ const fetchEnrollments = async (page) => {
       response.items.map(enrollment => fetchCourseDetails(enrollment.courseId))
     );
   } catch (error) {
-    console.error('Error fetching enrollments:', error);
+    console.error('Không thể tải đăng ký khóa học:', error);
     enrollments.value = [];
     totalPages.value = 0;
   } finally {

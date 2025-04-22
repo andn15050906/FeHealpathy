@@ -1,6 +1,6 @@
 <template>
   <div class="language-switcher">
-    <h3 class="section-title">Language Settings</h3>
+    <h3 class="section-title">Cài đặt ngôn ngữ</h3>
     <div class="language-select">
       <v-select v-model="model" :items="options" />
     </div>

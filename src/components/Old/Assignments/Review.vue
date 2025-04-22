@@ -41,7 +41,7 @@
                   <div role="main">
                     <div v-for="(question, index) in assignment.questions" :key="question.id" class="que multichoice deferredfeedback notyetanswered">
                       <div class="info">
-                        <h3 class="no">Question <span class="qno">{{ index + 1 }}</span></h3>
+                        <h3 class="no">Câu hỏi <span class="qno">{{ index + 1 }}</span></h3>
                       </div>
                       <div class="content">
                         <div class="formulation clearfix">
@@ -58,7 +58,7 @@
                         </div>
                         <div class="outcome clearfix">
                           <div class="feedback">
-                            <div class="rightanswer">The correct answer is:</div>
+                            <div class="rightanswer">Câu trả lời đúng là:</div>
                             <div v-for="choice in question.choices" v-if="choice.isCorrect" :key="choice.id">
                               {{ choice.content }}
                             </div>
@@ -87,18 +87,18 @@
             // Example data, replace with actual data
             {
               id: 1,
-              content: 'What is the output of print(2 + 3)?',
+              content: 'Kết quả của print(2 + 3) là gì?',
               choices: [
                 { id: 1, content: '5', isCorrect: true },
                 { id: 2, content: '23', isCorrect: false },
-                { id: 3, content: 'Error', isCorrect: false },
+                { id: 3, content: 'Lỗi', isCorrect: false },
               ],
             },
             {
               id: 2,
-              content: 'Which of the following is a Python keyword?',
+              content: 'Khóa từ nào sau đây là khóa từ của Python?',
               choices: [
-                { id: 4, content: 'function', isCorrect: false },
+                { id: 4, content: 'hàm', isCorrect: false },
                 { id: 5, content: 'def', isCorrect: true },
                 { id: 6, content: 'loop', isCorrect: false },
               ],

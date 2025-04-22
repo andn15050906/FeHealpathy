@@ -8,7 +8,7 @@
         </div>
     </div>
     <div v-else class="media-display">
-        <p>No media selected</p>
+        <p>Không có phương tiện truyền thông được chọn</p>
     </div>
 </template>
 <script>

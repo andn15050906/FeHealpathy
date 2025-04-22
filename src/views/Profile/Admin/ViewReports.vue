@@ -19,13 +19,13 @@
       <!-- User Progress Section -->
       <div v-if="currentTab === 'user-progress'" class="report-section">
         <div class="section-header">
-          <h2><i class="fas fa-chart-line"></i> User Progress Statistics</h2>
+          <h2><i class="fas fa-chart-line"></i> Thống kê tiến độ người dùng</h2>
           <div class="section-filters">
             <select v-model="selectedFeature" class="filter-select">
-              <option value="all">All Features</option>
-              <option value="health-tracking">Health Tracking</option>
-              <option value="nutrition">Nutrition Planning</option>
-              <option value="workouts">Workout Programs</option>
+              <option value="all">Tất cả tính năng</option>
+              <option value="health-tracking">Theo dõi sức khỏe</option>
+              <option value="nutrition">Lập kế hoạch dinh dưỡng</option>
+              <option value="workouts">Chương trình tập luyện</option>
             </select>
           </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="stats-grid">
           <div class="stat-card gradient-1">
             <div class="card-header">
-              <h3>Roadmap Progress</h3>
+              <h3>Tiến độ lộ trình</h3>
               <div class="card-actions">
                 <button class="btn-icon">
                   <i class="fas fa-ellipsis-v"></i>
@@ -45,15 +45,15 @@
                 <div class="progress-value">
                   {{ userStats.avgCompletionRate }}%
                 </div>
-                <div class="progress-label">Completion Rate</div>
+                <div class="progress-label">Tỷ lệ hoàn thành</div>
               </div>
               <div class="stat-details">
                 <div class="stat-row">
-                  <span>Active Users</span>
+                  <span>Người dùng hoạt động</span>
                   <strong>{{ userStats.activeUsers }}</strong>
                 </div>
                 <div class="stat-row">
-                  <span>Completed Roadmaps</span>
+                  <span>Lộ trình hoàn thành</span>
                   <strong>{{ userStats.completedRoadmaps }}</strong>
                 </div>
               </div>
@@ -62,7 +62,7 @@
 
           <div class="stat-card gradient-2">
             <div class="card-header">
-              <h3>Feature Engagement</h3>
+              <h3>Độ tham gia tính năng</h3>
               <div class="card-actions">
                 <button class="btn-icon">
                   <i class="fas fa-ellipsis-v"></i>
@@ -74,12 +74,12 @@
                 <div class="engagement-item">
                   <i class="fas fa-clock"></i>
                   <div class="engagement-value">{{ featureStats.usageFrequency }}</div>
-                  <div class="engagement-label">Uses/Week</div>
+                  <div class="engagement-label">Sử dụng/Tuần</div>
                 </div>
                 <div class="engagement-item">
                   <i class="fas fa-smile"></i>
                   <div class="engagement-value">{{ featureStats.satisfaction }}%</div>
-                  <div class="engagement-label">Satisfaction</div>
+                  <div class="engagement-label">Sự hài lòng</div>
                 </div>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default {
       try {
         // API calls here
       } catch (error) {
-        console.error('Error fetching report data:', error);
+        console.error('Lỗi khi tải dữ liệu báo cáo:', error);
       }
     }
   },

@@ -267,7 +267,7 @@ export default {
     prepareDelete(item, type) {
       this.selectedItem = item
       this.selectedItemType = type
-      this.deleteMessage = `Are you sure you want to delete "${item.title}"?`
+      this.deleteMessage = `Bạn có chắc chắn muốn xóa "${item.title}"?`
       this.showDeletePopup = true
     },
     changePageCourse(page) {
@@ -320,15 +320,15 @@ export default {
           switch (this.selectedItemType) {
             case 'courses':
               await deleteCourse(this.selectedItem.id);
-              toast.success("Course deleted successfully!");
+              toast.success("Khóa học đã được xóa thành công!");
               break;
             case 'blogs':
               await deleteArticle(this.selectedItem.id);
-              toast.success("Blog deleted successfully!");
+              toast.success("Bài viết đã được xóa thành công!");
               break;
             case 'roadmaps':
               await deleteRoadmap(this.selectedItem.id);
-              toast.success("Roadmap deleted successfully!");
+              toast.success("Lộ trình đã được xóa thành công!");
               break;
           }
           
@@ -338,8 +338,8 @@ export default {
             this.fetchRoadmaps()
           ]);
         } catch (error) {
-          console.error('Error deleting content:', error);
-          toast.error("Failed to delete content. Please try again.");
+          console.error('Không thể xóa nội dung:', error);
+          toast.error("Không thể xóa nội dung. Vui lòng thử lại.");
         } finally {
           this.$refs.loadingSpinner.hideSpinner();
         }
@@ -362,8 +362,8 @@ export default {
 
         this.sortBlogs();
       } catch (error) {
-        console.error('Error fetching blogs:', error);
-        toast.error("Failed to fetch blogs. Please try again.");
+        console.error('Không thể tải bài viết:', error);
+        toast.error("Không thể tải bài viết. Vui lòng thử lại.");
         this.blogs = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -385,8 +385,8 @@ export default {
 
         this.sortRoadmaps();
       } catch (error) {
-        console.error('Error fetching roadmaps:', error);
-        toast.error("Failed to fetch roadmaps. Please try again.");
+        console.error('Không thể tải lộ trình:', error);
+        toast.error("Không thể tải lộ trình. Vui lòng thử lại.");
         this.roadmaps = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -408,8 +408,8 @@ export default {
 
         this.sortCourses();
       } catch (error) {
-        console.error('Error fetching courses:', error);
-        toast.error("Failed to fetch courses. Please try again.");
+        console.error('Không thể tải khóa học:', error);
+        toast.error("Không thể tải khóa học. Vui lòng thử lại.");
         this.courses = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -422,15 +422,15 @@ export default {
       return 'bg-secondary'
     },
     handleBlogCreated() {
-      toast.success("Blog created successfully!");
+      toast.success("Bài viết đã được tạo thành công!");
       this.fetchBlogs();
     },
     handleCourseCreated() {
-      toast.success("Course created successfully!");
+      toast.success("Khóa học đã được tạo thành công!");
       this.fetchCourses();
     },
     handleRoadmapCreated() {
-      toast.success("Roadmap created successfully!");
+      toast.success("Lộ trình đã được tạo thành công!");
       this.fetchRoadmaps();
     }
   },

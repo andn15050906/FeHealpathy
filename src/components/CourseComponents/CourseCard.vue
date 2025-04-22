@@ -48,7 +48,7 @@ const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     } catch (error) {
-        console.error("Error formatting date:", error);
+        console.error("Lỗi định dạng ngày:", error);
         return dateString;
     }
 };

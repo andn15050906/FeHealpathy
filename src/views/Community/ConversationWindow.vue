@@ -2,32 +2,32 @@
     <div class="window-container">
         <div v-if="singleRoom">
             <form v-if="addNewRoom" @submit.prevent="createRoom">
-                <input v-model="addRoomUsername" type="text" placeholder="Add username" />
+                <input v-model="addRoomUsername" type="text" placeholder="thêm tên người dùng" />
                 <button type="submit" :disabled="disableForm || !addRoomUsername">
-                    Create Room
+                    Tạo cuộc trò chuyện
                 </button>
-                <button class="button-cancel" @click="addNewRoom = false">Cancel</button>
+                <button class="button-cancel" @click="addNewRoom = false">Hủy bỏ</button>
             </form>
 
             <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
-                <input v-model="invitedUsername" type="text" placeholder="Add username" />
+                <input v-model="invitedUsername" type="text" placeholder="thêm tên người dùng" />
                 <button type="submit" :disabled="disableForm || !invitedUsername">
-                    Add User
+                    Thêm người dùng
                 </button>
-                <button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
+                <button class="button-cancel" @click="inviteRoomId = null">Hủy bỏ</button>
             </form>
 
             <form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
                 <select v-model="removeUserId">
-                    <option default value="">Select User</option>
+                    <option default value="">Chọn người dùng</option>
                     <option v-for="user in removeUsers" :key="user._id" :value="user._id">
                         {{ user.username }}
                     </option>
                 </select>
                 <button type="submit" :disabled="disableForm || !removeUserId">
-                    Remove User
+                    Xóa người dùng
                 </button>
-                <button class="button-cancel" @click="removeRoomId = null">Cancel</button>
+                <button class="button-cancel" @click="removeRoomId = null">Hủy bỏ</button>
             </form>
         </div>
 
@@ -107,8 +107,8 @@ export default {
         }
         else {
             this.menuActions = [
-                { name: 'inviteUser', title: 'Invite User' },
-                { name: 'removeUser', title: 'Remove User' }
+                { name: 'inviteUser', title: 'Thêm người dùng' },
+                { name: 'removeUser', title: 'Xóa người dùng' }
             ];
             this.fetchRooms();
         }
@@ -153,11 +153,11 @@ export default {
             showInviteModal: false,
             showMembersTooltip: false,
             messageActions: [
-                { name: 'editMessage', title: 'Edit Message', onlyMe: true },
-                { name: 'deleteMessage', title: 'Delete Message', onlyMe: true }
+                { name: 'editMessage', title: 'Chỉnh sửa tin nhắn', onlyMe: true },
+                { name: 'deleteMessage', title: 'Xóa tin nhắn', onlyMe: true }
             ],
             styles: { container: { borderRadius: '4px' } },
-            templatesText: [{ tag: 'help', text: 'This is the help' }]
+            templatesText: [{ tag: 'help', text: 'Đây là hỗ trợ' }]
         }
     },
     computed: {

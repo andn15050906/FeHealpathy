@@ -3,17 +3,17 @@
         <v-card>
             <v-card-title class="d-flex align-center title-section">
                 <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
-                <span class="title">Confirm Cancel</span>
+                <span class="title">Xác nhận hủy</span>
             </v-card-title>
             <v-card-text class="d-flex align-center text-section">
                 <span>{{ message }}</span>
             </v-card-text>
             <v-card-actions class="justify-end action-section">
                 <v-btn color="blue darken-1" class="keep-btn" @click="handleClick(false)">
-                    <span class="keep-text">Keep Editing</span>
+                    <span class="keep-text">Tiếp tục chỉnh sửa</span>
                 </v-btn>
                 <v-btn color="grey" text class="cancel-btn" @click="handleClick(true)">
-                    Confirm Cancel
+                    Xác nhận hủy
                 </v-btn>
             </v-card-actions>
         </v-card>

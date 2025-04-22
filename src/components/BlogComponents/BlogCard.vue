@@ -10,7 +10,7 @@
     <div class="blog-content d-flex flex-column p-3">
       <h3 class="blog-title text-center mb-3">
         <RouterLink :to="`/blogs/${blog.id}`" target="_blank" class="text-decoration-none">
-          {{ blog.title || 'Untitled Blog' }}
+          {{ blog.title || 'Bài viết chưa có tiêu đề' }}
         </RouterLink>
       </h3>
       <div class="blog-footer mt-auto">
@@ -37,9 +37,9 @@ const props = defineProps({
 const formatDate = (dateString) => {
   try {
     const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    return new Date(dateString).toLocaleDateString('vi-VN', options);
   } catch (error) {
-    console.error('Error formatting date:', error);
+    console.error('Lỗi định dạng ngày:', error);
     return dateString;
   }
 };

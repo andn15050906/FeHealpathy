@@ -2,37 +2,37 @@
   {
     "id": 1,
     "icon": "🧘‍♀️",
-    "name": "Healing the Soul",
-    "intro": "Explore methods to find peace within your soul."
+    "name": "Chữa lành tâm hồn",
+    "intro": "Khám phá các phương pháp để tìm thấy sự bình yên trong tâm hồn."
   },
   {
     "id": 2,
     "icon": "🌱",
-    "name": "Personal Development",
-    "intro": "Learn how to grow personally and enhance your quality of life."
+    "name": "Phát triển bản thân",
+    "intro": "Học cách phát triển bản thân và nâng cao chất lượng cuộc sống."
   },
   {
     "id": 3,
     "icon": "💖",
-    "name": "Self-Love",
-    "intro": "Discover ways to love and care for yourself every day."
+    "name": "Yêu thương bản thân",
+    "intro": "Khám phá cách yêu thương và chăm sóc bản thân mỗi ngày."
   },
   {
     "id": 4,
     "icon": "🌈",
-    "name": "Meditation",
-    "intro": "Explore meditation techniques to relax and focus."
+    "name": "Thiền định",
+    "intro": "Khám phá các kỹ thuật thiền để thư giãn và tập trung."
   },
   {
     "id": 5,
     "icon": "🌼",
-    "name": "Positive Living",
-    "intro": "Learn how to live positively and view life optimistically."
+    "name": "Sống tích cực",
+    "intro": "Học cách sống tích cực và nhìn cuộc sống lạc quan."
   },
   {
     "id": 6,
     "icon": "🌊",
-    "name": "Connecting with Nature",
-    "intro": "Discover how to connect with nature to find peace."
+    "name": "Kết nối với thiên nhiên",
+    "intro": "Khám phá cách kết nối với thiên nhiên để tìm thấy sự bình yên."
   }
 ]

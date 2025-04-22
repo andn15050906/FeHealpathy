@@ -120,7 +120,7 @@ export default {
                     window.scrollTo(0, 0);
                 }
             } catch (error) {
-                console.error("Error loading pose details:", error);
+                console.error("Lỗi tải thông tin tư thế:", error);
             }
         };
 
@@ -129,7 +129,7 @@ export default {
                 const res = await getRecommendationPoses();
                 recommendedPoses.value = res || [];
             } catch (error) {
-                console.error("Error fetching recommended poses:", error);
+                console.error("Lỗi tải tư thế khuyến nghị:", error);
             }
         };
 

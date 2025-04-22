@@ -22,7 +22,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </div>      
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
@@ -109,11 +109,13 @@
           </div>
           <div class="form-group">
             <label for="description">Mô tả</label>
+            <label for="description">Mô tả</label>
             <textarea id="description" v-model="newEvent.description" class="form-input"
               placeholder="Nhập mô tả Thói quen" @input="validateDescriptionConstraints"></textarea>
             <div v-if="descriptionError" class="error-message" style="color: #e74c3c;">{{ descriptionError }}</div>
           </div>
           <div class="form-group">
+            <label for="objective">Mục tiêu</label>
             <label for="objective">Mục tiêu</label>
             <input id="objective" v-model="newEvent.objective" class="form-input"
               placeholder="Nhập mục tiêu (không bắt buộc)" />
@@ -152,9 +154,11 @@
           <div class="form-group time-group">
             <div>
               <label for="startTime">Thời gian bắt đầu</label>
+              <label for="startTime">Thời gian bắt đầu</label>
               <input id="startTime" type="time" v-model="newEvent.startTime" class="form-input" />
             </div>
             <div>
+              <label for="endTime">Thời gian kết thúc</label>
               <label for="endTime">Thời gian kết thúc</label>
               <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
             </div>
@@ -398,7 +402,7 @@ export default {
           const deadline = getDeadline(event);
           if (now > deadline) {
             event.closed = true;
-            toast.error("Event closed due to deadline!", { duration: 150, position: "bottom-center" });
+            toast.error("Sự kiện đã được đóng do thời hạn!", { duration: 150, position: "bottom-center" });
             this.renderChart();
           }
         }

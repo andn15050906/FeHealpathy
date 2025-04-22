@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h2 style="text-align: center; font-size: 32px; margin-top: 24px;">Create assignment</h2>
+      <h2 style="text-align: center; font-size: 32px; margin-top: 24px;">Tạo bài tập</h2>
   
       <div style="width: 50%; margin: 0 auto;">
         <div class="dropzone needsclick" @click="triggerFileUpload">
@@ -17,19 +17,19 @@
   
         <form @submit.prevent="submitForm" id="app-form-create">
           <input v-model="form.SectionId" type="hidden" />
-          <label for="name">Assignment Name</label>
+          <label for="name">Tên bài tập</label>
           <input v-model="form.Name" type="text" class="form-control" />
   
-          <label for="duration">Duration</label>
+          <label for="duration">Thời gian</label>
           <input v-model.number="form.Duration" type="number" class="form-control" />
   
-          <label for="grade">Grade to pass ( / 10)</label>
+          <label for="grade">Điểm để đạt ( / 10)</label>
           <input v-model.number="form.GradeToPass" type="number" class="form-control" />
   
           <input ref="fileInput" type="file" @change="handleFileChange" hidden />
   
           <div class="row" style="margin-top: 24px; justify-content: center;">
-            <button type="submit" class="btn btn-outline-success btn-lg">Submit</button>
+            <button type="submit" class="btn btn-outline-success btn-lg">Gửi</button>
           </div>
         </form>
       </div>
@@ -40,7 +40,7 @@
   export default {
     data() {
       return {
-        dropzoneText: "Drop files here or click to upload.",
+        dropzoneText: "Đặt tập tin vào đây hoặc nhấp để tải lên.",
         fileSelected: false,
         form: {
           SectionId: "", // Section ID value
@@ -62,7 +62,7 @@
           this.fileSelected = true;
           this.form.File = file;
         } else {
-          this.dropzoneText = "Drop files here or click to upload.";
+          this.dropzoneText = "Đặt tập tin vào đây hoặc nhấp để tải lên.";
           this.fileSelected = false;
         }
       },
@@ -73,8 +73,8 @@
         formData.append("GradeToPass", this.form.GradeToPass);
         formData.append("File", this.form.File);
   
-        // Handle form submission with Axios or Fetch API
-        console.log("Submitting form", formData);
+          // Handle form submission with Axios or Fetch API
+        console.log("Gửi form", formData);
       },
     },
   };

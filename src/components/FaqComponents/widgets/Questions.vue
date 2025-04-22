@@ -1,7 +1,7 @@
 <template>
   <VaCard class="faq-card">
     <VaCardContent>
-      <h2 class="faq-title">Popular Questions</h2>
+      <h2 class="faq-title">Câu hỏi thường gặp</h2>
       <VaAccordion v-model="accordionState" class="faq-accordion">
         <VaCollapse v-for="(item, index) in faqItems" :key="index">
           <template #header>
@@ -30,34 +30,34 @@ const accordionState = reactive([]);
 
 const faqItems = [
   {
-    question: 'How do I track my daily activities?',
-    answer: 'Tracking your daily activities in HEALPATHY is simple:',
+    question: 'Làm thế nào để theo dõi hoạt động hàng ngày của tôi?',
+    answer: 'Theo dõi hoạt động hàng ngày trong HEALPATHY rất đơn giản:',
     list: [
-      'Go to the Activity Tracking section',
-      'Click "Add Activity" to log new activities',
-      'Select activity type and enter details',
-      'Save your entry to update your health dashboard',
+      'Đi đến phần Theo dõi hoạt động',
+      'Nhấp vào "Thêm hoạt động" để ghi nhận hoạt động mới',
+      'Chọn loại hoạt động và nhập chi tiết',
+      'Lưu bản ghi để cập nhật bảng khỏe mạnh của bạn',
     ],
   },
   {
-    question: 'How can I join health groups?',
-    answer: 'To join health groups:',
+    question: 'Làm thế nào để tham gia nhóm khỏe mạnh?',
+    answer: 'Để tham gia nhóm khỏe mạnh:',
     list: [
-      'Browse available groups in the Community section',
-      'Click "Join Group" on groups that interest you',
-      'Participate in discussions and share experiences',
-      'Connect with others who have similar health goals',
+      'Duyệt các nhóm khả dụng trong phần Cộng đồng',
+      'Nhấp vào "Tham gia nhóm" trên các nhóm mà bạn quan tâm',
+      'Tham gia thảo luận và chia sẻ kinh nghiệm',
+      'Kết nối với những người có cùng mục tiêu khỏe mạnh',
     ],
   },
   {
-    question: 'How do I set health goals?',
-    answer: 'Setting health goals helps track your progress:',
+    question: 'Làm thế nào để đặt mục tiêu khỏe mạnh?',
+    answer: 'Đặt mục tiêu khỏe mạnh giúp theo dõi tiến bộ của bạn:',
     list: [
-      'Visit your Profile Settings',
-      'Select "Health Goals"',
-      'Choose goal categories',
-      'Set specific targets and timeframes',
-      'Track progress through your dashboard',
+      'Đi đến Cài đặt hồ sơ của bạn',
+      'Chọn "Mục tiêu khỏe mạnh"',
+      'Chọn loại mục tiêu',
+      'Đặt các mục tiêu cụ thể và thời hạn',
+      'Theo dõi tiến bộ qua bảng khỏe mạnh của bạn',
     ],
   },
 ];

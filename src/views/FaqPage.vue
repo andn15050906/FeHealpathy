@@ -1,5 +1,5 @@
 <template>
-  <h1 class="page-title">How can we help you?</h1>
+  <h1 class="page-title">Có thể chúng tôi giúp gì cho bạn?</h1>
   <Categories />
   <RequestDemo />
   <Questions />

@@ -37,7 +37,7 @@
             <img :src="advisor.avatarUrl" alt="avatar" class="avatar" />
             <h3>{{ advisor.fullName }}</h3>
             <p class="bio">{{ advisor.intro }}</p>
-            <RouterLink class="btn btn-info" :to="`/advisor/view-profile/${advisor.advisorId}`">View Profile</RouterLink>
+            <RouterLink class="btn btn-info" :to="`/advisor/view-profile/${advisor.advisorId}`">Xem hồ sơ</RouterLink>
         </div>
         <small v-if="advisors.length === 0" class="form-text text-muted">
           Đang tải danh sách chuyên gia...

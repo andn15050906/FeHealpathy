@@ -48,7 +48,7 @@ const fetchrecommendedArticals = async () => {
         console.log(res)
         recommendedArticals.value = res || [];
     } catch (error) {
-        console.error("Error fetching recommended articals:", error);
+        console.error("Lỗi khi tải bài viết đề xuất:", error);
     }
 };
 
@@ -57,7 +57,7 @@ const navigateToArticle = async (id) => {
         await router.push({ name: 'BlogDetail', params: { id } });
         window.location.reload();
     } catch (error) {
-        console.error("Navigation error:", error);
+        console.error("Lỗi khi chuyển trang:", error);
     }
 };
 

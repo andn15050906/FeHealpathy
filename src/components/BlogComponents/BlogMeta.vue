@@ -1,7 +1,7 @@
 <template>
   <div class="blog-meta">
     <div class="author-section">
-      <img :src="BlogMeta.Author.AvatarUrl" alt="Author avatar" class="author-avatar" />
+      <img :src="BlogMeta.Author.AvatarUrl" alt="Ảnh đại diện tác giả" class="author-avatar" />
       <div class="author-info">
         <h3 class="author-name">{{ BlogMeta.Author.Name }}</h3>
         <span class="author-handle">{{ BlogMeta.Author.Handle }}</span>

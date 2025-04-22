@@ -2,9 +2,9 @@
     <div class="container my-5">
         <div v-if="!isCreatingSurvey && !isEditingSurvey">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Survey Management</h1>
+                <h1>Quản lý khảo sát</h1>
                 <button class="btn btn-primary" @click="isCreatingSurvey = true">
-                    <i class="fas fa-plus"></i> Add Survey
+                    <i class="fas fa-plus"></i> Thêm khảo sát
                 </button>
             </div>
             <div v-if="surveys && surveys.length" class="list-group">
@@ -14,7 +14,7 @@
                         <h5 class="mb-1">{{ survey.name }}</h5>
                         <p class="mb-1 text-muted">{{ survey.description }}</p>
                         <small class="text-muted">
-                            Questions: {{ survey.questions ? survey.questions.length : 0 }}
+                            Câu hỏi: {{ survey.questions ? survey.questions.length : 0 }}
                         </small>
                     </div>
                     <div>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div v-else class="text-center mb-3">
-                <p>No surveys found.</p>
+                <p>Không tìm thấy khảo sát.</p>
             </div>
             <div class="d-flex justify-content-center align-items-center mt-3">
                 <Pagination :currentPage="currentPage" :totalPages="totalPages" @GoToPage="goToPage" />
@@ -39,7 +39,7 @@
         <EditSurvey v-if="isEditingSurvey" :surveyData="selectedSurvey" @cancel="cancelEdit"
             @surveyUpdated="handleSurveyUpdated" />
 
-        <DeleteConfirmPopup v-model:isVisible="showDeleteConfirm" message="Are you sure you want to delete this survey?"
+        <DeleteConfirmPopup v-model:isVisible="showDeleteConfirm" message="Bạn có chắc chắn muốn xóa khảo sát này?"
             url="" @confirmDelete="handleDeleteConfirm" />
     </div>
 </template>

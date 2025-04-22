@@ -98,7 +98,7 @@ export default {
             url: media.url,
           }));
         } else {
-          sweetAlert.showError("Diary not found.");
+          sweetAlert.showError("Không tìm thấy nhật ký.");
         }
       } catch (error) {
         sweetAlert.showError("Không thể tải nhật ký. Vui lòng thử lại.");
@@ -163,7 +163,7 @@ export default {
         }
         router.push({ name: "diaryList" });
       } catch (error) {
-        console.error("Error saving memory:", error);
+        console.error("Lỗi khi lưu nhật ký:", error);
         sweetAlert.showError("Không thể lưu nhật ký. Vui lòng thử lại.");
       }
     }

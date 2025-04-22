@@ -163,7 +163,7 @@ export default {
 
     const validateExperience = () => {
       const wordCount = form.value.experience.trim().split(/\s+/).length;
-      console.log('Experience word count:', wordCount);
+      console.log('Độ dài kinh nghiệm:', wordCount);
       if (wordCount < 5) {
         sweetAlert.showError('Kinh nghiệm phải có ít nhất 5 từ.');
         return false;
@@ -173,7 +173,7 @@ export default {
 
     const validateIntroduction = () => {
       const wordCount = form.value.intro.trim().split(/\s+/).length;
-      console.log('Introduction word count:', wordCount);
+      console.log('Độ dài giới thiệu:', wordCount);
       if (wordCount < 5) {
         sweetAlert.showError('Giới thiệu phải có ít nhất 5 từ.');
         return false;

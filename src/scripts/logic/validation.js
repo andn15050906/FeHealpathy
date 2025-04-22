@@ -1,11 +1,11 @@
 export const handleFormSubmit = async (callback, sweetAlert) => {
     const result = await sweetAlert.showAlert({
-        title: 'Confirmation',
-        text: 'Are you sure you want to update this item?',
+        title: 'Xác nhận',
+        text: 'Bạn có chắc chắn muốn cập nhật thông tin này?',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, update it!',
-        cancelButtonText: 'No, cancel!'
+        confirmButtonText: 'Có, cập nhật!',
+        cancelButtonText: 'Không, hủy bỏ!'
     });
 
     if (result.isConfirmed) {
@@ -24,16 +24,16 @@ export const groupNameRules = [
 
 const isRequired = (val) => {
     if (val === undefined || val === null || val === '')
-        return "This field is required!";
+        return "Trường này không được trống!";
     return true;
 }
 
 export const isArrayOfType = (val, type) => {
     if (!Array.isArray(val))
-        return 'Value is not an array!';
+        return 'Giá trị không phải là mảng!';
     val.forEach(item => {
         if (!(item instanceof type)) {
-            return 'Value contains some items not inheriting ' + type;
+            return 'Giá trị chứa một số phần tử không kế thừa ' + type;
         }
     })
     return true;
