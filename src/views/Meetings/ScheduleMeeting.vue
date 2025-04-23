@@ -1,98 +1,118 @@
 <template>
-  <div class="schedule-meeting">
-    <h2 class="page-title">Đặt lịch họp với Advisor</h2>
+  <div class="schedule-meeting container">
+    <h2 class="page-title text-center">Đặt lịch họp với chuyên gia</h2>
 
-    <div class="meeting-form">
+    <div class="meeting-form card p-4 mb-5">
       <div class="form-group">
-        <label>Chọn ngày họp:</label>
-        <input type="date" v-model="meetingDate" :min="today" class="form-input"/>
-      </div>
-      <div class="form-group">
-        <label>Chọn giờ bắt đầu:</label>
-        <input type="time" v-model="startTime" class="form-input" />
-        <small class="form-text" v-if="startTime">
-          {{ new Date(`${meetingDate}T${startTime}`).toLocaleTimeString('vi-VN') }}
+        <label for="meeting-date">Chọn ngày họp:</label>
+        <input id="meeting-date" type="date" v-model="meetingDate" :min="today" class="form-control" />
+        <small class="text-danger" v-if="validationErrors.meetingDate">
+          {{ validationErrors.meetingDate }}
         </small>
       </div>
 
-      <div class="form-group">
-        <label>Chọn giờ kết thúc:</label>
-        <input type="time" v-model="endTime" class="form-input" />
-        <small class="form-text" v-if="endTime">
-          {{ new Date(`${meetingDate}T${endTime}`).toLocaleTimeString('vi-VN') }}
-          <span v-if="endTime < startTime">(Ngày hôm sau)</span>
-        </small>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-group">
+            <label for="start-time">Chọn giờ bắt đầu:</label>
+            <input id="start-time" type="time" v-model="startTime" class="form-control" />
+            <small class="text-danger" v-if="validationErrors.startTime">
+              {{ validationErrors.startTime }}
+            </small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label for="end-time">Chọn giờ kết thúc:</label>
+            <input id="end-time" type="time" v-model="endTime" class="form-control" />
+            <small class="text-danger" v-if="validationErrors.endTime">
+              {{ validationErrors.endTime }}
+            </small>
+          </div>
+        </div>
       </div>
 
       <div class="form-group">
         <label>Chọn chuyên gia tư vấn:</label>
-        <div class="advisors-grid">
-          <div
-            v-for="advisor in advisors"
-            :key="advisor.advisorId"
-            class="advisor-card"
-            :class="{ selected: selectedAdvisor === advisor.advisorId }"
-            @click="selectedAdvisor = advisor.advisorId"
-          >
-            <img :src="advisor.avatarUrl" alt="avatar" class="avatar" />
-            <h3>{{ advisor.fullName }}</h3>
-            <p class="bio">{{ advisor.intro }}</p>
-            <RouterLink class="btn btn-info" :to="`/advisor/view-profile/${advisor.advisorId}`">Xem hồ sơ</RouterLink>
+        <div class="row advisors-grid">
+          <div v-for="advisor in advisors" :key="advisor.advisorId" class="col-3 mb-4">
+            <div class="advisor-card card text-center"
+              :class="{ 'border-primary': selectedAdvisor === advisor.advisorId }"
+              @click="selectedAdvisor = advisor.advisorId">
+              <div class="advisor-avatar-container mx-auto mt-3">
+                <img :src="advisor.avatarUrl" alt="avatar" class="avatar" />
+              </div>
+              <div class="card-body">
+                <h3 class="advisor-name">{{ advisor.fullName }}</h3>
+                <p class="bio">{{ advisor.intro }}</p>
+                <RouterLink class="btn btn-outline-primary btn-sm" :to="`/advisor/view-profile/${advisor.advisorId}`">
+                  <i class="fas fa-user-circle"></i> Đặt lịch
+                </RouterLink>
+              </div>
+            </div>
+          </div>
         </div>
-        <small v-if="advisors.length === 0" class="form-text text-muted">
-          Đang tải danh sách chuyên gia...
+        <div v-if="advisors.length === 0" class="text-center p-4">
+          <i class="fas fa-spinner fa-spin"></i> Đang tải danh sách chuyên gia...
+        </div>
+        <small class="text-danger" v-if="validationErrors.selectedAdvisor">
+          {{ validationErrors.selectedAdvisor }}
         </small>
       </div>
 
-      </div>
-
       <div class="form-group">
-        <label>Ghi chú:</label>
-        <textarea v-model="notes" class="form-input" rows="3" placeholder="Nhập ghi chú cho cuộc họp..."></textarea>
+        <label for="meeting-notes">Ghi chú:</label>
+        <textarea id="meeting-notes" v-model="notes" class="form-control" rows="3"
+          placeholder="Nhập ghi chú cho cuộc họp..."></textarea>
       </div>
 
-      <div class="form-error" v-if="!isValidTime && startTime && endTime">
-        Thời gian kết thúc phải sau thời gian bắt đầu
-      </div>
-
-      <button @click="scheduleMeeting" class="btn btn-primary" :disabled="isLoading || !isValidTime">
+      <button @click="scheduleMeeting" class="btn btn-primary w-100" :disabled="isLoading">
+        <i class="fas fa-calendar-plus"></i>
         {{ isLoading ? 'Đang xử lý...' : 'Đặt lịch họp' }}
       </button>
     </div>
 
-    <div class="meetings-list">
-      <h3>Lịch hẹn của bạn</h3>
-      <div v-if="meetings.length === 0" class="no-meetings">
-        Chưa có cuộc hẹn nào được đặt
+    <div class="meetings-list mt-5">
+      <h4 class="section-title">Lịch hẹn của bạn</h4>
+
+      <div v-if="meetings.length === 0" class="no-meetings card p-5 text-center">
+        <i class="fas fa-calendar-times mb-3 text-dark"></i>
+        <p>Chưa có cuộc hẹn nào được đặt</p>
       </div>
-      <div v-else class="meetings-grid">
-        <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
-          <div class="meeting-header">
-            <h4>Cuộc hẹn với {{ meeting.advisorName }}</h4>
-            <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
-          </div>
-          <div class="meeting-details">
-            <p><i class="fas fa-calendar"></i> {{ formatISODateWithHMS(meeting.startAt) }}</p>
-            <p><i class="fas fa-clock"></i> 
-              {{ new Date(meeting.startAt).toLocaleTimeString('vi-VN') }} - 
-              {{ new Date(meeting.endAt).toLocaleTimeString('vi-VN') }}
-            </p>
-            <p v-if="meeting.description"><i class="fas fa-sticky-note"></i> {{ meeting.description }}</p>
-          </div>
-          <div class="meeting-actions">
-            <button @click="joinMeeting(meeting.id)" class="btn btn-success">
-              Tham gia cuộc gọi
-            </button>
-            <!--<button v-if="meeting.status === 'pending'" 
-                    @click="cancelMeeting(meeting.id)" 
-                    class="btn btn-danger">
-              Hủy lịch
-            </button>
-            <button v-if="meeting.status === 'confirmed'" 
-                    @click="joinMeeting(meeting.id)" 
-                    class="btn btn-success">
-              Tham gia
-            </button>-->
+
+      <div v-else class="row">
+        <div v-for="meeting in meetings" :key="meeting.id" class="col-4 mb-4">
+          <div class="meeting-card card h-100 border-2">
+            <div class="meeting-header card-header d-flex justify-content-between align-items-center">
+              <h4 class="mb-0">Cuộc hẹn với {{ meeting.advisorName }}</h4>
+              <span :class="['badge', getBadgeClass(meeting.status)]">
+                {{ meeting.status }}
+              </span>
+            </div>
+
+            <div class="card-body text-center">
+              <div class="meeting-details">
+                <p>
+                  <i class="fas fa-calendar-day text-dark"></i>
+                  {{ formatISODateWithHMS(meeting.startAt) }}
+                </p>
+                <p>
+                  <i class="fas fa-clock text-dark"></i>
+                  {{ new Date(meeting.startAt).toLocaleTimeString('vi-VN') }} -
+                  {{ new Date(meeting.endAt).toLocaleTimeString('vi-VN') }}
+                </p>
+                <p v-if="meeting.description" class="meeting-description">
+                  <i class="fas fa-sticky-note text-dark"></i>
+                  {{ meeting.description }}
+                </p>
+              </div>
+            </div>
+
+            <div class="card-footer text-center">
+              <button @click="joinMeeting(meeting.id)" class="btn btn-success w-100">
+                <i class="fas fa-video"></i> Tham gia cuộc gọi
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -101,14 +121,16 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, computed } from 'vue';
-import { createMeeting, getMeetings, deleteMeeting, joinMeeting as joinMeetingApi } from '@/scripts/api/services/meetingService';
+import { ref, onBeforeMount, onMounted, computed } from 'vue';
+import { createMeeting, getMeetings, deleteMeeting } from '@/scripts/api/services/meetingService';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
 import { useRouter } from 'vue-router';
 
+const router = useRouter();
+const today = new Date().toLocaleDateString('en-CA');
 const meetingDate = ref('');
 const startTime = ref('');
 const endTime = ref('');
@@ -117,348 +139,324 @@ const notes = ref('');
 const isLoading = ref(false);
 const meetings = ref([]);
 const advisors = ref([]);
-const today = new Date().toISOString().split('T')[0];
-const router = useRouter();
+
+const validationErrors = ref({
+  meetingDate: '',
+  startTime: '',
+  endTime: '',
+  selectedAdvisor: '',
+});
+
+function formatTimeForInput(date) {
+  return date.toTimeString().substring(0, 5);
+}
+
+function setDefaultValues() {
+  const now = new Date();
+  meetingDate.value = now.toLocaleDateString('en-CA');
+  startTime.value = formatTimeForInput(now);
+  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  endTime.value = formatTimeForInput(oneHourLater);
+}
+
+onMounted(setDefaultValues);
 
 const isValidTime = computed(() => {
-  if (!startTime.value || !endTime.value || !meetingDate.value) return true;
-
-  const startDateTime = new Date(`${meetingDate.value}T${startTime.value}`);
-  const endDateTime = new Date(`${meetingDate.value}T${endTime.value}`);
-
-  if (endDateTime < startDateTime) {
-    endDateTime.setDate(endDateTime.getDate() + 1);
-  }
-
-  return startDateTime < endDateTime;
+  if (!startTime.value || !endTime.value) return true;
+  const [sh, sm] = startTime.value.split(':').map(Number);
+  const [eh, em] = endTime.value.split(':').map(Number);
+  return (eh > sh) || (eh === sh && em > sm);
 });
+
+function getBadgeClass(status) {
+  switch (status) {
+    case 'pending': return 'bg-warning text-dark';
+    case 'confirmed': return 'bg-success';
+    case 'cancelled': return 'bg-danger';
+    default: return 'bg-secondary';
+  }
+}
+
+async function loadMeetings() {
+  try {
+    const resp = await getMeetings();
+    const me = getUserProfile().id;
+    const list = resp.items || [];
+    meetings.value = list
+      .filter(m => m.participants.some(p => p.creatorId === me))
+      .map(m => ({
+        ...m,
+        advisorName:
+          advisors.value.find(a => a.advisorId === m.advisorId)?.fullName ||
+          'Advisor',
+      }));
+  } catch {
+    console.error('Không thể tải danh sách cuộc họp');
+  }
+}
 
 onBeforeMount(async () => {
   try {
-    const response = await getAllAdvisors();
-    if (response) {
-      console.log(response);
-      advisors.value = response.filter(_ => _.userId != getUserProfile().id);
-      await loadMeetings();
-    }
-  } catch (error) {
-    toast.error('Không thể tải danh sách advisor');
+    const resp = await getAllAdvisors();
+    advisors.value = (resp || []).filter(a => a.userId !== getUserProfile().id);
+    await loadMeetings();
+  } catch {
+    toast.error('Không thể tải danh sách chuyên gia');
   }
 });
 
-const loadMeetings = async () => {
-  try {
-    const response = await getMeetings();
-    if (response?.items) {
-      meetings.value = response.items
-        .filter(_ => _.participants.find(_ => _.creatorId == getUserProfile().id))
-        .map(meeting => ({
-          ...meeting,
-          advisorName: advisors.value.find(a => a.advisorId === meeting.advisorId)?.fullName || 'Advisor'
-        }));
-    } else {
-      meetings.value = [];
-    }
-  } catch (error) {
-    //toast.error('Không thể tải danh sách cuộc họp');
+function validateForm() {
+  let ok = true;
+  validationErrors.value = {
+    meetingDate: '',
+    startTime: '',
+    endTime: '',
+    selectedAdvisor: '',
+  };
+  if (!meetingDate.value) {
+    validationErrors.value.meetingDate = 'Vui lòng chọn ngày họp';
+    ok = false;
   }
-};
-
-// Đặt lịch họp mới
-const scheduleMeeting = async () => {
-  if (!meetingDate.value || !startTime.value || !endTime.value || !selectedAdvisor.value) {
-    toast.error('Vui lòng điền đầy đủ thông tin');
-    return;
+  if (!startTime.value) {
+    validationErrors.value.startTime = 'Vui lòng chọn giờ bắt đầu';
+    ok = false;
   }
-
-  if (!isValidTime.value) {
-    toast.error('Thời gian không hợp lệ');
-    return;
+  if (!endTime.value) {
+    validationErrors.value.endTime = 'Vui lòng chọn giờ kết thúc';
+    ok = false;
   }
+  if (!selectedAdvisor.value) {
+    validationErrors.value.selectedAdvisor = 'Vui lòng chọn chuyên gia tư vấn';
+    ok = false;
+  }
+  if (startTime.value && endTime.value && !isValidTime.value) {
+    validationErrors.value.endTime = 'Thời gian kết thúc phải sau thời gian bắt đầu';
+    ok = false;
+  }
+  return ok;
+}
 
+async function scheduleMeeting() {
+  if (!validateForm()) return;
   isLoading.value = true;
   try {
-    const startDateTime = new Date(`${meetingDate.value}T${startTime.value}`);
-    const endDateTime = new Date(`${meetingDate.value}T${endTime.value}`);
-    
-    // Nếu giờ kết thúc < giờ bắt đầu, tự động đẩy sang ngày hôm sau
-    if (endDateTime < startDateTime) {
-      endDateTime.setDate(endDateTime.getDate() + 1);
-    }
-
-    const dto = {
+    const startAt = new Date(`${meetingDate.value}T${startTime.value}`);
+    const endAt = new Date(`${meetingDate.value}T${endTime.value}`);
+    await createMeeting({
       title: 'Cuộc họp với Advisor',
-      startAt: startDateTime,
-      endAt: endDateTime,
-      maxParticipants: 2,
+      startAt, endAt, maxParticipants: 2,
       participants: [
         { userId: getUserProfile().id, isHost: true },
         { userId: selectedAdvisor.value, isHost: false },
       ],
-      description: notes.value || ''
-    };
-
-    const response = await createMeeting(dto);
-    
-    if (response) {
-      toast.success('Đặt lịch họp thành công');
-      
-      meetingDate.value = '';
-      startTime.value = '';
-      endTime.value = '';
-      selectedAdvisor.value = '';
-      notes.value = '';
-      
-      await loadMeetings();
-    }
-  } catch (error) {
-    //toast.error('Không thể đặt lịch họp');
+      description: notes.value || '',
+    });
+    toast.success('Đặt lịch họp thành công');
+    setDefaultValues();
+    selectedAdvisor.value = '';
+    notes.value = '';
+    await loadMeetings();
+  } catch {
+    console.error('Không thể đặt lịch họp');
   } finally {
     isLoading.value = false;
   }
-};
+}
 
-// Hủy lịch họp
-const cancelMeeting = async (meetingId) => {
+async function cancelMeeting(id) {
   if (!confirm('Bạn có chắc chắn muốn hủy lịch họp này?')) return;
-
   try {
-    await deleteMeeting(meetingId);
+    await deleteMeeting(id);
     toast.success('Hủy lịch họp thành công');
     await loadMeetings();
-  } catch (error) {
+  } catch {
     toast.error('Không thể hủy lịch họp');
   }
-};
+}
 
-const joinMeeting = async (meetingId) => {
-  try {
-    //await joinMeetingApi(meetingId);
-    router.push(`/call/${meetingId}`);
-  } catch (error) {
-    toast.error('Không thể tham gia cuộc họp');
-  }
-};
+function joinMeeting(id) {
+  router.push(`/call/${id}`);
+}
 </script>
 
 <style scoped>
 .schedule-meeting {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .page-title {
-  text-align: center;
   margin-bottom: 30px;
-  color: #333;
+  font-weight: 600;
+  font-size: 28px;
+  position: relative;
+  padding-bottom: 12px;
+  color: #000000;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #000000;
+}
+
+.section-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #000000;
+}
+
+.section-title i {
+  color: #000000;
 }
 
 .meeting-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  border: 2px solid #dee2e6;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #666;
+  margin-bottom: 8px;
+  font-weight: 600;
 }
 
-.form-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-.btn-success {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #218838;
-}
-
-.meetings-list {
-  margin-top: 40px;
-}
-
-.meetings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.meeting-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.meeting-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
+.text-danger {
   font-size: 12px;
-}
-
-.status-badge.pending {
-  background-color: #ffc107;
-  color: #000;
-}
-
-.status-badge.confirmed {
-  background-color: #28a745;
-  color: white;
-}
-
-.status-badge.cancelled {
-  background-color: #dc3545;
-  color: white;
-}
-
-.meeting-details {
-  margin-bottom: 15px;
-}
-
-.meeting-details p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.meeting-details i {
-  margin-right: 8px;
-  color: #007bff;
-}
-
-.meeting-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.no-meetings {
-  text-align: center;
-  color: #666;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.form-text {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #666;
-}
-
-.form-error {
-  color: #dc3545;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.form-group small {
-  color: #666;
-  font-size: 12px;
-  margin-top: 4px;
+  margin-top: 2px;
   display: block;
 }
 
-.form-input[type="date"] {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
+.next-day-indicator {
+  color: #000000;
+  font-weight: 500;
 }
 
-.advisors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.advisor-card {
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 12px;
+.advisors-grid .advisor-card {
+  height: 100%;
+  transition: all 0.3s ease;
+  border-width: 2px;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.advisor-card:hover {
-  border-color: #007bff;
-  transform: scale(1.03);
+.advisors-grid .advisor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
-.advisor-card.selected {
-  border-color: #007bff;
-  background-color: #f0f8ff;
+.advisor-avatar-container {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #dee2e6;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+}
+
+.border-primary .advisor-avatar-container {
+  border-color: #000000;
 }
 
 .advisor-card .avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  margin-bottom: 8px;
+}
+
+.advisor-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  text-align: center;
 }
 
 .advisor-card .bio {
-  font-size: 0.9rem;
-  color: #555;
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 0px;
+  line-height: 1.5;
+  height: 63px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-align: center;
 }
 
-.advisor-card .email {
-  font-size: 0.8rem;
-  color: #888;
+.meeting-card {
+  transition: all 0.3s ease;
+  border-width: 2px !important;
 }
-</style> 
+
+.meeting-card:hover {
+  border-color: #000000 !important;
+  transform: translateY(-4px);
+}
+
+.meeting-header {
+  border-bottom: 2px solid #dee2e6;
+  text-align: center;
+}
+
+.meeting-details {
+  margin: 0 auto;
+}
+
+.meeting-details p {
+  margin: 10px 0;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.meeting-details i {
+  color: #000000;
+  font-size: 16px;
+}
+
+.no-meetings {
+  border: 2px dashed #dee2e6;
+}
+
+.no-meetings i {
+  font-size: 48px;
+  color: #000000;
+  opacity: 0.5;
+}
+
+.meeting-description {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  font-style: italic;
+  text-align: center;
+}
+
+.border-2 {
+  border-width: 2px !important;
+}
+
+.btn {
+  text-align: center;
+}
+
+.border-primary {
+  border-color: #000000 !important;
+}
+</style>
