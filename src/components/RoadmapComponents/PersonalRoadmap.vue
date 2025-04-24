@@ -117,6 +117,10 @@ html {
     scroll-behavior: smooth;
 }
 
+strong {
+    font-weight: 700 !important;
+}
+
 .roadmap-intro {
     background-color: #ffffff; 
     padding: 30px;
@@ -145,7 +149,6 @@ html {
     color: #444; 
     margin-bottom: 15px; 
     line-height: 1.6; 
-    font-family: 'Poppins', sans-serif; 
     text-align: center; 
 }
 
@@ -214,7 +217,7 @@ html {
     border-radius: 8px;
     margin-top: 15px;
     text-align: center;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .highlighted-note a {

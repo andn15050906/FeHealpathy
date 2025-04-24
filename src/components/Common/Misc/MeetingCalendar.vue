@@ -113,7 +113,6 @@ export default {
     height: 100%;
     margin: 20px auto;
     padding: 0 10px;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .calendar-wrapper {

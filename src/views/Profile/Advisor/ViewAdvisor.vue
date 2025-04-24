@@ -117,7 +117,6 @@ onBeforeMount(() => {
 <style scoped>
 .content {
   width: 100%;
-  font-family: 'Roboto', sans-serif;
 }
 
 .profile-container {

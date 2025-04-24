@@ -153,7 +153,7 @@ export default {
           labels: surveyResults.value.map(r => `${r.surveyTitle} (${formatISODate(r.creationTime)})`),
           datasets: [
             {
-              label: "Survey Score (based on Score scale = 100)",
+              label: "Điểm số đánh giá (Thang điểm = 100)",
               data: surveyResults.value.map(r => (r.score / r.maxScore) * 100),
               backgroundColor: surveyResults.value.map(r => getChartColor(r)),
               borderWidth: 1,

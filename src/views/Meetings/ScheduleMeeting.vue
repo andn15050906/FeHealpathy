@@ -282,7 +282,6 @@ function joinMeeting(id) {
 <style scoped>
 .schedule-meeting {
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .page-title {

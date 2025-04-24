@@ -300,7 +300,6 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: Poppins, sans-serif;
   letter-spacing: -0.41px;
 }
 
@@ -463,7 +462,7 @@ export default defineComponent({
   display: flex;
   margin-top: 16px;
   gap: 40px;
-  font-family: Poppins, sans-serif;
+  /* font-family: Poppins, sans-serif; */
   font-weight: 500;
   letter-spacing: -0.41px;
 }

@@ -336,7 +336,6 @@ export default {
   background: #fdfaf6;
   padding: 40px 50px;
   text-align: center;
-  font-family: "Georgia", serif;
   line-height: 1.8;
   border-radius: 5px;
   cursor: pointer;

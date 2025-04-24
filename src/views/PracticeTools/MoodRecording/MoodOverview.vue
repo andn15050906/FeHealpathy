@@ -72,7 +72,6 @@
     max-width: 1473px;
     flex-direction: column;
     align-items: center;
-    font-family: Poppins, sans-serif;
     text-align: center;
 }
 
@@ -102,7 +101,7 @@
     border: none;
     font-weight: 700;
     cursor: pointer;
-    font-family: inherit;
+    /* font-family: inherit; */
 }
 
 .join-button:hover {
