@@ -80,7 +80,6 @@ export default {
 
 <style scoped>
 .yoga-detail {
-  font-family: "Poppins", Arial, sans-serif;
   color: #333;
   max-width: 100%;
   margin: 10px auto;
