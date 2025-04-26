@@ -31,7 +31,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: Poppins, sans-serif;
     color: rgba(255, 255, 255, 1);
     text-align: center;
     position: absolute;

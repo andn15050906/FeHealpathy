@@ -220,6 +220,5 @@ export default {
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 10px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 </style>

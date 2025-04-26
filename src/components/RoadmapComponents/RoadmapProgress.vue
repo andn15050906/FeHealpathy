@@ -1,49 +1,73 @@
 <template>
-    <v-container>
-        <v-card>
-            <v-card-title>
-                <h1>Tiến độ lộ trình</h1>
-            </v-card-title>
-            <v-card-text>
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h2 class="mb-0" style="font-weight: 600;">Tiến độ lộ trình</h2>
+            </div>
+            <div class="card-body">
                 <p>{{ roadmap.introText }}</p>
-                <v-tabs v-model="activeTab">
-                    <v-tab v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :value="phase.id" :class="getPhaseTabClass(phase)">
-                        <v-icon v-if="isPhaseCompleted(phase)" small class="mr-1">mdi-check-circle</v-icon>
-                        {{ phase.title }}
-                    </v-tab>
-                </v-tabs>
-                <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id" :ref="'phase-' + phase.id">
-                    <v-card>
-                        <v-card-title :class="getPhaseHeaderClass(phase)">
+
+                <ul class="nav nav-tabs mb-4" id="roadmapTabs">
+                    <li class="nav-item" v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)"
+                        :key="phase.id">
+                        <button class="nav-link" :class="[
+                            activeTab === phase.id ? 'active' : '',
+                            getPhaseTabClass(phase)
+                        ]" @click="activeTab = phase.id">
+                            <i v-if="isPhaseCompleted(phase)" class="bi bi-check-circle-fill me-1"></i>
                             {{ phase.title }}
-                            <v-icon v-if="isPhaseCompleted(phase)" class="ml-2">mdi-check-circle</v-icon>
-                            <v-icon v-else-if="isPhaseInProgress(phase)" class="ml-2">mdi-progress-clock</v-icon>
-                        </v-card-title>
-                        <v-card-subtitle>{{ phase.description }}</v-card-subtitle>
-                        <v-card-text>
-                            <v-data-table :headers="getTableHeaders" :items="phase.milestones" item-class="milestone-row">
-                                <template v-slot:item="{ item }">
-                                    <tr :class="getMilestoneClass(item)">
-                                        <td class="text-vertical-center">{{ item.title }}</td>
-                                        <td class="text-center">{{ item.repeatTimesRequired }}</td>
-                                        <!--<td class="text-center">{{ item.timeSpentRequired }}</td>-->
-                                        <td class="text-center">
-                                            <span>{{ getProgressText(item) }}</span>
-                                            <v-icon small class="ml-1">{{ getProgressIcon(item) }}</v-icon>
-                                        </td>
-                                        <td class="text-center">
-                                            <v-btn v-if="item.status == 'current'" class="navigate-btn"
-                                                @click="gotoLinkByEvent(item)">{{ text.Follow }}</v-btn>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </v-data-table>
-                        </v-card-text>
-                    </v-card>
+                        </button>
+                    </li>
+                </ul>
+
+                <div v-for="phase in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="phase.id"
+                    :ref="'phase-' + phase.id">
+                    <div class="card mb-4">
+                        <div class="card-header py-3" :class="getPhaseHeaderClass(phase)">
+                            <div class="d-flex align-items-center">
+                                <h5 class="mb-0">{{ phase.title }}</h5>
+                                <i v-if="isPhaseCompleted(phase)" class="bi bi-check-circle-fill ms-2"></i>
+                                <i v-else-if="isPhaseInProgress(phase)" class="bi bi-clock-history ms-2"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">{{ phase.description }}</p>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Tiêu đề</th>
+                                            <th scope="col" class="text-center">Số lần thực hiện</th>
+                                            <th scope="col" class="text-center">Tiến độ</th>
+                                            <th scope="col" class="text-center">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in phase.milestones?.sort((a,b) => a.index - b.index)" :key="item.id"
+                                            :class="getMilestoneClass(item)">
+                                            <td>{{ item.title }}</td>
+                                            <td class="text-center">{{ item.repeatTimesRequired }}</td>
+                                            <td class="text-center">
+                                                <span>{{ getProgressText(item) }}</span>
+                                                <i class="ms-1" :class="getProgressIcon(item)"></i>
+                                            </td>
+                                            <td class="text-center">
+                                                <button v-if="item.status == 'current'" class="btn btn-primary btn-sm"
+                                                    @click="gotoLinkByEvent(item)">
+                                                    {{ text.Follow }}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </v-card-text>
-        </v-card>
-    </v-container>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -52,17 +76,6 @@ import { getLinkByEventLabel, getLinkByObjectId } from '@/scripts/api/services/a
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
 export default {
-    computed: {
-        getTableHeaders() {
-            return [
-                { title: 'Tiêu đề', value: 'title', align: 'center' },
-                { title: 'Lặp lại lần', value: 'repeatTimesRequired', align: 'center' },
-                /*{ title: 'Time Spent Required', value: 'timeSpentRequired', align: 'center' },*/
-                { title: 'Tiến độ', value: 'progress', align: 'center' },
-                { title: 'Hành động', value: 'eventName', align: 'center' }
-            ];
-        }
-    },
     data() {
         return {
             text: {
@@ -70,22 +83,26 @@ export default {
             },
             activeTab: null,
             roadmap: {},
-            phasesStatus: {} // Lưu trạng thái của từng phase
+            phasesStatus: {}
         }
     },
     async beforeMount() {
         let tempRoadmap = await getCurrentRoadmapWithProgress();
-        let phasesProgress = await getProgress();
-        let completedMilestones = [];
-        for (let phaseProgress of phasesProgress) {
-            completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
-        }
+        let phasesProgress = (await getProgress()).progress;
+        let completedMilestones = phasesProgress.map(_ => _.milestone);
 
         for (let phase of tempRoadmap.phases) {
             let completedCount = 0;
             phase.totalMilestones = phase.milestones.length;
 
-            for (let milestone of phase.milestones) {
+            let belowLocked = false;
+            for (let milestone of phase.milestones.sort((a, b) => a.index - b.index)) {
+                if (belowLocked) {
+                    milestone.status = 'locked';
+                    milestone.progress = 'Hãy hoàn thành bước trước';
+                    continue;
+                }
+
                 if (tempRoadmap.isCompleted) {
                     milestone.status = 'completed';
                     milestone.progress = 'Đã hoàn thành';
@@ -99,22 +116,23 @@ export default {
                     }
                     else if (phase.index > tempRoadmap.currentPhase.index) {
                         milestone.status = 'locked';
-                        milestone.progress = 'Chưa bắt đầu';
+                        milestone.progress = 'Hãy hoàn thành bước trước';
                     }
-                    else {
-                        if (completedMilestones.includes(milestone.id)) {
-                            milestone.status = 'completed';
-                            milestone.progress = 'Đã hoàn thành';
-                            completedCount++;
-                        } else {
-                            milestone.status = 'current';
-                            milestone.progress = 'Đang thực hiện';
-                        }
+                    else if (completedMilestones.includes(milestone.id)) {
+                        milestone.status = 'completed';
+                        milestone.progress = 'Đã hoàn thành';
+                        completedCount++;
+                    } else {
+                        milestone.status = 'current';
+                        milestone.progress = 'Đang thực hiện';
                     }
                 }
+
+                if (milestone.status == 'current' && milestone.isRequired) {
+                    belowLocked = true;
+                }
             }
-            
-            // Xác định trạng thái của phase
+
             this.phasesStatus[phase.id] = {
                 completed: completedCount === phase.totalMilestones,
                 inProgress: phase.id == tempRoadmap.currentPhase?.id,
@@ -122,10 +140,9 @@ export default {
                 totalMilestones: phase.totalMilestones
             };
         }
-        
+
         this.roadmap = tempRoadmap;
-        
-        // Đặt active tab là phase đầu tiên chưa hoàn thành hoặc đang thực hiện
+
         if (!this.activeTab && tempRoadmap.phases.length > 0) {
             for (let phase of tempRoadmap.phases) {
                 if (this.phasesStatus[phase.id].inProgress) {
@@ -133,8 +150,7 @@ export default {
                     break;
                 }
             }
-            
-            // Nếu không có phase nào đang thực hiện, chọn phase đầu tiên chưa hoàn thành
+
             if (!this.activeTab) {
                 for (let phase of tempRoadmap.phases) {
                     if (!this.phasesStatus[phase.id].completed) {
@@ -143,8 +159,7 @@ export default {
                     }
                 }
             }
-            
-            // Nếu vẫn không có, chọn phase đầu tiên
+
             if (!this.activeTab && tempRoadmap.phases.length > 0) {
                 this.activeTab = tempRoadmap.phases[0].id;
             }
@@ -163,19 +178,26 @@ export default {
             }
         },
         getMilestoneClass(milestone) {
-            return `milestone-${milestone.status || 'locked'}`;
+            switch (milestone.status) {
+                case 'completed':
+                    return 'table-primary';
+                case 'current':
+                    return 'table-success';
+                default:
+                    return 'table-light';
+            }
         },
         getProgressText(milestone) {
             return milestone.progress || 'Chưa bắt đầu';
         },
         getProgressIcon(milestone) {
-            switch(milestone.status) {
+            switch (milestone.status) {
                 case 'completed':
-                    return 'mdi-check-circle';
+                    return 'bi bi-check-circle-fill text-primary';
                 case 'current':
-                    return 'mdi-rocket';
+                    return 'bi bi-rocket-takeoff-fill text-success';
                 default:
-                    return 'mdi-lock';
+                    return 'bi bi-lock-fill text-secondary';
             }
         },
         isPhaseCompleted(phase) {
@@ -186,20 +208,20 @@ export default {
         },
         getPhaseTabClass(phase) {
             if (this.isPhaseCompleted(phase)) {
-                return 'phase-tab-completed';
+                return 'text-primary phase-completed';
             } else if (this.isPhaseInProgress(phase)) {
-                return 'phase-tab-in-progress';
+                return 'text-success phase-progress';
             } else {
-                return 'phase-tab-locked';
+                return 'text-secondary phase-locked';
             }
         },
         getPhaseHeaderClass(phase) {
             if (this.isPhaseCompleted(phase)) {
-                return 'phase-header-completed';
+                return 'bg-light-primary';
             } else if (this.isPhaseInProgress(phase)) {
-                return 'phase-header-in-progress';
+                return 'bg-light-success';
             } else {
-                return 'phase-header-locked';
+                return 'bg-light';
             }
         },
         gotoLinkByEvent(milestone) {
@@ -214,193 +236,89 @@ export default {
 };
 </script>
 
-<style scoped>
-.roadmap {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+<style>
+/* Bootstrap icons - add link to bootstrap icons in your main index.html */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
+
+.bg-light-primary {
+    background-color: rgba(13, 110, 253, 0.05);
 }
 
-.phase {
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
+.bg-light-success {
+    background-color: rgba(25, 135, 84, 0.05);
 }
 
-.milestones {
-    margin-top: 10px;
+.nav-tabs .nav-link {
+    border-radius: 0;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-.milestones ul {
-    list-style-type: none;
-    padding: 0;
+.nav-tabs .nav-link.active {
+    font-weight: 700;
+    font-size: 1.15rem;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
 }
 
-.milestones li {
-    margin: 5px 0;
+.phase-completed.active {
+    border-bottom: 3px solid #0d6efd !important;
 }
 
-.v-container {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.phase-progress.active {
+    border-bottom: 3px solid #198754 !important;
 }
 
-.v-card {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.phase-locked.active {
+    border-bottom: 3px solid #6c757d !important;
 }
 
-.v-card-title h1 {
-    font-size: 2em;
-    color: #333;
-    margin: 0;
+.card-header {
+    border-bottom: 0;
 }
 
-.v-card-text {
-    padding: 20px;
+.table> :not(caption)>*>* {
+    padding: 0.75rem 1rem;
 }
 
-.v-tabs {
-    margin-top: 20px;
+.table>tbody>tr.table-primary {
+    --bs-table-bg: rgba(13, 110, 253, 0.1);
+    font-weight: 500;
 }
 
-.v-tab {
-    font-weight: bold;
+.table>tbody>tr.table-success {
+    --bs-table-bg: rgba(25, 135, 84, 0.1);
+    font-weight: 500;
+    border-left: 4px solid #198754;
 }
 
-.v-tab:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-}
-
-.v-tabs-items {
-    border-top: 1px solid #e0e0e0;
-}
-
-.v-card-subtitle {
-    font-style: italic;
-    color: #666;
-}
-
-.v-simple-table {
-    width: 100%;
-    margin-top: 10px;
-}
-
-.v-simple-table th {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    text-align: center;
-}
-
-.v-simple-table td {
-    padding: 10px;
-    border-bottom: 1px solid #e0e0e0;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.v-simple-table tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
-}
-
-.v-data-table__td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* Milestone status styles */
-.milestone-completed {
-    background-color: rgba(0, 123, 255, 0.15) !important;
-    font-weight: bold;
-    color: #0056b3;
-}
-
-.milestone-current {
-    background-color: rgba(40, 167, 69, 0.15) !important;
-    font-weight: bold;
-    color: #28a745;
-    border-left: 4px solid #28a745;
-}
-
-.milestone-locked {
-    background-color: rgba(108, 117, 125, 0.1) !important;
+.table>tbody>tr.table-light {
+    --bs-table-bg: rgba(108, 117, 125, 0.05);
     color: #6c757d;
 }
 
-.milestone-completed td {
-    border-bottom: 1px solid rgba(0, 123, 255, 0.3);
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
 
-.milestone-current td {
-    border-bottom: 1px solid rgba(40, 167, 69, 0.3);
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
 }
 
-.milestone-locked td {
-    border-bottom: 1px solid rgba(108, 117, 125, 0.2);
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-.text-center {
-    text-align: center !important;
-    vertical-align: middle !important;
+.card-body {
+    padding: 1.5rem;
 }
 
-.text-vertical-center {
-    vertical-align: middle !important;
-}
-
-/* Phase tab styles */
-.phase-tab-completed {
-    color: #0056b3 !important;
-    background-color: rgba(0, 123, 255, 0.05);
-}
-
-.phase-tab-completed.v-tab--active {
-    background-color: rgba(0, 123, 255, 0.15);
-    border-bottom: 3px solid #0056b3;
-}
-
-.phase-tab-in-progress {
-    color: #28a745 !important;
-    background-color: rgba(40, 167, 69, 0.05);
-}
-
-.phase-tab-in-progress.v-tab--active {
-    background-color: rgba(40, 167, 69, 0.15);
-    border-bottom: 3px solid #28a745;
-}
-
-.phase-tab-locked {
-    color: #6c757d !important;
-}
-
-.phase-tab-locked.v-tab--active {
-    background-color: rgba(108, 117, 125, 0.1);
-    border-bottom: 3px solid #6c757d;
-}
-
-/* Phase header styles */
-.phase-header-completed {
-    color: #0056b3;
-    border-bottom: 2px solid rgba(0, 123, 255, 0.3);
-}
-
-.phase-header-in-progress {
-    color: #28a745;
-    border-bottom: 2px solid rgba(40, 167, 69, 0.3);
-}
-
-.phase-header-locked {
-    color: #6c757d;
-    border-bottom: 2px solid rgba(108, 117, 125, 0.2);
-}
-
-.navigate-btn {
-    color: #000000;
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
 }
 </style>

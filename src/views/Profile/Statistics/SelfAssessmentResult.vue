@@ -1,52 +1,71 @@
 <template>
-  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true"
-    :centered="true"></StatisticsTabs>
+  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true" :centered="true">
+  </StatisticsTabs>
 
-  <div class="container">
-    <h1 class="title">📊 Kết quả tự đánh giá</h1>
+  <div class="container py-4">
+    <h2 class="text-center mb-4">📊 Kết quả tự đánh giá</h2>
 
-    <div class="section">
-      <h2>📅 Lịch sử khảo sát</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Survey Taken</th>
-            <th>Score</th>
-            <th>Evaluation</th>
-            <th>Date</th>
-            <th>Review</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(result, index) in surveyResults" :key="index">
-            <td>{{ result.surveyTitle }}</td>
-            <!--...-->
-            <td>{{ result.score <= result.maxScore ? result.score : result.maxScore }} / {{ result.maxScore }}</td>
-            <td v-if="result.bands.length > 0" :class="result.bands[0].ratingClass">
-              {{ getEvaluation(result) }}
-            </td>
-            <td v-else :class="
-              getChartColor(result) == '#e91e63' ? 'bad':
-              getChartColor(result) == '#ffc107' ? 'average':
-              'good'">
-              {{ getEvaluation(result) }}
-            </td>
-            <td>{{ localFormatISODate(result.creationTime) }}</td>
-            <td><RouterLink :to="{ name: 'SubmissionReview', params: { id: result.id} }">Review</RouterLink></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h4 mb-0">📅 Lịch sử khảo sát</h2>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-container">
+          <table class="table table-hover table-striped mb-0">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th>Khảo sát</th>
+                <th>Điểm số</th>
+                <th>Đánh giá</th>
+                <th>Ngày</th>
+                <th>Xem chi tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(result, index) in surveyResults" :key="index">
+                <td>{{ result.surveyTitle }}</td>
+                <td>{{ result.score <= result.maxScore ? result.score : result.maxScore }} / {{ result.maxScore }}</td>
+                <td v-if="result.bands.length > 0" :class="result.bands[0].ratingClass">
+                  {{ getEvaluation(result) }}
+                </td>
+                <td v-else :class="getChartColor(result) == '#e91e63' ? 'bad' :
+                  getChartColor(result) == '#ffc107' ? 'average' :
+                    'good'">
+                  {{ getEvaluation(result) }}
+                </td>
+                <td>{{ localFormatISODate(result.creationTime) }}</td>
+                <td>
+                  <RouterLink class="btn btn-sm btn-outline-primary"
+                    :to="{ name: 'SubmissionReview', params: { id: result.id } }">Chi tiết</RouterLink>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <div class="charts-container">
-      <div :style="{ width: '30%' }">
-        <h2>🎯 Tỷ lệ kết quả đánh giá</h2>
-        <canvas ref="pieChart"></canvas>
+    <div class="row">
+      <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-white">
+            <h2 class="h4 mb-0">🎯 Tỷ lệ kết quả đánh giá</h2>
+          </div>
+          <div class="card-body chart-container">
+            <canvas ref="pieChart"></canvas>
+          </div>
+        </div>
       </div>
 
-      <div :style="{ width: '60%' }">
-        <h2>📊 Điểm số đánh giá theo thời gian</h2>
-        <canvas ref="barChart"></canvas>
+      <div class="col-md-8">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-white">
+            <h2 class="h4 mb-0">📊 Điểm số đánh giá theo thời gian</h2>
+          </div>
+          <div class="card-body chart-container">
+            <canvas ref="barChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -117,6 +136,15 @@ export default {
             },
           ],
         },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
       });
 
       new Chart(barChart.value, {
@@ -125,8 +153,8 @@ export default {
           labels: surveyResults.value.map(r => `${r.surveyTitle} (${formatISODate(r.creationTime)})`),
           datasets: [
             {
-              label: "Survey Score (based on Score scale = 100)",
-              data: surveyResults.value.map(r => (r.score / r.maxScore) * 100),    // r.maxScore > 0
+              label: "Điểm số đánh giá (Thang điểm = 100)",
+              data: surveyResults.value.map(r => (r.score / r.maxScore) * 100),
               backgroundColor: surveyResults.value.map(r => getChartColor(r)),
               borderWidth: 1,
             },
@@ -135,7 +163,8 @@ export default {
         options: {
           indexAxis: "y",
           responsive: true,
-          scales: { x: { min: 0, max: /*maxRenderedScore.value*/ 100 } },
+          maintainAspectRatio: false,
+          scales: { x: { min: 0, max: 100 } },
         },
       });
     }
@@ -201,40 +230,48 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 1100px;
-  margin: auto;
-  background: white;
-  padding: 50px;
+h2 {
+  color: #343a40;
+  font-weight: 600;
+}
+
+.card {
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-height: 1000px;
+  overflow: hidden;
+  border: none;
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 40px;
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.section {
-  margin-bottom: 80px;
+.table-container {
+  height: 300px;
+  overflow-y: auto;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-th,
-td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+.table th {
+  font-weight: 600;
+  color: #495057;
 }
 
-th {
-  background: #f9f9f9;
+.table td {
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.04);
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
 }
 
 .good {
@@ -252,42 +289,13 @@ th {
   font-weight: bold;
 }
 
-.charts-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  flex-wrap: wrap;
-  padding-bottom: 40px;
-  text-align: center;
+a.btn-outline-primary {
+  color: #007bff;
+  border-color: #007bff;
 }
 
-.chart-box canvas {
-  max-width: 950px;
-  max-height: 950px;
-  display: block;
-  margin: auto;
-  margin-top: 20px;
-}
-
-.chart-box h2 {
-  text-align: center;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-@media (max-width: 768px) {
-  .charts-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .chart-box {
-    width: 100%;
-  }
-
-  .chart-box canvas {
-    max-width: 400px;
-    max-height: 400px;
-  }
+a.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #007bff;
 }
 </style>

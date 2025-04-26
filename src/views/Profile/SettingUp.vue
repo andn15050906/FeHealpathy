@@ -83,7 +83,7 @@ onBeforeMount(async () => {
     var preferencesSurveys = await getAllPreferenceSurveys();
 
     firstEvaluationOptions.value = new SurveyOptions(
-        surveys.items.find(item => item.name.includes("Đánh giá đầu tiên")),
+        surveys.items.find(item => item.name.includes("First Evaluation")),
         '✨ Hãy cho chúng tôi biết thêm về bạn ✨',
         () => { switchChild(true) },
         submitFirstEvaluation,
@@ -91,7 +91,7 @@ onBeforeMount(async () => {
         false
     );
     wellnessSurveyOptions.value = new SurveyOptions(
-        surveys.items.find(survey => survey.name.includes("Đánh giá sức khỏe")),
+        surveys.items.find(survey => survey.name.includes("Wellness Assessment")),
         '✨ Hãy cho chúng tôi biết thêm về bạn ✨',
         () => { switchChild(true) },
         submitWellnessSurvey,
@@ -99,7 +99,7 @@ onBeforeMount(async () => {
         false
     );
     whatYouWantSurveyOptions.value = new SurveyOptions(
-        preferencesSurveys.find(survey => survey.title.includes("Cần chúng tôi giúp gì?")),
+        preferencesSurveys.find(survey => survey.title.includes("What you want us to help you")),
         "✨ Bạn muốn chúng tôi giúp gì? ✨",
         null,
         submitWhatYouWantSurvey,
