@@ -13,18 +13,18 @@
               <tr>
                 <th>Thời gian</th>
                 <th>Hoạt động</th>
-                <th>Nội dung</th>
+                <!--<th>Nội dung</th>-->
               </tr>
             </thead>
             <tbody>
               <tr v-for="(activity, index) in recentActivities" :key="index">
                 <td>{{ activity.creationTime }}</td>
                 <td>{{ activity.action }}</td>
-                <td>
+                <!--<td>
                   <a href="/" class="text-decoration-none" v-if="activity.content.type == 'link'">{{
                     activity.content.display }}</a>
                   <span v-else>{{ activity.content.display }}</span>
-                </td>
+                </td>-->
               </tr>
             </tbody>
           </table>
@@ -45,7 +45,6 @@
 
 <script setup>
 import { ref, onBeforeMount } from "vue";
-import Chart from "chart.js/auto";
 import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
 import { formatISODateWithHMS, formatISODateWithDDMM } from '@/scripts/logic/common';
 import { getUserProfile } from '@/scripts/api/services/authService';
@@ -106,45 +105,43 @@ onBeforeMount(async () => {
     }
 
     let userId = userProfile.id;
-    ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
+  ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
 
-    var sentimentDataTask = getSentimentAnalysis();
-    var activityLogsTask = getActivityLogs({ pageSize: 128, CreatorId: userId });
+  var sentimentDataTask = getSentimentAnalysis();
+  var activityLogsTask = getActivityLogs({ pageSize: 128, CreatorId: userId });
 
-    await Promise.all([sentimentDataTask, activityLogsTask]);
-    const sentimentData = await sentimentDataTask;
-    const activityLogs = await activityLogsTask;
+  await Promise.all([sentimentDataTask, activityLogsTask]);
+  const sentimentData = await sentimentDataTask;
+  const activityLogs = await activityLogsTask;
 
-    console.log(sentimentData);
-    console.log(activityLogs);
 
-    if (!activityLogs || !Array.isArray(activityLogs)) {
+  if (!activityLogs || !Array.isArray(activityLogs)) {
       return;
+  }
+
+  let logs = activityLogs.map(log => {
+    let json = undefined;
+    try {
+      json = JSON.parse(log.content);
+    } catch (e) {
+      json = {};
     }
 
-    recentActivities.value = activityLogs.map(log => {
-      let json = undefined;
-      try {
-        json = JSON.parse(log.content);
-      } catch (e) {
-        json = {};
-      }
-
-      let action = '';
-      if (json && json.GenericType) {
-        action = safeGetDisplayName(json.GenericType);
-      } else {
+    let action = '';
+    if (json && json.GenericType) {
+      action = safeGetDisplayName(json.GenericType);
+    } else {
         action = 'Hoạt động chung';
-      }
+    }
 
-      let content = {
-        type: 'link',
-        display: 'Xem chi tiết...'
-      };
+    let content = {
+      type: 'link',
+      display: 'Xem chi tiết...'
+    };
 
-      try {
-        if ((!json.GenericType || json.GenericType == 'General_Activity_Created') && json.Content) {
-          let parsedContent;
+    try {
+    if ((!json.GenericType || json.GenericType == 'General_Activity_Created') && json.Content) {
+      let parsedContent;
           try {
             parsedContent = JSON.parse(json.Content);
           } catch (e) {
@@ -160,79 +157,86 @@ onBeforeMount(async () => {
           } catch (e) {
           }
 
-          if (parsedContent.question && parsedContent.answer) {
-            action = TRACKED_EVENTS.QuestionOfTheDay_Answered?.displayName || 'Trả lời câu hỏi ngày';
-            content = {
-              type: 'text',
-              display: parsedContent.question
-            };
-          }
-          else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated?.label) {
+      if (parsedContent.question && parsedContent.answer) {
+        action = TRACKED_EVENTS.QuestionOfTheDay_Answered?.displayName || 'Trả lời câu hỏi ngày';
+        content = {
+          type: 'text',
+          display: parsedContent.question
+        };
+      }
+      else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated?.label) {
             action = TRACKED_EVENTS.DiaryNote_Created?.displayName || 'Tạo nhật ký';
           }
           else if (parsedContent.event == TRACKED_EVENTS.Media_Viewed?.label) {
             action = TRACKED_EVENTS.Media_Viewed?.displayName || 'Xem phương tiện';
-          }
+      }
         }
       } catch (e) {
-      }
-
-      return {
-        creationTime: formatISODateWithHMS(log.creationTime),
-        action: action,
-        content: content
-      }
-    }).slice(0, 20);
-
-    if (!sentimentData || typeof sentimentData !== 'object') {
-      return;
     }
 
-    let labels = [];
-    let scores = {};
-    let activities = {};
+    return {
+      creationTime: formatISODateWithHMS(log.creationTime),
+      action: action,
+      content: content
+    }
+  })
+  
+  recentActivities.value = logs
+    .filter(_ => _.action
+      && _.action != TRACKED_EVENTS.DiaryNote_Updated.displayName
+      && _.action != TRACKED_EVENTS.Routine_Updated.displayName)
+    .slice(0, 20);
 
-    for (let date in sentimentData) {
+  if (!sentimentData || typeof sentimentData !== 'object') {
+    return;
+  }
+
+  let labels = [];
+  let scores = {};
+  let activities = {};
+
+  for (let date in sentimentData) {
       if (sentimentData[date] && typeof sentimentData[date].score === 'number') {
         labels.push(formatISODateWithDDMM(date, 'DD/MM'));
         scores[date] = sentimentData[date].score * -1;
       }
-    }
+  }
 
-    for (let date of labels) {
+  for (let date of labels) {
+    if (!activities[date])
       activities[date] = [];
-    }
+  }
 
-    for (let logItem of activityLogs) {
-      let date = formatISODateWithDDMM(logItem.creationTime, 'DD/MM');
+  for (let logItem of activityLogs) {
+    let date = formatISODateWithDDMM(logItem.creationTime, 'DD/MM');
       if (activities[date]) {
         activities[date].push(logItem);
       }
-    }
+  }
 
-    sentimentChartData.value = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Điểm số cảm xúc',
-          data: Object.values(scores),
-          borderColor: "#4CAF50",
-          backgroundColor: 'rgba(76, 175, 80, 0.2)',
-          fill: true,
-          tension: 0.3,
-          yAxisID: "y-mood",
-        },
-        {
-          label: "Số lượng hoạt động",
-          data: Object.values(activities).map(arr => arr.length),
-          borderColor: "#FFA726",
-          backgroundColor: "rgba(255, 167, 38, 0.2)",
-          tension: 0.3,
-          yAxisID: "y-activity",
-          fill: true,
-        }
-      ],
-    };
+  sentimentChartData.value = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Điểm số cảm xúc',
+        data: Object.values(scores),
+        borderColor: "#4CAF50",
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.3,
+        yAxisID: "y-mood",
+      },
+      {
+        label: "Điểm hoạt động",
+        data: Object.values(activities).map(arr => arr.length),
+        borderColor: "#FFA726",
+        backgroundColor: "rgba(255, 167, 38, 0.2)",
+        tension: 0.3,
+        yAxisID: "y-activity",
+        fill: true,
+      }
+    ],
+  };
   } catch (error) {
   }
 });

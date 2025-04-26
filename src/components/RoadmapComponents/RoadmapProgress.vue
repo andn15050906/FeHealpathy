@@ -38,13 +38,13 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Tiêu đề</th>
-                                            <th scope="col" class="text-center">Lặp lại lần</th>
+                                            <th scope="col" class="text-center">Số lần thực hiện</th>
                                             <th scope="col" class="text-center">Tiến độ</th>
                                             <th scope="col" class="text-center">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="item in phase.milestones" :key="item.id"
+                                        <tr v-for="item in phase.milestones?.sort((a,b) => a.index - b.index)" :key="item.id"
                                             :class="getMilestoneClass(item)">
                                             <td>{{ item.title }}</td>
                                             <td class="text-center">{{ item.repeatTimesRequired }}</td>
@@ -88,17 +88,21 @@ export default {
     },
     async beforeMount() {
         let tempRoadmap = await getCurrentRoadmapWithProgress();
-        let phasesProgress = await getProgress();
-        let completedMilestones = [];
-        for (let phaseProgress of phasesProgress) {
-            completedMilestones = [...completedMilestones, ...JSON.parse(phaseProgress.milestonesCompleted)]
-        }
+        let phasesProgress = (await getProgress()).progress;
+        let completedMilestones = phasesProgress.map(_ => _.milestone);
 
         for (let phase of tempRoadmap.phases) {
             let completedCount = 0;
             phase.totalMilestones = phase.milestones.length;
 
-            for (let milestone of phase.milestones) {
+            let belowLocked = false;
+            for (let milestone of phase.milestones.sort((a, b) => a.index - b.index)) {
+                if (belowLocked) {
+                    milestone.status = 'locked';
+                    milestone.progress = 'Hãy hoàn thành bước trước';
+                    continue;
+                }
+
                 if (tempRoadmap.isCompleted) {
                     milestone.status = 'completed';
                     milestone.progress = 'Đã hoàn thành';
@@ -112,18 +116,20 @@ export default {
                     }
                     else if (phase.index > tempRoadmap.currentPhase.index) {
                         milestone.status = 'locked';
-                        milestone.progress = 'Chưa bắt đầu';
+                        milestone.progress = 'Hãy hoàn thành bước trước';
                     }
-                    else {
-                        if (completedMilestones.includes(milestone.id)) {
-                            milestone.status = 'completed';
-                            milestone.progress = 'Đã hoàn thành';
-                            completedCount++;
-                        } else {
-                            milestone.status = 'current';
-                            milestone.progress = 'Đang thực hiện';
-                        }
+                    else if (completedMilestones.includes(milestone.id)) {
+                        milestone.status = 'completed';
+                        milestone.progress = 'Đã hoàn thành';
+                        completedCount++;
+                    } else {
+                        milestone.status = 'current';
+                        milestone.progress = 'Đang thực hiện';
                     }
+                }
+
+                if (milestone.status == 'current' && milestone.isRequired) {
+                    belowLocked = true;
                 }
             }
 

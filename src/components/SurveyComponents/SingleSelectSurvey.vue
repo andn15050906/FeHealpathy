@@ -7,7 +7,7 @@
         <v-card v-if="optionsRef.isReadOnly && result">
             <v-card-title><h4>{{ text.result }}</h4></v-card-title>
             <v-card-text class="test-result">
-                <p>{{ text.score }} <strong>{{ result.score }} / {{ result.maxScore }}</strong></p>
+                <p>{{ text.score }} <strong>{{ result.score <= result.maxScore ? result.score : result.maxScore }} / {{ result.maxScore }}</strong></p>
                 <span v-for="(band) in result.bands">
                     {{ renderBandName(band.name) }}: 
                     <span :class="`score-${band.ratingClass}`">{{ band.rating }}</span>
@@ -28,7 +28,7 @@
             </div>
         </div>
         <v-form ref="form" v-model="valid" lazy-validation @submit.prevent>
-            <v-row v-for="(question, index) in optionsRef.survey.questions" :key="index">
+            <v-row v-for="(question, index) in (optionsRef.survey?.questions ?? [])" :key="index">
                 <v-col v-if="!isSinglePage || currentQuestionIndex == index">
                     <v-card>
                         <v-card-title>
@@ -132,7 +132,6 @@ const resetSurvey = () => {
 const setSurveyAndAnswers = (options, choices) => {
     optionsRef.value = options;
     var calcResult = calcSurveyResult(optionsRef.value.survey, choices)
-    console.log(calcResult);
     submission.value = calcResult.answers;
     result.value = {
         score: calcResult.score,
