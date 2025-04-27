@@ -82,35 +82,36 @@
 
       <div v-else class="row">
         <div v-for="meeting in meetings" :key="meeting.id" class="col-4 mb-4">
-          <div class="meeting-card card h-100 border-2">
+          <div class="meeting-card card h-100 shadow-sm">
             <div class="meeting-header card-header d-flex justify-content-between align-items-center">
-              <h4 class="mb-0">Cuộc hẹn với {{ meeting.advisorName }}</h4>
+              <h5 class="mb-0 fw-bold">{{ meeting.advisorName }}</h5>
               <span :class="['badge', getBadgeClass(meeting.status)]">
                 {{ meeting.status }}
               </span>
             </div>
 
-            <div class="card-body text-center">
+            <div class="card-body">
               <div class="meeting-details">
-                <p>
-                  <i class="fas fa-calendar-day text-dark"></i>
-                  {{ formatISODateWithHMS(meeting.startAt) }}
-                </p>
-                <p>
-                  <i class="fas fa-clock text-dark"></i>
-                  {{ new Date(meeting.startAt).toLocaleTimeString('vi-VN') }} -
-                  {{ new Date(meeting.endAt).toLocaleTimeString('vi-VN') }}
-                </p>
-                <p v-if="meeting.description" class="meeting-description">
-                  <i class="fas fa-sticky-note text-dark"></i>
-                  {{ meeting.description }}
-                </p>
+                <div class="info-row mb-2">
+                  <i class="fas fa-calendar-day me-2"></i>
+                  <span>{{ formatISODateWithHMS(meeting.startAt) }}</span>
+                </div>
+                <div class="info-row mb-2">
+                  <i class="fas fa-clock me-2"></i>
+                  <span>
+                    {{ formatTime(meeting.startAt) }} - {{ formatTime(meeting.endAt) }}
+                  </span>
+                </div>
+                <div v-if="meeting.description" class="info-row description-container p-2 mt-2">
+                  <i class="fas fa-sticky-note me-2 align-self-start mt-1"></i>
+                  <p class="m-0 text-start">{{ meeting.description }}</p>
+                </div>
               </div>
             </div>
 
-            <div class="card-footer text-center">
-              <button @click="joinMeeting(meeting.id)" class="btn btn-success w-100">
-                <i class="fas fa-video"></i> Tham gia cuộc gọi
+            <div class="card-footer border-top-0 bg-white pb-3">
+              <button @click="joinMeeting(meeting.id)" class="btn btn-primary w-100">
+                <i class="fas fa-video me-2"></i> Tham gia cuộc họp
               </button>
             </div>
           </div>
@@ -151,6 +152,11 @@ function formatTimeForInput(date) {
   return date.toTimeString().substring(0, 5);
 }
 
+function formatTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
 function setDefaultValues() {
   const now = new Date();
   meetingDate.value = now.toLocaleDateString('en-CA');
@@ -188,10 +194,10 @@ async function loadMeetings() {
         ...m,
         advisorName:
           advisors.value.find(a => a.advisorId === m.advisorId)?.fullName ||
-          'Advisor',
+          'Chuyên gia',
       }));
   } catch {
-    console.error('Không thể tải danh sách cuộc họp');
+    toast.error('Không thể tải danh sách cuộc họp');
   }
 }
 
@@ -243,7 +249,7 @@ async function scheduleMeeting() {
     const startAt = new Date(`${meetingDate.value}T${startTime.value}`);
     const endAt = new Date(`${meetingDate.value}T${endTime.value}`);
     await createMeeting({
-      title: 'Cuộc họp với Advisor',
+      title: 'Cuộc họp với chuyên gia',
       startAt, endAt, maxParticipants: 2,
       participants: [
         { userId: getUserProfile().id, isHost: true },
@@ -257,7 +263,7 @@ async function scheduleMeeting() {
     notes.value = '';
     await loadMeetings();
   } catch {
-    console.error('Không thể đặt lịch họp');
+    toast.error('Không thể đặt lịch họp');
   } finally {
     isLoading.value = false;
   }
@@ -396,36 +402,57 @@ function joinMeeting(id) {
 }
 
 .meeting-card {
-  transition: all 0.3s ease;
-  border-width: 2px !important;
+  transition: all 0.25s ease;
+  border: none;
 }
 
 .meeting-card:hover {
-  border-color: #000000 !important;
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 .meeting-header {
-  border-bottom: 2px solid #dee2e6;
-  text-align: center;
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1rem;
 }
 
 .meeting-details {
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.meeting-details p {
-  margin: 10px 0;
-  color: #6c757d;
+.info-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  color: #495057;
+  font-size: 0.95rem;
 }
 
-.meeting-details i {
-  color: #000000;
-  font-size: 16px;
+.description-container {
+  display: flex;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #000000;
+}
+
+.description-container p {
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.card-footer {
+  padding-top: 0;
+}
+
+.btn-primary {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .no-meetings {
@@ -436,23 +463,6 @@ function joinMeeting(id) {
   font-size: 48px;
   color: #000000;
   opacity: 0.5;
-}
-
-.meeting-description {
-  background-color: #f8f9fa;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #dee2e6;
-  font-style: italic;
-  text-align: center;
-}
-
-.border-2 {
-  border-width: 2px !important;
-}
-
-.btn {
-  text-align: center;
 }
 
 .border-primary {

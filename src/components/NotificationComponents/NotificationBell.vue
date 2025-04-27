@@ -12,18 +12,10 @@
           Không có thông báo
         </div>
         <div v-else>
-          <div
-            class="notification-item"
-            v-for="(notification, index) in notifications"
-            :key="index"
-            :class="{ unread: !notification.read }"
-          >
+          <div class="notification-item" v-for="(notification, index) in notifications" :key="index"
+            :class="{ unread: !notification.read }">
             <p class="notification-content">{{ notification.content }}</p>
-            <button
-              class="mark-read-button"
-              v-if="!notification.read"
-              @click="markAsRead(index)"
-            >
+            <button class="mark-read-button" v-if="!notification.read" @click="markAsRead(index)">
               Đánh dấu đã đọc
             </button>
           </div>
@@ -55,9 +47,7 @@ export default {
   },
   computed: {
     unreadCount() {
-      return 0;
-      //return this.notifications.filter((notification) => !notification.read)
-      //  .length;
+      return this.notifications.filter((notification) => !notification.read).length;
     },
   },
   methods: {
@@ -83,9 +73,15 @@ export default {
         const response = await getNotifications({ ReceiverId: this.userId });
         const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
 
-        const notifications = response.items || response;
+        let notificationsData = [];
 
-        this.notifications = notifications.map((notification) => {
+        if (response && Array.isArray(response)) {
+          notificationsData = response;
+        } else if (response && response.items && Array.isArray(response.items)) {
+          notificationsData = response.items;
+        }
+
+        this.notifications = notificationsData.map((notification) => {
           let content = "";
           try {
             const parsed = JSON.parse(notification.message);
@@ -102,6 +98,7 @@ export default {
         });
       } catch (error) {
         console.error("Lỗi khi lấy thông báo:", error);
+        this.notifications = [];
       }
     },
   },
@@ -210,6 +207,7 @@ export default {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
