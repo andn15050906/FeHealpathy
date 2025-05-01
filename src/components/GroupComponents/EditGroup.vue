@@ -1,6 +1,6 @@
 <template>
     <div class="edit-conversation-container">
-        <h1 class="title">Edit Conversation</h1>
+        <h1 class="title">Chỉnh sửa cuộc hội thoại</h1>
         <v-form @submit.prevent="onSubmit" class="form">
             <!-- Conversation Title -->
             <v-text-field label="Conversation Name *" v-model="conversationInfo.title" maxlength="45" outlined required
@@ -9,48 +9,48 @@
             <!-- Privacy (Checkbox) -->
             <div class="custom-checkbox">
                 <input type="checkbox" v-model="conversationInfo.isPrivate" class="custom-checkbox__input" />
-                <label class="privateGroup">Private Conversation</label>
+                <label class="privateGroup">Cuộc hội thoại riêng tư</label>
             </div>
 
             <!-- Conversation Avatar -->
             <div class="form-input">
-                <label class="form-label">Conversation Avatar</label>
+                <label class="form-label">Ảnh đại diện cuộc hội thoại</label>
                 <div class="file-input-wrapper">
                     <input type="file" id="file-upload" @change="onFileChange" accept="image/*"
                         class="custom-file-input" />
                     <label for="file-upload" class="custom-file-label">
-                        Choose File
+                        Chọn tệp
                     </label>
-                    <span class="file-name">{{ conversationInfo.avatarUrl?.name || 'No file chosen' }}</span>
+                    <span class="file-name">{{ conversationInfo.avatarUrl?.name || 'Không có tệp được chọn' }}</span>
                 </div>
 
                 <!-- Image Preview -->
                 <div v-if="previewImage" class="image-preview">
-                    <img :src="previewImage" alt="Avatar Preview" class="preview-img" />
+                    <img :src="previewImage" alt="Ảnh đại diện" class="preview-img" />
                 </div>
             </div>
 
             <!-- Add Members -->
             <div class="form-input">
-                <label class="form-label">Add Members</label>
+                <label class="form-label">Thêm thành viên</label>
                 <v-autocomplete v-model="newMemberName" :items="userSearchResults" item-title="fullName" item-value="id"
-                    label="Search for users" @input="onUserSearch" return-object outlined />
+                    label="Tìm kiếm người dùng" @input="onUserSearch" return-object outlined />
                 <v-btn @click="addMember" color="secondary" :disabled="!newMemberName">
-                    Add Member
+                    Thêm thành viên
                 </v-btn>
             </div>
 
             <!-- Members List -->
             <div v-if="members.length > 0" class="members-list">
-                <p><strong>Members:</strong></p>
+                <p><strong>Thành viên:</strong></p>
                 <ul>
-                    <li v-for="(member, index) in members" :key="index">{{ member.name }} (Admin: {{ member.isAdmin ? 'Yes' : 'No' }})</li>
+                    <li v-for="(member, index) in members" :key="index">{{ member.name }} (Admin: {{ member.isAdmin ? 'Có' : 'Không' }})</li>
                 </ul>
             </div>
 
             <!-- Submit Button -->
             <v-btn type="submit" color="primary" :loading="isLoading" class="form-button">
-                Save Changes
+                Lưu thay đổi
             </v-btn>
         </v-form>
     </div>
@@ -103,10 +103,10 @@ onMounted(async () => {
 
             members.value = updatedMembers;
         } else {
-            console.warn("No conversation found with the given ID");
+            console.warn("Không tìm thấy cuộc hội thoại với ID đã cho");
         }
     } catch (error) {
-        console.error('Error fetching conversation:', error);
+        console.error('Lỗi khi lấy cuộc hội thoại:', error);
     }
 });
 
@@ -125,7 +125,7 @@ async function onSubmit() {
         await updateConversation(formData);
         router.push('/chat');
     } catch (error) {
-        console.error('Error updating conversation:', error);
+            console.error('Lỗi khi cập nhật cuộc hội thoại:', error);
     } finally {
         isLoading.value = false;
     }
@@ -142,13 +142,13 @@ async function onUserSearch(event) {
             userSearchResults.value = [];
         }
     } catch (error) {
-        console.error("Failed to fetch users", error);
+        console.error("Lỗi khi lấy người dùng:", error);
     }
 }
 
 function addMember() {
     if (newMemberName.value) {
-        console.log("Selected User:", newMemberName.value);
+        console.log("Người dùng đã chọn:", newMemberName.value);
         members.value.push({
             id: newMemberName.value.id,
             name: newMemberName.value.fullName,

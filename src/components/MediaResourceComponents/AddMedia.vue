@@ -11,7 +11,7 @@
                     <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-secondary"></i>
                     <p class="mb-3">Kéo và thả file MP3/MP4 vào đây hoặc nhấp để chọn</p>
                     <button type="button" class="btn btn-outline-primary px-4" @click="triggerFileInput">
-                        Chọn File
+                        Chọn tệp
                     </button>
                 </div>
                 <div v-else class="py-3">
@@ -20,7 +20,7 @@
                     <p class="h5 mb-1 text-primary">{{ newMedia.file.name }}</p>
                     <p class="text-muted mb-2">{{ (newMedia.file.size / (1024 * 1024)).toFixed(2) }} MB</p>
                     <button type="button" class="btn btn-sm btn-outline-secondary" @click.stop="newMedia.file = null">
-                        Đổi File
+                        Đổi tệp
                     </button>
                 </div>
                 <input type="file" accept=".mp3, .mp4" class="d-none" ref="fileInput" @change="handleFileSelect" />
@@ -277,8 +277,8 @@ export default {
 
                 this.$emit("add-media", formData);
             } catch (err) {
-                this.error = "Failed to add media. Please try again.";
-                console.error("Add media error:", err);
+                this.error = "Không thể thêm tài nguyên. Vui lòng thử lại.";
+                console.error("Lỗi thêm tài nguyên:", err);
             } finally {
                 this.loading = false;
                 this.resetForm();

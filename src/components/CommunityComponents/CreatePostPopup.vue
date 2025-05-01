@@ -13,7 +13,7 @@
 
                 <v-card-text class="form-header d-flex align-center py-4">
                     <v-avatar size="50" class="mr-3">
-                        <v-img :src="userProfile.avatarUrl" alt="User Avatar" />
+                        <v-img :src="userProfile.avatarUrl" alt="Anh người dùng" />
                     </v-avatar>
 
                     <div>
@@ -138,7 +138,7 @@ export default {
                     type: "negative",
                     message: "Có lỗi xảy ra khi đăng bài.",
                 });
-                console.error("Submit post error:", error);
+                console.error("Lỗi đăng bài:", error);
             } finally {
                 this.isSubmitting = false; // Reset loading state
             }

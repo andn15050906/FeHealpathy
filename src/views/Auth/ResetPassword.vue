@@ -2,11 +2,11 @@
   <div class="reset-password-container">
     <h1>Reset Password</h1>
     <form @submit.prevent="handleResetPassword">
-      <label for="newPassword">New Password:</label>
+      <label for="newPassword">Mật khẩu mới:</label>
       <input v-model="newPassword" type="password" id="newPassword" required />
-      <label for="confirmPassword">Confirm Password:</label>
+      <label for="confirmPassword">Xác nhận mật khẩu:</label>
       <input v-model="confirmPassword" type="password" id="confirmPassword" required />
-      <button type="submit">Reset Password</button>
+      <button type="submit">Khôi phục mật khẩu</button>
       <div v-if="message" :class="{ 'error-message': !isSuccess, 'success-message': isSuccess }">
         {{ message }}
       </div>
@@ -29,7 +29,7 @@ const isSuccess = ref(false);
 
 const handleResetPassword = async () => {
   if (newPassword.value !== confirmPassword.value) {
-    message.value = 'Passwords do not match!';
+    message.value = 'Mật khẩu không khớp!';
     isSuccess.value = false;
     return;
   }
@@ -39,11 +39,11 @@ const handleResetPassword = async () => {
 
   try {
     await resetPassword(email, token, newPassword.value);
-    message.value = 'Password reset successful!';
+    message.value = 'Khôi phục mật khẩu thành công!';
     isSuccess.value = true;
     setTimeout(() => router.push({ name: 'signIn' }), 2000);
   } catch (error) {
-    message.value = 'Password reset failed. Please try again.';
+    message.value = 'Khôi phục mật khẩu thất bại. Vui lòng thử lại.';
     isSuccess.value = false;
   }
 };

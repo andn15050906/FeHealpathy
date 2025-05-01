@@ -1,8 +1,8 @@
 <template>
   <div v-if="!isPremium">
     <div class="premium-alert">
-      <h2 class="hero-title">Premium Content Only</h2>
-      <p>You need a premium account to access this content.</p>
+      <h2 class="hero-title">Nội dung Premium</h2>
+      <p>Bạn cần tài khoản premium để truy cập nội dung này.</p>
     </div>
     <AccountUpgrade></AccountUpgrade>
   </div>

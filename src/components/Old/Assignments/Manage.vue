@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid" style="margin-top: 40px;">
-    <h1 style="font-size: 36px; text-align: center; margin-bottom: 12px">Manage Assignments</h1>
+    <h1 style="font-size: 36px; text-align: center; margin-bottom: 12px">Quản lý bài tập</h1>
 
     <div class="card shadow mb-4">
       <div class="card-body">
@@ -8,15 +8,15 @@
           <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
               <tr>
-                <th class="text-center">Name</th>
-                <th class="text-center">Duration (sec)</th>
-                <th class="text-center">Number of questions</th>
-                <th class="text-center">Section</th>
+                <th class="text-center">Tên</th>
+                <th class="text-center">Thời gian (giây)</th>
+                <th class="text-center">Số câu hỏi</th>
+                <th class="text-center">Môn học</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="assignments.length === 0">
-                <th style="text-align: center; color: red" colspan="4">Empty</th>
+                <th style="text-align: center; color: red" colspan="4">Trống</th>
               </tr>
               <tr v-for="assignment in assignments" :key="assignment.id">
                 <td>
@@ -56,11 +56,11 @@ export default {
     return {
       courseId: this.courseId,
       course: {},
-      assignments: [], // Array to hold assignment data
+      assignments: [], // Mảng để lưu trữ dữ liệu bài tập
     };
   },
   mounted() {
-    // Fetch the assignment data when the component is mounted
+    // Lấy dữ liệu bài tập khi component được mounted
     this.getCourseDetail();
     this.getByCourse();
   },

@@ -1,20 +1,20 @@
 <template>
   <div class="moderate-content">
-    <h1 class="title">Moderate Uploaded Content</h1>
+    <h1 class="title">Kiểm duyệt nội dung tải lên</h1>
 
     <div class="content-header">
       <div class="filters">
         <select v-model="selectedType" class="filter-select">
-          <option value="all">All Types</option>
-          <option value="image">Images</option>
-          <option value="video">Videos</option>
-          <option value="document">Documents</option>
+          <option value="all">Tất cả loại</option>
+          <option value="image">Hình ảnh</option>
+          <option value="video">Video</option>
+          <option value="document">Tài liệu</option>
         </select>
         <select v-model="selectedStatus" class="filter-select">
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="all">Tất cả trạng thái</option>
+          <option value="pending">Chờ duyệt</option>
+          <option value="approved">Đã duyệt</option>
+          <option value="rejected">Đã từ chối</option>
         </select>
       </div>
       <div class="search-box">
@@ -22,7 +22,7 @@
         <input
           type="text"
           v-model="searchQuery"
-          placeholder="Search content..."
+          placeholder="Tìm kiếm nội dung..."
           class="search-input"
         />
       </div>
@@ -52,13 +52,13 @@
           </span>
         </div>
         <div class="content-actions">
-          <button class="btn btn-view" @click="viewContent(content)" title="View Details">
+          <button class="btn btn-view" @click="viewContent(content)" title="Xem chi tiết">
             <i class="fas fa-eye"></i>
           </button>
-          <button class="btn btn-approve" @click="approveContent(content)" title="Approve">
+          <button class="btn btn-approve" @click="approveContent(content)" title="Duyệt">
             <i class="fas fa-check"></i>
           </button>
-          <button class="btn btn-reject" @click="rejectContent(content)" title="Reject">
+          <button class="btn btn-reject" @click="rejectContent(content)" title="Từ chối">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -69,7 +69,7 @@
       <button :disabled="currentPage === 1" @click="currentPage--">
         <i class="fas fa-chevron-left"></i>
       </button>
-      <span>Page {{ currentPage }} / {{ totalPages }}</span>
+      <span>Trang {{ currentPage }} / {{ totalPages }}</span>
       <button :disabled="currentPage === totalPages" @click="currentPage++">
         <i class="fas fa-chevron-right"></i>
       </button>
@@ -90,7 +90,7 @@ export default {
         {
           id: 1,
           type: 'image',
-          title: 'Health Image 1',
+          title: 'Hình ảnh sức khỏe 1',
           url: 'https://example.com/image1.jpg',
           uploader: 'John Doe',
           uploadDate: '2024-03-15',
@@ -99,7 +99,7 @@ export default {
         {
           id: 2,
           type: 'video',
-          title: 'Exercise Tutorial',
+          title: 'Bài tập thể dục 1',
           url: 'https://example.com/video1.mp4',
           uploader: 'Jane Smith',
           uploadDate: '2024-03-14',
@@ -108,7 +108,7 @@ export default {
         {
           id: 3,
           type: 'document',
-          title: 'Health Guidelines',
+          title: 'Hướng dẫn sức khỏe 1',
           url: 'https://example.com/doc1.pdf',
           uploader: 'Mike Johnson',
           uploadDate: '2024-03-13',
@@ -145,14 +145,14 @@ export default {
   },
   methods: {
     viewContent(content) {
-      console.log('View details:', content)
+      console.log('Xem chi tiết:', content)
     },
     approveContent(content) {
-      console.log('Approve content:', content)
+      console.log('Duyệt nội dung:', content)
       content.status = 'approved'
     },
     rejectContent(content) {
-      console.log('Reject content:', content)
+      console.log('Từ chối nội dung:', content)
       content.status = 'rejected'
     }
   },

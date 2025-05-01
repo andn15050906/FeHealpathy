@@ -3,16 +3,16 @@
     :centered="true"></StatisticsTabs>
 
   <div class="container">
-    <h1 id="title" style="text-align: center">Activity Statistics</h1>
+    <h1 id="title" style="text-align: center">Thống kê hoạt động</h1>
 
     <div class="section">
-      <h2>📌 Recent Notable Activities</h2>
+      <h2>📌 Các hoạt động gần đây</h2>
       <table>
         <thead>
           <tr>
-            <th>Time</th>
-            <th>Action</th>
-            <th>Content</th>
+            <th>Thời gian</th>
+            <th>Hoạt động</th>
+            <th>Nội dung</th>
           </tr>
         </thead>
         <tbody>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="section">
-      <h2>📈 Mood & Activity Trends</h2>
+      <h2>📈 Xu hướng cảm xúc và hoạt động</h2>
       <Line :data="sentimentChartData" :options="sentimentChartOptions" />
     </div>
   </div>
@@ -63,14 +63,14 @@ const sentimentChartOptions = ref({
       position: "left",
       //beginAtZero: true,
       //max: 100,
-      title: { display: true, text: "Sentiment Score" },
+      title: { display: true, text: "Điểm số cảm xúc" },
       //ticks: { callback: (value) => value + "%" },
     },
     "y-activity": {
       type: "linear",
       position: "right",
       beginAtZero: true,
-      title: { display: true, text: "Activeness" },
+      title: { display: true, text: "Hoạt động" },
     },
   }
 });
@@ -164,7 +164,7 @@ onBeforeMount(async () => {
     labels: labels,
     datasets: [
       {
-        label: 'Sentiment score',
+        label: 'Điểm số cảm xúc',
         data: Object.values(scores),
         borderColor: "#4CAF50",
         backgroundColor: 'rgba(76, 175, 80, 0.2)',
@@ -173,7 +173,7 @@ onBeforeMount(async () => {
         yAxisID: "y-mood",
       },
       {
-        label: "Activity Count",
+        label: "Số lượng hoạt động",
         data: Object.values(activities).map(_ => _.length),
         borderColor: "#FFA726",
         backgroundColor: "rgba(255, 167, 38, 0.2)",

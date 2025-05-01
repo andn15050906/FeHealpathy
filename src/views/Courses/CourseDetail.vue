@@ -289,7 +289,7 @@ export default {
         return;
       }
 
-      console.log("Redirecting to lecture with ID:", lectureId);
+      console.log("Chuyển hướng đến bài giảng với ID:", lectureId);
       
       router.push({ 
         name: 'lectureDetail',

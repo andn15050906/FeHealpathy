@@ -38,7 +38,7 @@
       </div>
 
       <div class="text-secondary py-3">
-        © 2025 Healpathy. All rights reserved.
+        © 2025 Healpathy. Tất cả quyền được bảo lưu.
       </div>
     </div>
   </footer>

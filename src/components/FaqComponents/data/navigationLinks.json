@@ -1,55 +1,55 @@
 {
-  "Getting Started": [
+  "Bắt đầu": [
     {
-      "name": "How to create an account"
+      "name": "Cách tạo tài khoản"
     },
     {
-      "name": "Profile setup guide"
+      "name": "Hướng dẫn thiết lập hồ sơ"
     },
     {
-      "name": "Security and privacy"
+      "name": "Bảo mật và quyền riêng tư"
     },
     {
-      "name": "Basic navigation"
+      "name": "Điều hướng cơ bản"
     }
   ],
-  "Health Tracking": [
+  "Theo dõi sức khỏe": [
     {
-      "name": "Track your daily activities"
+      "name": "Theo dõi hoạt động hàng ngày"
     },
     {
-      "name": "Monitor health metrics"
+      "name": "Giám sát chỉ số sức khỏe"
     },
     {
-      "name": "Set health goals"
+      "name": "Đặt mục tiêu sức khỏe"
     },
     {
-      "name": "View progress reports"
+      "name": "Xem báo cáo tiến độ"
     }
   ],
-  "Community Features": [
+  "Tính năng cộng đồng": [
     {
-      "name": "Join health groups"
+      "name": "Tham gia nhóm sức khỏe"
     },
     {
-      "name": "Participate in discussions"
+      "name": "Tham gia thảo luận"
     },
     {
-      "name": "Share experiences"
+      "name": "Chia sẻ trải nghiệm"
     },
     {
-      "name": "Connect with others"
+      "name": "Kết nối với mọi người"
     }
   ],
-  "Support & Help": [
+  "Hỗ trợ & Trợ giúp": [
     {
-      "name": "Contact support team"
+      "name": "Liên hệ đội ngũ hỗ trợ"
     },
     {
-      "name": "Report issues"
+      "name": "Báo cáo vấn đề"
     },
     {
-      "name": "Feedback submission"
+      "name": "Gửi phản hồi"
     }
   ]
 }

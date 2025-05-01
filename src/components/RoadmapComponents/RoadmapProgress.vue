@@ -2,7 +2,7 @@
     <v-container>
         <v-card>
             <v-card-title>
-                <h1>Your roadmap progress</h1>
+                <h1>Tiến độ lộ trình</h1>
             </v-card-title>
             <v-card-text>
                 <p>{{ roadmap.introText }}</p>
@@ -55,18 +55,18 @@ export default {
     computed: {
         getTableHeaders() {
             return [
-                { title: 'Milestone Title', value: 'title', align: 'center' },
-                { title: 'Repeat Times Required', value: 'repeatTimesRequired', align: 'center' },
+                { title: 'Tiêu đề', value: 'title', align: 'center' },
+                { title: 'Lặp lại lần', value: 'repeatTimesRequired', align: 'center' },
                 /*{ title: 'Time Spent Required', value: 'timeSpentRequired', align: 'center' },*/
-                { title: 'Progress', value: 'progress', align: 'center' },
-                { title: 'Action', value: 'eventName', align: 'center' }
+                { title: 'Tiến độ', value: 'progress', align: 'center' },
+                { title: 'Hành động', value: 'eventName', align: 'center' }
             ];
         }
     },
     data() {
         return {
             text: {
-                Follow: 'Follow'
+                Follow: 'Theo dõi'
             },
             activeTab: null,
             roadmap: {},
@@ -88,27 +88,27 @@ export default {
             for (let milestone of phase.milestones) {
                 if (tempRoadmap.isCompleted) {
                     milestone.status = 'completed';
-                    milestone.progress = 'Completed';
+                    milestone.progress = 'Đã hoàn thành';
                     completedCount++;
                 }
                 else if (tempRoadmap.currentPhase) {
                     if (phase.index < tempRoadmap.currentPhase.index) {
                         milestone.status = 'completed';
-                        milestone.progress = 'Completed';
+                        milestone.progress = 'Đã hoàn thành';
                         completedCount++;
                     }
                     else if (phase.index > tempRoadmap.currentPhase.index) {
                         milestone.status = 'locked';
-                        milestone.progress = 'Not Started';
+                        milestone.progress = 'Chưa bắt đầu';
                     }
                     else {
                         if (completedMilestones.includes(milestone.id)) {
                             milestone.status = 'completed';
-                            milestone.progress = 'Completed';
+                            milestone.progress = 'Đã hoàn thành';
                             completedCount++;
                         } else {
                             milestone.status = 'current';
-                            milestone.progress = 'In Progress';
+                            milestone.progress = 'Đang thực hiện';
                         }
                     }
                 }
@@ -166,7 +166,7 @@ export default {
             return `milestone-${milestone.status || 'locked'}`;
         },
         getProgressText(milestone) {
-            return milestone.progress || 'Not Started';
+            return milestone.progress || 'Chưa bắt đầu';
         },
         getProgressIcon(milestone) {
             switch(milestone.status) {

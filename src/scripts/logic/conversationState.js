@@ -14,7 +14,7 @@ export class VideoHandler {
 
     turnOn(stream) {
         if (!this.#isOn) {
-            console.log("turning on video...");
+            console.log("Bắt đầu video...");
             this.#isOn = true;
             this.turnOnVideo(stream);
         }
@@ -35,11 +35,6 @@ export class VideoHandler {
         this.#stream.getVideoTracks().forEach((track) => track.stop());
         this.#videoContainer.parentElement.removeChild(this.#videoContainer);
     }
-
-
-
-
-
 
     turnOnVideo(stream) {
         this.#stream = stream;

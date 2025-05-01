@@ -3,22 +3,22 @@
     <button class="btn btn-outline-secondary back-button" @click="goBack">
       <i class="fas fa-arrow-left"></i> Quay lại
     </button>
-    <h1 class="title">Yoga For Beginners | Day 01 | Hye Yoga</h1>
+    <h1 class="title">Yoga cho người bắt đầu | Ngày 01 | Hye Yoga</h1>
     <p class="category">Cơ Bản</p>
 
     <div class="video-container">
       <iframe class="video" src="https://www.youtube.com/embed/iSS4asEmIfE"
-        title="Yoga For Beginners | Day 01 | Hye Yoga" frameborder="0"
+        title="Yoga cho người bắt đầu | Ngày 01 | Hye Yoga" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe>
     </div>
 
     <div class="actions text-center">
       <button @click="likeExercise" class="btn btn-danger me-2">
-        <i class="fas fa-heart"></i> Like
+        <i class="fas fa-heart"></i> Thích
       </button>
       <button @click="shareExercise" class="btn btn-primary">
-        <i class="fas fa-share-alt"></i> Share
+        <i class="fas fa-share-alt"></i> Chia sẻ
       </button>
     </div>
 

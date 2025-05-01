@@ -1,24 +1,24 @@
 <template>
     <div class="container my-5">
-        <h1 class="text-center mb-4">Edit Survey</h1>
+        <h1 class="text-center mb-4">Chỉnh sửa khảo sát</h1>
 
         <div class="card mb-4">
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label">Survey Name *</label>
-                    <input v-model="survey.name" type="text" class="form-control" placeholder="Enter survey name" />
+                    <label class="form-label">Tên khảo sát *</label>
+                    <input v-model="survey.name" type="text" class="form-control" placeholder="Nhập tên khảo sát" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Description *</label>
+                    <label class="form-label">Mô tả *</label>
                     <textarea v-model="survey.description" class="form-control" rows="3"
-                        placeholder="Enter survey description"></textarea>
+                        placeholder="Nhập mô tả khảo sát"></textarea>
                 </div>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-body">
-                <label class="form-label">Upload Questions JSON File</label>
+                <label class="form-label">Tải lên tệp câu hỏi JSON</label>
                 <input type="file" class="form-control" @change="handleFileUpload" accept="application/json" />
             </div>
         </div>
@@ -26,29 +26,29 @@
         <div v-if="questions.length" class="mb-4">
             <div v-for="(question, questionIndex) in questions" :key="questionIndex" class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Question {{ questionIndex + 1 }}</h2>
+                    <h2 class="h5 mb-0">Câu hỏi {{ questionIndex + 1 }}</h2>
                     <button class="btn btn-danger btn-sm" @click="removeQuestion(questionIndex)">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Question Content *</label>
+                        <label class="form-label">Nội dung câu hỏi *</label>
                         <input v-model="question.content" type="text" class="form-control"
-                            placeholder="Enter question content" />
+                            placeholder="Nhập nội dung câu hỏi" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Explanation *</label>
+                        <label class="form-label">Giải thích *</label>
                         <input v-model="question.explanation" type="text" class="form-control"
-                            placeholder="Enter explanation" />
+                            placeholder="Nhập giải thích" />
                     </div>
                     <div class="mb-3">
-                        <h3 class="h6">Answers</h3>
+                        <h3 class="h6">Câu trả lời</h3>
                         <div v-for="(answer, answerIndex) in question.answers" :key="answerIndex"
                             class="row align-items-center mb-1">
                             <div class="col-md-10">
                                 <input v-model="answer.content" type="text" class="form-control"
-                                    :placeholder="'Answer ' + (answerIndex + 1)" />
+                                    :placeholder="'Câu trả lời ' + (answerIndex + 1)" />
                             </div>
                             <div class="col-md-2 text-end">
                                 <button class="btn btn-danger btn-sm" @click="removeAnswer(questionIndex, answerIndex)">
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <button class="btn btn-secondary btn-sm" @click.prevent="addAnswer(questionIndex)">
-                            Add Answer
+                            Thêm câu trả lời
                         </button>
                     </div>
                 </div>
@@ -66,18 +66,18 @@
 
         <div class="mb-3 text-end">
             <button class="btn btn-secondary" @click="addQuestion">
-                Add New Question
+                Thêm câu hỏi mới
             </button>
         </div>
 
         <div class="d-flex justify-content-between">
             <button class="btn btn-danger" @click="$emit('cancel')">
-                Cancel
+                Hủy bỏ
             </button>
             <button class="btn btn-success" :disabled="isLoading" @click="updateSurveyData">
                 <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
                     aria-hidden="true"></span>
-                Save Survey
+                Lưu khảo sát
             </button>
         </div>
     </div>
@@ -121,7 +121,7 @@ function handleFileUpload(event) {
                 questions.value = parsed;
             }
         } catch (error) {
-            console.error("Error parsing JSON file:", error);
+            console.error("Lỗi khi phân tích tệp JSON:", error);
         }
     };
     reader.readAsText(file);
@@ -169,7 +169,7 @@ async function updateSurveyData() {
         const response = await updateSurvey(payload);
         emits("surveyUpdated");
     } catch (error) {
-        console.error("Error updating survey:", error);
+        console.error("Lỗi khi cập nhật khảo sát:", error);
     } finally {
         isLoading.value = false;
     }

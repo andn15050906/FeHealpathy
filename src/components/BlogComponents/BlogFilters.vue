@@ -8,14 +8,14 @@
                 @click.native="handleTagClick(tag)" />
         </nav>
         <div class="sort-wrapper">
-            <label for="sort-select" class="sort-label">Sort By:</label>
+            <label for="sort-select" class="sort-label">Sắp xếp theo:</label>
             <div class="sort-options">
                 <button class="sort-btn" :class="{ 'active': sortOrder === 'newest' }" @click="handleSort('newest')">
-                    Newest
+                    Mới nhất
                 </button>
                 <button class="sort-btn" :class="{ 'active': sortOrder === 'mostView' }"
                     @click="handleSort('mostView')">
-                    Most View
+                    Xem nhiều nhất
                 </button>
             </div>
         </div>

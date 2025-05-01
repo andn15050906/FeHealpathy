@@ -1,16 +1,16 @@
 <template>
   <div v-if="!isEditingYoga" class="py-4">
     <div class="card-body">
-      <h1 class="text-center mb-4"><i class="fas fa-spa"></i> Yoga Management</h1>
+      <h1 class="text-center mb-4"><i class="fas fa-spa"></i> Quản lý Yoga</h1>
       <div class="text-center mb-3">
         <router-link :to="{ name: 'CreateYoga' }">
           <button class="btn btn-success">
-            <i class="fas fa-plus-circle"></i> Create A Yoga Lesson
+            <i class="fas fa-plus-circle"></i> Tạo bài tập Yoga
           </button>
         </router-link>
       </div>
 
-      <p v-if="isLoading" class="text-center">Loading data...</p>
+      <p v-if="isLoading" class="text-center">Đang tải dữ liệu...</p>
 
       <div v-if="!isLoading">
         <div v-if="yogas.length" class="list-group">
@@ -19,19 +19,19 @@
               width="150" height="100">
             <div class="flex-grow-1">
               <h5>{{ yoga.title }}</h5>
-              <p class="text-muted">Date: {{ formattedDate(yoga.creationTime) }}</p>
+              <p class="text-muted">Ngày tạo: {{ formattedDate(yoga.creationTime) }}</p>
             </div>
             <div>
               <button class="btn btn-warning me-2" @click="editYoga(yoga)">
-                <i class="fas fa-edit"></i> Update
+                <i class="fas fa-edit"></i> Cập nhật
               </button>
               <button class="btn btn-danger" @click="openDeletePopup(yoga)">
-                <i class="fas fa-trash"></i> Delete
+                <i class="fas fa-trash"></i> Xóa
               </button>
             </div>
           </div>
         </div>
-        <p v-else class="text-center text-muted">No yoga lessons available!</p>
+        <p v-else class="text-center text-muted">Không có bài tập Yoga!</p>
       </div>
     </div>
 
@@ -39,7 +39,7 @@
   </div>
 
   <UpdateYoga v-if="isEditingYoga" :yogaData="selectedYoga" @yogaUpdated="handleYogaUpdated" />
-  <DeleteConfirmPopup :message="'Are you sure you want to delete this yoga lesson?'" :isVisible="isDeletePopupVisible"
+  <DeleteConfirmPopup :message="'Bạn có chắc chắn muốn xóa bài tập Yoga này?'" :isVisible="isDeletePopupVisible"
     @confirmDelete="handleDeleteConfirm" @update:isVisible="isDeletePopupVisible = $event" />
 </template>
 
@@ -74,7 +74,7 @@ export default {
           await deleteCourse(this.yogaToDelete.id);
           this.fetchYogas();
         } catch (error) {
-          alert("Error deleting yoga lesson. Please try again.");
+          alert("Lỗi khi xóa bài tập Yoga. Vui lòng thử lại.");
         } finally {
           this.isDeletePopupVisible = false;
           this.yogaToDelete = null;
@@ -103,7 +103,7 @@ export default {
           this.totalPages = 1;
         }
       } catch (error) {
-        console.error("Error fetching yoga lessons:", error);
+        console.error("Lỗi khi tải bài tập Yoga:", error);
         this.yogas = [];
         this.totalCount = 0;
         this.totalPages = 1;

@@ -14,12 +14,12 @@ function ConvertToDateAndTime(isoDate) {
 function readErr(error) {
     if (!error.response) {
         console.log(error);
-        return 'An Error Occured!';
+        return 'Đã xảy ra lỗi!';
     }
 
     let data = error.response.data;
     let errorMessage;
-    if (data.status == 400 && data.title == "One or more validation errors occurred.") {
+    if (data.status == 400 && data.title == "Một hoặc nhiều lỗi kiểm tra dữ liệu đã xảy ra.") {
         // return the first ASP.NET validation error
         let firstProp = Object.values(data.errors)[0]
         errorMessage = firstProp[0];
@@ -36,7 +36,7 @@ function readErr(error) {
         return errorMessage.substring(5);
     }
 
-    return 'An Error Occured!';
+    return 'Đã xảy ra lỗi!';
 }
 
 
@@ -104,7 +104,7 @@ export const formatISODateWithHMS = (isoDate) => {
     const date = new Date(isoDate);
     
     if (isNaN(date)) {
-        throw new Error('Invalid date format');
+        throw new Error('Định dạng ngày tháng không hợp lệ');
     }
     
     const options = {
@@ -117,7 +117,7 @@ export const formatISODateWithHMS = (isoDate) => {
         hour12: false
     };
     
-    return date.toLocaleString('en-US', options);;
+    return date.toLocaleString('vi-VN', options);;
 }
 
 export const reactionMap = {

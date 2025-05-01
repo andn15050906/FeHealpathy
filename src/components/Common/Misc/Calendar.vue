@@ -22,7 +22,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </div>      
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
@@ -87,7 +87,7 @@
             </div>
           </div>
         </transition>
-        <button class="add-event-btn" @click="openNewEventForm">
+        <button v-if="!isDateBeforeToday" class="add-event-btn" @click="openNewEventForm">
           <i class="fa-solid fa-plus"></i> Thêm thói quen mới
         </button>
       </div>
@@ -109,11 +109,13 @@
           </div>
           <div class="form-group">
             <label for="description">Mô tả</label>
+            <label for="description">Mô tả</label>
             <textarea id="description" v-model="newEvent.description" class="form-input"
               placeholder="Nhập mô tả Thói quen" @input="validateDescriptionConstraints"></textarea>
             <div v-if="descriptionError" class="error-message" style="color: #e74c3c;">{{ descriptionError }}</div>
           </div>
           <div class="form-group">
+            <label for="objective">Mục tiêu</label>
             <label for="objective">Mục tiêu</label>
             <input id="objective" v-model="newEvent.objective" class="form-input"
               placeholder="Nhập mục tiêu (không bắt buộc)" />
@@ -152,9 +154,11 @@
           <div class="form-group time-group">
             <div>
               <label for="startTime">Thời gian bắt đầu</label>
+              <label for="startTime">Thời gian bắt đầu</label>
               <input id="startTime" type="time" v-model="newEvent.startTime" class="form-input" />
             </div>
             <div>
+              <label for="endTime">Thời gian kết thúc</label>
               <label for="endTime">Thời gian kết thúc</label>
               <input id="endTime" type="time" v-model="newEvent.endTime" class="form-input" />
             </div>
@@ -205,7 +209,10 @@ import {
   addMonths,
   isSameDay as dfIsSameDay,
   isSameMonth,
-  format
+  format,
+  isAfter,
+  isBefore,
+  startOfDay
 } from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 import { Chart, registerables } from "chart.js";
@@ -379,6 +386,11 @@ export default {
     },
     remainingCount() {
       return this.currentEvents.filter(task => !task.completed && !task.closed).length;
+    },
+    isDateBeforeToday() {
+      const today = startOfDay(new Date());
+      const selectedDay = startOfDay(this.selectedDate);
+      return isBefore(selectedDay, today);
     }
   },
   mounted() {
@@ -390,7 +402,7 @@ export default {
           const deadline = getDeadline(event);
           if (now > deadline) {
             event.closed = true;
-            toast.error("Event closed due to deadline!", { duration: 150, position: "bottom-center" });
+            toast.error("Sự kiện đã được đóng do thời hạn!", { duration: 150, position: "bottom-center" });
             this.renderChart();
           }
         }
@@ -504,6 +516,8 @@ export default {
       });
     },
     openNewEventForm() {
+      if (this.isDateBeforeToday) return;
+
       this.isEditing = false;
       this.timeError = "";
       this.titleError = "";
@@ -674,7 +688,7 @@ export default {
       this.chartInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Đã hoàn thành", "Còn lại", "Đã đóng"],
+          labels: ["Đã hoàn thành", "Còn lại", "Chưa hoàn thành"],
           datasets: [
             {
               data: progressData,

@@ -110,9 +110,9 @@ export default {
             avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
           };
         }
-        console.log("User role:", this.user.role);
+        console.log("Vai trò người dùng:", this.user.role);
       } catch (error) {
-        console.error('Error fetching user status:', error);
+          console.error('Lỗi khi lấy trạng thái người dùng:', error);
       }
     },
 
@@ -136,7 +136,7 @@ export default {
         this.user = { name: '', role: '', avatarUrl: '' };
         this.$router.push({ name: 'signIn' });
       } catch (error) {
-        console.error('Error signing out:', error);
+        console.error('Lỗi khi đăng xuất:', error);
       }
     },
 

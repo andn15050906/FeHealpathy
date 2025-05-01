@@ -1,11 +1,11 @@
 <template>
   <div v-if="!isEditingBlog">
     <div class="blog-management">
-      <h1 class="title"><i class="fas fa-edit"></i> Blog Management</h1>
+      <h1 class="title"><i class="fas fa-edit"></i> Quản lý bài viết</h1>
       <div class="header-actions">
         <router-link to="/blogs/create">
           <button class="btn btn-success create-blog-btn">
-            <i class="fas fa-plus"></i> Create Blog
+            <i class="fas fa-plus"></i> Tạo bài viết
           </button>
         </router-link>
       </div>
@@ -20,14 +20,14 @@
               <div class="card-body blog-details d-flex flex-column h-100">
                 <h5 class="card-title blog-title">{{ blog.title }}</h5>
                 <p class="card-text blog-date text-muted">
-                  <small>Published: {{ formattedDate(blog.creationTime) }}</small>
+                  <small>Đăng tải: {{ formattedDate(blog.creationTime) }}</small>
                 </p>
                 <div class="actions mt-auto">
                   <button class="btn btn-warning edit me-2" @click="editBlog(blog)">
-                    <i class="fas fa-pencil-alt"></i> Edit
+                    <i class="fas fa-pencil-alt"></i> Sửa
                   </button>
                   <button class="btn btn-danger delete" @click="openDeletePopup(blog)">
-                    <i class="fas fa-trash-alt"></i> Delete
+                    <i class="fas fa-trash-alt"></i> Xóa
                   </button>
                 </div>
               </div>
@@ -36,12 +36,12 @@
         </div>
       </div>
 
-      <p v-if="blogs.length === 0" class="no-blogs alert alert-info text-center">No blogs have been published yet!</p>
+      <p v-if="blogs.length === 0" class="no-blogs alert alert-info text-center">Chưa có bài viết nào được đăng tải!</p>
     </div>
   </div>
   <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog" @blogUpdated="handleBlogUpdated" />
 
-  <DeleteConfirmPopup :message="'Delete this blog?'" :isVisible="isDeletePopupVisible"
+    <DeleteConfirmPopup :message="'Xóa bài viết này?'" :isVisible="isDeletePopupVisible"
     @confirmDelete="handleDeleteConfirm" @update:isVisible="isDeletePopupVisible = $event" />
 </template>
 
@@ -74,11 +74,11 @@ export default {
           console.log(data);
         } else {
           this.blogs = [];
-          this.errorMessage = "No blogs yet!";
+          this.errorMessage = "Chưa có bài viết nào được đăng tải!";
         }
       } catch (error) {
         this.blogs = [];
-        this.errorMessage = "Error loading blog data. Please try again.";
+        this.errorMessage = "Lỗi tải dữ liệu bài viết. Vui lòng thử lại.";
         console.error(error);
       } finally {
         this.loading = false;
@@ -96,7 +96,7 @@ export default {
           await deleteArticle(this.blogToDelete.id);
           this.fetchBlogs();
         } catch (error) {
-          alert("Error deleting blog. Please try again.");
+          alert("Lỗi xóa bài viết. Vui lòng thử lại.");
           console.error(error);
         } finally {
           this.isDeletePopupVisible = false;

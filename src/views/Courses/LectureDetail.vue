@@ -360,13 +360,13 @@ export default {
       } catch (error) {
         console.error('Lỗi khi xóa bình luận:', error);
         if (error.response) {
-          console.error('Server Response Data:', error.response.data);
-          console.error('Server Response Status:', error.response.status);
-          console.error('Server Response Headers:', error.response.headers);
+          console.error('Dữ liệu phản hồi từ server:', error.response.data);
+          console.error('Mã trạng thái phản hồi từ server:', error.response.status);
+          console.error('Tiêu đề phản hồi từ server:', error.response.headers);
         } else if (error.request) {
-          console.error('No response received:', error.request);
+          console.error('Không nhận được phản hồi:', error.request);
         } else {
-          console.error('Error setting up request:', error.message);
+          console.error('Lỗi khi thiết lập yêu cầu:', error.message);
         }
       } finally {
         showDeleteConfirm.value = false;

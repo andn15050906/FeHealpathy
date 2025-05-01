@@ -1,7 +1,7 @@
 <template>
   <div class="yoga-container">
     <span class="total-count">{{ totalLessons }} lessons</span>
-    <h1 class="page-title">Yoga Practice</h1>
+    <h1 class="page-title">Thực hành Yoga</h1>
 
     <!-- <div class="filter-section">
       <button v-for="filter in filters" :key="filter.value"
@@ -39,10 +39,10 @@ export default {
       itemsPerPage: 12,
       currentFilter: 'newest',
       filters: [
-        { label: 'Newest to Oldest', value: 'newest' },
-        { label: 'Oldest to Newest', value: 'oldest' },
-        { label: 'Rating', value: 'rating' },
-        { label: 'Title', value: 'title' }
+        { label: 'Mới nhất tới cũ nhất', value: 'newest' },
+        { label: 'Cũ nhất tới mới nhất', value: 'oldest' },
+        { label: 'Đánh giá', value: 'rating' },
+        { label: 'Tiêu đề', value: 'title' }
       ],
       allLessons: []
     }

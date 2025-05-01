@@ -109,7 +109,7 @@ export default {
                     this.totalPages = response.pageCount || 1;
                 }
             } catch (error) {
-                console.error("Error fetching media resources:", error);
+                console.error("Lỗi khi tải phương tiện truyền thông:", error);
                 this.mediaFiles = [];
                 this.totalPages = 1;
             }
@@ -127,10 +127,10 @@ export default {
                 await createMediaResource(newMedia);
                 this.showAddMedia = false;
                 await this.fetchMediaResources(this.currentPage);
-                toast.success("Media added successfully!");
+                toast.success("Phương tiện truyền thông đã được thêm thành công!");
             } catch (error) {
-                console.error("Failed to add media.", error);
-                toast.error("Failed to add media.");
+                console.error("Lỗi khi thêm phương tiện truyền thông.", error);
+                toast.error("Lỗi khi thêm phương tiện truyền thông.");
             } finally {
                 this.$refs.loadingSpinner.hideSpinner();
             }
@@ -140,11 +140,11 @@ export default {
                 this.$refs.loadingSpinner.showSpinner();
                 await updateMediaResource(updatedMediaFormData);
                 await this.fetchMediaResources(this.currentPage);
-                toast.success("Media updated successfully!");
+                toast.success("Phương tiện truyền thông đã được cập nhật thành công!");
                 this.showEditMedia = false;
                 this.selectedMedia = null;
             } catch (error) {
-                toast.error("Failed to update media.");
+                toast.error("Lỗi khi cập nhật phương tiện truyền thông.");
             } finally {
                 this.$refs.loadingSpinner.hideSpinner();
             }
@@ -165,9 +165,9 @@ export default {
                     this.mediaToDelete = null;
                     this.showDeletePopup = false;
                     await this.fetchMediaResources(this.currentPage);
-                    toast.success("Media deleted successfully!");
+                    toast.success("Phương tiện truyền thông đã được xóa thành công!");
                 } catch (error) {
-                    toast.error("Failed to delete media.");
+                    toast.error("Lỗi khi xóa phương tiện truyền thông.");
                 }
             } else {
                 this.mediaToDelete = null;

@@ -59,7 +59,7 @@ const handlePurchase = async (paymentOptions) => {
         );
         window.location.href = response.url;
     } catch (error) {
-        console.error("Purchase error", error);
+        console.error("Lỗi thanh toán", error);
     }
 };
 </script>

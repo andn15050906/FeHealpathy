@@ -1,6 +1,6 @@
 <template>
   <div class="sleep-chart">
-    <h3>Sleep Data</h3>
+    <h3>Dữ liệu ngủ</h3>
     <canvas id="sleepChart"></canvas>
   </div>
 </template>
@@ -25,7 +25,7 @@ onMounted(() => {
     data: {
       labels: Array.from({ length: props.sleepData.hours.length }, (_, i) => `Day ${i + 1}`),
       datasets: [{
-        label: 'Hours of Sleep',
+        label: 'Giờ ngủ',
         data: props.sleepData.hours,
         borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',

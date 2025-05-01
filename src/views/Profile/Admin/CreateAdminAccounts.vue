@@ -1,12 +1,12 @@
 <template>
   <div class="grant-admin">
-    <h1>User Management</h1>
+    <h1>Quản lý tài khoản người dùng</h1>
     <data-table :data="users" :columns="columns">
       <template v-slot:actions="{ row }">
         <button
           class="icon-button"
           @click="openUserDetail(row)"
-          title="View Details"
+          title="Xem chi tiết"
         >
           <i class="fas fa-eye"></i>
         </button>
@@ -14,7 +14,7 @@
           class="icon-button"
           v-if="row.role !== 2"
           @click="openUpgradeAdmin(row)"
-          title="Upgrade to Admin"
+          title="Nâng cấp thành Admin"
         >
           <i class="fas fa-user-shield"></i>
         </button>
@@ -22,7 +22,7 @@
           class="icon-button ban"
           v-if="row.role !== 2"
           @click="handleBanUser(row)"
-          title="Ban User"
+          title="Ban người dùng"
         >
           <i class="fas fa-ban"></i>
         </button>
@@ -64,10 +64,10 @@ export default {
       selectedUser: null,
       users: [],
       columns: [
-        { title: "User ID", key: "id" },
-        { title: "Name", key: "fullName" },
+        { title: "ID", key: "id" },
+        { title: "Tên", key: "fullName" },
         { title: "Email", key: "email" },
-        { title: "Role", key: "role" },
+        { title: "Vai trò", key: "role" },
       ],
     };
   },
@@ -76,16 +76,16 @@ export default {
     async fetchUsers() {
       try {
         const response = await getUsers();
-        console.log("Users data:", response.items);
+        console.log("Dữ liệu người dùng:", response.items);
         this.users = response.items;
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Lỗi khi tải danh sách người dùng:", error);
       }
     },
 
     // Mở popup hiển thị chi tiết thông tin user
     openUserDetail(user) {
-      console.log("Selected user:", user);
+      console.log("Người dùng đã chọn:", user);
       this.selectedUser = user;
       this.showUserDetail = true;
     },
@@ -98,7 +98,7 @@ export default {
 
     // Xử lý khi xác nhận nâng cấp user lên Admin
     handleUpgradeConfirm(data) {
-      console.log("Upgrading user with data:", data);
+      console.log("Nâng cấp người dùng với dữ liệu:", data);
       const userIndex = this.users.findIndex((u) => u.id === data.userId);
       if (userIndex !== -1) {
         this.users[userIndex].role = "Admin";
@@ -107,7 +107,7 @@ export default {
 
     // Xử lý khi click nút ban user
     async handleBanUser(user) {
-      if (confirm(`Are you sure you want to ban user ${user.fullName}?`)) {
+      if (confirm(`Bạn có chắc chắn muốn ban người dùng ${user.fullName}?`)) {
         try {
           // TODO: Gọi API ban user
           // 1. Gọi API ban user với user ID
@@ -117,15 +117,15 @@ export default {
           //   this.users[userIndex].role = "Banned";
           // }
           // 3. Hiển thị thông báo thành công/thất bại
-          console.log("Banning user:", user);
+          console.log("Ban người dùng:", user);
 
           // Send notification ban user
           await submitUserBanned({
             userId: user.id,
-            message: "You have been banned due to a violation of our policies.",
+            message: "Bạn đã bị cấm do vi phạm chính sách của chúng tôi.",
           });
         } catch (error) {
-          console.error("Error banning user or sending notification:", error);
+          console.error("Lỗi khi ban người dùng hoặc gửi thông báo:", error);
         }
       }
     },

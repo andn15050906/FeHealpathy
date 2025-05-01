@@ -4,7 +4,7 @@
         <thead>
           <tr>
             <th v-for="column in columns" :key="column.key">{{ column.title }}</th>
-            <th>Actions</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -17,11 +17,11 @@
         </tbody>
       </table>
       <div class="pagination-info">
-        <span>Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ data.length }} entries</span>
+        <span>Hiển thị từ {{ startIndex + 1 }} đến {{ endIndex }} trong {{ data.length }} bản ghi</span>
         <div class="pagination-controls">
-          <button :disabled="currentPage === 1" @click="currentPage--">Previous</button>
+          <button :disabled="currentPage === 1" @click="currentPage--">Trang trước</button>
           <span class="page-number">{{ currentPage }}</span>
-          <button :disabled="currentPage >= totalPages" @click="currentPage++">Next</button>
+            <button :disabled="currentPage >= totalPages" @click="currentPage++">Trang tiếp</button>
         </div>
       </div>
     </div>

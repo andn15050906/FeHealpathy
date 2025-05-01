@@ -2,7 +2,7 @@
   <div v-if="show" class="popup-overlay">
     <div class="popup-content">
       <div class="popup-header">
-        <h2>Upgrade to Admin</h2>
+        <h2>Nâng cấp thành Admin</h2>
         <button class="close-button" @click="close">×</button>
       </div>
       <div class="upgrade-form">
@@ -15,31 +15,31 @@
         </div>
         
         <div class="form-group">
-          <label>Reason for upgrade:</label>
-          <textarea v-model="reason" placeholder="Enter reason for upgrading to Admin role"></textarea>
+          <label>Lý do nâng cấp:</label>
+          <textarea v-model="reason" placeholder="Nhập lý do nâng cấp thành vai trò Admin"></textarea>
         </div>
 
         <div class="form-group">
-          <label>Admin privileges:</label>
+          <label>Quyền Admin:</label>
           <div class="checkbox-group">
             <label class="checkbox">
               <input type="checkbox" v-model="privileges.userManagement">
-              User Management
+              Quản lý người dùng
             </label>
             <label class="checkbox">
               <input type="checkbox" v-model="privileges.contentManagement">
-              Content Management
+              Quản lý nội dung
             </label>
             <label class="checkbox">
               <input type="checkbox" v-model="privileges.systemSettings">
-              System Settings
+              Cài đặt hệ thống
             </label>
           </div>
         </div>
 
         <div class="actions">
-          <button class="cancel-button" @click="close">Cancel</button>
-          <button class="confirm-button" @click="confirmUpgrade">Confirm Upgrade</button>
+          <button class="cancel-button" @click="close">Hủy</button>
+          <button class="confirm-button" @click="confirmUpgrade">Xác nhận nâng cấp</button>
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@
 
 <script>
 export default {
-  name: 'UpgradeAdminPopup',
+  name: 'Nâng cấp Admin',
   props: {
     show: {
       type: Boolean,
@@ -75,7 +75,7 @@ export default {
     },
     confirmUpgrade() {
       if (!this.reason.trim()) {
-        alert('Please provide a reason for the upgrade');
+        alert('Vui lòng nhập lý do nâng cấp');
         return;
       }
       this.$emit('confirm', {

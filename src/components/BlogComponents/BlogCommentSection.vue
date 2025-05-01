@@ -71,9 +71,9 @@
                                     <i class="fas fa-thumbs-up me-1"></i>{{ comment.likes }}
                                 </button>
                                 <span style="display: none">
-                                    Current User ID: {{ currentUserId }} ({{ typeof currentUserId }})
-                                    Creator ID: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
-                                    Is Owner: {{ currentUserId === comment.creatorId }}
+                                    Người dùng hiện tại: {{ currentUserId }} ({{ typeof currentUserId }})
+                                    ID người tạo bình luận: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
+                                    Là người tạo bình luận: {{ currentUserId === comment.creatorId }}
                                 </span>
                                 <template v-if="isCommentOwner(comment)">
                                     <button class="btn btn-link p-0 text-secondary" @click="toggleEditComment(comment)">
@@ -181,7 +181,7 @@ export default {
                     this.page === 1 ? detailed : [...this.comments, ...detailed];
                 this.totalPages = response.totalPages || 1;
             } catch (e) {
-                console.error(e);
+                console.error('Lỗi khi tải bình luận:', e);
             }
         },
         validateComment() {
@@ -205,7 +205,6 @@ export default {
                 return;
             }
 
-            // Kiểm tra nếu comment chỉ chứa khoảng trắng
             if (!/\S/.test(comment)) {
                 this.commentError = 'Bình luận không thể chỉ chứa khoảng trắng';
                 this.isCommentValid = false;
@@ -228,6 +227,8 @@ export default {
                 this.newComment = "";
                 this.page = 1;
                 await this.fetchComments();
+            } catch (error) {
+                console.error('Lỗi khi gửi bình luận:', error);
             } finally {
                 this.loading = false;
             }
@@ -248,37 +249,38 @@ export default {
             try {
                 await updateComment(commentId, this.editingContent.trim());
                 const idx = this.comments.findIndex((c) => c.id === commentId);
-                if (idx !== -1) this.comments[idx].content = this.editingContent;
-            } catch (e) {
-                console.error(e);
-            } finally {
+                if (idx !== -1) {
+                    this.comments[idx].content = this.editingContent.trim();
+                }
                 this.cancelEdit();
+            } catch (error) {
+                console.error('Lỗi khi cập nhật bình luận:', error);
             }
         },
-        confirmDeleteComment(id) {
-            this.commentToDelete = id;
+        formatDate(date) {
+            return dayjs(date).format('DD/MM/YYYY HH:mm');
+        },
+        isCommentOwner(comment) {
+            return String(comment.creatorId) === String(this.currentUserId);
+        },
+        confirmDeleteComment(commentId) {
+            this.commentToDelete = commentId;
             this.isDeletePopupVisible = true;
         },
-        async handleDeleteConfirmed(confirm) {
-            if (confirm && this.commentToDelete) {
+        async handleDeleteConfirmed() {
+            try {
                 await deleteComment(this.commentToDelete);
-                this.comments = this.comments.filter(
-                    (c) => c.id !== this.commentToDelete
-                );
+                this.comments = this.comments.filter(c => c.id !== this.commentToDelete);
+                this.commentToDelete = null;
+            } catch (error) {
+                console.error('Lỗi khi xóa bình luận:', error);
             }
-            this.isDeletePopupVisible = false;
         },
         async loadMoreComments() {
             if (this.page < this.totalPages) {
                 this.page++;
                 await this.fetchComments();
             }
-        },
-        formatDate(date) {
-            return dayjs(date).format("DD/MM/YYYY");
-        },
-        isCommentOwner(comment) {
-            return String(this.currentUserId) === String(comment.creatorId);
         },
     },
 };

@@ -36,10 +36,10 @@ export default {
     computed: {
         getTableHeaders() {
             return [
-                { title: 'Milestone Title', value: 'title'},
-                { title: 'Event Name', value: 'eventName' },
-                { title: 'Repeat Times Required', value: 'repeatTimesRequired' },
-                { title: 'Time Spent Required', value: 'timeSpentRequired' }
+                { title: 'Tiêu đề', value: 'title'},
+                { title: 'Tên sự kiện', value: 'eventName' },
+                { title: 'Lặp lại lần', value: 'repeatTimesRequired' },
+                { title: 'Thời gian cần thiết', value: 'timeSpentRequired' }
             ];
         }
     },

@@ -59,7 +59,7 @@
             <GlowingButton @click="optionsRef.switchCallback"
                 primaryColor="#bdc3c7" secondaryColor="#2c3e50" padding="4px 8px" class="w-100">{{ text.skipForNow }}</GlowingButton>
         </div>
-    <v-alert v-if="submitted" type="success">Survey submitted successfully!</v-alert>
+        <v-alert v-if="submitted" type="success">Khảo sát đã được gửi thành công!</v-alert>
     </v-container>
 </template>
 

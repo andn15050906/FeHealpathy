@@ -6,8 +6,8 @@
             </v-card-text>
 
             <v-card-actions class="justify-end">
-                <v-btn color="cyan" text @click="onclickHandler(false)">Cancel</v-btn>
-                <v-btn color="red" text @click="onclickHandler(true)">Remove</v-btn>
+                <v-btn color="cyan" text @click="onclickHandler(false)">Hủy</v-btn>
+                <v-btn color="red" text @click="onclickHandler(true)">Xóa</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

@@ -1,7 +1,7 @@
 <template>
     <div class="search-results-container">
         <BlogFilters
-            :tags="['Meditation & Mindfulness', 'Stress & Anxiety', 'Sleep', 'Mental Health', 'Personal Growth']"
+            :tags="['Trải nghiệm', 'Tâm lý', 'Sức khỏe', 'Tâm trí', 'Cá nhân']"
             :currentSort="currentSort" @search="handleSearch" @tag-click="handleTagClick"
             @sort-change="handleSortChange" />
 
