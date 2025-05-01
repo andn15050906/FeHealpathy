@@ -48,7 +48,8 @@
             </div>
 
             <div class="sidebar-actions">
-                <button class="schedule-btn" @click="openScheduleForm">
+                <button class="schedule-btn" @click="openScheduleForm" :disabled="hasScheduledConsultation"
+                    :style="hasScheduledConsultation ? 'background-color: #cccccc; cursor: not-allowed;' : ''">
                     <i class="fa-solid fa-plus"></i> Đặt lịch tư vấn
                 </button>
             </div>
@@ -167,7 +168,10 @@ export default {
             return days;
         },
         selectedDayName() { return format(this.selectedDate, "EEEE"); },
-        selectedDayEvents() { return this.events.filter(event => dfIsSameDay(event.date, this.selectedDate)); }
+        selectedDayEvents() { return this.events.filter(event => dfIsSameDay(event.date, this.selectedDate)); },
+        hasScheduledConsultation() {
+            return this.selectedDayEvents.some(event => event.name.includes('Tư vấn với cố vấn'));
+        }
     },
     methods: {
         dayClasses(day) {
