@@ -2,51 +2,25 @@
   <div class="schedule-meeting container">
     <h2 class="page-title text-center">Đặt lịch họp với chuyên gia</h2>
 
+    <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn đặt lịch họp không?'" :isVisible="showConfirm"
+      @confirmSave="onConfirmSave" @update:isVisible="showConfirm = $event" />
+
     <div class="meeting-form card p-4 mb-5">
-      <div class="form-group">
-        <label for="meeting-date">Chọn ngày họp:</label>
-        <input id="meeting-date" type="date" v-model="meetingDate" :min="today" class="form-control" />
-        <small class="text-danger" v-if="validationErrors.meetingDate">
-          {{ validationErrors.meetingDate }}
-        </small>
-      </div>
-
-      <div class="row">
-        <div class="col-6">
-          <div class="form-group">
-            <label for="start-time">Chọn giờ bắt đầu:</label>
-            <input id="start-time" type="time" v-model="startTime" class="form-control" />
-            <small class="text-danger" v-if="validationErrors.startTime">
-              {{ validationErrors.startTime }}
-            </small>
-          </div>
-        </div>
-        <div class="col-6">
-          <div class="form-group">
-            <label for="end-time">Chọn giờ kết thúc:</label>
-            <input id="end-time" type="time" v-model="endTime" class="form-control" />
-            <small class="text-danger" v-if="validationErrors.endTime">
-              {{ validationErrors.endTime }}
-            </small>
-          </div>
-        </div>
-      </div>
-
       <div class="form-group">
         <label>Chọn chuyên gia tư vấn:</label>
         <div class="row advisors-grid">
-          <div v-for="advisor in advisors" :key="advisor.advisorId" class="col-3 mb-4">
+          <div v-for="advisor in advisors" :key="advisor.advisorId" class="col-3">
             <div class="advisor-card card text-center"
               :class="{ 'border-primary': selectedAdvisor === advisor.advisorId }"
-              @click="selectedAdvisor = advisor.advisorId">
+              @click="selectAdvisor(advisor.advisorId)">
               <div class="advisor-avatar-container mx-auto mt-3">
                 <img :src="advisor.avatarUrl" alt="avatar" class="avatar" />
               </div>
               <div class="card-body">
                 <h3 class="advisor-name">{{ advisor.fullName }}</h3>
                 <p class="bio">{{ advisor.intro }}</p>
-                <RouterLink class="btn btn-outline-primary btn-sm" :to="`/advisor/view-profile/${advisor.advisorId}`">
-                  <i class="fas fa-user-circle"></i> Đặt lịch
+                <RouterLink class="btn btn-outline-primary btn-md" :to="`/advisor/view-profile/${advisor.advisorId}`">
+                  <i class="fas fa-user-circle"></i> Xem và đặt lịch
                 </RouterLink>
               </div>
             </div>
@@ -66,7 +40,7 @@
           placeholder="Nhập ghi chú cho cuộc họp..."></textarea>
       </div>
 
-      <button @click="scheduleMeeting" class="btn btn-primary w-100" :disabled="isLoading">
+      <button @click="showConfirm = true" class="btn btn-primary w-100" :disabled="isLoading || !isFormValid">
         <i class="fas fa-calendar-plus"></i>
         {{ isLoading ? 'Đang xử lý...' : 'Đặt lịch họp' }}
       </button>
@@ -75,13 +49,13 @@
     <div class="meetings-list mt-5">
       <h4 class="section-title">Lịch hẹn của bạn</h4>
 
-      <div v-if="meetings.length === 0" class="no-meetings card p-5 text-center">
+      <div v-if="upcomingMeetings.length === 0" class="no-meetings card p-5 text-center">
         <i class="fas fa-calendar-times mb-3 text-dark"></i>
         <p>Chưa có cuộc hẹn nào được đặt</p>
       </div>
 
       <div v-else class="row">
-        <div v-for="meeting in meetings" :key="meeting.id" class="col-4 mb-4">
+        <div v-for="meeting in upcomingMeetings" :key="meeting.id" class="col-4 mb-4">
           <div class="meeting-card card h-100 shadow-sm">
             <div class="meeting-header card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0 fw-bold">{{ meeting.advisorName }}</h5>
@@ -122,57 +96,47 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, onMounted, computed } from 'vue';
+import { ref, onBeforeMount, computed } from 'vue';
 import { createMeeting, getMeetings, deleteMeeting } from '@/scripts/api/services/meetingService';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
 import { useRouter } from 'vue-router';
+import SaveConfirmPopUp from '../../components/Common/Popup/SaveConfirmPopUp.vue';
 
 const router = useRouter();
-const today = new Date().toLocaleDateString('en-CA');
-const meetingDate = ref('');
-const startTime = ref('');
-const endTime = ref('');
 const selectedAdvisor = ref('');
 const notes = ref('');
 const isLoading = ref(false);
 const meetings = ref([]);
 const advisors = ref([]);
+const showConfirm = ref(false);
+const validationErrors = ref({ selectedAdvisor: '' });
+const pageIndex = ref(0);
+const pageSize = ref(10);
 
-const validationErrors = ref({
-  meetingDate: '',
-  startTime: '',
-  endTime: '',
-  selectedAdvisor: '',
+const isFormValid = computed(() => {
+  return !!selectedAdvisor.value;
 });
 
-function formatTimeForInput(date) {
-  return date.toTimeString().substring(0, 5);
+const upcomingMeetings = computed(() => {
+  const now = new Date();
+  return meetings.value.filter(meeting => {
+    const meetingStartDate = new Date(meeting.startAt);
+    return meetingStartDate >= now;
+  });
+});
+
+function selectAdvisor(id) {
+  selectedAdvisor.value = id;
+  validationErrors.value.selectedAdvisor = '';
 }
 
 function formatTime(dateString) {
   const date = new Date(dateString);
   return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
-
-function setDefaultValues() {
-  const now = new Date();
-  meetingDate.value = now.toLocaleDateString('en-CA');
-  startTime.value = formatTimeForInput(now);
-  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-  endTime.value = formatTimeForInput(oneHourLater);
-}
-
-onMounted(setDefaultValues);
-
-const isValidTime = computed(() => {
-  if (!startTime.value || !endTime.value) return true;
-  const [sh, sm] = startTime.value.split(':').map(Number);
-  const [eh, em] = endTime.value.split(':').map(Number);
-  return (eh > sh) || (eh === sh && em > sm);
-});
 
 function getBadgeClass(status) {
   switch (status) {
@@ -185,7 +149,10 @@ function getBadgeClass(status) {
 
 async function loadMeetings() {
   try {
-    const resp = await getMeetings();
+    const resp = await getMeetings({
+      PageIndex: 0,
+      PageSize: 255
+    });
     const me = getUserProfile().id;
     const list = resp.items || [];
     meetings.value = list
@@ -211,46 +178,17 @@ onBeforeMount(async () => {
   }
 });
 
-function validateForm() {
-  let ok = true;
-  validationErrors.value = {
-    meetingDate: '',
-    startTime: '',
-    endTime: '',
-    selectedAdvisor: '',
-  };
-  if (!meetingDate.value) {
-    validationErrors.value.meetingDate = 'Vui lòng chọn ngày họp';
-    ok = false;
-  }
-  if (!startTime.value) {
-    validationErrors.value.startTime = 'Vui lòng chọn giờ bắt đầu';
-    ok = false;
-  }
-  if (!endTime.value) {
-    validationErrors.value.endTime = 'Vui lòng chọn giờ kết thúc';
-    ok = false;
-  }
-  if (!selectedAdvisor.value) {
-    validationErrors.value.selectedAdvisor = 'Vui lòng chọn chuyên gia tư vấn';
-    ok = false;
-  }
-  if (startTime.value && endTime.value && !isValidTime.value) {
-    validationErrors.value.endTime = 'Thời gian kết thúc phải sau thời gian bắt đầu';
-    ok = false;
-  }
-  return ok;
-}
-
 async function scheduleMeeting() {
-  if (!validateForm()) return;
   isLoading.value = true;
   try {
-    const startAt = new Date(`${meetingDate.value}T${startTime.value}`);
-    const endAt = new Date(`${meetingDate.value}T${endTime.value}`);
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
     await createMeeting({
       title: 'Cuộc họp với chuyên gia',
-      startAt, endAt, maxParticipants: 2,
+      startAt: now,
+      endAt: oneHourLater,
+      maxParticipants: 2,
       participants: [
         { userId: getUserProfile().id, isHost: true },
         { userId: selectedAdvisor.value, isHost: false },
@@ -258,7 +196,6 @@ async function scheduleMeeting() {
       description: notes.value || '',
     });
     toast.success('Đặt lịch họp thành công');
-    setDefaultValues();
     selectedAdvisor.value = '';
     notes.value = '';
     await loadMeetings();
@@ -266,6 +203,16 @@ async function scheduleMeeting() {
     toast.error('Không thể đặt lịch họp');
   } finally {
     isLoading.value = false;
+  }
+}
+
+function onConfirmSave(confirm) {
+  if (confirm) {
+    if (!isFormValid.value) {
+      validationErrors.value.selectedAdvisor = 'Vui lòng chọn chuyên gia tư vấn';
+      return;
+    }
+    scheduleMeeting();
   }
 }
 
@@ -342,11 +289,6 @@ function joinMeeting(id) {
   font-size: 12px;
   margin-top: 2px;
   display: block;
-}
-
-.next-day-indicator {
-  color: #000000;
-  font-weight: 500;
 }
 
 .advisors-grid .advisor-card {
