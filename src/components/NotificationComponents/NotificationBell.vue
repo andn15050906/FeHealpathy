@@ -100,7 +100,7 @@ export default {
         const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
         const notifications = response.items || response;
 
-        this.notifications = notificationsData.map((notification) => {
+        this.notifications = notifications.map((notification) => {
           let content = "";
           let senderName = "Hệ thống";
           let timestamp = notification.createdTime || new Date().toISOString();
@@ -244,23 +244,6 @@ export default {
   font-size: 0.75rem;
   color: #007bff;
   cursor: pointer;
-  margin-left: 10px;
-  transition: color 0.2s ease;
-}
-
-.mark-read-button:hover {
-  color: #0056b3;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .fade-enter-active,
