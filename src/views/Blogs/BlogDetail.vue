@@ -58,9 +58,9 @@ export default {
     };
   },
   async created() {
-    await this.fetchBlogData();
     const userProfile = getUserProfile();
     this.currentUserId = userProfile?.id;
+    await this.fetchBlogData();
   },
   methods: {
     async fetchBlogData() {
@@ -71,7 +71,8 @@ export default {
         if (!this.blog) {
           console.error("Không tìm thấy bài viết với ID:", blogId);
         } else {
-          logArticleRead(blogId);
+          if (this.currentUserId)
+            logArticleRead(blogId);
         }
 
         this.loading = false;

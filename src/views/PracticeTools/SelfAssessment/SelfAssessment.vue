@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-2">
+  <div class="container">
     <h2 class="fw-bold text-center mb-5 text-dark">Đánh Giá Sức Khỏe Tinh Thần</h2>
     <div class="survey-grid">
       <SurveyCard v-for="(item, index) in surveys" :key="item.id" :survey="item" @click="openTest(item.id)" />

@@ -57,7 +57,7 @@ const props = defineProps({
 .survey-description {
     font-size: 1.2rem;
     color: #555;
-    font-weight: 800;
+    font-weight: 600;
     text-align: center;
     margin-top: 0.5rem;
 }

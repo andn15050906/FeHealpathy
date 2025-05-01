@@ -1,265 +1,279 @@
 <template>
   <div class="content">
-      <div class="profile-container">
-          <div class="profile-card">
-              <div class="profile-image-section">
-                  <div class="avatar-container">
-                      <img :src="form.avatarUrl" alt="User Avatar" class="avatar-image" />
-                  </div>
-              </div>
-              <div class="profile-card">
-                  <div class="profile-form-section">
-                      <form @submit.prevent="handleSubmit">
-                      <div class="form-row">
-                          <div class="form-group">
-                          <label for="creationTime">Ngày tham gia</label>
-                          <span class="form-control readonly-field">{{ form.creationTime }}</span>
-                          </div>
-                      </div>
-                      <div class="form-row">
-                          <div class="form-group">
-                          <label for="courseCount">Số khóa học</label>
-                          <span class="form-control readonly-field">{{ form.courseCount }}</span>
-                          </div>
-                          <div class="form-group">
-                          <label for="experience">Kinh nghiệm</label>
-                          <input type="text" readonly id="experience" v-model="form.experience" class="form-control" />
-                          </div>
-                      </div>
-                      <div class="form-row">
-                          <div class="form-group full-width">
-                          <label for="intro">Giới thiệu</label>
-                          <textarea readonly id="intro" v-model="form.intro" maxlength="1000" class="form-control"></textarea>
-                          </div>
-                      </div>
-                      </form>
-                  </div>
-              </div>
+    <div class="profile-container">
+      <div class="profile-card">
+        <div class="profile-image-section">
+          <div class="avatar-container">
+            <img :src="form.avatarUrl" alt="User Avatar" class="avatar-image" />
           </div>
+          <div class="advisor-name">{{ form.fullName }}</div>
+        </div>
+        <div class="profile-details-section">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Giới thiệu</div>
+              <div class="stat-value">{{ form.intro }}</div>
+            </div>
+          </div>  
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Ngày tham gia</div>
+              <div class="stat-value">{{ formattedDate }}</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Số khóa học</div>
+              <div class="stat-value">{{ form.courseCount }}</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Kinh nghiệm</div>
+              <div class="stat-value">{{ form.experience }}</div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
   </div>
-  <div>
-    <Calendar :events="advisorCalendar" :initialDate="today" />
+  <div class="calendar-container">
+    <h2 class="section-title">Lịch làm việc</h2>
+    <MeetingCalendar :events="advisorCalendar" :initialDate="today" />
   </div>
 </template>
-  
+
 <script setup>
 import { useRoute } from 'vue-router';
-import { ref, onBeforeMount, inject } from 'vue';
+import { ref, onBeforeMount, inject, computed } from 'vue';
 import dict from '@/scripts/data/dictionary.json';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
-import Calendar from "@/components/Common/Misc/Calendar.vue";
-
+import MeetingCalendar from '../../../components/Common/Misc/MeetingCalendar.vue';
 const route = useRoute();
 const form = ref({
-    advisorId:'',
-    userId: '',
-    fullName: '',
-    avatarUrl: '',
-    creationTime: '',
-    courseCount: 0,
-    experience: '',
-    intro: ''
+  advisorId: '',
+  userId: '',
+  fullName: '',
+  avatarUrl: '',
+  creationTime: '',
+  courseCount: 0,
+  experience: '',
+  intro: ''
 });
 
 const originalForm = ref({});
 const loadingSpinner = inject('loadingSpinner');
-const text = dict['en']
+const text = dict['en'];
+
+const formattedDate = computed(() => {
+  if (!form.value.creationTime) return '';
+  const parts = form.value.creationTime.split('-');
+  if (parts.length !== 3) return form.value.creationTime;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+});
 
 const fetchProfile = async (advisorId) => {
-    try {
-        loadingSpinner?.showSpinner();
-        let advisors = await getAllAdvisors();
-        console.log(advisors);
-        const advisorData = advisors.find(_ => _.advisorId == advisorId);
+  try {
+    loadingSpinner?.showSpinner();
+    let advisors = await getAllAdvisors();
+    console.log(advisors);
+    const advisorData = advisors.find(_ => _.advisorId == advisorId);
 
-        const advisor = advisorData.items ? advisorData.items[0] : advisorData;
-        advisor.creationTime = formatDate(advisor.creationTime);
-        advisor.intro = advisor.intro;
+    const advisor = advisorData.items ? advisorData.items[0] : advisorData;
+    advisor.creationTime = formatDate(advisor.creationTime);
+    advisor.intro = advisor.intro;
 
-        Object.assign(form.value, advisor);
-        originalForm.value = { ...form.value };
-    } catch (error) {
-        console.error(error);
-    } finally {
-        loadingSpinner?.hideSpinner();
-    }
+    Object.assign(form.value, advisor);
+    originalForm.value = { ...form.value };
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loadingSpinner?.hideSpinner();
+  }
 };
 
 const formatDate = (date) => {
-    if (!date || typeof date !== 'string') return '';
-    return date.split('T')[0];
+  if (!date || typeof date !== 'string') return '';
+  return date.split('T')[0];
 };
 
 onBeforeMount(() => {
-    fetchProfile(route.params.advisorId);
+  fetchProfile(route.params.advisorId);
 });
 </script>
-  
-  <style scoped>
-  .content {
-    width: 100%;
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  .profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
+
+<style scoped>
+.content {
+  width: 100%;
+}
+
+.profile-container {
+  max-width: 1200px;
+  margin: 10px auto;
+}
+
+.profile-card {
+  display: flex;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.profile-image-section {
+  flex: 0 0 300px;
+  padding: 40px 30px;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid #eaedf0;
+}
+
+.avatar-container {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 4px solid white;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.advisor-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.advisor-stats {
+  width: 100%;
+}
+
+.stat-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.intro-stat-item {
+  background-color: #f8fcff;
+  border-left: 3px solid #4a90e2;
+}
+
+.stat-icon {
+  flex: 0 0 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.stat-icon .fas.fa-calendar-alt {
+  color: #4a6cf7;
+}
+
+.stat-icon .fas.fa-book {
+  color: #38b2ac;
+}
+
+.stat-icon .fas.fa-star {
+  color: #f6ad55;
+}
+
+.stat-icon .fas.fa-user-tie {
+  color: #4a90e2;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.intro-value {
+  font-weight: 400;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.profile-details-section {
+  flex: 1;
+  padding: 40px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f2f5;
+}
+
+.intro-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  white-space: pre-line;
+}
+
+.calendar-container {
+  max-width: 1200px;
+  margin: 0 auto 10px;
+  padding: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
   .profile-card {
-    display: flex;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    /* */
-    flex: 1;
-  }
-  
-  .profile-image-section {
-    flex: 0 0 350px;
-    padding: 30px;
-    background-color: #f7f7fc;
-    display: flex;
     flex-direction: column;
   }
-  
-  .avatar-container {
-    width: 150px;
-    height: 150px;
-    position: relative;
-    margin: 0 auto 30px;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
+
+  .profile-image-section {
+    flex: 0 0 auto;
+    border-right: none;
+    border-bottom: 1px solid #eaedf0;
   }
-  
-  .avatar-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .camera-icon {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .profile-info {
-    margin-bottom: 30px;
-  }
-  
-  .info-item {
-    display: flex;
-    margin-bottom: 15px;
-  }
-  
-  .info-label {
-    width: 120px;
-    color: #6c757d;
-    font-weight: 500;
-  }
-  
-  .info-value {
-    flex: 1;
-    color: #333;
-    font-weight: 500;
-  }
-  
-  .profile-form-section {
-    flex: 1;
-    padding: 30px;
-  }
-  
-  .form-row {
-    display: flex;
-    margin-bottom: 20px;
-    gap: 20px;
-  }
-  
-  .form-group {
-    flex: 1;
-  }
-  
-  .form-group.full-width {
-    width: 100%;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 8px;
-    color: #6c757d;
-    font-weight: 500;
-  }
-  
-  .form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    font-size: 14px;
-  }
-  
-  textarea.form-control {
-    height: 100px;
-    resize: vertical;
-  }
-  
-  .form-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
-  }
-  
-  .btn {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-save {
-    background-color: #5e72e4;
-    color: white;
-  }
-  
-  .btn-cancel {
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    color: #6c757d;
-  }
-  
-  .btn-warning {
-    background-color: #ff9800;
-    color: white;
-    margin-top: 20px;
-  }
-  
-  .password-change-btn {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .white-text {
-    color: #fff;
-  }
-  
-  .white-text a {
-    color: whitesmoke;
-  }
-  </style>  
+}
+</style>

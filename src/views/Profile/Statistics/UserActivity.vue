@@ -1,46 +1,50 @@
 <template>
-  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true"
-    :centered="true"></StatisticsTabs>
+  <StatisticsTabs :initial-tab="0" tab-color="blue" tab-direction="horizontal" :grow="true" :centered="true">
+  </StatisticsTabs>
 
-  <div class="container">
-    <h1 id="title" style="text-align: center">Thống kê hoạt động</h1>
+  <div class="container py-4">
+    <h2 class="text-center mb-4">Thống kê hoạt động</h2>
 
-    <div class="section">
-      <h2>📌 Các hoạt động gần đây</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Thời gian</th>
-            <th>Hoạt động</th>
-            <th>Nội dung</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(activity, index) in recentActivities" :key="index">
-            <td>{{ activity.creationTime }}</td>
-            <td>{{ activity.action }}</td>
-            <!--<td :class="activity.content.includes('negative') ? 'alert' : 'highlight'">
-              {{ activity.content }}
-            </td>-->
-            <td>
-              <a href="/" v-if="activity.content.type == 'link'">{{ activity.content.display }}</a>
-              <span v-else>{{ activity.content.display }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-container">
+          <table class="table table-hover table-striped mb-0">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th>Thời gian</th>
+                <th>Hoạt động</th>
+                <!--<th>Nội dung</th>-->
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(activity, index) in recentActivities" :key="index">
+                <td>{{ activity.creationTime }}</td>
+                <td>{{ activity.action }}</td>
+                <!--<td>
+                  <a href="/" class="text-decoration-none" v-if="activity.content.type == 'link'">{{
+                    activity.content.display }}</a>
+                  <span v-else>{{ activity.content.display }}</span>
+                </td>-->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-      <h2>📈 Xu hướng cảm xúc và hoạt động</h2>
-      <Line :data="sentimentChartData" :options="sentimentChartOptions" />
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h4 mb-0">📈 Xu hướng cảm xúc và hoạt động</h2>
+      </div>
+      <div class="card-body chart-container">
+        <Line :data="sentimentChartData" :options="sentimentChartOptions" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeMount } from "vue";
-import Chart from "chart.js/auto";
+import { ref, onBeforeMount } from "vue";
 import { getActivityLogs, getDisplayName, TRACKED_EVENTS } from '@/scripts/api/services/activityLogService';
 import { formatISODateWithHMS, formatISODateWithDDMM } from '@/scripts/logic/common';
 import { getUserProfile } from '@/scripts/api/services/authService';
@@ -57,14 +61,12 @@ const sentimentChartData = ref({
 });
 const sentimentChartOptions = ref({
   responsive: true,
+  maintainAspectRatio: false,
   scales: {
     "y-mood": {
       type: "linear",
       position: "left",
-      //beginAtZero: true,
-      //max: 100,
       title: { display: true, text: "Điểm số cảm xúc" },
-      //ticks: { callback: (value) => value + "%" },
     },
     "y-activity": {
       type: "linear",
@@ -72,11 +74,37 @@ const sentimentChartOptions = ref({
       beginAtZero: true,
       title: { display: true, text: "Hoạt động" },
     },
+  },
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      padding: 10,
+      cornerRadius: 6
+    }
   }
 });
 
+const safeGetDisplayName = (genericType) => {
+  try {
+    if (!genericType) return 'Hoạt động chung';
+    const displayName = getDisplayName(genericType);
+    return displayName || 'Hoạt động chung';
+  } catch (error) {
+    return 'Hoạt động chung';
+  }
+};
+
 onBeforeMount(async () => {
-  let userId = (await getUserProfile()).id;
+  try {
+    const userProfile = await getUserProfile();
+    if (!userProfile || !userProfile.id) {
+      return;
+    }
+
+    let userId = userProfile.id;
   ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale);
 
   var sentimentDataTask = getSentimentAnalysis();
@@ -85,52 +113,65 @@ onBeforeMount(async () => {
   await Promise.all([sentimentDataTask, activityLogsTask]);
   const sentimentData = await sentimentDataTask;
   const activityLogs = await activityLogsTask;
-  console.log(sentimentData);
-  console.log(activityLogs);
 
-  recentActivities.value = activityLogs.map(log => {
+
+  if (!activityLogs || !Array.isArray(activityLogs)) {
+      return;
+  }
+
+  let logs = activityLogs.map(log => {
     let json = undefined;
     try {
       json = JSON.parse(log.content);
-    } catch (e) { }
+    } catch (e) {
+      json = {};
+    }
 
     let action = '';
     if (json && json.GenericType) {
-      action = getDisplayName(json.GenericType);
+      action = safeGetDisplayName(json.GenericType);
+    } else {
+        action = 'Hoạt động chung';
     }
 
-    let content =  {
+    let content = {
       type: 'link',
       display: 'Xem chi tiết...'
     };
 
-    //...
+    try {
     if ((!json.GenericType || json.GenericType == 'General_Activity_Created') && json.Content) {
-      let parsedContent = JSON.parse(json.Content);
-      try {
-        let nestedJson = JSON.parse(parsedContent.Content);
-        if (nestedJson)
-          parsedContent = nestedJson;
-      } catch (e) { }
-      
+      let parsedContent;
+          try {
+            parsedContent = JSON.parse(json.Content);
+          } catch (e) {
+            parsedContent = {};
+          }
+
+          try {
+            if (parsedContent.Content) {
+              let nestedJson = JSON.parse(parsedContent.Content);
+              if (nestedJson)
+                parsedContent = nestedJson;
+            }
+          } catch (e) {
+          }
+
       if (parsedContent.question && parsedContent.answer) {
-        action = TRACKED_EVENTS.QuestionOfTheDay_Answered.displayName;
-        content =  {
+        action = TRACKED_EVENTS.QuestionOfTheDay_Answered?.displayName || 'Trả lời câu hỏi ngày';
+        content = {
           type: 'text',
           display: parsedContent.question
         };
       }
-      else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated.label) {
-        action = TRACKED_EVENTS.DiaryNote_Created.displayName;
-        /*action = TRACKED_EVENTS.Mood_Updated.displayName;
-        content =  {
-          type: 'text',
-          display: parsedContent.content
-        };*/''
+      else if (parsedContent.action == TRACKED_EVENTS.Mood_Updated?.label) {
+            action = TRACKED_EVENTS.DiaryNote_Created?.displayName || 'Tạo nhật ký';
+          }
+          else if (parsedContent.event == TRACKED_EVENTS.Media_Viewed?.label) {
+            action = TRACKED_EVENTS.Media_Viewed?.displayName || 'Xem phương tiện';
       }
-      else if (parsedContent.event == TRACKED_EVENTS.Media_Viewed.label) {
-        action = TRACKED_EVENTS.Media_Viewed.displayName;
-      }
+        }
+      } catch (e) {
     }
 
     return {
@@ -138,26 +179,39 @@ onBeforeMount(async () => {
       action: action,
       content: content
     }
-  }).slice(0, 20);
+  })
+  
+  recentActivities.value = logs
+    .filter(_ => _.action
+      && _.action != TRACKED_EVENTS.DiaryNote_Updated.displayName
+      && _.action != TRACKED_EVENTS.Routine_Updated.displayName)
+    .slice(0, 20);
+
+  if (!sentimentData || typeof sentimentData !== 'object') {
+    return;
+  }
 
   let labels = [];
   let scores = {};
   let activities = {};
 
   for (let date in sentimentData) {
-    labels.push(formatISODateWithDDMM(date, 'DD/MM'));
-    scores[date] = sentimentData[date].score * -1;
+      if (sentimentData[date] && typeof sentimentData[date].score === 'number') {
+        labels.push(formatISODateWithDDMM(date, 'DD/MM'));
+        scores[date] = sentimentData[date].score * -1;
+      }
   }
 
   for (let date of labels) {
     if (!activities[date])
       activities[date] = [];
   }
+
   for (let logItem of activityLogs) {
     let date = formatISODateWithDDMM(logItem.creationTime, 'DD/MM');
-    if (!activities[date])
-      continue;
-    activities[date].push(logItem);
+      if (activities[date]) {
+        activities[date].push(logItem);
+      }
   }
 
   sentimentChartData.value = {
@@ -173,8 +227,8 @@ onBeforeMount(async () => {
         yAxisID: "y-mood",
       },
       {
-        label: "Số lượng hoạt động",
-        data: Object.values(activities).map(_ => _.length),
+        label: "Điểm hoạt động",
+        data: Object.values(activities).map(arr => arr.length),
         borderColor: "#FFA726",
         backgroundColor: "rgba(255, 167, 38, 0.2)",
         tension: 0.3,
@@ -183,62 +237,61 @@ onBeforeMount(async () => {
       }
     ],
   };
-})
+  } catch (error) {
+  }
+});
 </script>
 
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f5f5f5;
+h2 {
+  color: #343a40;
+  font-weight: 600;
 }
 
-#title {
-  margin-bottom: 20px;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  background: white;
-  padding: 20px;
+.card {
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: none;
 }
 
-.section {
-  margin-bottom: 20px;
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.highlight {
-  font-weight: bold;
-  color: #4caf50;
+.table-container {
+  height: 380px;
+  overflow-y: auto;
 }
 
-.alert {
-  color: red;
-  font-weight: bold;
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+.table th {
+  font-weight: 600;
+  color: #495057;
 }
 
-th,
-td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+.table td {
+  vertical-align: middle;
 }
 
-th {
-  background: #f9f9f9;
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.04);
 }
 
-canvas {
-  max-width: 100%;
-  margin-top: 20px;
+.chart-container {
+  height: 450px;
+  position: relative;
+}
+
+a {
+  color: #007bff;
+}
+
+a:hover {
+  color: #0056b3;
 }
 </style>

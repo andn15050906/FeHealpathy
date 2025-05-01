@@ -94,7 +94,7 @@
   
   .card-title {
     font-size: 2.5rem;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 1rem;
   }
   
