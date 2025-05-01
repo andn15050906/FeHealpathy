@@ -149,21 +149,19 @@
     </div>
     
     <DeleteConfirmPopup
-      :isVisible="showDeleteConfirm"
-      v-model:visible="showDeleteConfirm"
+      v-model:isVisible="showDeleteConfirm"
       title="Xác nhận xóa bình luận"
       message="Bạn có chắc chắn muốn xóa bình luận này không?"
-      @confirm="handleDeleteConfirm"
+      @confirmDelete="handleDeleteConfirm"
       @cancel="handleDeleteCancel"
     />
 
     <UpdateConfirmPopup
-      :isVisible="showUpdateConfirm"
-      v-model:visible="showUpdateConfirm"
+      v-model:isVisible="showUpdateConfirm"
       :url="`/api/Comments/${commentToUpdate?.id}`"
       title="Xác nhận cập nhật"
       message="Bạn có chắc chắn muốn cập nhật bình luận này không?"
-      @confirm="handleUpdateConfirm"
+      @confirmUpdate="handleUpdateConfirm"
       @cancel="handleUpdateCancel"
     />
   </div>
@@ -178,7 +176,7 @@ import {
   getPagedLectureComments, 
   createLectureComment, 
   updateLectureComment, 
-  deleteComment 
+  deleteLectureComment 
 } from "@/scripts/api/services/commentService";
 import { getUserProfile } from "@/scripts/api/services/authService";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
@@ -316,7 +314,12 @@ export default {
       showUpdateConfirm.value = true;
     };
 
-    const handleUpdateConfirm = async () => {
+    const handleUpdateConfirm = async (confirm) => {
+      if (!confirm) {
+        showUpdateConfirm.value = false;
+        return;
+      }
+      
       if (!commentToUpdate.value) return;
       
       try {
@@ -326,7 +329,7 @@ export default {
         
       } catch (error) {
         console.error('Lỗi khi cập nhật bình luận:', error);
-        toast.error('Không thể cập nhật bình luận. Vui lòng thử lại sau.');
+        alert('Không thể cập nhật bình luận. Vui lòng thử lại sau.');
       } finally {
         showUpdateConfirm.value = false;
         commentToUpdate.value = null;
@@ -351,11 +354,16 @@ export default {
       showDeleteConfirm.value = true;
     };
 
-    const handleDeleteConfirm = async () => {
+    const handleDeleteConfirm = async (confirm) => {
+      if (!confirm) {
+        showDeleteConfirm.value = false;
+        return;
+      }
+      
       if (!commentToDelete.value) return;
       
       try {
-        await deleteComment(commentToDelete.value);
+        await deleteLectureComment(commentToDelete.value);
         await fetchComments();
       } catch (error) {
         console.error('Lỗi khi xóa bình luận:', error);

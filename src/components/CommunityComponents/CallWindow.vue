@@ -423,7 +423,7 @@ import { getUsers } from '@/scripts/api/services/userService';
 import { HubConnection, RTCHandler, ParticipantExtraInfo, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
 import { createSidebar, createInCallWindow, createOutCallWindow, createVideoTile, createMessageContainer, createMessage } from '@/components/call_html.js';
 import { VideoHandler } from '@/scripts/logic/conversationState';
-import { onMounted } from 'vue';
+import { onBeforeMount } from 'vue';
 
 
 
@@ -447,7 +447,7 @@ const client = getUserProfile();
 var conversationName = 'Video Conference';
 var _roomId = props?.roomId ?? 'eb4e0163-271a-4886-9e60-bee318d7ca44';
 
-onMounted(() => {
+onBeforeMount(() => {
     var _onCall = false;
     var callWindow;
     var _videoRow, roomChatInp, _defaultMedia = MEDIA_TYPE.DISPLAY_MEDIA;
@@ -581,7 +581,7 @@ onMounted(() => {
             }
         }
         function addParticipantHandler(participant) {
-            let videoContainer = createVideoTile(participant.connectionId, client.avatarUrl);
+            let videoContainer = createVideoTile(participant.connectionId, participant.avatar ?? client.avatarUrl);
             _videoRow.appendChild(videoContainer);
             _participants[participant.connectionId] = new ParticipantHandler(participant);
             _participants[participant.connectionId].videoHandler = new VideoHandler(videoContainer, participant.connectionId);

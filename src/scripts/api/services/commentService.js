@@ -27,8 +27,37 @@ export const getPagedBlogComments = async (blogId, page = 1, pageSize = 5) => {
     }
 };
 
+export const getPagedLectureComments = async (lectureId, page = 1, pageSize = 10) => {
+    try {
+        return await get(`${API_BASE_URL}`, {
+            SourceId: lectureId,
+            TargetEntity: TargetFeedbackEntities.LectureComment.value,
+            page,
+            pageSize
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const createBlogComment = async (formData) => {
     try {
+        return await postForm(`${API_BASE_URL}`, formData);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createLectureComment = async (lectureId, content) => {
+    try {
+        if (!lectureId || !content || typeof content !== "string") {
+            throw new Error("LectureId và Content phải là chuỗi hợp lệ.");
+        }
+
+        const formData = new FormData();
+        formData.append("sourceId", lectureId);
+        formData.append("targetEntity", TargetFeedbackEntities.LectureComment.value);
+        formData.append("content", content.trim());
         return await postForm(`${API_BASE_URL}`, formData);
     } catch (error) {
         throw error;
@@ -70,39 +99,21 @@ export const updateLectureComment = async (commentId, newContent) => {
     }
 };
 
-export const deleteComment = async (commentId) => {
-    try {
-        return await del(`${API_BASE_URL}/${commentId}`);
-    } catch (error) {
-        throw error;
-    }
+// export const deleteComment = async (commentId) => {
+//     try {
+//         return await del(`${API_BASE_URL}/${commentId}`);
+//     } catch (error) {
+//         throw error;
+//     }
+// };
+
+export const deleteArticleComment = async (commentId) => {
+    return await del(`/Comments/article/${commentId}`);
 };
 
-export const getPagedLectureComments = async (lectureId, page = 1, pageSize = 10) => {
-    try {
-        return await get(`${API_BASE_URL}`, {
-            SourceId: lectureId,
-            TargetEntity: TargetFeedbackEntities.LectureComment.value,
-            page,
-            pageSize
-        });
-    } catch (error) {
-        throw error;
-    }
+export const deleteLectureComment = async (commentId) => {
+    return await del(`/Comments/lecture/${commentId}`);
 };
 
-export const createLectureComment = async (lectureId, content) => {
-    try {
-        if (!lectureId || !content || typeof content !== "string") {
-            throw new Error("LectureId và Content phải là chuỗi hợp lệ.");
-        }
 
-        const formData = new FormData();
-        formData.append("sourceId", lectureId);
-        formData.append("targetEntity", TargetFeedbackEntities.LectureComment.value);
-        formData.append("content", content.trim());
-        return await postForm(`${API_BASE_URL}`, formData);
-    } catch (error) {
-        throw error;
-    }
-};
+

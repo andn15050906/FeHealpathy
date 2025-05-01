@@ -6,7 +6,6 @@
           <i class="fas fa-tachometer-alt mr-2"></i> Dashboard quản trị viên
         </h1>
         <p class="subtitle">Chào mừng trở lại, Admin</p>
-        <p class="subtitle">Chào mừng trở lại, Admin</p>
       </div>
       <div class="header-actions">
         <!--<button class="btn-icon" @click="toggleDarkMode">

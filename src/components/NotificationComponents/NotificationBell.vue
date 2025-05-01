@@ -2,22 +2,39 @@
   <div v-if="isAuthenticated" class="notification-bell-container">
     <div class="bell-icon" @click="toggleDropdown">
       <i class="fas fa-bell"></i>
-      <span v-if="unreadCount > 0" class="notification-count">{{
-        unreadCount
-      }}</span>
+      <span v-if="unreadCount > 0" class="notification-count">
+        {{ unreadCount }}
+      </span>
     </div>
+
     <transition name="fade">
       <div v-if="isDropdownVisible" class="notification-dropdown">
+        <div class="header">
+          <span>Thông báo</span>
+          <button class="mark-all-button" v-if="unreadCount > 0" @click="markAllAsRead">
+            Đánh dấu tất cả đã đọc
+          </button>
+        </div>
+
         <div v-if="notifications.length === 0" class="no-notifications">
           Không có thông báo
         </div>
+
         <div v-else>
-          <div class="notification-item" v-for="(notification, index) in notifications" :key="index"
+          <div class="notification-item" v-for="(notification, index) in notifications" :key="notification.id"
             :class="{ unread: !notification.read }">
-            <p class="notification-content">{{ notification.content }}</p>
-            <button class="mark-read-button" v-if="!notification.read" @click="markAsRead(index)">
-              Đánh dấu đã đọc
-            </button>
+            <div class="notification-text">
+              <p class="sender-name">{{ notification.senderName }}</p>
+              <p class="notification-content">{{ notification.content }}</p>
+              <p class="time">{{ getTimeAgo(notification.timestamp) }}</p>
+            </div>
+
+            <div class="actions">
+              <i v-if="!notification.read" class="fas fa-circle unread-dot" title="Chưa đọc"></i>
+              <button v-if="!notification.read" class="mark-read" @click="markAsRead(notification.id)">
+                Đã đọc
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -30,14 +47,8 @@ import { getNotifications } from "@/scripts/api/services/notificationService";
 
 export default {
   props: {
-    isAuthenticated: {
-      type: Boolean,
-      required: true,
-    },
-    userId: {
-      type: String,
-      required: true,
-    },
+    isAuthenticated: Boolean,
+    userId: String,
   },
   data() {
     return {
@@ -47,58 +58,71 @@ export default {
   },
   computed: {
     unreadCount() {
-      return this.notifications.filter((notification) => !notification.read).length;
+      return this.notifications.filter((n) => !n.read).length;
     },
   },
   methods: {
     toggleDropdown() {
       this.isDropdownVisible = !this.isDropdownVisible;
     },
-    markAsRead(index) {
-      const notification = this.notifications[index];
-      notification.read = true;
-
-      const readIds = JSON.parse(
-        localStorage.getItem("readNotifications") || "[]"
-      );
-      readIds.push(notification.id);
-      localStorage.setItem(
-        "readNotifications",
-        JSON.stringify([...new Set(readIds)])
-      );
+    getTimeAgo(timestamp) {
+      const time = new Date(timestamp);
+      const now = new Date();
+      const diff = Math.floor((now - time) / 1000);
+      if (diff < 60) return `${diff} giây trước`;
+      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+      return `${Math.floor(diff / 86400)} ngày trước`;
     },
+    markAsRead(id) {
+      const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
+      if (!readIds.includes(id)) {
+        readIds.push(id);
+        localStorage.setItem("readNotifications", JSON.stringify(readIds));
+      }
 
+      const index = this.notifications.findIndex((n) => n.id === id);
+      if (index !== -1) {
+        this.notifications[index].read = true;
+      }
+    },
+    markAllAsRead() {
+      const allIds = this.notifications.map((n) => n.id);
+      localStorage.setItem("readNotifications", JSON.stringify(allIds));
+      this.notifications = this.notifications.map((n) => ({
+        ...n,
+        read: true,
+      }));
+    },
     async fetchNotifications() {
       try {
         const response = await getNotifications({ ReceiverId: this.userId });
         const readIds = JSON.parse(localStorage.getItem("readNotifications") || "[]");
-
-        let notificationsData = [];
-
-        if (response && Array.isArray(response)) {
-          notificationsData = response;
-        } else if (response && response.items && Array.isArray(response.items)) {
-          notificationsData = response.items;
-        }
+        const notifications = response.items || response;
 
         this.notifications = notificationsData.map((notification) => {
           let content = "";
+          let senderName = "Hệ thống";
+          let timestamp = notification.createdTime || new Date().toISOString();
+
           try {
             const parsed = JSON.parse(notification.message);
-            content = parsed.Message || "No message";
-          } catch (e) {
+            content = parsed.Message || "Không có nội dung";
+            senderName = parsed.Sender || "Hệ thống";
+          } catch {
             content = notification.message;
           }
 
           return {
             id: notification.id,
             content,
+            senderName,
+            timestamp,
             read: readIds.includes(notification.id),
           };
         });
-      } catch (error) {
-        console.error("Lỗi khi lấy thông báo:", error);
-        this.notifications = [];
+      } catch (err) {
+        console.error("Lỗi khi lấy thông báo:", err);
       }
     },
   },
@@ -117,28 +141,22 @@ export default {
 }
 
 .bell-icon {
-  position: relative;
   font-size: 1.8rem;
   cursor: pointer;
   color: #333;
-  transition: transform 0.2s ease;
-}
-
-.bell-icon:hover {
-  transform: scale(1.1);
+  position: relative;
 }
 
 .notification-count {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #ff4040;
+  background: red;
   color: white;
   font-size: 0.8rem;
-  font-weight: bold;
-  border-radius: 50%;
   padding: 2px 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  font-weight: bold;
 }
 
 .notification-dropdown {
@@ -146,53 +164,85 @@ export default {
   top: 40px;
   right: 0;
   background: white;
+  width: 300px;
+  max-height: 400px;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 200px;
-  max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+}
+
+.mark-all-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .no-notifications {
   padding: 15px;
   text-align: center;
   color: #666;
-  font-size: 0.9rem;
 }
 
 .notification-item {
-  padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  transition: background 0.2s ease;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
 }
 
 .notification-item.unread {
-  background: #f9f9f9;
-  font-weight: bold;
+  background: #f0f7ff;
 }
 
-.notification-item:last-child {
-  border-bottom: none;
-}
-
-.notification-content {
-  margin-bottom: -5px;
-  font-size: 0.9rem;
-  color: #333;
+.notification-text {
   flex: 1;
 }
 
-.mark-read-button {
+.sender-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.notification-content {
+  margin: 2px 0;
+  font-size: 0.9rem;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unread-dot {
+  font-size: 0.6rem;
+  color: #007bff;
+}
+
+.mark-read {
   background: none;
   border: none;
+  font-size: 0.75rem;
   color: #007bff;
-  font-size: 0.8rem;
   cursor: pointer;
   margin-left: 10px;
   transition: color 0.2s ease;
@@ -207,7 +257,6 @@ export default {
     opacity: 0;
     transform: translateY(-10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
