@@ -40,15 +40,16 @@
                     <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
                     <div class="event-description" v-if="event.description">{{ event.description }}</div>
                     <div class="event-actions">
-                        <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                        <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        <button class="action-btn cancel" @click="confirmDeleteEvent(index)">
+                            <i class="fa-solid fa-trash "></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-actions">
                 <button class="schedule-btn" @click="openScheduleForm">
-                    <i class="fa-solid fa-plus"></i> Đặt lịch
+                    <i class="fa-solid fa-plus"></i> Đặt lịch tư vấn
                 </button>
             </div>
         </div>
@@ -56,40 +57,52 @@
         <div class="modal" v-if="showScheduleModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Đặt lịch họp với cố vấn</h3>
+                    <h3>Đặt lịch tư vấn với cố vấn</h3>
                     <span class="close-btn" @click="closeScheduleModal">&times;</span>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Ngày họp với cố vấn</label>
+                        <label>Ngày tư vấn với cố vấn</label>
                         <div class="selected-date-display">{{ formattedSelectedDate }}</div>
                     </div>
                     <div class="form-group">
-                        <label>Giờ bắt đầu</label>
-                        <input type="time" v-model="scheduleForm.startTime" class="time-input">
+                        <label>Chọn khung giờ tư vấn</label>
+                        <div class="time-slots">
+                            <div v-for="(slot, index) in availableTimeSlots" :key="index" class="time-slot-item"
+                                :class="{ 'selected': scheduleForm.selectedSlot === index }"
+                                @click="selectTimeSlot(index)">
+                                <div class="slot-checkbox">
+                                    <i class="fa-solid"
+                                        :class="scheduleForm.selectedSlot === index ? 'fa-check-circle' : 'fa-circle'"></i>
+                                </div>
+                                <div class="slot-time">
+                                    Slot {{ index + 1 }}: {{ slot.startTime }} - {{ slot.endTime }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Thời gian họp</label>
-                        <div class="duration-options">
-                            <button v-for="duration in durations" :key="duration.value"
-                                @click="selectDuration(duration.value)"
-                                :class="['duration-btn', scheduleForm.duration === duration.value ? 'active' : '']">
-                                {{ duration.label }}
-                            </button>
-                        </div>
+                        <label>Ghi chú</label>
+                        <textarea v-model="scheduleForm.notes" rows="3" class="form-control"
+                            placeholder="Nhập ghi chú..." />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="cancel-btn" @click="closeScheduleModal">Hủy bỏ</button>
-                    <button class="save-btn" @click="showSaveConfirm"
-                        :disabled="!scheduleForm.startTime || !scheduleForm.duration">Lưu lại</button>
+                    <button class="save-btn" @click="confirmSave" :disabled="scheduleForm.selectedSlot === null">
+                        Lưu lại
+                    </button>
                 </div>
             </div>
         </div>
 
-        <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn đặt lịch họp với cố vấn không?'"
+        <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn đặt lịch tư vấn với cố vấn không?'"
             :isVisible="showSaveConfirmation" @confirmSave="handleSaveConfirmation"
             @update:isVisible="val => showSaveConfirmation = val" />
+
+        <DeleteConfirmPopup :message="'Bạn có chắc chắn muốn huỷ cuộc hẹn tư vấn này không?'"
+            :isVisible="showDeleteConfirmation" @confirmDelete="handleDeleteConfirmation"
+            @update:isVisible="val => showDeleteConfirmation = val" />
     </div>
 </template>
 
@@ -107,15 +120,12 @@ import {
     format
 } from "date-fns";
 import SaveConfirmPopUp from "../Popup/SaveConfirmPopUp.vue";
+import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 
 export default {
     name: "Calendar",
-    components: {
-        SaveConfirmPopUp
-    },
-    props: {
-        initialDate: { type: Date, default: () => new Date() }
-    },
+    components: { SaveConfirmPopUp, DeleteConfirmPopup },
+    props: { initialDate: { type: Date, default: () => new Date() } },
     data() {
         return {
             currentDate: this.initialDate,
@@ -123,15 +133,20 @@ export default {
             events: [],
             showScheduleModal: false,
             showSaveConfirmation: false,
+            showDeleteConfirmation: false,
+            eventToDeleteIndex: null,
             scheduleForm: {
-                startTime: "09:00",
-                duration: 30
+                selectedSlot: null,
+                notes: ''
             },
-            durations: [
-                { value: 15, label: "15 phút" },
-                { value: 30, label: "30 phút" },
-                { value: 45, label: "45 phút" },
-                { value: 60, label: "1 giờ" }
+            availableTimeSlots: [
+                { startTime: "09:00", endTime: "10:00" },
+                { startTime: "10:00", endTime: "11:00" },
+                { startTime: "11:00", endTime: "12:00" },
+                { startTime: "13:00", endTime: "14:00" },
+                { startTime: "14:00", endTime: "15:00" },
+                { startTime: "15:00", endTime: "16:00" },
+                { startTime: "16:00", endTime: "17:00" }
             ]
         };
     },
@@ -170,36 +185,59 @@ export default {
         selectDay(day) { this.selectedDate = day.date; this.$emit('date-selected', this.selectedDate); },
         hasEvents(day) { return this.events.some(event => dfIsSameDay(event.date, day.date)); },
         getEventCount(day) { return this.events.filter(event => dfIsSameDay(event.date, day.date)).length; },
-        openScheduleForm() { this.showScheduleModal = true; },
-        closeScheduleModal() { this.showScheduleModal = false; },
-        selectDuration(duration) { this.scheduleForm.duration = duration; },
-        showSaveConfirm() { this.showSaveConfirmation = true; },
+        openScheduleForm() {
+            this.scheduleForm.selectedSlot = null;
+            this.showScheduleModal = true;
+        },
+        closeScheduleModal() {
+            this.showScheduleModal = false;
+            this.scheduleForm.notes = '';
+            this.scheduleForm.selectedSlot = null;
+        },
+        selectTimeSlot(index) {
+            this.scheduleForm.selectedSlot = index;
+        },
+        confirmSave() { this.showSaveConfirmation = true; },
         handleSaveConfirmation(confirmed) {
             if (confirmed) {
                 this.saveSchedule();
-                this.showSaveConfirmation = false;
             }
+            this.showSaveConfirmation = false;
         },
         saveSchedule() {
-            const startTime = this.scheduleForm.startTime;
-            const durationMinutes = this.scheduleForm.duration;
-
-            const [hours, minutes] = startTime.split(':').map(Number);
-            let endHours = hours + Math.floor((minutes + durationMinutes) / 60);
-            let endMinutes = (minutes + durationMinutes) % 60;
-
-            const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
-
-            const newEvent = {
-                name: "Họp với cố vấn",
-                date: this.selectedDate,
-                startTime: startTime,
-                endTime: endTime,
-                description: `Thời gian họp: ${durationMinutes} phút`
-            };
-
-            this.events.push(newEvent);
-            this.closeScheduleModal();
+            if (this.scheduleForm.selectedSlot !== null) {
+                const selectedSlot = this.availableTimeSlots[this.scheduleForm.selectedSlot];
+                this.events.push({
+                    name: `Tư vấn với cố vấn - Slot ${this.scheduleForm.selectedSlot + 1}`,
+                    date: this.selectedDate,
+                    startTime: selectedSlot.startTime,
+                    endTime: selectedSlot.endTime,
+                    description: this.scheduleForm.notes || `Thời gian tư vấn 1 giờ`
+                });
+                this.closeScheduleModal();
+            }
+        },
+        confirmDeleteEvent(index) {
+            this.eventToDeleteIndex = index;
+            this.showDeleteConfirmation = true;
+        },
+        handleDeleteConfirmation(confirmed) {
+            if (confirmed && this.eventToDeleteIndex !== null) {
+                this.deleteEvent(this.eventToDeleteIndex);
+            }
+            this.showDeleteConfirmation = false;
+            this.eventToDeleteIndex = null;
+        },
+        deleteEvent(index) {
+            const eventToDelete = this.selectedDayEvents[index];
+            const mainIndex = this.events.findIndex(event =>
+                dfIsSameDay(event.date, eventToDelete.date) &&
+                event.startTime === eventToDelete.startTime &&
+                event.endTime === eventToDelete.endTime
+            );
+            if (mainIndex !== -1) {
+                this.events.splice(mainIndex, 1);
+            }
         }
     }
 };
@@ -404,13 +442,15 @@ export default {
     background: none;
     border: none;
     cursor: pointer;
-    color: #7f8c8d;
     padding: 2px;
     border-radius: 3px;
 }
 
+.action-btn.cancel {
+    color: #dc2626;
+}
+
 .action-btn:hover {
-    color: #2c3e50;
     background: #eaeaea;
 }
 
@@ -572,5 +612,46 @@ export default {
 
 .save-btn:hover {
     background-color: #2563eb;
+}
+
+.time-slots {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.time-slot-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.time-slot-item:last-child {
+    border-bottom: none;
+}
+
+.time-slot-item:hover {
+    background-color: #f5f5f5;
+}
+
+.time-slot-item.selected {
+    background-color: #e3f2fd;
+}
+
+.slot-checkbox {
+    margin-right: 12px;
+    color: #757575;
+}
+
+.time-slot-item.selected .slot-checkbox {
+    color: #2196f3;
+}
+
+.slot-time {
+    font-size: 14px;
 }
 </style>

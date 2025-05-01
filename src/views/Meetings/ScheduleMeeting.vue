@@ -1,9 +1,6 @@
 <template>
   <div class="schedule-meeting container">
-    <h2 class="page-title text-center">Đặt lịch họp với chuyên gia</h2>
-
-    <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn đặt lịch họp không?'" :isVisible="showConfirm"
-      @confirmSave="onConfirmSave" @update:isVisible="showConfirm = $event" />
+    <h2 class="page-title text-center">Đặt lịch tư vấn với chuyên gia</h2>
 
     <div class="meeting-form card p-4 mb-5">
       <div class="form-group">
@@ -33,25 +30,14 @@
           {{ validationErrors.selectedAdvisor }}
         </small>
       </div>
-
-      <div class="form-group">
-        <label for="meeting-notes">Ghi chú:</label>
-        <textarea id="meeting-notes" v-model="notes" class="form-control" rows="3"
-          placeholder="Nhập ghi chú cho cuộc họp..."></textarea>
-      </div>
-
-      <button @click="showConfirm = true" class="btn btn-primary w-100" :disabled="isLoading || !isFormValid">
-        <i class="fas fa-calendar-plus"></i>
-        {{ isLoading ? 'Đang xử lý...' : 'Đặt lịch họp' }}
-      </button>
     </div>
 
     <div class="meetings-list mt-5">
-      <h4 class="section-title">Lịch hẹn của bạn</h4>
+      <h4 class="section-title">Lịch hẹn tư vấn của bạn</h4>
 
       <div v-if="upcomingMeetings.length === 0" class="no-meetings card p-5 text-center">
         <i class="fas fa-calendar-times mb-3 text-dark"></i>
-        <p>Chưa có cuộc hẹn nào được đặt</p>
+        <p>Chưa có cuộc hẹn tư vấn nào được đặt</p>
       </div>
 
       <div v-else class="row">
@@ -85,7 +71,7 @@
 
             <div class="card-footer border-top-0 bg-white pb-3">
               <button @click="joinMeeting(meeting.id)" class="btn btn-primary w-100">
-                <i class="fas fa-video me-2"></i> Tham gia cuộc họp
+                <i class="fas fa-video me-2"></i> Tham gia tư vấn
               </button>
             </div>
           </div>
@@ -97,35 +83,23 @@
 
 <script setup>
 import { ref, onBeforeMount, computed } from 'vue';
-import { createMeeting, getMeetings, deleteMeeting } from '@/scripts/api/services/meetingService';
+import { getMeetings } from '@/scripts/api/services/meetingService';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
 import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
 import { useRouter } from 'vue-router';
-import SaveConfirmPopUp from '../../components/Common/Popup/SaveConfirmPopUp.vue';
 
 const router = useRouter();
 const selectedAdvisor = ref('');
-const notes = ref('');
 const isLoading = ref(false);
 const meetings = ref([]);
 const advisors = ref([]);
-const showConfirm = ref(false);
 const validationErrors = ref({ selectedAdvisor: '' });
-const pageIndex = ref(0);
-const pageSize = ref(10);
-
-const isFormValid = computed(() => {
-  return !!selectedAdvisor.value;
-});
 
 const upcomingMeetings = computed(() => {
   const now = new Date();
-  return meetings.value.filter(meeting => {
-    const meetingStartDate = new Date(meeting.startAt);
-    return meetingStartDate >= now;
-  });
+  return meetings.value.filter(m => new Date(m.startAt) >= now);
 });
 
 function selectAdvisor(id) {
@@ -134,8 +108,7 @@ function selectAdvisor(id) {
 }
 
 function formatTime(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  return new Date(dateString).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
 
 function getBadgeClass(status) {
@@ -149,22 +122,17 @@ function getBadgeClass(status) {
 
 async function loadMeetings() {
   try {
-    const resp = await getMeetings({
-      PageIndex: 0,
-      PageSize: 255
-    });
+    const resp = await getMeetings({ PageIndex: 0, PageSize: 255 });
     const me = getUserProfile().id;
     const list = resp.items || [];
     meetings.value = list
       .filter(m => m.participants.some(p => p.creatorId === me))
       .map(m => ({
         ...m,
-        advisorName:
-          advisors.value.find(a => a.advisorId === m.advisorId)?.fullName ||
-          'Chuyên gia',
+        advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
       }));
   } catch {
-    toast.error('Không thể tải danh sách cuộc họp');
+    toast.error('Không thể tải danh sách tư vấn');
   }
 }
 
@@ -177,55 +145,6 @@ onBeforeMount(async () => {
     toast.error('Không thể tải danh sách chuyên gia');
   }
 });
-
-async function scheduleMeeting() {
-  isLoading.value = true;
-  try {
-    const now = new Date();
-    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-
-    await createMeeting({
-      title: 'Cuộc họp với chuyên gia',
-      startAt: now,
-      endAt: oneHourLater,
-      maxParticipants: 2,
-      participants: [
-        { userId: getUserProfile().id, isHost: true },
-        { userId: selectedAdvisor.value, isHost: false },
-      ],
-      description: notes.value || '',
-    });
-    toast.success('Đặt lịch họp thành công');
-    selectedAdvisor.value = '';
-    notes.value = '';
-    await loadMeetings();
-  } catch {
-    toast.error('Không thể đặt lịch họp');
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function onConfirmSave(confirm) {
-  if (confirm) {
-    if (!isFormValid.value) {
-      validationErrors.value.selectedAdvisor = 'Vui lòng chọn chuyên gia tư vấn';
-      return;
-    }
-    scheduleMeeting();
-  }
-}
-
-async function cancelMeeting(id) {
-  if (!confirm('Bạn có chắc chắn muốn hủy lịch họp này?')) return;
-  try {
-    await deleteMeeting(id);
-    toast.success('Hủy lịch họp thành công');
-    await loadMeetings();
-  } catch {
-    toast.error('Không thể hủy lịch họp');
-  }
-}
 
 function joinMeeting(id) {
   router.push(`/call/${id}`);
