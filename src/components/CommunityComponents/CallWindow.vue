@@ -423,7 +423,7 @@ import { getUsers } from '@/scripts/api/services/userService';
 import { HubConnection, RTCHandler, ParticipantExtraInfo, MessagingHandler, MESSAGE_TYPES } from '@/scripts/api/hubClient';
 import { createSidebar, createInCallWindow, createOutCallWindow, createVideoTile, createMessageContainer, createMessage } from '@/components/call_html.js';
 import { VideoHandler } from '@/scripts/logic/conversationState';
-import { onBeforeMount } from 'vue';
+import { onMounted } from 'vue';
 
 
 
@@ -447,7 +447,7 @@ const client = getUserProfile();
 var conversationName = 'Video Conference';
 var _roomId = props?.roomId ?? 'eb4e0163-271a-4886-9e60-bee318d7ca44';
 
-onBeforeMount(() => {
+onMounted(() => {
     var _onCall = false;
     var callWindow;
     var _videoRow, roomChatInp, _defaultMedia = MEDIA_TYPE.DISPLAY_MEDIA;
@@ -469,7 +469,7 @@ onBeforeMount(() => {
             callWindow.innerHTML = createOutCallWindow(conversationName);
             document.getElementById('_join-room-btn').onclick = () => {
                 if (isValidRoomId(_roomId)) {
-                    _rtcHandler.joinRoom(_roomId, new ParticipantExtraInfo(client.fullName, client.avatar));
+                    _rtcHandler.joinRoom(_roomId, new ParticipantExtraInfo(client.fullName, client.avatar ?? client.avatarUrl));
                 }
             }
         }
