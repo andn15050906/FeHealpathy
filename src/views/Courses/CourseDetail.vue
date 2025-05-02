@@ -100,8 +100,12 @@
             <button 
               class="btn-view" 
               @click="viewLecture(lecture.id)"
-              :disabled="!lecture.isPreviewable" 
-              :title="!lecture.isPreviewable ? 'Bạn cần mua khóa học để xem bài giảng này' : 'Xem bài giảng'"
+              :disabled="!lecture.isPreviewable && !isOwner && !isEnrolled"
+              :title="lecture.isPreviewable 
+                        ? 'Xem bài giảng' 
+                        : (isOwner || isEnrolled 
+                            ? 'Xem bài giảng' 
+                            : 'Bạn cần mua khóa học để xem bài giảng này')"
             >
               ▶️ Xem bài giảng
             </button> 

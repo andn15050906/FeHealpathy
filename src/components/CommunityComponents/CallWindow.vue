@@ -469,7 +469,7 @@ onMounted(() => {
             callWindow.innerHTML = createOutCallWindow(conversationName);
             document.getElementById('_join-room-btn').onclick = () => {
                 if (isValidRoomId(_roomId)) {
-                    _rtcHandler.joinRoom(_roomId, new ParticipantExtraInfo(client.fullName, client.avatar));
+                    _rtcHandler.joinRoom(_roomId, new ParticipantExtraInfo(client.fullName, client.avatar ?? client.avatarUrl));
                 }
             }
         }
@@ -581,7 +581,7 @@ onMounted(() => {
             }
         }
         function addParticipantHandler(participant) {
-            let videoContainer = createVideoTile(participant.connectionId, client.avatarUrl);
+            let videoContainer = createVideoTile(participant.connectionId, participant.avatar ?? client.avatarUrl);
             _videoRow.appendChild(videoContainer);
             _participants[participant.connectionId] = new ParticipantHandler(participant);
             _participants[participant.connectionId].videoHandler = new VideoHandler(videoContainer, participant.connectionId);

@@ -178,7 +178,7 @@ onMounted(async () => {
         thumb: null,
         addedMedia: null,
         removedMedia: null,
-        previewImage: section.thumb?.url || null,
+        previewImage: section.media?.url || null,
         existingThumb: section.thumb ? {
           id: section.thumb.id,
           url: section.thumb.url,

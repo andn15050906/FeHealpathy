@@ -21,20 +21,20 @@
             "LearnMore": "Tìm hiểu thêm"
         },
         "Section4": {
-            "Title": "Hơn hai nghìn đánh giá 5 sao."
+            "Title": ""
         },
         "Testimonial": [
             {
                 "Text": "Khi tôi không thể ngủ được, tôi mở ứng dụng này và chỉ sau 5 phút là ngủ thiếp đi.",
-                "UserText": "A từ Mỹ"
+                "UserText": "Đình Long"
             },
             {
                 "Text": "Tôi có một bộ não rất bận rộn và thường khó thư giãn. Giờ đây việc luyện tập hàng ngày thực sự tuyệt vời và chữa lành cho tôi.",
-                "UserText": "B từ Việt Nam"
+                "UserText": "Huỳnh Minh"
             },
             {
                 "Text": "Healpathy đã thay đổi cuộc sống của tôi theo những cách không thể đo đếm. Tôi trở nên kiên cường hơn và cảm thấy kết nối với bản thân nhiều hơn.",
-                "UserText": "C từ Anh"
+                "UserText": "Nguyễn Nam"
             }
         ],
         "Pricing": {

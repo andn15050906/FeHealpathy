@@ -67,9 +67,9 @@
                         <div v-else>
                             <p class="mb-2">{{ comment.content }}</p>
                             <div class="d-flex gap-3">
-                                <button class="btn btn-link p-0 text-secondary" @click="likeComment(comment)">
+                                <!-- <button class="btn btn-link p-0 text-secondary" @click="likeComment(comment)">
                                     <i class="fas fa-thumbs-up me-1"></i>{{ comment.likes }}
-                                </button>
+                                </button> -->
                                 <span style="display: none">
                                     Người dùng hiện tại: {{ currentUserId }} ({{ typeof currentUserId }})
                                     ID người tạo bình luận: {{ comment.creatorId }} ({{ typeof comment.creatorId }})
@@ -111,7 +111,7 @@ import {
     getPagedBlogComments,
     createBlogComment,
     updateComment,
-    deleteComment,
+    deleteArticleComment,
     TargetFeedbackEntities
 } from "@/scripts/api/services/commentService";
 import { getUserById } from "@/scripts/api/services/userService";
@@ -269,7 +269,7 @@ export default {
         },
         async handleDeleteConfirmed() {
             try {
-                await deleteComment(this.commentToDelete);
+                await deleteArticleComment(this.commentToDelete);
                 this.comments = this.comments.filter(c => c.id !== this.commentToDelete);
                 this.commentToDelete = null;
             } catch (error) {

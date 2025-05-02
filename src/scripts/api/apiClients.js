@@ -1,9 +1,19 @@
 import axios from "axios";
 import { clearUserAuthData } from '@/scripts/api/services/authService';
 
+var baseUrl;
+
+const switchGateway = () => {
+    baseUrl = (baseUrl == import.meta.env.VITE_BACKEND_FALLBACK_URL + "/api")
+        ? import.meta.env.VITE_BACKEND_URL + "/api"
+        : import.meta.env.VITE_BACKEND_FALLBACK_URL + "/api"
+}
+
+switchGateway();
+
 const createApiClient = (contentType) => {
     const client = axios.create({
-        baseURL: import.meta.env.VITE_BACKEND_URL + "/api",
+        baseURL: baseUrl,
         withCredentials: true,
         headers: {
             "Content-Type": contentType,
@@ -65,12 +75,12 @@ try {
 	});
 	return response.data;
 } catch (error) {
-	logError(error);
+	await logError(error, client);
 	throw error;
 }
 };
 
-const logError = error =>
+const logError = async (error, client) =>
 {
 	if (error.response) {
 		if (error.response.status === 401
@@ -79,9 +89,13 @@ const logError = error =>
 			clearUserAuthData();
 			window.location.href = "/sign-in";
 		}
-		/*else {
-			console.log('An error occurred:', error.message);
-		}*/
+        else if (error.response.status == 403) {
+            try {
+                const response = await client({ method: "get", url: 'healthcheck' });
+            } catch (err) {
+                switchGateway();
+            }
+        }
 	}
 	/*else {
 		console.log('Error without response:', error.message);

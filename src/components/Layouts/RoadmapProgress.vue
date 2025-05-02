@@ -47,7 +47,7 @@ watch(useRoute(), () => {
 });
 
 function goTo(reference, isNewRoadmap) {
-    router.push({ path: isNewRoadmap ? 'Setting-up' : reference })
+    router.push({ path: isNewRoadmap ? '/setting-up' : reference })
 }
 
 /*function goToNextStep(index) {
