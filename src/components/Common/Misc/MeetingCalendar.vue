@@ -35,13 +35,16 @@
             </div>
 
             <div class="events-list">
+                <div v-if="selectedDayEvents.length === 0" class="no-events">
+                    Không có lịch tư vấn nào trong ngày này
+                </div>
                 <div v-for="(event, index) in selectedDayEvents" :key="index" class="event-item">
                     <div class="event-name">{{ event.name }}</div>
                     <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
                     <div class="event-description" v-if="event.description">{{ event.description }}</div>
                     <div class="event-actions">
                         <button class="action-btn cancel" @click="confirmDeleteEvent(index)">
-                            <i class="fa-solid fa-trash "></i>
+                            <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
                 </div>
@@ -118,15 +121,21 @@ import {
     addMonths,
     isSameDay as dfIsSameDay,
     isSameMonth,
-    format
+    format,
 } from "date-fns";
 import SaveConfirmPopUp from "../Popup/SaveConfirmPopUp.vue";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
+import { createMeeting, deleteMeeting, getMeetings } from "../../../scripts/api/services/meetingService.js";
+import { getUserProfile } from '../../../scripts/api/services/authService.js';
+import { toast } from 'vue3-toastify';
 
 export default {
-    name: "Calendar",
+    name: "MeetingCalendar",
     components: { SaveConfirmPopUp, DeleteConfirmPopup },
-    props: { initialDate: { type: Date, default: () => new Date() } },
+    props: {
+        initialDate: { type: Date, default: () => new Date() },
+        advisorId: { type: String, default: '' }
+    },
     data() {
         return {
             currentDate: this.initialDate,
@@ -148,7 +157,8 @@ export default {
                 { startTime: "14:00", endTime: "15:00" },
                 { startTime: "15:00", endTime: "16:00" },
                 { startTime: "16:00", endTime: "17:00" }
-            ]
+            ],
+            currentUser: null
         };
     },
     computed: {
@@ -168,12 +178,24 @@ export default {
             return days;
         },
         selectedDayName() { return format(this.selectedDate, "EEEE"); },
-        selectedDayEvents() { return this.events.filter(event => dfIsSameDay(event.date, this.selectedDate)); },
+        selectedDayEvents() { return this.events.filter(event => dfIsSameDay(new Date(event.date), this.selectedDate)); },
         hasScheduledConsultation() {
             return this.selectedDayEvents.some(event => event.name.includes('Tư vấn với cố vấn'));
         }
     },
+    async mounted() {
+        await this.getCurrentUser();
+        this.fetchMeetings();
+    },
     methods: {
+        async getCurrentUser() {
+            try {
+                this.currentUser = await getUserProfile();
+            } catch (error) {
+                console.error("Failed to get user profile:", error);
+                this.currentUser = null;
+            }
+        },
         dayClasses(day) {
             return {
                 "calendar-day": true,
@@ -184,11 +206,22 @@ export default {
             };
         },
         formatDate(date) { return format(date, "dd"); },
-        prevMonth() { this.currentDate = subMonths(this.currentDate, 1); this.$emit('month-changed', this.currentDate); },
-        nextMonth() { this.currentDate = addMonths(this.currentDate, 1); this.$emit('month-changed', this.currentDate); },
-        selectDay(day) { this.selectedDate = day.date; this.$emit('date-selected', this.selectedDate); },
-        hasEvents(day) { return this.events.some(event => dfIsSameDay(event.date, day.date)); },
-        getEventCount(day) { return this.events.filter(event => dfIsSameDay(event.date, day.date)).length; },
+        prevMonth() {
+            this.currentDate = subMonths(this.currentDate, 1);
+            this.$emit('month-changed', this.currentDate);
+            this.fetchMeetings();
+        },
+        nextMonth() {
+            this.currentDate = addMonths(this.currentDate, 1);
+            this.$emit('month-changed', this.currentDate);
+            this.fetchMeetings();
+        },
+        selectDay(day) {
+            this.selectedDate = day.date;
+            this.$emit('date-selected', this.selectedDate);
+        },
+        hasEvents(day) { return this.events.some(event => dfIsSameDay(new Date(event.date), day.date)); },
+        getEventCount(day) { return this.events.filter(event => dfIsSameDay(new Date(event.date), day.date)).length; },
         openScheduleForm() {
             this.scheduleForm.selectedSlot = null;
             this.showScheduleModal = true;
@@ -202,45 +235,144 @@ export default {
             this.scheduleForm.selectedSlot = index;
         },
         confirmSave() { this.showSaveConfirmation = true; },
-        handleSaveConfirmation(confirmed) {
+        async handleSaveConfirmation(confirmed) {
             if (confirmed) {
-                this.saveSchedule();
+                await this.saveSchedule();
             }
             this.showSaveConfirmation = false;
         },
-        saveSchedule() {
+        async saveSchedule() {
             if (this.scheduleForm.selectedSlot !== null) {
                 const selectedSlot = this.availableTimeSlots[this.scheduleForm.selectedSlot];
-                this.events.push({
-                    name: `Tư vấn với cố vấn - Slot ${this.scheduleForm.selectedSlot + 1}`,
-                    date: this.selectedDate,
-                    startTime: selectedSlot.startTime,
-                    endTime: selectedSlot.endTime,
-                    description: this.scheduleForm.notes || `Thời gian tư vấn 1 giờ`
-                });
-                this.closeScheduleModal();
+                const dateStr = format(this.selectedDate, "yyyy-MM-dd");
+                const startTimeStr = `${dateStr}T${selectedSlot.startTime}:00`;
+                const startAt = new Date(startTimeStr);
+                const endTimeStr = `${dateStr}T${selectedSlot.endTime}:00`;
+                const endAt = new Date(endTimeStr);
+
+                try {
+                    //TODO: THROW 500 IN BE
+                    // const participants = [
+                    //     {
+                    //         userId: this.currentUser.id,
+                    //         isHost: false
+                    //     }
+                    // ];
+                    // if (this.advisorId) {
+                    //     participants.push({
+                    //         userId: this.advisorId,
+                    //         isHost: true
+                    //     });
+                    // }
+
+                    const meetingData = {
+                        title: `Tư vấn với cố vấn - Slot ${this.scheduleForm.selectedSlot + 1}`,
+                        startAt: startTimeStr,
+                        endAt: endTimeStr,
+                        maxParticipants: 2,
+                        // participants: participants,
+                        participants: [],
+                        description: this.scheduleForm.notes || `Thời gian tư vấn 1 giờ`
+                    };
+
+                    const response = await createMeeting(meetingData);
+
+                    this.events.push({
+                        id: response.id,
+                        name: meetingData.title,
+                        date: dateStr,
+                        startTime: selectedSlot.startTime,
+                        endTime: selectedSlot.endTime,
+                        description: meetingData.description,
+                        rawStartAt: startAt,
+                        rawEndAt: endAt
+                    });
+
+                    toast.success("Đặt lịch tư vấn thành công", {
+                        timeout: 500,
+                        closeButton: false,
+                        hideProgressBar: true
+                    });
+
+                    this.closeScheduleModal();
+                } catch (error) {
+                    console.error("Failed to create meeting:", error);
+                }
             }
         },
         confirmDeleteEvent(index) {
             this.eventToDeleteIndex = index;
             this.showDeleteConfirmation = true;
         },
-        handleDeleteConfirmation(confirmed) {
+        async handleDeleteConfirmation(confirmed) {
             if (confirmed && this.eventToDeleteIndex !== null) {
-                this.deleteEvent(this.eventToDeleteIndex);
+                await this.deleteEvent(this.eventToDeleteIndex);
             }
             this.showDeleteConfirmation = false;
             this.eventToDeleteIndex = null;
         },
-        deleteEvent(index) {
+        async deleteEvent(index) {
             const eventToDelete = this.selectedDayEvents[index];
             const mainIndex = this.events.findIndex(event =>
-                dfIsSameDay(event.date, eventToDelete.date) &&
-                event.startTime === eventToDelete.startTime &&
-                event.endTime === eventToDelete.endTime
+                event.id === eventToDelete.id
             );
+
             if (mainIndex !== -1) {
-                this.events.splice(mainIndex, 1);
+                try {
+                    await deleteMeeting(eventToDelete.id);
+                    this.events.splice(mainIndex, 1);
+
+                    toast.success("Huỷ lịch tư vấn thành công", {
+                        timeout: 500,
+                        closeButton: false,
+                        hideProgressBar: true
+                    });
+                } catch (error) {
+                    console.error("Failed to delete meeting:", error);
+                }
+            }
+        },
+        async fetchMeetings() {
+            try {
+                const firstDay = startOfMonth(this.currentDate);
+                const lastDay = endOfMonth(this.currentDate);
+                const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
+                const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
+                const userProfile = JSON.parse(localStorage.getItem("userProfile"));
+
+                const queryParams = {
+                    // CreatorId: userProfile.id,
+                    Start: fromDate,
+                    End: toDate
+                };
+
+                const response = await getMeetings(queryParams);
+
+                let meetingsData = [];
+                if (response && Array.isArray(response)) {
+                    meetingsData = response;
+                } else if (response && response.items && Array.isArray(response.items)) {
+                    meetingsData = response.items;
+                }
+
+                this.events = meetingsData.map(meeting => {
+                    const startAt = new Date(meeting.startAt);
+                    const endAt = new Date(meeting.endAt);
+
+                    return {
+                        id: meeting.id,
+                        name: meeting.title,
+                        date: format(startAt, 'yyyy-MM-dd'),
+                        startTime: format(startAt, 'HH:mm'),
+                        endTime: format(endAt, 'HH:mm'),
+                        description: meeting.description,
+                        rawStartAt: startAt,
+                        rawEndAt: endAt
+                    };
+                });
+            } catch (error) {
+                console.error("Failed to fetch meetings:", error);
+                this.events = [];
             }
         }
     }

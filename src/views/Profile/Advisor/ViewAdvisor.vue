@@ -51,7 +51,8 @@
   </div>
   <div class="calendar-container">
     <h2 class="section-title">Lịch làm việc</h2>
-    <MeetingCalendar :events="advisorCalendar" :initialDate="today" @event-created="handleEventCreated" />
+    <MeetingCalendar :events="advisorCalendar" :initialDate="today" :advisorId="form.advisorId"
+      @event-created="handleEventCreated" />
   </div>
 </template>
 
