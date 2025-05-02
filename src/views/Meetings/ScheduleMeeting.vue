@@ -35,13 +35,13 @@
     <div class="meetings-list mt-5">
       <h4 class="section-title">Lịch hẹn tư vấn của bạn</h4>
 
-      <div v-if="upcomingMeetings.length === 0" class="no-meetings card p-5 text-center">
+      <div v-if="meetings.length === 0" class="no-meetings card p-5 text-center">
         <i class="fas fa-calendar-times mb-3 text-dark"></i>
         <p>Chưa có cuộc hẹn tư vấn nào được đặt</p>
       </div>
 
       <div v-else class="row">
-        <div v-for="meeting in upcomingMeetings" :key="meeting.id" class="col-4 mb-4">
+        <div v-for="meeting in meetings" :key="meeting.id" class="col-4 mb-4">
           <div class="meeting-card card h-100 shadow-sm">
             <div class="meeting-header card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0 fw-bold">{{ meeting.advisorName }}</h5>
@@ -70,8 +70,13 @@
             </div>
 
             <div class="card-footer border-top-0 bg-white pb-3">
-              <button @click="joinMeeting(meeting.id)" class="btn btn-primary w-100">
-                <i class="fas fa-video me-2"></i> Tham gia tư vấn
+              <button @click="joinMeeting(meeting.id)" class="btn btn-primary w-100"
+                :disabled="!isMeetingJoinable(meeting.startAt, meeting.endAt)"
+                :class="{ 'btn-secondary': !isMeetingJoinable(meeting.startAt, meeting.endAt) }">
+                <i class="fas fa-video me-2"></i>
+                <span v-if="isMeetingJoinable(meeting.startAt, meeting.endAt)">Tham gia tư vấn</span>
+                <span v-else-if="new Date(meeting.startAt) > new Date()">Chưa đến giờ tư vấn</span>
+                <span v-else>Đã kết thúc tư vấn</span>
               </button>
             </div>
           </div>
@@ -89,6 +94,11 @@ import { getUserProfile } from '@/scripts/api/services/authService';
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { toast } from 'vue3-toastify';
 import { useRouter } from 'vue-router';
+import {
+  startOfMonth,
+  endOfMonth,
+  format,
+} from "date-fns";
 
 const router = useRouter();
 const selectedAdvisor = ref('');
@@ -96,11 +106,6 @@ const isLoading = ref(false);
 const meetings = ref([]);
 const advisors = ref([]);
 const validationErrors = ref({ selectedAdvisor: '' });
-
-const upcomingMeetings = computed(() => {
-  const now = new Date();
-  return meetings.value.filter(m => new Date(m.startAt) >= now);
-});
 
 function selectAdvisor(id) {
   selectedAdvisor.value = id;
@@ -120,18 +125,36 @@ function getBadgeClass(status) {
   }
 }
 
+function isMeetingJoinable(startAt, endAt) {
+  const now = new Date();
+  const meetingStart = new Date(startAt);
+  const meetingEnd = new Date(endAt);
+
+  return meetingStart <= now && now <= meetingEnd;
+}
+
 async function loadMeetings() {
   try {
-    const resp = await getMeetings({ PageIndex: 0, PageSize: 255 });
+    const currentDate = new Date();
+    const firstDay = startOfMonth(currentDate);
+    const lastDay = endOfMonth(currentDate);
+    const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
+    const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
     const me = getUserProfile().id;
+
+    const resp = await getMeetings({
+      CreatorId: me,
+      Start: fromDate,
+      End: toDate
+    });
+
     const list = resp.items || [];
-    meetings.value = list
-      .filter(m => m.participants.some(p => p.creatorId === me))
-      .map(m => ({
-        ...m,
-        advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
-      }));
-  } catch {
+    meetings.value = list.map(m => ({
+      ...m,
+      advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
+    }));
+  } catch (error) {
+    console.error('Error loading meetings:', error);
     toast.error('Không thể tải danh sách tư vấn');
   }
 }
