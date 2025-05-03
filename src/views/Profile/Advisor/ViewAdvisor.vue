@@ -51,14 +51,14 @@
   </div>
   <div class="calendar-container">
     <h2 class="section-title">Lịch làm việc</h2>
-    <MeetingCalendar :events="advisorCalendar" :initialDate="today" :advisorId="form.advisorId"
+    <MeetingCalendar :events="advisorCalendar" :initialDate="today" :advisorId="form.userId"
       @event-created="handleEventCreated" />
   </div>
 </template>
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
-import { ref, onBeforeMount, inject, computed } from 'vue';
+import { ref, onBeforeMount, inject, computed, watch } from 'vue';
 import { toast } from 'vue3-toastify';
 import dict from '@/scripts/data/dictionary.json';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
@@ -82,6 +82,7 @@ const today = new Date();
 const originalForm = ref({});
 const loadingSpinner = inject('loadingSpinner');
 const text = dict['en'];
+const isDataLoaded = ref(false);
 
 const formattedDate = computed(() => {
   if (!form.value.creationTime) return '';
@@ -95,18 +96,20 @@ const fetchProfile = async (advisorId) => {
     loadingSpinner?.showSpinner();
     const advisors = await getAllAdvisors(advisorId);
     if (!advisors || advisors.length === 0) {
-      toast.error("Advisor not found", {
+      toast.error("Không tìm thấy cố vấn", {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 500
+        autoClose: 1500
       });
       return;
     }
     const advisor = advisors[0];
     advisor.creationTime = formatDate(advisor.creationTime);
+    if (!advisor.userId) {
+      return;
+    }
     Object.assign(form.value, advisor);
     originalForm.value = { ...form.value };
   } catch (error) {
-    console.error(`Error loading profile`);
   } finally {
     loadingSpinner?.hideSpinner();
   }
@@ -135,9 +138,29 @@ const handleEventCreated = (event) => {
 };
 
 onBeforeMount(() => {
-  fetchProfile(route.params.advisorId);
+  const advisorId = route.params.advisorId;
+  if (advisorId) {
+    fetchProfile(advisorId);
+  } else {
+    console.error('Advisor ID not found in route parameters');
+  }
 });
 </script>
+
+<style scoped>
+.loading-calendar {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #6c757d;
+}
+</style>
 
 <style scoped>
 .content {
