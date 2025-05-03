@@ -9,7 +9,7 @@
           <li><router-link class="hovered-link" to="/practice">Công Cụ</router-link></li>
           <li><router-link class="hovered-link" to="/blogs">Bài Viết</router-link></li>
           <li><router-link class="hovered-link" to="/courses">Khóa Học</router-link></li>
-          <li><router-link class="hovered-link" to="/community">Cộng Đồng</router-link></li>
+          <li><router-link class="hovered-link" to="/chat">Cộng Đồng</router-link></li>
           <li><router-link class="hovered-link" to="/faq">FAQ</router-link></li>
         </ul>
       </div>
