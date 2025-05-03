@@ -3,17 +3,21 @@ import { clearUserAuthData } from '@/scripts/api/services/authService';
 
 var baseUrl;
 
+export const getBaseUrl = () => {
+    return baseUrl;
+}
+
 const switchGateway = () => {
-    baseUrl = (baseUrl == import.meta.env.VITE_BACKEND_FALLBACK_URL + "/api")
-        ? import.meta.env.VITE_BACKEND_URL + "/api"
-        : import.meta.env.VITE_BACKEND_FALLBACK_URL + "/api"
+    baseUrl = (baseUrl == import.meta.env.VITE_BACKEND_FALLBACK_URL)
+        ? import.meta.env.VITE_BACKEND_URL
+        : import.meta.env.VITE_BACKEND_FALLBACK_URL
 }
 
 switchGateway();
 
 const createApiClient = (contentType) => {
     const client = axios.create({
-        baseURL: baseUrl,
+        baseURL: baseUrl + "/api",
         withCredentials: true,
         headers: {
             "Content-Type": contentType,
