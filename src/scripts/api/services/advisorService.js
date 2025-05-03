@@ -5,24 +5,28 @@ import { getUsers } from './userService';
 const API_BASE_URL = '/Advisors';
 
 
-export const getAllAdvisors = async () => {
+export const getAllAdvisors = async (advisorId = null) => {
   try {
     let advisors = (await get(`${API_BASE_URL}`)).items;
-
+    if (advisorId) {
+      advisors = advisors.filter(advisor => advisor.id === advisorId);
+    }
     let advisor_users = [];
     for (let advisor of advisors) {
       let user = (await getUsers({ advisorId: advisor.id }))?.items?.shift() ?? null;
-      advisor_users.push({
-        advisorId: advisor.id,
-        userId: user.id,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-        creationTime: advisor.creationTime,
-        intro: advisor.intro,
-        experience: advisor.experience,
-        balance: advisor.balance,
-        courseCount: advisor.courseCount
-      });
+      if (user) {
+        advisor_users.push({
+          advisorId: advisor.id,
+          userId: user.id,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+          creationTime: advisor.creationTime,
+          intro: advisor.intro,
+          experience: advisor.experience,
+          balance: advisor.balance,
+          courseCount: advisor.courseCount
+        });
+      }
     }
     
     return advisor_users;

@@ -2,17 +2,9 @@ import { get, post, patch, del } from '../apiClients';
 
 const BASE_URL = '/Meetings';
 
-export const getMeetings = async (queryParams = { PageIndex: 0, PageSize: 10 }) => {
-  try {
-    const params = new URLSearchParams();
-    Object.keys(queryParams).forEach(key => {
-      params.append(key, queryParams[key]);
-    });
-    const response = await get(`${BASE_URL}?${params.toString()}`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
+export const getMeetings = async (queryParams) => {
+  const params = new URLSearchParams(queryParams);
+  return get(`${BASE_URL}?${params.toString()}`);
 };
 
 export const createMeeting = async (dto) => {
