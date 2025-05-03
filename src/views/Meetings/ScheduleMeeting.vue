@@ -83,6 +83,58 @@
         </div>
       </div>
     </div>
+
+    <div class="meetings-list mt-5">
+      <h4 class="section-title">Lịch hẹn tư vấn với bạn</h4>
+
+      <div v-if="advisorMeetings.length === 0" class="no-meetings card p-5 text-center">
+        <i class="fas fa-calendar-times mb-3 text-dark"></i>
+        <p>Chưa có cuộc hẹn tư vấn nào với bạn</p>
+      </div>
+
+      <div v-else class="row">
+        <div v-for="meeting in advisorMeetings" :key="meeting.id" class="col-4 mb-4">
+          <div class="meeting-card card h-100 shadow-sm">
+            <div class="meeting-header card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold">{{ meeting.creatorName }}</h5>
+              <span :class="['badge', getBadgeClass(meeting.status)]">
+                {{ meeting.status }}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <div class="meeting-details">
+                <div class="info-row mb-2">
+                  <i class="fas fa-calendar-day me-2"></i>
+                  <span>{{ formatISODateWithHMS(meeting.startAt) }}</span>
+                </div>
+                <div class="info-row mb-2">
+                  <i class="fas fa-clock me-2"></i>
+                  <span>
+                    {{ formatTime(meeting.startAt) }} - {{ formatTime(meeting.endAt) }}
+                  </span>
+                </div>
+                <div v-if="meeting.description" class="info-row description-container p-2 mt-2">
+                  <i class="fas fa-sticky-note me-2 align-self-start mt-1"></i>
+                  <p class="m-0 text-start">{{ meeting.description }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer border-top-0 bg-white pb-3">
+              <button @click="joinMeeting(meeting.id)" class="btn btn-primary w-100"
+                :disabled="!isMeetingJoinable(meeting.startAt, meeting.endAt)"
+                :class="{ 'btn-secondary': !isMeetingJoinable(meeting.startAt, meeting.endAt) }">
+                <i class="fas fa-video me-2"></i>
+                <span v-if="isMeetingJoinable(meeting.startAt, meeting.endAt)">Tham gia tư vấn</span>
+                <span v-else-if="new Date(meeting.startAt) > new Date()">Chưa đến giờ tư vấn</span>
+                <span v-else>Đã kết thúc tư vấn</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -104,6 +156,7 @@ const router = useRouter();
 const selectedAdvisor = ref('');
 const isLoading = ref(false);
 const meetings = ref([]);
+const advisorMeetings = ref([]);
 const advisors = ref([]);
 const validationErrors = ref({ selectedAdvisor: '' });
 
@@ -142,20 +195,31 @@ async function loadMeetings() {
     const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
     const me = getUserProfile().id;
 
-    const resp = await getMeetings({
+    const creatorResp = await getMeetings({
       CreatorId: me,
       Start: fromDate,
       End: toDate
     });
 
-    const list = resp.items || [];
-    meetings.value = list.map(m => ({
+    const creatorList = creatorResp.items || [];
+    meetings.value = creatorList.map(m => ({
       ...m,
       advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
     }));
+
+    const advisorResp = await getMeetings({
+      Participants: [me],
+      Start: fromDate,
+      End: toDate
+    });
+
+    const advisorList = advisorResp.items || [];
+    advisorMeetings.value = advisorList.map(m => ({
+      ...m,
+      creatorName: m.creatorName || 'Khách hàng',
+    }));
   } catch (error) {
     console.error('Error loading meetings:', error);
-    toast.error('Không thể tải danh sách tư vấn');
   }
 }
 

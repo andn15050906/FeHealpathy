@@ -42,7 +42,7 @@
                     <div class="event-name">{{ event.name }}</div>
                     <div class="event-time">{{ event.startTime }} - {{ event.endTime }}</div>
                     <div class="event-description" v-if="event.description">{{ event.description }}</div>
-                    <div class="event-actions">
+                    <div class="event-actions" v-if="isUserEvent(event)">
                         <button class="action-btn cancel" @click="confirmDeleteEvent(index)">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -51,8 +51,9 @@
             </div>
 
             <div class="sidebar-actions">
-                <button class="schedule-btn" @click="openScheduleForm" :disabled="hasScheduledConsultation"
-                    :style="hasScheduledConsultation ? 'background-color: #cccccc; cursor: not-allowed;' : ''">
+                <button class="schedule-btn" @click="openScheduleForm"
+                    :disabled="userHasBookingOnSelectedDay || isPastDate"
+                    :style="(userHasBookingOnSelectedDay || isPastDate) ? 'background-color: #cccccc; cursor: not-allowed;' : ''">
                     <i class="fa-solid fa-plus"></i> Đặt lịch tư vấn
                 </button>
             </div>
@@ -72,15 +73,17 @@
                     <div class="form-group">
                         <label>Chọn khung giờ tư vấn</label>
                         <div class="time-slots">
-                            <div v-for="(slot, index) in availableTimeSlots" :key="index" class="time-slot-item"
-                                :class="{ 'selected': scheduleForm.selectedSlot === index }"
-                                @click="selectTimeSlot(index)">
+                            <div v-for="(slot, index) in availableTimeSlots" :key="index" class="time-slot-item" :class="{
+                                'selected': scheduleForm.selectedSlot === index,
+                                'disabled': isTimeSlotBooked(slot)
+                            }" @click="isTimeSlotBooked(slot) ? null : selectTimeSlot(index)">
                                 <div class="slot-checkbox">
                                     <i class="fa-solid"
                                         :class="scheduleForm.selectedSlot === index ? 'fa-check-circle' : 'fa-circle'"></i>
                                 </div>
                                 <div class="slot-time">
                                     Slot {{ index + 1 }}: {{ slot.startTime }} - {{ slot.endTime }}
+                                    <span v-if="isTimeSlotBooked(slot)" class="booked-indicator">(đã đặt)</span>
                                 </div>
                             </div>
                         </div>
@@ -122,6 +125,9 @@ import {
     isSameDay as dfIsSameDay,
     isSameMonth,
     format,
+    isBefore,
+    startOfDay,
+    parseISO
 } from "date-fns";
 import SaveConfirmPopUp from "../Popup/SaveConfirmPopUp.vue";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
@@ -134,7 +140,7 @@ export default {
     components: { SaveConfirmPopUp, DeleteConfirmPopup },
     props: {
         initialDate: { type: Date, default: () => new Date() },
-        advisorId: { type: String, default: '' }
+        advisorId: { type: String, required: true }
     },
     data() {
         return {
@@ -158,7 +164,8 @@ export default {
                 { startTime: "15:00", endTime: "16:00" },
                 { startTime: "16:00", endTime: "17:00" }
             ],
-            currentUser: null
+            currentUserId: null,
+            today: startOfDay(new Date())
         };
     },
     computed: {
@@ -178,22 +185,49 @@ export default {
             return days;
         },
         selectedDayName() { return format(this.selectedDate, "EEEE"); },
-        selectedDayEvents() { return this.events.filter(event => dfIsSameDay(new Date(event.date), this.selectedDate)); },
-        hasScheduledConsultation() {
-            return this.selectedDayEvents.some(event => event.name.includes('Tư vấn với cố vấn'));
+        selectedDayEvents() {
+            return this.events.filter(event => dfIsSameDay(new Date(event.date), this.selectedDate));
+        },
+        userHasBookingOnSelectedDay() {
+            if (!this.currentUserId) return false;
+
+            const dateStr = format(this.selectedDate, "yyyy-MM-dd");
+
+            return this.events.some(event => {
+                if (event.date !== dateStr) return false;
+
+                return event.participants &&
+                    event.participants.some(p =>
+                        p.userId === this.currentUserId && !p.isHost
+                    );
+            });
+        },
+        isPastDate() {
+            return isBefore(this.selectedDate, this.today);
+        }
+    },
+    watch: {
+        advisorId: {
+            immediate: true,
+            handler(newVal) {
+                if (newVal) {
+                    this.fetchMeetings();
+                }
+            }
         }
     },
     async mounted() {
         await this.getCurrentUser();
-        this.fetchMeetings();
+        await this.fetchMeetings();
     },
     methods: {
         async getCurrentUser() {
             try {
-                this.currentUser = await getUserProfile();
+                const userProfile = await getUserProfile();
+                this.currentUserId = userProfile.id;
             } catch (error) {
                 console.error("Failed to get user profile:", error);
-                this.currentUser = null;
+                this.currentUserId = null;
             }
         },
         dayClasses(day) {
@@ -202,7 +236,8 @@ export default {
                 "current-month": day.isCurrentMonth,
                 "other-month": !day.isCurrentMonth,
                 "selected": dfIsSameDay(day.date, this.selectedDate),
-                "has-events": this.hasEvents(day)
+                "has-events": this.hasEvents(day),
+                "past-date": isBefore(day.date, this.today)
             };
         },
         formatDate(date) { return format(date, "dd"); },
@@ -220,9 +255,47 @@ export default {
             this.selectedDate = day.date;
             this.$emit('date-selected', this.selectedDate);
         },
-        hasEvents(day) { return this.events.some(event => dfIsSameDay(new Date(event.date), day.date)); },
-        getEventCount(day) { return this.events.filter(event => dfIsSameDay(new Date(event.date), day.date)).length; },
+        hasEvents(day) {
+            return this.events.some(event => dfIsSameDay(new Date(event.date), day.date));
+        },
+        getEventCount(day) {
+            return this.events.filter(event => dfIsSameDay(new Date(event.date), day.date)).length;
+        },
+        isTimeSlotBooked(slot) {
+            const dateStr = format(this.selectedDate, "yyyy-MM-dd");
+            const slotStartTime = `${dateStr}T${slot.startTime}:00`;
+            const slotEndTime = `${dateStr}T${slot.endTime}:00`;
+            const slotStart = new Date(slotStartTime);
+            const slotEnd = new Date(slotEndTime);
+
+            return this.selectedDayEvents.some(event => {
+                const eventStart = event.rawStartAt;
+                const eventEnd = event.rawEndAt;
+
+                return (
+                    (eventStart <= slotStart && eventEnd > slotStart) ||
+                    (eventStart >= slotStart && eventStart < slotEnd)
+                );
+            });
+        },
+        isUserEvent(event) {
+            if (!this.currentUserId) return false;
+
+            return event.participants &&
+                event.participants.some(p =>
+                    p.userId === this.currentUserId && !p.isHost
+                );
+        },
         openScheduleForm() {
+            if (this.isPastDate) return;
+            if (this.userHasBookingOnSelectedDay) {
+                toast.error("Bạn đã đặt lịch tư vấn trong ngày này rồi", {
+                    timeout: 1500,
+                    closeButton: true
+                });
+                return;
+            }
+
             this.scheduleForm.selectedSlot = null;
             this.showScheduleModal = true;
         },
@@ -232,7 +305,10 @@ export default {
             this.scheduleForm.selectedSlot = null;
         },
         selectTimeSlot(index) {
-            this.scheduleForm.selectedSlot = index;
+            const slot = this.availableTimeSlots[index];
+            if (!this.isTimeSlotBooked(slot)) {
+                this.scheduleForm.selectedSlot = index;
+            }
         },
         confirmSave() { this.showSaveConfirmation = true; },
         async handleSaveConfirmation(confirmed) {
@@ -244,6 +320,24 @@ export default {
         async saveSchedule() {
             if (this.scheduleForm.selectedSlot !== null) {
                 const selectedSlot = this.availableTimeSlots[this.scheduleForm.selectedSlot];
+
+                if (this.isTimeSlotBooked(selectedSlot)) {
+                    toast.error("Khung giờ này đã được đặt, vui lòng chọn khung giờ khác", {
+                        timeout: 1500,
+                        closeButton: true
+                    });
+                    return;
+                }
+
+                if (this.userHasBookingOnSelectedDay) {
+                    toast.error("Bạn đã đặt lịch tư vấn trong ngày này rồi", {
+                        timeout: 1500,
+                        closeButton: true
+                    });
+                    this.closeScheduleModal();
+                    return;
+                }
+
                 const dateStr = format(this.selectedDate, "yyyy-MM-dd");
                 const startTimeStr = `${dateStr}T${selectedSlot.startTime}:00`;
                 const startAt = new Date(startTimeStr);
@@ -251,33 +345,29 @@ export default {
                 const endAt = new Date(endTimeStr);
 
                 try {
-                    //TODO: THROW 500 IN BE
-                    // const participants = [
-                    //     {
-                    //         userId: this.currentUser.id,
-                    //         isHost: false
-                    //     }
-                    // ];
-                    // if (this.advisorId) {
-                    //     participants.push({
-                    //         userId: this.advisorId,
-                    //         isHost: true
-                    //     });
-                    // }
+                    const participants = [
+                        {
+                            userId: this.currentUserId,
+                            isHost: false
+                        },
+                        {
+                            userId: this.advisorId,
+                            isHost: true
+                        }
+                    ];
 
                     const meetingData = {
                         title: `Tư vấn với cố vấn - Slot ${this.scheduleForm.selectedSlot + 1}`,
                         startAt: startTimeStr,
                         endAt: endTimeStr,
                         maxParticipants: 2,
-                        // participants: participants,
-                        participants: [],
+                        participants: participants,
                         description: this.scheduleForm.notes || `Thời gian tư vấn 1 giờ`
                     };
 
                     const response = await createMeeting(meetingData);
 
-                    this.events.push({
+                    const newEvent = {
                         id: response.id,
                         name: meetingData.title,
                         date: dateStr,
@@ -285,8 +375,11 @@ export default {
                         endTime: selectedSlot.endTime,
                         description: meetingData.description,
                         rawStartAt: startAt,
-                        rawEndAt: endAt
-                    });
+                        rawEndAt: endAt,
+                        participants: participants
+                    };
+
+                    this.events.push(newEvent);
 
                     toast.success("Đặt lịch tư vấn thành công", {
                         timeout: 500,
@@ -296,7 +389,10 @@ export default {
 
                     this.closeScheduleModal();
                 } catch (error) {
-                    console.error("Failed to create meeting:", error);
+                    toast.error("Có lỗi xảy ra khi đặt lịch", {
+                        timeout: 1500,
+                        closeButton: true
+                    });
                 }
             }
         },
@@ -313,6 +409,15 @@ export default {
         },
         async deleteEvent(index) {
             const eventToDelete = this.selectedDayEvents[index];
+
+            if (!this.isUserEvent(eventToDelete)) {
+                toast.error("Bạn không có quyền xóa lịch hẹn này", {
+                    timeout: 1500,
+                    closeButton: true
+                });
+                return;
+            }
+
             const mainIndex = this.events.findIndex(event =>
                 event.id === eventToDelete.id
             );
@@ -338,10 +443,8 @@ export default {
                 const lastDay = endOfMonth(this.currentDate);
                 const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
                 const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
-                const userProfile = JSON.parse(localStorage.getItem("userProfile"));
-
                 const queryParams = {
-                    // CreatorId: userProfile.id,
+                    Participants: [this.advisorId],
                     Start: fromDate,
                     End: toDate
                 };
@@ -359,6 +462,12 @@ export default {
                     const startAt = new Date(meeting.startAt);
                     const endAt = new Date(meeting.endAt);
 
+                    const participants = meeting.participants.map(p => ({
+                        userId: p.creatorId,
+                        isHost: p.isHost,
+                        status: p.status
+                    }));
+
                     return {
                         id: meeting.id,
                         name: meeting.title,
@@ -367,7 +476,8 @@ export default {
                         endTime: format(endAt, 'HH:mm'),
                         description: meeting.description,
                         rawStartAt: startAt,
-                        rawEndAt: endAt
+                        rawEndAt: endAt,
+                        participants: participants
                     };
                 });
             } catch (error) {
@@ -789,5 +899,18 @@ export default {
 
 .slot-time {
     font-size: 14px;
+}
+
+.time-slot-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f0f0f0;
+}
+
+.booked-indicator {
+    color: #e74c3c;
+    font-style: italic;
+    margin-left: 5px;
+    font-size: 0.9em;
 }
 </style>
