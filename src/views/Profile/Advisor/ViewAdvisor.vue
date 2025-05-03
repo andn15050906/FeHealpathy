@@ -17,7 +17,7 @@
               <div class="stat-label">Giới thiệu</div>
               <div class="stat-value">{{ form.intro }}</div>
             </div>
-          </div>  
+          </div>
           <div class="stat-item">
             <div class="stat-icon">
               <i class="fas fa-calendar-alt"></i>
@@ -51,17 +51,21 @@
   </div>
   <div class="calendar-container">
     <h2 class="section-title">Lịch làm việc</h2>
-    <MeetingCalendar :events="advisorCalendar" :initialDate="today" />
+    <MeetingCalendar :events="advisorCalendar" :initialDate="today" :advisorId="form.advisorId"
+      @event-created="handleEventCreated" />
   </div>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ref, onBeforeMount, inject, computed } from 'vue';
+import { toast } from 'vue3-toastify';
 import dict from '@/scripts/data/dictionary.json';
 import { getAllAdvisors } from '@/scripts/api/services/advisorService';
 import MeetingCalendar from '../../../components/Common/Misc/MeetingCalendar.vue';
+
 const route = useRoute();
+const router = useRouter();
 const form = ref({
   advisorId: '',
   userId: '',
@@ -73,6 +77,8 @@ const form = ref({
   intro: ''
 });
 
+const advisorCalendar = ref([]);
+const today = new Date();
 const originalForm = ref({});
 const loadingSpinner = inject('loadingSpinner');
 const text = dict['en'];
@@ -87,18 +93,20 @@ const formattedDate = computed(() => {
 const fetchProfile = async (advisorId) => {
   try {
     loadingSpinner?.showSpinner();
-    let advisors = await getAllAdvisors();
-    console.log(advisors);
-    const advisorData = advisors.find(_ => _.advisorId == advisorId);
-
-    const advisor = advisorData.items ? advisorData.items[0] : advisorData;
+    const advisors = await getAllAdvisors(advisorId);
+    if (!advisors || advisors.length === 0) {
+      toast.error("Advisor not found", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 500
+      });
+      return;
+    }
+    const advisor = advisors[0];
     advisor.creationTime = formatDate(advisor.creationTime);
-    advisor.intro = advisor.intro;
-
     Object.assign(form.value, advisor);
     originalForm.value = { ...form.value };
   } catch (error) {
-    console.error(error);
+    console.error(`Error loading profile`);
   } finally {
     loadingSpinner?.hideSpinner();
   }
@@ -107,6 +115,23 @@ const fetchProfile = async (advisorId) => {
 const formatDate = (date) => {
   if (!date || typeof date !== 'string') return '';
   return date.split('T')[0];
+};
+
+const handleEventCreated = (event) => {
+  const meetingData = {
+    date: event.date,
+    startTime: event.startTime,
+    endTime: event.endTime
+  };
+
+  const encodedMeeting = encodeURIComponent(JSON.stringify(meetingData));
+  router.push({
+    path: '/schedule-meeting',
+    query: {
+      advisorId: form.value.advisorId,
+      meeting: encodedMeeting
+    }
+  });
 };
 
 onBeforeMount(() => {

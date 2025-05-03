@@ -7,25 +7,24 @@
         <div class="course-header">
           <div class="course-media-actions">
             <img :src="course.thumbUrl" alt="Course Thumbnail" class="course-thumb" />
-            
+
             <div class="owner-status" v-if="isOwner">
               <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
             </div>
 
-            <div 
-              class="course-actions" 
-              v-else-if="!isEnrolled && !isLoadingEnrollment" 
-            >
+            <div class="course-actions" v-else-if="!isEnrolled && !isLoadingEnrollment">
               <div class="course-pricing">
                 <span class="price-label">Giá:</span>
-                <span class="price" v-if="course.discount > 0">
-                  <del>{{ course.price?.toLocaleString('vi-VN') }} VND</del>
-                  <strong>{{ discountedPrice == 0 ? 'Miễn phí' : discountedPrice.toLocaleString('vi-VN') + ' VND' }}</strong>
-                  <span class="discount-badge">{{ Math.floor(course.discount * 100) }}% OFF</span>
-                </span>
-                <span class="price" v-else>
-                  <strong>{{ course.price?.toLocaleString('vi-VN') }} VND</strong>
-                </span>
+                <div class="price-container">
+                  <div class="old-price-row" v-if="course.discount > 0">
+                    <del>{{ course.price?.toLocaleString('vi-VN') }} VND</del>
+                    <span class="discount-badge">{{ Math.floor(course.discount * 100) }}% OFF</span>
+                  </div>
+                  <div class="new-price">
+                    <strong>{{ discountedPrice == 0 ? 'Miễn phí' : discountedPrice.toLocaleString('vi-VN') + ' VND'
+                      }}</strong>
+                  </div>
+                </div>
               </div>
               <div class="buy-button-container">
                 <button class="btn-buy" @click="handlePurchase">💰 Mua ngay</button>
@@ -35,7 +34,7 @@
               <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
             </div>
             <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
-                <p>Đang kiểm tra trạng thái...</p>
+              <p>Đang kiểm tra trạng thái...</p>
             </div>
           </div>
 
@@ -63,27 +62,19 @@
             </div>
 
             <div class="course-section">
-               <h3 class="section-subtitle">💡 Yêu cầu khóa học</h3>
+              <h3 class="section-subtitle">💡 Yêu cầu khóa học</h3>
               <p class="course-requirements">{{ course.requirements }}</p>
             </div>
           </div>
         </div>
 
         <h2 class="section-title">📚 Bài giảng</h2>
-        
+
         <div v-if="lectures.length > 0" class="lecture-grid">
-          <div
-            v-for="lecture in lectures" 
-            :key="lecture.id"  
-            class="lecture-card"
-          >
+          <div v-for="lecture in lectures" :key="lecture.id" class="lecture-card">
             <template v-if="lecture.firstImageUrl">
-              <img
-                :src="lecture.firstImageUrl" 
-                alt="Lecture Image"
-                class="lecture-thumb"
-                @error="(e) => { e.target.style.display='none'; e.target.nextElementSibling.style.display='block'; }"
-              />
+              <img :src="lecture.firstImageUrl" alt="Lecture Image" class="lecture-thumb"
+                @error="(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'block'; }" />
               <div class="lecture-thumb-placeholder" style="display: none;">Không thể tải ảnh</div>
             </template>
             <template v-else>
@@ -93,9 +84,7 @@
             <div class="lecture-content">
               <h3>{{ lecture.title }}</h3>
               <p class="lecture-summary">{{ lecture.contentSummary }}</p>
-              <span v-if="lecture.isPreviewable" class="preview-badge"
-                >🔓 Xem trước miễn phí</span 
-              >
+              <span v-if="lecture.isPreviewable" class="preview-badge">🔓 Xem trước miễn phí</span>
             </div>
             <button 
               class="btn-view" 
@@ -108,14 +97,14 @@
                             : 'Bạn cần mua khóa học để xem bài giảng này')"
             >
               ▶️ Xem bài giảng
-            </button> 
+            </button>
           </div>
         </div>
         <div v-else-if="!isLoadingLectures && course">
-            <p>Chưa có bài giảng nào cho khóa học này.</p>
+          <p>Chưa có bài giảng nào cho khóa học này.</p>
         </div>
       </div>
-      <div v-else-if="!isLoadingCourse && !course && !isLoadingEnrollment"> 
+      <div v-else-if="!isLoadingCourse && !course && !isLoadingEnrollment">
         <p class="loading-placeholder">⚠️ Không thể tải thông tin khóa học.</p>
       </div>
     </div>
@@ -125,13 +114,15 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getCourseById } from "@/scripts/api/services/courseService"; 
+import { getCourseById } from "@/scripts/api/services/courseService";
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 import { getUserProfile } from "@/scripts/api/services/authService";
-import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue'; 
+import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 import { getUserById } from "@/scripts/api/services/userService";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
   name: "CourseDetail",
@@ -156,87 +147,87 @@ export default {
       try {
         currentUser.value = getUserProfile();
       } catch (error) {
-        console.error("Lỗi khi lấy thông tin người dùng từ localStorage:", error);
+        toast.error("Lỗi khi lấy thông tin người dùng từ localStorage");
         currentUser.value = null;
       }
     };
 
     const fetchCourseInfo = async () => {
-       isLoadingCourse.value = true;
-       try {
-         const courseData = await getCourseById(courseId);
-         if (courseData) {
-           course.value = {
-             id: courseData.id, 
-             title: courseData.title,
-             thumbUrl: courseData.thumbUrl, 
-             intro: courseData.intro,
-             description: courseData.description,
-             price: courseData.price,
-             discount: courseData.discount,
-             learnerCount: courseData.learnerCount, 
-             ratingCount: courseData.ratingCount, 
-             totalRating: courseData.totalRating, 
-             outcomes: courseData.outcomes || "Thông tin đang được cập nhật.",
-             requirements: courseData.requirements || "Thông tin đang được cập nhật.",
-             creatorId: courseData.creatorId
-           };
-           if (courseData.creatorId) {
-              try {
-                const instructorData = await getUserById(courseData.creatorId);
-                instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
-              } catch (userError) {
-                console.error(`Lỗi khi lấy thông tin giảng viên ${courseData.creatorId}:`, userError);
-                instructorName.value = "Không rõ";
-              }
-            } else {
+      isLoadingCourse.value = true;
+      try {
+        const courseData = await getCourseById(courseId);
+        if (courseData) {
+          course.value = {
+            id: courseData.id,
+            title: courseData.title,
+            thumbUrl: courseData.thumbUrl,
+            intro: courseData.intro,
+            description: courseData.description,
+            price: courseData.price,
+            discount: courseData.discount,
+            learnerCount: courseData.learnerCount,
+            ratingCount: courseData.ratingCount,
+            totalRating: courseData.totalRating,
+            outcomes: courseData.outcomes || "Thông tin đang được cập nhật.",
+            requirements: courseData.requirements || "Thông tin đang được cập nhật.",
+            creatorId: courseData.creatorId
+          };
+          if (courseData.creatorId) {
+            try {
+              const instructorData = await getUserById(courseData.creatorId);
+              instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
+            } catch (userError) {
+              toast.error(`Lỗi khi lấy thông tin giảng viên`);
               instructorName.value = "Không rõ";
             }
-           if (currentUser.value && course.value) {
-               isOwner.value = course.value.creatorId === currentUser.value.id;
-           }
-           return true;
-         } else {
-           console.error("Không tìm thấy dữ liệu khóa học.");
-           isOwner.value = false;
-           return false;
-         }
-       } catch (error) {
-         console.error("Lỗi khi lấy thông tin khóa học:", error);
-         isOwner.value = false;
-         return false; 
-       } finally {
-         isLoadingCourse.value = false;
-       }
+          } else {
+            instructorName.value = "Không rõ";
+          }
+          if (currentUser.value && course.value) {
+            isOwner.value = course.value.creatorId === currentUser.value.id;
+          }
+          return true;
+        } else {
+          toast.error("Không tìm thấy dữ liệu khóa học");
+          isOwner.value = false;
+          return false;
+        }
+      } catch (error) {
+        toast.error("Lỗi khi lấy thông tin khóa học");
+        isOwner.value = false;
+        return false;
+      } finally {
+        isLoadingCourse.value = false;
+      }
     };
 
     const fetchLectures = async () => {
-       if (!courseId) return; 
-       isLoadingLectures.value = true;
-       try {
-          const response = await getLectures(courseId); 
-          const lectureList = response?.items || [];
-          lectures.value = lectureList.map(lecture => {
-             const firstImageMaterial = lecture.materials?.find(material => material.type === 1); 
-             return {
-                ...lecture,
-                firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null 
-             };
-          });
-       } catch (error) {
-          console.error(`Lỗi khi lấy danh sách bài giảng cho khóa học ${courseId}:`, error);
-          lectures.value = []; 
-       } finally {
-          isLoadingLectures.value = false;
-       }
+      if (!courseId) return;
+      isLoadingLectures.value = true;
+      try {
+        const response = await getLectures(courseId);
+        const lectureList = response?.items || [];
+        lectures.value = lectureList.map(lecture => {
+          const firstImageMaterial = lecture.materials?.find(material => material.type === 1);
+          return {
+            ...lecture,
+            firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null
+          };
+        });
+      } catch (error) {
+        toast.error(`Lỗi khi lấy danh sách bài giảng cho khóa học`);
+        lectures.value = [];
+      } finally {
+        isLoadingLectures.value = false;
+      }
     };
 
     const checkEnrollmentStatus = async () => {
       if (!courseId) return;
       isLoadingEnrollment.value = true;
       try {
-        const response = await getEnrollments({ pageSize: 100 }); 
-        
+        const response = await getEnrollments({ pageSize: 100 });
+
         if (response && response.items) {
           const enrolled = response.items.some(enrollment => enrollment.courseId === courseId);
           isEnrolled.value = enrolled;
@@ -244,58 +235,55 @@ export default {
           isEnrolled.value = false;
         }
       } catch (error) {
-        console.error("Lỗi khi kiểm tra trạng thái đăng ký:", error);
-        isEnrolled.value = false; 
+        toast.error("Lỗi khi kiểm tra trạng thái đăng ký");
+        isEnrolled.value = false;
       } finally {
         isLoadingEnrollment.value = false;
       }
     };
 
-    const isLoading = computed(() => 
-      isLoadingCourse.value || 
-      isLoadingLectures.value || 
+    const isLoading = computed(() =>
+      isLoadingCourse.value ||
+      isLoadingLectures.value ||
       isLoadingEnrollment.value
     );
 
     const discountedPrice = computed(() => {
-       if (!course.value) return 0;
-       const discount = Number(course.value.discount) || 0;
-       const price = Number(course.value.price) || 0;
-       return Math.floor(discount > 0 ? price * (1 - discount) : price);
+      if (!course.value) return 0;
+      const discount = Number(course.value.discount) || 0;
+      const price = Number(course.value.price) || 0;
+      return Math.floor(discount > 0 ? price * (1 - discount) : price);
     });
 
     const averageRating = computed(() => {
-       if (!course.value || !course.value.ratingCount) return "N/A";
-       return (course.value.totalRating / course.value.ratingCount).toFixed(1);
+      if (!course.value || !course.value.ratingCount) return "N/A";
+      return (course.value.totalRating / course.value.ratingCount).toFixed(1);
     });
 
     const handlePurchase = async () => {
-       if (!course.value?.id) {
-         alert("Không xác định được khóa học.");
-         return;
-       }
+      if (!course.value?.id) {
+        toast.error("Không xác định được khóa học");
+        return;
+      }
       try {
         const data = await purchaseCourse(course.value.id);
         if (!data?.url) {
-          alert("Không nhận được URL thanh toán.");
+          toast.error("Không nhận được URL thanh toán");
           return;
         }
         window.location.href = data.url;
       } catch (error) {
-        console.error("Lỗi khi mua khóa học:", error);
-        alert(error.response?.data?.message || "Có lỗi xảy ra khi tiến hành thanh toán.");
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tiến hành thanh toán");
       }
     };
 
     const viewLecture = (lectureId) => {
       if (!lectureId) {
-        console.error("Không có ID bài giảng trong CourseDetail");
+        toast.error("Không có ID bài giảng");
         return;
       }
 
-      console.log("Chuyển hướng đến bài giảng với ID:", lectureId);
-      
-      router.push({ 
+      router.push({
         name: 'lectureDetail',
         params: { id: lectureId },
         query: { courseId: course.value.id }
@@ -303,19 +291,19 @@ export default {
     };
 
     onMounted(async () => {
-       getCurrentUserInfo();
-       
-       await Promise.all([
-         fetchCourseInfo(),
-         fetchLectures(),
-         checkEnrollmentStatus()
-       ]);
+      getCurrentUserInfo();
+
+      await Promise.all([
+        fetchCourseInfo(),
+        fetchLectures(),
+        checkEnrollmentStatus()
+      ]);
     });
 
     return {
-      isLoading, 
-      isLoadingCourse, 
-      isLoadingLectures, 
+      isLoading,
+      isLoadingCourse,
+      isLoadingLectures,
       isLoadingEnrollment,
       isEnrolled,
       isOwner,
@@ -333,19 +321,18 @@ export default {
 
 <style scoped>
 .course-detail-container {
-  max-width: 1100px;
-  margin: 40px auto;
+  margin: 0px auto;
   background: white;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.06);
 }
 
 .course-header {
   display: flex;
   align-items: flex-start;
-  gap: 40px;
-  margin-bottom: 40px;
+  gap: 48px;
+  margin-bottom: 50px;
 }
 
 .course-media-actions {
@@ -353,15 +340,22 @@ export default {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .course-thumb {
   width: 100%;
   height: 210px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
   display: block;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-thumb:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .course-info {
@@ -369,46 +363,53 @@ export default {
 }
 
 .course-title {
-  font-size: 28px;
-  margin: 0 0 10px 0;
-  font-weight: 600;
-  color: #333;
+  font-size: 32px;
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  color: #222;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .course-meta {
-  font-size: 14px;
+  font-size: 15px;
   color: #555;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 20px;
 }
+
 .course-meta span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  background-color: #f8f9fa;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
 }
 
 .course-section {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .section-subtitle {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #0056b3;
-  margin-bottom: 8px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eef2f7;
 }
 
 .course-intro,
 .course-description,
 .course-outcomes,
 .course-requirements {
-  font-size: 15px;
+  font-size: 16px;
   color: #444;
-  line-height: 1.6;
+  line-height: 1.7;
   margin-top: 0;
 }
 
@@ -425,158 +426,193 @@ export default {
 .course-pricing {
   font-size: 18px;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
 .price-label {
   font-weight: 500;
-  color: #555;
-  margin-right: 5px;
+  color: #444;
+  margin-bottom: 5px;
 }
 
-.price del {
-  color: #aaa;
-  font-size: 16px;
-  margin-right: 8px;
+.price-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.price strong {
-   font-weight: bold;
-   font-size: 22px;
-   color: #d9534f;
+.old-price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.old-price-row del {
+  color: #999;
+  font-size: 14px;
 }
 
 .discount-badge {
-  background-color: #f0ad4e;
+  background: linear-gradient(135deg, #f0ad4e, #ec971f);
   color: white;
-  padding: 3px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 12px;
   font-weight: bold;
-  margin-left: 10px;
+  box-shadow: 0 2px 5px rgba(240, 173, 78, 0.4);
+}
+
+.new-price strong {
+  font-weight: 700;
+  font-size: 24px;
+  color: #d9534f;
 }
 
 .buy-button-container {
-  margin-top: 0;
+  margin-top: 5px;
 }
 
 .btn-buy {
-  background: linear-gradient(to right, #28a745, #218838);
+  background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
-  padding: 14px 30px;
+  padding: 16px 30px;
   font-size: 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+  font-weight: 600;
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
   width: 100%;
   text-align: center;
+  letter-spacing: 0.5px;
 }
 
 .btn-buy:hover {
-  background: linear-gradient(to right, #218838, #1e7e34);
-  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.5);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #218838, #1a6b2d);
+  box-shadow: 0 8px 18px rgba(40, 167, 69, 0.4);
+  transform: translateY(-3px);
 }
 
 .section-title {
-  font-size: 22px;
-  margin-top: 40px;
-  border-bottom: 2px solid #0056b3;
-  padding-bottom: 8px;
-  color: #333;
+  font-size: 24px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #0056b3;
+  padding-bottom: 10px;
+  color: #222;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title:after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #28a745;
 }
 
 .lecture-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
   margin-top: 25px;
 }
 
 .lecture-card {
   background: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
 }
 
 .lecture-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
 .lecture-thumb {
   width: 100%;
-  height: 150px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 8px;
-  background-color: #f0f0f0;
-  margin-bottom: 15px;
+  border-radius: 10px;
+  background-color: #f5f5f5;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .lecture-content h3 {
-  font-size: 17px;
-  margin: 0 0 8px 0;
+  font-size: 18px;
+  margin: 0 0 10px 0;
   color: #333;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .lecture-summary {
   font-size: 14px;
-  color: #555;
-  margin-bottom: 12px;
-  line-height: 1.5;
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.6;
 }
 
 .preview-badge {
   display: inline-block;
-  background: #17a2b8;
+  background: linear-gradient(135deg, #17a2b8, #138496);
   color: #fff;
   font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
   font-weight: 500;
+  box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
 }
 
 .btn-view {
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px;
+  font-size: 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
   width: 100%;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
 }
 
 .btn-view:hover {
-  background: #0056b3;
+  background: linear-gradient(135deg, #0056b3, #004494);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
+  transform: translateY(-2px);
 }
 
 .btn-view:disabled {
-  background-color: #adb5bd;
-  color: #6c757d;
+  background: linear-gradient(135deg, #adb5bd, #868e96);
+  color: #fff;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.8;
+  box-shadow: none;
 }
 
 .btn-view:disabled:hover {
-  background-color: #adb5bd;
+  background: linear-gradient(135deg, #adb5bd, #868e96);
+  transform: none;
 }
 
 @media (max-width: 768px) {
@@ -598,15 +634,15 @@ export default {
   }
 
   .course-info {
-      width: 100%;
+    width: 100%;
   }
 
   .course-pricing {
-      justify-content: center;
+    justify-content: center;
   }
 
   .btn-buy {
-      width: 100%;
+    width: 100%;
   }
 
   .lecture-grid {
@@ -614,65 +650,77 @@ export default {
   }
 
   .course-detail-container {
-      padding: 20px;
+    padding: 25px;
   }
 }
 
 .loading-placeholder {
   text-align: center;
-  padding: 50px;
-  font-size: 1.2em;
-  color: #666;
+  padding: 60px;
+  font-size: 1.3em;
+  color: #555;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  margin: 40px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .lecture-thumb-placeholder {
   width: 100%;
-  height: 150px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
   color: #888;
   font-size: 14px;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px dashed #ddd;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 }
 
 .enrollment-status {
   margin-top: 20px;
-  padding: 15px;
+  padding: 18px;
   background-color: #e9f7ef;
-  border: 1px solid #b8e0c8;
-  border-radius: 8px;
+  border: 1px solid #c8e6d2;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.1);
 }
 
 .enrolled-message {
   color: #155724;
   font-weight: 600;
   margin: 0;
+  font-size: 16px;
 }
 
 .enrollment-loading {
-    margin-top: 20px;
-    text-align: center;
-    color: #6c757d;
+  margin-top: 20px;
+  text-align: center;
+  color: #6c757d;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
 }
 
 .owner-status {
   margin-top: 20px;
-  padding: 15px;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  border-radius: 8px;
+  padding: 18px;
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.1);
 }
 
 .owner-message {
   color: #856404;
   font-weight: 600;
   margin: 0;
+  font-size: 16px;
 }
 </style>

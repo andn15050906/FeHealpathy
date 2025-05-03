@@ -17,15 +17,23 @@
                     <span class="instructor">{{ course.creator?.fullName }}</span>
                     <p class="course-date m-0">{{ formatDate(course.creationTime) }}</p>
                 </div>
-                <div class="rating d-flex align-items-center">
-                    <div class="stars">
-                        <i v-if="course.ratingCount > 0" v-for="n in Math.ceil(course.totalRating / course.ratingCount)"
-                            :key="n" class="fa fa-star" aria-hidden="true"></i>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="rating d-flex align-items-center">
+                        <div class="stars">
+                            <i v-if="course.ratingCount > 0"
+                                v-for="n in Math.ceil(course.totalRating / course.ratingCount)" :key="n"
+                                class="fa fa-star" aria-hidden="true"></i>
+                        </div>
+                        <span class="rating-text ms-2">
+                            <span v-if="course.ratingCount > 0">({{ course.ratingCount }})</span>
+                            <span v-else>Chưa có đánh giá</span>
+                        </span>
                     </div>
-                    <span class="rating-text ms-2">
-                        <span v-if="course.ratingCount > 0">({{ course.ratingCount }})</span>
-                        <span v-else>Chưa có đánh giá</span>
-                    </span>
+                    <div class="price-container">
+                        <span v-if="course.discount > 0" class="original-price">{{ formatPriceVND(course.price)
+                            }}</span>
+                        <span class="final-price">{{ displayPrice(calculateFinalPrice(course)) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,6 +70,24 @@ const getLevelText = (level) => {
 
 function isOnDiscount(course) {
     return course.discount > 0 && new Date(course.discountExpiry) > new Date();
+}
+
+function calculateFinalPrice(course) {
+    if (course.discount > 0) {
+        return course.price * (1 - course.discount);
+    }
+    return course.price;
+}
+
+function formatPriceVND(price) {
+    return price.toLocaleString() + ' VND';
+}
+
+function displayPrice(price) {
+    if (price === 0) {
+        return 'Miễn phí';
+    }
+    return formatPriceVND(price);
 }
 
 function formatPrice(price) {
@@ -185,5 +211,22 @@ function formatPrice(price) {
 .rating-text {
     font-size: 13px;
     color: #7f8c8d;
+}
+
+.price-container {
+    text-align: right;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #95a5a6;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.final-price {
+    color: #e74c3c;
+    font-weight: 600;
+    font-size: 14px;
 }
 </style>

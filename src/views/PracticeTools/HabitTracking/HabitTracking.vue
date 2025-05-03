@@ -44,7 +44,15 @@ export default {
         const userProfile = JSON.parse(localStorage.getItem("userProfile"));
         const queryParams = new URLSearchParams({ CreatorId: userProfile.id, From: formattedFirstDay, To: formattedLastDay });
         const response = await getPagedRoutines(queryParams);
-        habits.value = response.items.map(item => ({
+
+        let routineItems = [];
+        if (response && Array.isArray(response)) {
+          routineItems = response;
+        } else if (response && response.items && Array.isArray(response.items)) {
+          routineItems = response.items;
+        }
+
+        habits.value = routineItems.map(item => ({
           id: item.id,
           title: item.title,
           description: item.description || "Chưa có mô tả",
@@ -59,6 +67,7 @@ export default {
         }));
       } catch (error) {
         console.error(error);
+        habits.value = [];
         toast.error("Không tải được danh sách thói quen!", { position: "bottom-center" });
       } finally {
         spinnerRef.value?.hideSpinner();
@@ -182,7 +191,8 @@ export default {
         }
         await loadRoutines(currentViewDate.value);
         toast.success(habit.isUpdate ? "Cập nhật thói quen thành công!" : "Thêm thói quen thành công!", { position: "bottom-center" });
-      } catch {
+      } catch (error) {
+        console.error(error);
         toast.error(habit.isUpdate ? "Cập nhật thói quen thất bại!" : "Thêm thói quen thất bại!", { position: "bottom-center" });
       } finally {
         spinnerRef.value?.hideSpinner();
@@ -196,7 +206,8 @@ export default {
         else await deleteRoutine(id);
         await loadRoutines(currentViewDate.value);
         toast.success("Xóa thói quen thành công!", { position: "bottom-center" });
-      } catch {
+      } catch (error) {
+        console.error(error);
         toast.error("Xóa thói quen thất bại!", { position: "bottom-center" });
       } finally {
         spinnerRef.value?.hideSpinner();
