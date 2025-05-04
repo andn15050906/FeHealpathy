@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <div class="meetings-list mt-5">
+    <div v-if="userRole === 1" class="meetings-list mt-5">
       <h4 class="section-title">Lịch hẹn tư vấn với bạn</h4>
 
       <div v-if="advisorMeetings.length === 0" class="no-meetings card p-5 text-center">
@@ -159,6 +159,7 @@ const meetings = ref([]);
 const advisorMeetings = ref([]);
 const advisors = ref([]);
 const validationErrors = ref({ selectedAdvisor: '' });
+const userRole = ref(0);
 
 function selectAdvisor(id) {
   selectedAdvisor.value = id;
@@ -193,7 +194,9 @@ async function loadMeetings() {
     const lastDay = endOfMonth(currentDate);
     const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
     const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
-    const me = getUserProfile().id;
+    const cu = getUserProfile();
+    const me = cu.id;
+    userRole.value = cu.role;
 
     const creatorResp = await getMeetings({
       CreatorId: me,
@@ -207,17 +210,19 @@ async function loadMeetings() {
       advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
     }));
 
-    const advisorResp = await getMeetings({
-      Participants: [me],
-      Start: fromDate,
-      End: toDate
-    });
+    if (userRole.value === 1) {
+      const advisorResp = await getMeetings({
+        Participants: [me],
+        Start: fromDate,
+        End: toDate
+      });
 
-    const advisorList = advisorResp.items || [];
-    advisorMeetings.value = advisorList.map(m => ({
-      ...m,
-      creatorName: m.creatorName || 'Khách hàng',
-    }));
+      const advisorList = advisorResp.items || [];
+      advisorMeetings.value = advisorList.map(m => ({
+        ...m,
+        creatorName: m.creatorName || 'Khách hàng',
+      }));
+    }
   } catch (error) {
     console.error('Error loading meetings:', error);
   }
