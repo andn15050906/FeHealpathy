@@ -21,7 +21,7 @@ export const calcSurveyResult = (survey, choices) => {
     let matchingBands = [];
     for (let band of surveyRef.bands) {
         if (band.minScore <= score && band.maxScore >= score) {
-            if (['normal', 'mild'].includes(band.bandRating.toLowerCase())) {
+            if (['normal', 'mild', 'high'].includes(band.bandRating.toLowerCase())) {
                 matchingBands.push({
                     name: band.bandName,
                     rating: 'Tốt',
@@ -35,7 +35,7 @@ export const calcSurveyResult = (survey, choices) => {
                     ratingClass: 'average'
                 });
             }
-            else if (['severe', 'examplely severe'].includes(band.bandRating.toLowerCase())) {
+            else if (['severe', 'examplely severe', 'low', ''].includes(band.bandRating.toLowerCase())) {
                 matchingBands.push({
                     name: band.bandName,
                     rating: 'Tệ',
