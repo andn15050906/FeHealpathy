@@ -17,3 +17,7 @@ export const getUserStatistics = async () => {
 export const forceCalcProgress = async () => {
   return await get(`${API_BASE_URL}/force-progress`);
 }
+
+export const forceUpdateMilestone = async (phase, milestone) => {
+  return await get(`${API_BASE_URL}/force-milestone/${phase}/${milestone}`);
+}
