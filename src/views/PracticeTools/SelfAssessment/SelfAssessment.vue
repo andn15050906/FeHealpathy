@@ -29,8 +29,10 @@ import { CreateMcqChoiceDto, CreateSubmissionDto } from '@/scripts/types/dtos';
 import { useRouter } from 'vue-router';
 import { getPagedSurveys } from '@/scripts/api/services/surveysService';
 import { createSubmission } from '@/scripts/api/services/submissionsService';
+import { forceUpdateMilestone } from '@/scripts/api/services/statisticsService';
 import SingleSelectSurvey from '@/components/SurveyComponents/SingleSelectSurvey.vue';
 import SurveyCard from '@/components/SurveyComponents/SurveyCard.vue';
+import { getUserProfile } from '../../../scripts/api/services/authService';
 
 const text = {
   pleaseAnswer: "Bạn hãy trả lời những câu hỏi sau:"
@@ -144,6 +146,21 @@ const submitSurvey = async (survey, questionsWithAnswer) => {
 const submitCallback = async (questionsWithAnswer) => {
   try {
     var response = await submitSurvey(currentSurvey.value, questionsWithAnswer);
+    console.log(currentSurvey.value);
+    if (currentSurvey.value.name && currentSurvey.value.name.includes('RSE')) {
+      try {
+        var currentRoadmap = getUserProfile().roadmapId;
+        await forceUpdateMilestone(
+          currentRoadmap == '8cacd52d-bad9-4dbb-b361-f388fd3d46de'
+            ? '2C4407AB-5638-4D11-97DA-5999781F0DDF'
+            : 'DD83AC77-5F83-4DFD-B448-629AACBD16F9',
+          currentRoadmap == '8cacd52d-bad9-4dbb-b361-f388fd3d46de'
+            ? 'D9FB3264-1FAC-408E-9F9A-F201E06E2468'
+            : 'B71C303E-B69D-41D0-875E-C38CB62A03B6'
+        );
+      }
+      catch(ex) { } 
+    }
     router.push({ name: 'SubmissionReview', params: { id: response } });
   }
   catch (error) {

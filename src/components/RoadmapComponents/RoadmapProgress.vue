@@ -33,7 +33,7 @@
                         <div class="card-body">
                             <p class="text-muted">{{ phase.description }}</p>
 
-                            <button class="btn btn-primary btn-sm" @click="reCalcProgress()">Refresh</button>
+                            <!--<button class="btn btn-primary btn-sm" @click="reCalcProgress()">Refresh</button>-->
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle">
                                     <thead>
