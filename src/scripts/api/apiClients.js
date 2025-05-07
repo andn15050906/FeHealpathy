@@ -114,5 +114,26 @@ export const del = (url) => apiCall(apiClient, "delete", url);
 export const postForm = (url, data) => apiCall(formApiClient, "post", url, data);
 export const patchForm = (url, data) => apiCall(formApiClient, "patch", url, data);
 
+export const getBlob = async (url, fileName) => {
+    try {
+        axios({ url: baseUrl + url, withCredentials: true, method: 'GET', responseType: 'blob' })
+            .then((response) => {
+                const href = URL.createObjectURL(response.data);
+            
+                const link = document.createElement('a');
+                link.href = href;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+            
+                document.body.removeChild(link);
+                URL.revokeObjectURL(href);
+            });
+    } catch (error) {
+        await logError(error, client);
+        throw error;
+    }
+}
+
 export const getML = (url, params) => apiCall(mlApiClient, "get", url, null, params);
 export default apiClient;

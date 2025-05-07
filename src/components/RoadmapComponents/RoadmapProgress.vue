@@ -33,6 +33,7 @@
                         <div class="card-body">
                             <p class="text-muted">{{ phase.description }}</p>
 
+                            <button class="btn btn-primary btn-sm" @click="reCalcProgress()">Refresh</button>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle">
                                     <thead>
@@ -71,7 +72,7 @@
 </template>
 
 <script>
-import { getProgress } from '@/scripts/api/services/statisticsService';
+import { getProgress, forceCalcProgress } from '@/scripts/api/services/statisticsService';
 import { getLinkByEventLabel, getLinkByObjectId } from '@/scripts/api/services/activityLogService';
 import { getCurrentRoadmapWithProgress } from '@/scripts/api/services/roadmapService';
 
@@ -87,83 +88,7 @@ export default {
         }
     },
     async beforeMount() {
-        let tempRoadmap = await getCurrentRoadmapWithProgress();
-        let phasesProgress = (await getProgress()).progress;
-        let completedMilestones = phasesProgress.map(_ => _.milestone);
-
-        for (let phase of tempRoadmap.phases) {
-            let completedCount = 0;
-            phase.totalMilestones = phase.milestones.length;
-
-            let belowLocked = false;
-            for (let milestone of phase.milestones.sort((a, b) => a.index - b.index)) {
-                if (belowLocked) {
-                    milestone.status = 'locked';
-                    milestone.progress = 'Hãy hoàn thành bước trước';
-                    continue;
-                }
-
-                if (tempRoadmap.isCompleted) {
-                    milestone.status = 'completed';
-                    milestone.progress = 'Đã hoàn thành';
-                    completedCount++;
-                }
-                else if (tempRoadmap.currentPhase) {
-                    if (phase.index < tempRoadmap.currentPhase.index) {
-                        milestone.status = 'completed';
-                        milestone.progress = 'Đã hoàn thành';
-                        completedCount++;
-                    }
-                    else if (phase.index > tempRoadmap.currentPhase.index) {
-                        milestone.status = 'locked';
-                        milestone.progress = 'Hãy hoàn thành bước trước';
-                    }
-                    else if (completedMilestones.includes(milestone.id)) {
-                        milestone.status = 'completed';
-                        milestone.progress = 'Đã hoàn thành';
-                        completedCount++;
-                    } else {
-                        milestone.status = 'current';
-                        milestone.progress = 'Đang thực hiện';
-                    }
-                }
-
-                if (milestone.status == 'current' && milestone.isRequired) {
-                    belowLocked = true;
-                }
-            }
-
-            this.phasesStatus[phase.id] = {
-                completed: completedCount === phase.totalMilestones,
-                inProgress: phase.id == tempRoadmap.currentPhase?.id,
-                completedCount: completedCount,
-                totalMilestones: phase.totalMilestones
-            };
-        }
-
-        this.roadmap = tempRoadmap;
-
-        if (!this.activeTab && tempRoadmap.phases.length > 0) {
-            for (let phase of tempRoadmap.phases) {
-                if (this.phasesStatus[phase.id].inProgress) {
-                    this.activeTab = phase.id;
-                    break;
-                }
-            }
-
-            if (!this.activeTab) {
-                for (let phase of tempRoadmap.phases) {
-                    if (!this.phasesStatus[phase.id].completed) {
-                        this.activeTab = phase.id;
-                        break;
-                    }
-                }
-            }
-
-            if (!this.activeTab && tempRoadmap.phases.length > 0) {
-                this.activeTab = tempRoadmap.phases[0].id;
-            }
-        }
+        await this.fetchProgress();
     },
     watch: {
         activeTab(newVal) {
@@ -171,6 +96,85 @@ export default {
         },
     },
     methods: {
+        async fetchProgress() {
+            let tempRoadmap = await getCurrentRoadmapWithProgress();
+            let phasesProgress = (await getProgress()).progress;
+            let completedMilestones = phasesProgress.map(_ => _.milestone);
+
+            for (let phase of tempRoadmap.phases) {
+                let completedCount = 0;
+                phase.totalMilestones = phase.milestones.length;
+
+                let belowLocked = false;
+                for (let milestone of phase.milestones.sort((a, b) => a.index - b.index)) {
+                    if (belowLocked) {
+                        milestone.status = 'locked';
+                        milestone.progress = 'Hãy hoàn thành bước trước';
+                        continue;
+                    }
+
+                    if (tempRoadmap.isCompleted) {
+                        milestone.status = 'completed';
+                        milestone.progress = 'Đã hoàn thành';
+                        completedCount++;
+                    }
+                    else if (tempRoadmap.currentPhase) {
+                        if (phase.index < tempRoadmap.currentPhase.index) {
+                            milestone.status = 'completed';
+                            milestone.progress = 'Đã hoàn thành';
+                            completedCount++;
+                        }
+                        else if (phase.index > tempRoadmap.currentPhase.index) {
+                            milestone.status = 'locked';
+                            milestone.progress = 'Hãy hoàn thành bước trước';
+                        }
+                        else if (completedMilestones.includes(milestone.id)) {
+                            milestone.status = 'completed';
+                            milestone.progress = 'Đã hoàn thành';
+                            completedCount++;
+                        } else {
+                            milestone.status = 'current';
+                            milestone.progress = 'Đang thực hiện';
+                        }
+                    }
+
+                    if (milestone.status == 'current' && milestone.isRequired) {
+                        belowLocked = true;
+                    }
+                }
+
+                this.phasesStatus[phase.id] = {
+                    completed: completedCount === phase.totalMilestones,
+                    inProgress: phase.id == tempRoadmap.currentPhase?.id,
+                    completedCount: completedCount,
+                    totalMilestones: phase.totalMilestones
+                };
+            }
+
+            this.roadmap = tempRoadmap;
+
+            if (!this.activeTab && tempRoadmap.phases.length > 0) {
+                for (let phase of tempRoadmap.phases) {
+                    if (this.phasesStatus[phase.id].inProgress) {
+                        this.activeTab = phase.id;
+                        break;
+                    }
+                }
+
+                if (!this.activeTab) {
+                    for (let phase of tempRoadmap.phases) {
+                        if (!this.phasesStatus[phase.id].completed) {
+                            this.activeTab = phase.id;
+                            break;
+                        }
+                    }
+                }
+
+                if (!this.activeTab && tempRoadmap.phases.length > 0) {
+                    this.activeTab = tempRoadmap.phases[0].id;
+                }
+            }
+        },
         scrollToPhase(phaseId) {
             const phaseElement = this.$refs['phase-' + phaseId];
             if (phaseElement) {
@@ -231,6 +235,11 @@ export default {
             else {
                 this.$router.push({ path: getLinkByEventLabel(milestone.eventName) });
             }
+        },
+        reCalcProgress() {
+            forceCalcProgress().then(() => {
+                this.fetchProgress();
+            })
         }
     }
 };

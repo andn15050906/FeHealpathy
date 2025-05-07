@@ -11,7 +11,7 @@
         <!--<button class="btn-icon" @click="toggleDarkMode">
           <i :class="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
         </button>-->
-        <button class="btn-action">
+        <button class="btn-action" @click="downloadReport">
           <i class="fas fa-download mr-2"></i> Xuất báo cáo
         </button>
       </div>
@@ -186,6 +186,7 @@
 <script>
 import { Line as LineChart, Bar as BarChart } from 'vue-chartjs'
 import { getUserStatistics } from '@/scripts/api/services/statisticsService'
+import { exportReport } from '@/scripts/api/services/billService'
 import ViewReports from './ViewReports.vue'
 
 export default {
@@ -198,23 +199,10 @@ export default {
   data() {
     return {
       isDarkMode: false,
-      showNotifications: false,
       userChartPeriod: 'month',
       revenueChartPeriod: 'month',
       activitySearch: '',
       activityFilter: 'all',
-      unreadNotifications: 3,
-      notifications: [
-        {
-          id: 1,
-          type: 'warning',
-          title: 'Cập nhật hệ thống',
-          description: 'Bản cập nhật hệ thống được lên lịch tối nay',
-          time: '2 giờ trước',
-          read: false
-        },
-        
-      ],
       activities: [
         {
           id: 1,
@@ -291,20 +279,6 @@ export default {
     toggleDarkMode() {
       this.isDarkMode = !this.isDarkMode
     },
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications
-    },
-    closeNotifications() {
-      this.showNotifications = false
-    },
-    getNotificationIcon(type) {
-      const icons = {
-        warning: 'fas fa-exclamation-triangle',
-        success: 'fas fa-check-circle',
-        info: 'fas fa-info-circle'
-      }
-      return icons[type] || 'fas fa-bell'
-    },
     getActivityIcon(type) {
       const icons = {
         user: 'fas fa-user',
@@ -374,6 +348,9 @@ export default {
           console.error('Navigation error:', err);
         }
       });
+    },
+    downloadReport() {
+      exportReport();
     }
   },
   beforeMount() {

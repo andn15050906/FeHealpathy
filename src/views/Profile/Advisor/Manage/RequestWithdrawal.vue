@@ -44,19 +44,8 @@ export default {
       banks: [],
     };
   },
-  mounted() {
-    fetch('https://api.vietqr.io/v2/banks')
-      .then(res => res.json())
-      .then(data => {
-        this.banks = data.data;
-      });
-  },
   methods: {
     submitForm() {
-      // Xử lý gửi yêu cầu rút tiền ở đây
-      alert(
-        `Số TK: ${this.accountNumber}\nTên TK: ${this.accountName}\nNgân hàng: ${this.selectedBank}`
-      );
     },
   },
 };

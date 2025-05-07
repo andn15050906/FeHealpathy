@@ -11,15 +11,11 @@
                 <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.creationTime }}</span>
               </div>
               <div class="form-group">
-                <label for="balance">Số dư</label>
-                <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.balance }}</span>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
                 <label for="courseCount">Số khóa học</label>
                 <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.courseCount }}</span>
               </div>
+            </div>
+            <div class="form-row">
               <div class="form-group">
                 <label for="experience">Kinh nghiệm</label>
                 <input type="text" id="experience" v-model="form.experience" class="form-control" />
@@ -33,9 +29,16 @@
             </div>
             <div class="form-buttons">
               <button type="submit" class="btn btn-save">LƯU</button>
-              <button type="button" class="btn btn-cancel" @click="openCancelPopup">
-                HỦY
-              </button>
+              <button type="button" class="btn btn-cancel" @click="openCancelPopup">HỦY</button>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="balance">Số dư</label>
+                <span class="form-control readonly-field" style="cursor: not-allowed;" title="Trường này không thể chỉnh sửa">{{ form.balance }}</span>
+                <div class="form-buttons">
+                  <div class="btn btn-warning white-text" @click="openWithdrawalPopup">Rút tiền</div>
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -45,6 +48,15 @@
       url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
     <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Bạn có chắc chắn muốn hủy các thay đổi?"
       @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
+    <v-dialog v-if="withdrawDialogVisible" persistent max-width="400px">
+        <v-card>
+            <v-card-title class="d-flex align-center title-section">
+                <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
+                <span class="title">Xác nhận hủy</span>
+            </v-card-title>
+            <RequestWithdrawal />
+        </v-card>
+    </v-dialog>
   </div>
   <div>
     <div class="meetings-list">
@@ -84,6 +96,7 @@ import { getAdvisorProfile, updateAdvisorProfile } from '@/scripts/api/services/
 import SweetAlert from '../../../components/Common/Popup/SweetAlert.vue';
 import UpdateConfirmPopup from '../../../components/Common/Popup/UpdateConfirmPopup.vue';
 import CancelConfirmPopup from '../../../components/Common/Popup/CancelConfirmPopup.vue';
+import RequestWithdrawal from '@/views/Profile/Advisor/Manage/RequestWithdrawal.vue'
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { getMeetings } from '@/scripts/api/services/meetingService';
 import { useRouter } from 'vue-router';
@@ -92,7 +105,8 @@ export default {
   components: {
     SweetAlert,
     UpdateConfirmPopup, 
-    CancelConfirmPopup
+    CancelConfirmPopup,
+    RequestWithdrawal
   },
   setup() {
     const form = ref({
@@ -108,6 +122,7 @@ export default {
     const originalForm = ref({});
     const confirmDialogVisible = ref(false);
     const cancelDialogVisible = ref(false);
+    const withdrawDialogVisible = ref(false);
     const loadingSpinner = inject('loadingSpinner');
     const sweetAlert = inject('sweetAlert');
     const text = dict['en']
@@ -197,6 +212,10 @@ export default {
       cancelDialogVisible.value = true;
     };
 
+    const openWithdrawalPopup = () => {
+      withdrawDialogVisible.value = true;
+    }
+
     const handleConfirmCancel = (confirm) => {
       if (confirm) {
         form.value = { ...originalForm.value };
@@ -212,7 +231,6 @@ export default {
       try {
         const response = await getMeetings();
         if (response?.items) {
-          console.log(response);
           meetings.value = response.items
             .filter(_ => _.participants.find(_ => _.creatorId == userId))
             .map(meeting => ({
@@ -245,6 +263,7 @@ export default {
       text,
       handleSubmit,
       openCancelPopup,
+      openWithdrawalPopup,
       confirmDialogVisible,
       cancelDialogVisible,
       handleConfirmUpdate,
