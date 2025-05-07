@@ -20,40 +20,39 @@
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
           <ul v-if="showProfileMenu" class="dropdown-menu">
             <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
-            <li><router-link to="/statistics/self-assessment">Thống Kê</router-link></li>
-            <li><router-link to="/settings">Cài Đặt</router-link></li>
-            
-            <hr class="menu-divider" />
-            <li><router-link to="/meetings/schedule">Họp Với Cố Vấn</router-link></li>
-            <li><router-link to="/courses/enrolled">Các Khóa Học Đã Tham Gia</router-link></li>
-
+            <li><router-link to="/statistics/self-assessment">Thống kê</router-link></li>
+            <li><router-link to="/settings">Cài đặt</router-link></li>
             <li v-if="user.role != 1 && user.role != 2" >
               <hr class="menu-divider" />
-              <router-link to="/request-advisor">Xét Duyệt Làm Cố Vấn</router-link>
+              <router-link to="/request-advisor">Xét duyệt làm Cố vấn</router-link>
             </li>
+            
+            <hr class="menu-divider" />
+            <li><router-link to="/meetings/schedule">Họp với cố vấn</router-link></li>
+            <li><router-link to="/courses/enrolled">Khóa học đã tham gia</router-link></li>
 
             <li v-if="user.role === 1">
               <hr class="menu-divider" />
-              <router-link to="/advisor/edit-profile">Quản Lý Thông Tin Cố Vấn</router-link>
-              <router-link to="/advisor/content">Quản Lý Nội Dung Cố Vấn</router-link>
-              <router-link to="/media/manage">Quản Lý Tài Nguyên</router-link>
+              <router-link to="/advisor/edit-profile">Tài khoản cố vấn</router-link>
+              <router-link to="/advisor/content">Nội dung cố vấn</router-link>
+              <router-link to="/media/manage">Quản lý tài nguyên</router-link>
             </li>
             
             <li v-if="user.role === 2">
               <hr class="menu-divider" />
-              <router-link to="/admin">Quản Trị Viên</router-link>
-              <router-link to="/advisor/content">Quản Lý Nội Dung Cố Vấn</router-link>
+              <router-link to="/admin">Quản trị viên</router-link>
+              <router-link to="/advisor/content">Nội dung quản trị viên</router-link>
               <router-link to="/yogas/manage">Yoga</router-link>
             </li>
 
             <li>
               <hr class="menu-divider" />
-              <button style="width: 100%;" @click="signOut">Đăng Xuất</button>
+              <button style="width: 100%;" @click="signOut">Đăng xuất</button>
             </li>
           </ul>
         </div>
         <router-link v-else to="/sign-in">
-          <div class="text-dark login-btn">Đăng Nhập</div>
+          <div class="text-dark login-btn">Đăng nhập</div>
         </router-link>
       </div>
     </div>

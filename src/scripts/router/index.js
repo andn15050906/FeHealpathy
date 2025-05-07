@@ -20,7 +20,6 @@ import UserActivity from '@/views/Profile/Statistics/UserActivity.vue'
 import SelfAssessmentResult from '@/views/Profile/Statistics/SelfAssessmentResult.vue'
 import SubmissionReview from '@/views/Profile/Statistics/SubmissionReview.vue'
 
-import RequestWithdrawal from '@/views/Profile/Advisor/Manage/RequestWithdrawal.vue'
 import PracticeToolList from '@/views/PracticeTools/PracticeToolList.vue'
 import SelfAssessment from '@/views/PracticeTools/SelfAssessment/SelfAssessment.vue'
 import DiaryList from '@/views/PracticeTools/Diary/DiaryList.vue'
@@ -156,12 +155,6 @@ const router = createRouter({
       path: '/advisor/edit-profile',
       name: 'editAdvisor',
       component: EditAdvisor,
-      meta: { requiresAuth: true, requiresAdvisor: true }
-    },
-    {
-      path: '/advisor/request-withdrawal',
-      name: 'RequestWithdrawal',
-      component: RequestWithdrawal,
       meta: { requiresAuth: true, requiresAdvisor: true }
     },
     {

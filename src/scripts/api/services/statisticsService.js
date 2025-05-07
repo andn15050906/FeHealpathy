@@ -13,3 +13,7 @@ export const getSentimentAnalysis = async () => {
 export const getUserStatistics = async () => {
   return await get(`${API_BASE_URL}/report/general`);
 }
+
+export const forceCalcProgress = async () => {
+  return await get(`${API_BASE_URL}/force-progress`);
+}
