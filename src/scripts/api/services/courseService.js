@@ -7,7 +7,11 @@ const API_COURSE_RECOMMENDATION = "you-may-like/courses"
 export const getCourses = async (params = { pageIndex: 0, pageSize: 20 }) => {
   try {
     const response = await apiClient.get(`/Courses`, {
-      params: params,
+      params: {
+        pageIndex: params.pageIndex,
+        pageSize: params.pageSize,
+        ...(params.creatorId != null && { creatorId: params.creatorId })
+      }
     });
     return response.data;
   } catch (error) {

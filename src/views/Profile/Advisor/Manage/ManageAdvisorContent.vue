@@ -10,7 +10,7 @@
         </button>
       </li>
     </ul>
-  <!-- Courses Tab -->
+    <!-- Courses Tab -->
     <div v-if="currentTab === 'courses'" class="tab-pane fade show active">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4">Khóa học của bạn</h2>
@@ -43,9 +43,9 @@
           <tbody>
             <tr v-for="item in filteredCourses" :key="item.id">
               <td class="text-center">
-                  <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
-                    <img :src="item.thumbUrl" :alt="item.title" @error="setDefaultImage" />
-                  </div>
+                <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
+                  <img :src="item.thumbUrl" :alt="item.title" @error="setDefaultImage" />
+                </div>
               </td>
               <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
               <td class="col-level fixed-col text-center" :title="item.level">{{ item.level }}</td>
@@ -65,7 +65,8 @@
           </tbody>
         </table>
       </div>
-      <Pagination :currentPage="currentPageCourses" style="margin-top: 20px;" :totalPages="totalPagesCourses" @GoToPage="changePageCourse" />
+      <Pagination :currentPage="currentPageCourses" style="margin-top: 20px;" :totalPages="totalPagesCourses"
+        @GoToPage="changePageCourse" />
     </div>
     <!-- Blogs Tab -->
     <div v-if="currentTab === 'blogs'" class="tab-pane fade show active">
@@ -97,11 +98,12 @@
             </thead>
             <tbody>
               <tr v-for="item in filteredBlogs" :key="item.id">
-              <td class="text-center">
+                <td class="text-center">
                   <div class="thumb-wrapper ratio-16x9" style="max-width: 100px; margin: auto;">
-                    <img :src="item.thumb?.url || 'https://placehold.co/160x90'" :alt="item.thumb?.title || 'Default image'" class="img-fluid rounded" @error="setDefaultImage"/>
+                    <img :src="item.thumb?.url || 'https://placehold.co/160x90'"
+                      :alt="item.thumb?.title || 'Default image'" class="img-fluid rounded" @error="setDefaultImage" />
                   </div>
-              </td>
+                </td>
                 <td class="col-title fixed-col" :title="item.title">{{ item.title }}</td>
                 <td class="col-tags fixed-col">
                   <div class="d-flex flex-wrap gap-1">
@@ -125,7 +127,8 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageBlogs" style="margin-top: 20px;" :totalPages="totalPagesBlogs" @GoToPage="changePageBlog" />
+        <Pagination :currentPage="currentPageBlogs" style="margin-top: 20px;" :totalPages="totalPagesBlogs"
+          @GoToPage="changePageBlog" />
       </div>
     </div>
     <!-- Roadmaps Tab -->
@@ -172,7 +175,8 @@
             </tbody>
           </table>
         </div>
-        <Pagination :currentPage="currentPageRoadmaps" style="margin-top: 20px;" :totalPages="totalPagesRoadmaps" @GoToPage="changePageRoadmap" />
+        <Pagination :currentPage="currentPageRoadmaps" style="margin-top: 20px;" :totalPages="totalPagesRoadmaps"
+          @GoToPage="changePageRoadmap" />
       </div>
     </div>
     <UpdateBlog v-if="isEditingBlog" :blogData="selectedBlog" @blogUpdated="handleBlogUpdated" />
@@ -235,8 +239,8 @@ export default {
     },
     editBlog(blog) {
       if (blog && blog.id) {
-        this.$router.push({ 
-          name: 'updateBlog', 
+        this.$router.push({
+          name: 'updateBlog',
           params: { id: blog.id }
         });
       }
@@ -246,8 +250,8 @@ export default {
     },
     editRoadmap(roadmap) {
       if (roadmap && roadmap.id) {
-        this.$router.push({ 
-          name: 'updateRoadmap', 
+        this.$router.push({
+          name: 'updateRoadmap',
           params: { id: roadmap.id }
         });
       }
@@ -331,14 +335,13 @@ export default {
               toast.success("Lộ trình đã được xóa thành công!");
               break;
           }
-          
+
           await Promise.all([
             this.fetchCourses(),
             this.fetchBlogs(),
             this.fetchRoadmaps()
           ]);
         } catch (error) {
-          console.error('Không thể xóa nội dung:', error);
           toast.error("Không thể xóa nội dung. Vui lòng thử lại.");
         } finally {
           this.$refs.loadingSpinner.hideSpinner();
@@ -350,20 +353,13 @@ export default {
       try {
         this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageBlogs - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
+        console.log(params)
         const response = await getPagedArticles(params);
-
         this.blogs = response.items || [];
         this.totalPagesBlogs = Math.ceil(response.totalCount / this.pageSize);
-
-        const blogTab = this.tabs.find(tab => tab.id === 'blogs');
-        if (blogTab) {
-          blogTab.count = response.totalCount;
-        }
-
+        this.tabs.find(tab => tab.id === 'blogs').count = response.totalCount;
         this.sortBlogs();
-      } catch (error) {
-        console.error('Không thể tải bài viết:', error);
-        toast.error("Không thể tải bài viết. Vui lòng thử lại.");
+      } catch {
         this.blogs = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -374,19 +370,11 @@ export default {
         this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageRoadmaps - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getRoadmaps(params);
-
         this.roadmaps = response.items || [];
         this.totalPagesRoadmaps = Math.ceil(response.totalCount / this.pageSize);
-
-        const roadmapTab = this.tabs.find(tab => tab.id === 'roadmaps');
-        if (roadmapTab) {
-          roadmapTab.count = response.totalCount;
-        }
-
+        this.tabs.find(tab => tab.id === 'roadmaps').count = response.totalCount;
         this.sortRoadmaps();
-      } catch (error) {
-        console.error('Không thể tải lộ trình:', error);
-        toast.error("Không thể tải lộ trình. Vui lòng thử lại.");
+      } catch {
         this.roadmaps = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -397,19 +385,11 @@ export default {
         this.$refs.loadingSpinner.showSpinner();
         const params = { pageIndex: this.currentPageCourses - 1, pageSize: this.pageSize, creatorId: this.currentUserId };
         const response = await getCourses(params);
-
         this.courses = response.items || [];
         this.totalPagesCourses = Math.ceil(response.totalCount / this.pageSize);
-
-        const courseTab = this.tabs.find(tab => tab.id === 'courses');
-        if (courseTab) {
-          courseTab.count = response.totalCount;
-        }
-
+        this.tabs.find(tab => tab.id === 'courses').count = response.totalCount;
         this.sortCourses();
-      } catch (error) {
-        console.error('Không thể tải khóa học:', error);
-        toast.error("Không thể tải khóa học. Vui lòng thử lại.");
+      } catch {
         this.courses = [];
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
@@ -435,7 +415,9 @@ export default {
     }
   },
   computed: {
-    currentUserId: () => JSON.parse(localStorage.getItem('userProfile'))?.id,
+    currentUserId() {
+      return JSON.parse(localStorage.getItem('userProfile')).id;
+    },
     filteredCourses() {
       return this.courses.filter(item => item.title.toLowerCase().includes(this.searchQuery.courses.toLowerCase()))
     },
@@ -453,19 +435,17 @@ export default {
     document.head.appendChild(link)
 
     this.$refs.loadingSpinner.showSpinner();
-    try {
-      Promise.all([
-        this.fetchBlogs(),
-        this.fetchCourses(),
-        this.fetchRoadmaps()
-      ]);
-    } finally {
+    Promise.all([
+      this.fetchBlogs(),
+      this.fetchCourses(),
+      this.fetchRoadmaps()
+    ]).finally(() => {
       this.$refs.loadingSpinner.hideSpinner();
-    }
-
+    });
   }
 }
 </script>
+
 
 <style scoped>
 .nav-tabs .nav-link {
@@ -520,7 +500,8 @@ export default {
 .ratio-16x9 {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 ratio */
+  padding-top: 56.25%;
+  /* 16:9 ratio */
   overflow: hidden;
   border-radius: 0.5rem;
   background-color: #f0f0f0;
