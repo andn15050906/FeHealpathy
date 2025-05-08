@@ -95,15 +95,19 @@ const logError = async (error, client) =>
 		}
         else if (error.response.status == 403) {
             try {
-                const response = await client({ method: "get", url: 'healthcheck' });
+                await client({ method: "get", url: 'healthcheck' });
             } catch (err) {
                 switchGateway();
             }
         }
 	}
-	/*else {
-		console.log('Error without response:', error.message);
-	}*/
+	else {
+        try {
+            await client({ method: "get", url: 'healthcheck' });
+        } catch (err) {
+            switchGateway();
+        }
+	}
 }
 
 export const get = (url, params) => apiCall(apiClient, "get", url, null, params);
