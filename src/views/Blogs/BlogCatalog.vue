@@ -56,7 +56,8 @@ async function loadBlogs(page = 1) {
     const params = {
       pageIndex: currentPage.value - 1,
       pageSize: itemsPerPage,
-      tags: selectedTags.value
+      tags: selectedTags.value,
+      title: searchQuery.value
     };
 
     const response = await getPagedArticles(params);
