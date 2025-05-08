@@ -6,31 +6,48 @@
       <div class="course-detail-container" v-if="course">
         <div class="course-header">
           <div class="course-media-actions">
-            <img :src="course.thumbUrl" alt="Course Thumbnail" class="course-thumb" />
+            <img
+              :src="course.thumbUrl"
+              alt="Course Thumbnail"
+              class="course-thumb"
+            />
 
             <div class="owner-status" v-if="isOwner">
               <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
             </div>
 
-            <div class="course-actions" v-else-if="!isEnrolled && !isLoadingEnrollment">
+            <div
+              class="course-actions"
+              v-else-if="!isEnrolled && !isLoadingEnrollment"
+            >
               <div class="course-pricing">
                 <span class="price-label">Giá:</span>
                 <div class="price-container">
                   <div class="old-price-row" v-if="course.discount > 0">
-                    <del>{{ course.price?.toLocaleString('vi-VN') }} VND</del>
-                    <span class="discount-badge">{{ Math.floor(course.discount * 100) }}% OFF</span>
+                    <del>{{ course.price?.toLocaleString("vi-VN") }} VND</del>
+                    <span class="discount-badge"
+                      >{{ Math.floor(course.discount * 100) }}% OFF</span
+                    >
                   </div>
                   <div class="new-price">
-                    <strong>{{ discountedPrice == 0 ? 'Miễn phí' : discountedPrice.toLocaleString('vi-VN') + ' VND'
-                      }}</strong>
+                    <strong>{{
+                      discountedPrice == 0
+                        ? "Miễn phí"
+                        : discountedPrice.toLocaleString("vi-VN") + " VND"
+                    }}</strong>
                   </div>
                 </div>
               </div>
               <div class="buy-button-container">
-                <button class="btn-buy" @click="handlePurchase">💰 Mua ngay</button>
+                <button class="btn-buy" @click="handlePurchase">
+                  💰 Mua ngay
+                </button>
               </div>
             </div>
-            <div class="enrollment-status" v-else-if="isEnrolled && !isLoadingEnrollment">
+            <div
+              class="enrollment-status"
+              v-else-if="isEnrolled && !isLoadingEnrollment"
+            >
               <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
             </div>
             <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
@@ -71,30 +88,51 @@
         <h2 class="section-title">📚 Bài giảng</h2>
 
         <div v-if="lectures.length > 0" class="lecture-grid">
-          <div v-for="lecture in lectures" :key="lecture.id" class="lecture-card">
+          <div
+            v-for="lecture in lectures"
+            :key="lecture.id"
+            class="lecture-card"
+          >
             <template v-if="lecture.firstImageUrl">
-              <img :src="lecture.firstImageUrl" alt="Lecture Image" class="lecture-thumb"
-                @error="(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'block'; }" />
-              <div class="lecture-thumb-placeholder" style="display: none;">Không thể tải ảnh</div>
+              <img
+                :src="lecture.firstImageUrl"
+                alt="Lecture Image"
+                class="lecture-thumb"
+                @error="
+                  (e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }
+                "
+              />
+              <div class="lecture-thumb-placeholder" style="display: none">
+                Không thể tải ảnh
+              </div>
             </template>
             <template v-else>
-              <div class="lecture-thumb-placeholder">Không có ảnh xem trước</div>
+              <div class="lecture-thumb-placeholder">
+                Không có ảnh xem trước
+              </div>
             </template>
 
             <div class="lecture-content">
               <h3>{{ lecture.title }}</h3>
               <p class="lecture-summary">{{ lecture.contentSummary }}</p>
-              <span v-if="lecture.isPreviewable" class="preview-badge">🔓 Xem trước miễn phí</span>
+              <span v-if="lecture.isPreviewable" class="preview-badge"
+                >🔓 Xem trước miễn phí</span
+              >
             </div>
-            <button 
-              class="btn-view" 
+            <button
+              class="btn-view"
               @click="viewLecture(lecture.id)"
               :disabled="!lecture.isPreviewable && !isOwner && !isEnrolled"
-              :title="lecture.isPreviewable 
-                        ? 'Xem bài giảng' 
-                        : (isOwner || isEnrolled 
-                            ? 'Xem bài giảng' 
-                            : 'Bạn cần mua khóa học để xem bài giảng này')"
+              :title="
+                lecture.isPreviewable
+                  ? 'Xem bài giảng'
+                  : isOwner || isEnrolled
+                  ? 'Xem bài giảng'
+                  : 'Bạn cần mua khóa học để xem bài giảng này'
+              "
             >
               ▶️ Xem bài giảng
             </button>
@@ -106,6 +144,59 @@
       </div>
       <div v-else-if="!isLoadingCourse && !course && !isLoadingEnrollment">
         <p class="loading-placeholder">⚠️ Không thể tải thông tin khóa học.</p>
+      </div>
+
+      <div
+        class="card border-0 shadow-sm mb-2 mt-4"
+        v-if="recommendedCourses.length > 0"
+      >
+        <div class="card-body">
+          <h4 class="fw-bold text-dark card-title mb-4">
+            Khóa học bạn có thể thích
+          </h4>
+
+          <div class="position-relative">
+            <swiper
+              :modules="swiperModules"
+              :slides-per-view="1"
+              :space-between="10"
+              :navigation="true"
+              :pagination="{ clickable: true }"
+              :breakpoints="{
+                576: { slidesPerView: 1 },
+                768: { slidesPerView: 2, spaceBetween: 10 },
+                992: { slidesPerView: 3, spaceBetween: 10 },
+              }"
+              class="related-courses-swiper"
+            >
+              <swiper-slide
+                v-for="recCourse in recommendedCourses"
+                :key="recCourse.objectID"
+              >
+                <a
+                  :href="`/courses/${recCourse.objectID}`"
+                  class="card h-100 shadow-sm article-card text-decoration-none"
+                >
+                  <div class="image-container">
+                    <img
+                      :src="recCourse.ThumbUrl"
+                      class="card-img-top"
+                      alt="course image"
+                    />
+                  </div>
+                  <div class="card-content">
+                    <h5 class="fw-bold title-truncate">
+                      {{ recCourse.Title }}
+                    </h5>
+                    <p class="text-muted mb-0 date-text">
+                      {{ formatDate(recCourse.CreationTime) }}
+                    </p>
+                  </div>
+                </a>
+              </swiper-slide>
+            </swiper>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -119,15 +210,23 @@ import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 import { getUserProfile } from "@/scripts/api/services/authService";
-import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
+import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
 import { getUserById } from "@/scripts/api/services/userService";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import { getRecommendationCourses } from "@/scripts/api/services/courseService";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 export default {
   name: "CourseDetail",
   components: {
-    LoadingSpinner
+    LoadingSpinner,
+    Swiper,
+    SwiperSlide,
   },
   setup() {
     const router = useRouter();
@@ -142,6 +241,9 @@ export default {
     const isLoadingEnrollment = ref(true);
     const isOwner = ref(false);
     const currentUser = ref(null);
+    const recommendedCourses = ref([]);
+    const isLoadingRecommendations = ref(false);
+    const swiperModules = [Navigation, Pagination];
 
     const getCurrentUserInfo = () => {
       try {
@@ -168,13 +270,15 @@ export default {
             ratingCount: courseData.ratingCount,
             totalRating: courseData.totalRating,
             outcomes: courseData.outcomes || "Thông tin đang được cập nhật.",
-            requirements: courseData.requirements || "Thông tin đang được cập nhật.",
-            creatorId: courseData.creatorId
+            requirements:
+              courseData.requirements || "Thông tin đang được cập nhật.",
+            creatorId: courseData.creatorId,
           };
           if (courseData.creatorId) {
             try {
               const instructorData = await getUserById(courseData.creatorId);
-              instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
+              instructorName.value =
+                instructorData?.fullName || instructorData?.name || "Không rõ";
             } catch (userError) {
               instructorName.value = "Không rõ";
             }
@@ -203,11 +307,13 @@ export default {
       try {
         const response = await getLectures(courseId);
         const lectureList = response?.items || [];
-        lectures.value = lectureList.map(lecture => {
-          const firstImageMaterial = lecture.materials?.find(material => material.type === 1);
+        lectures.value = lectureList.map((lecture) => {
+          const firstImageMaterial = lecture.materials?.find(
+            (material) => material.type === 1
+          );
           return {
             ...lecture,
-            firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null
+            firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null,
           };
         });
       } catch (error) {
@@ -224,7 +330,9 @@ export default {
         const response = await getEnrollments({ pageSize: 100 });
 
         if (response && response.items) {
-          const enrolled = response.items.some(enrollment => enrollment.courseId === courseId);
+          const enrolled = response.items.some(
+            (enrollment) => enrollment.courseId === courseId
+          );
           isEnrolled.value = enrolled;
         } else {
           isEnrolled.value = false;
@@ -236,10 +344,27 @@ export default {
       }
     };
 
-    const isLoading = computed(() =>
-      isLoadingCourse.value ||
-      isLoadingLectures.value ||
-      isLoadingEnrollment.value
+    const fetchRecommendedCourses = async () => {
+      if (!courseId) return;
+      isLoadingRecommendations.value = true;
+      try {
+        const response = await getRecommendationCourses();
+        recommendedCourses.value = response || [];
+        recommendedCourses.value = recommendedCourses.value.filter(
+          (c) => c.id !== courseId
+        );
+      } catch (error) {
+        recommendedCourses.value = [];
+      } finally {
+        isLoadingRecommendations.value = false;
+      }
+    };
+
+    const isLoading = computed(
+      () =>
+        isLoadingCourse.value ||
+        isLoadingLectures.value ||
+        isLoadingEnrollment.value
     );
 
     const discountedPrice = computed(() => {
@@ -267,7 +392,10 @@ export default {
         }
         window.location.href = data.url;
       } catch (error) {
-        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tiến hành thanh toán");
+        toast.error(
+          error.response?.data?.message ||
+            "Có lỗi xảy ra khi tiến hành thanh toán"
+        );
       }
     };
 
@@ -277,10 +405,32 @@ export default {
       }
 
       router.push({
-        name: 'lectureDetail',
+        name: "lectureDetail",
         params: { id: lectureId },
-        query: { courseId: course.value.id }
+        query: { courseId: course.value.id },
       });
+    };
+
+    const navigateToCourse = (id) => {
+      if (id === courseId) return;
+
+      router.push({
+        name: "courseDetail",
+        params: { id: id },
+      });
+    };
+
+    const formatDiscountPrice = (course) => {
+      if (!course) return "";
+      const discount = Number(course.discount) || 0;
+      const price = Number(course.price) || 0;
+      const finalPrice = Math.floor(
+        discount > 0 ? price * (1 - discount) : price
+      );
+
+      return finalPrice === 0
+        ? "Miễn phí"
+        : `${finalPrice.toLocaleString("vi-VN")} VND`;
     };
 
     onMounted(async () => {
@@ -289,9 +439,20 @@ export default {
       await Promise.all([
         fetchCourseInfo(),
         fetchLectures(),
-        checkEnrollmentStatus()
+        checkEnrollmentStatus(),
       ]);
+
+      await fetchRecommendedCourses();
     });
+
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("vi-VN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      });
+    };
 
     return {
       isLoading,
@@ -307,6 +468,11 @@ export default {
       averageRating,
       viewLecture,
       handlePurchase,
+      recommendedCourses,
+      navigateToCourse,
+      formatDiscountPrice,
+      swiperModules,
+      formatDate,
     };
   },
 };
@@ -715,5 +881,119 @@ export default {
   font-weight: 600;
   margin: 0;
   font-size: 16px;
+}
+
+.related-courses-swiper {
+  padding: 0 15px;
+  padding-bottom: 2.5rem;
+  max-width: 100%;
+}
+
+.image-container {
+  height: 200px;
+  overflow: hidden;
+  border-radius: 6px 6px 0 0;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+}
+
+.article-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-content {
+  min-height: 75px;
+  max-height: 85px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  justify-content: space-between;
+}
+
+.title-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  max-height: 2.6em;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #6c757d;
+  font-weight: bold;
+  top: 45%;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.swiper-pagination-bullet-active {
+  background: #6c757d;
+}
+
+:deep(.swiper-pagination) {
+  bottom: 0 !important;
+  margin-bottom: 0.5rem;
+}
+
+:deep(.swiper-button-prev) {
+  left: 0;
+}
+
+:deep(.swiper-button-next) {
+  right: 0;
+}
+
+.article-card {
+  height: 320px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.article-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.swiper-wrapper) {
+  width: 100%;
+}
+
+:deep(.swiper-slide) {
+  width: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.card-body {
+  padding: 1.25rem 0.75rem;
 }
 </style>

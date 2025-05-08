@@ -11,6 +11,7 @@ const switchGateway = () => {
     baseUrl = (baseUrl == import.meta.env.VITE_BACKEND_FALLBACK_URL)
         ? import.meta.env.VITE_BACKEND_URL
         : import.meta.env.VITE_BACKEND_FALLBACK_URL
+    console.log('switching gateway: ' + baseUrl);
 }
 
 switchGateway();

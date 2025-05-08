@@ -161,7 +161,7 @@ const router = createRouter({
       path: '/meetings/schedule',
       name: 'ScheduleMeeting',
       component: ScheduleMeeting,
-      //meta: {requiresAuth: true,title: 'Đặt lịch họp'}
+      meta: { requiresAuth: true, requiresPremium: true }
     },
     {
       path: '/profile/:id',
@@ -369,13 +369,13 @@ const router = createRouter({
       path: '/courses/create',
       name: 'createCourse',
       component: CreateCourse,
-      // meta: { requiresAuth: true, requiresAdvisor: true }
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true }
     },
     {
       path: '/courses/update/:id',
       name: 'updateCourse',
       component: UpdateCourse,
-      // meta: { requiresAuth: true, requiresAdvisor: true },
+      meta: { requiresAuth: true, requiresAdvisorOrAdmin: true },
       props: true
     },
     {
