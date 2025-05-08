@@ -129,8 +129,6 @@ export default {
                 await this.fetchMediaResources(this.currentPage);
                 toast.success("Phương tiện truyền thông đã được thêm thành công!");
             } catch (error) {
-                console.error("Lỗi khi thêm phương tiện truyền thông.", error);
-                toast.error("Lỗi khi thêm phương tiện truyền thông.");
             } finally {
                 this.$refs.loadingSpinner.hideSpinner();
             }

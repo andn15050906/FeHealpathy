@@ -11,7 +11,8 @@ export const getPagedArticles = async (params = { pageIndex: 0, pageSize: 20 }) 
         params: {
           pageIndex: params.pageIndex,
           pageSize: params.pageSize,
-          tags: params.tags ? params.tags[0] : null
+          tags: params.tags ? params.tags[0] : null,
+          ...(params.creatorId != null && { creatorId: params.creatorId })
         }
       });
     return response.data;
