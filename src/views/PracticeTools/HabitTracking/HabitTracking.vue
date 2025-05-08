@@ -52,23 +52,31 @@ export default {
           routineItems = response.items;
         }
 
-        habits.value = routineItems.map(item => ({
-          id: item.id,
-          title: item.title,
-          description: item.description || "Chưa có mô tả",
-          objective: item.objective || "Chưa có mục tiêu",
-          repeaterSequenceId: item.repeaterSequenceId || null,
-          date: new Date(item.startDate).toISOString().split("T")[0],
-          startTime: new Date(item.startDate).toTimeString().slice(0, 5),
-          endTime: new Date(item.endDate).toTimeString().slice(0, 5),
-          completed: item.isCompleted,
-          closed: item.isClosed,
-          tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
-        }));
+        habits.value = routineItems.map(item => {
+          const startDate = new Date(item.startDate);
+          const endDate = new Date(item.endDate);
+          const correctedStartDate = new Date(startDate);
+          const correctedEndDate = new Date(endDate);
+          correctedStartDate.setDate(correctedStartDate.getDate() + 1);
+          correctedEndDate.setDate(correctedEndDate.getDate() + 1);
+
+          return {
+            id: item.id,
+            title: item.title,
+            description: item.description || "Chưa có mô tả",
+            objective: item.objective || "Chưa có mục tiêu",
+            repeaterSequenceId: item.repeaterSequenceId || null,
+            date: correctedStartDate.toISOString().split("T")[0],
+            startTime: startDate.toTimeString().slice(0, 5),
+            endTime: endDate.toTimeString().slice(0, 5),
+            completed: item.isCompleted,
+            closed: item.isClosed,
+            tag: Object.keys(tagMapping).find(key => tagMapping[key] === item.tag) || "#3498db"
+          };
+        });
       } catch (error) {
         console.error(error);
         habits.value = [];
-        toast.error("Không tải được danh sách thói quen!", { position: "bottom-center" });
       } finally {
         spinnerRef.value?.hideSpinner();
       }
@@ -190,7 +198,11 @@ export default {
           if (sd >= td) await createRoutine(createPayload(habit));
         }
         await loadRoutines(currentViewDate.value);
-        toast.success(habit.isUpdate ? "Cập nhật thói quen thành công!" : "Thêm thói quen thành công!", { position: "bottom-center" });
+
+        if (!habit.isUpdate)
+        {
+          toast.success("Thêm thói quen thành công!", { position: "bottom-center" });
+        }
       } catch (error) {
         console.error(error);
         toast.error(habit.isUpdate ? "Cập nhật thói quen thất bại!" : "Thêm thói quen thất bại!", { position: "bottom-center" });
