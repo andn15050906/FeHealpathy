@@ -104,7 +104,7 @@ export default {
           this.isLoggedIn = true;
           this.user = {
             id: clientData.id,
-            userName: clientData.userName || 'User',
+            userName: clientData.fullName || clientData.userName || 'User',
             role: clientData.role || 'Member',
             avatarUrl: clientData.avatarUrl || 'src/img/8f1ca2029e2efceebd22fa05cca423d7.jpg' // Lấy avatar từ profile hoặc dùng ảnh mặc định
           };

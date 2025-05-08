@@ -221,9 +221,11 @@ class RTCHandler {
         let connection = new RTCPeerConnection(this.#rtcConfiguration);
 
         connection.ontrack = (trackEvent) => {
+            console.log('RTC ontrack');
             this.onRTCTrack(peer, trackEvent);
         }
         connection.onicecandidate = (event) => {
+            console.log('RTC onicecandidate');
             if (event.candidate) {
                 console.log("new candidate");
                 this.#hubConnection.sendICECandidate(peer, event.candidate);
@@ -231,6 +233,7 @@ class RTCHandler {
         }
 
         this.#rtcPeerConnections[peer] = connection;
+        console.log('added connection');
     }
     setupRTCPeerConnections = (peers) => {
         for (let peer of peers)
