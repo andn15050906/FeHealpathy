@@ -147,7 +147,6 @@ export default {
       try {
         currentUser.value = getUserProfile();
       } catch (error) {
-        toast.error("Lỗi khi lấy thông tin người dùng từ localStorage");
         currentUser.value = null;
       }
     };
@@ -177,7 +176,6 @@ export default {
               const instructorData = await getUserById(courseData.creatorId);
               instructorName.value = instructorData?.fullName || instructorData?.name || "Không rõ";
             } catch (userError) {
-              toast.error(`Lỗi khi lấy thông tin giảng viên`);
               instructorName.value = "Không rõ";
             }
           } else {
@@ -188,12 +186,10 @@ export default {
           }
           return true;
         } else {
-          toast.error("Không tìm thấy dữ liệu khóa học");
           isOwner.value = false;
           return false;
         }
       } catch (error) {
-        toast.error("Lỗi khi lấy thông tin khóa học");
         isOwner.value = false;
         return false;
       } finally {
@@ -215,7 +211,6 @@ export default {
           };
         });
       } catch (error) {
-        toast.error(`Lỗi khi lấy danh sách bài giảng cho khóa học`);
         lectures.value = [];
       } finally {
         isLoadingLectures.value = false;
@@ -235,7 +230,6 @@ export default {
           isEnrolled.value = false;
         }
       } catch (error) {
-        toast.error("Lỗi khi kiểm tra trạng thái đăng ký");
         isEnrolled.value = false;
       } finally {
         isLoadingEnrollment.value = false;
@@ -279,7 +273,6 @@ export default {
 
     const viewLecture = (lectureId) => {
       if (!lectureId) {
-        toast.error("Không có ID bài giảng");
         return;
       }
 

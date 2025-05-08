@@ -245,7 +245,6 @@ export default {
           meetings.value = [];
         }
       } catch (error) {
-        //toast.error('Không thể tải danh sách cuộc họp');
       }
     };
 
