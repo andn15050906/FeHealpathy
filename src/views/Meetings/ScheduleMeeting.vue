@@ -218,10 +218,16 @@ async function loadMeetings() {
       });
 
       const advisorList = advisorResp.items || [];
-      advisorMeetings.value = advisorList.map(m => ({
-        ...m,
-        creatorName: m.creatorName || 'Khách hàng',
-      }));
+      advisorMeetings.value = advisorList
+        .filter(meeting => {
+          return meeting.participants.some(participant =>
+            participant.creatorId === me && participant.isHost === true
+          );
+        })
+        .map(m => ({
+          ...m,
+          creatorName: m.creatorName || 'Khách hàng',
+        }));
     }
   } catch (error) {
     console.error('Error loading meetings:', error);
@@ -234,7 +240,6 @@ onBeforeMount(async () => {
     advisors.value = (resp || []).filter(a => a.userId !== getUserProfile().id);
     await loadMeetings();
   } catch {
-    toast.error('Không thể tải danh sách chuyên gia');
   }
 });
 

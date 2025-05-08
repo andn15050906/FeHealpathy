@@ -22,7 +22,7 @@
             </span>
           </div>
         </div>
-      </div>      
+      </div>
       <div class="events-sidebar">
         <div class="selected-date">
           <div class="day-name">{{ selectedDayName }}</div>
@@ -191,7 +191,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -208,7 +207,8 @@ import {
   format,
   isAfter,
   isBefore,
-  startOfDay
+  startOfDay,
+  parseISO
 } from "date-fns";
 import DeleteConfirmPopup from "../Popup/DeleteConfirmPopup.vue";
 import { Chart, registerables } from "chart.js";
@@ -563,27 +563,18 @@ export default {
         return;
       }
 
-      // For new events
+      const savedEvent = {
+        ...this.newEvent,
+        date: format(this.selectedDate, "yyyy-MM-dd")
+      };
+
       if (!this.isEditing) {
-        const savedEvent = {
-          ...this.newEvent,
-          id: Date.now().toString(),
-          date: format(this.selectedDate, "yyyy-MM-dd"),
-          completed: false,
-          closed: false
-        };
-
-        this.$emit("save-event", savedEvent);
-      }
-      else {
-        const updatedEvent = {
-          ...this.newEvent,
-          date: format(this.selectedDate, "yyyy-MM-dd")
-        };
-
-        this.$emit("save-event", updatedEvent);
+        savedEvent.id = Date.now().toString();
+        savedEvent.completed = false;
+        savedEvent.closed = false;
       }
 
+      this.$emit("save-event", savedEvent);
       this.showEventForm = false;
       this.isEditing = false;
 
