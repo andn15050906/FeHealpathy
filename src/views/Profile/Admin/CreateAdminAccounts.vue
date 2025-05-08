@@ -64,7 +64,6 @@ export default {
       selectedUser: null,
       users: [],
       columns: [
-        { title: "ID", key: "id" },
         { title: "Tên", key: "fullName" },
         { title: "Email", key: "email" },
         { title: "Vai trò", key: "role" },
@@ -76,8 +75,7 @@ export default {
     async fetchUsers() {
       try {
         const response = await getUsers();
-        console.log("Dữ liệu người dùng:", response.items);
-        this.users = response.items;
+        this.users = response.items.filter(_ => _.id != '00000000-0000-0000-0000-000000000001');
       } catch (error) {
         console.error("Lỗi khi tải danh sách người dùng:", error);
       }

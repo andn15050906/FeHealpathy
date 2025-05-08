@@ -67,7 +67,7 @@
       <div v-else class="meetings-grid">
         <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
           <div class="meeting-header">
-            <h4>Cuộc hẹn với người dùng</h4>
+            <h4>{{ meeting.displayTitle ?? 'Cuộc hẹn với người dùng' }}</h4>
             <span :class="['status-badge', meeting.status]">{{ meeting.status }}</span>
           </div>
           <div class="meeting-details">
@@ -99,6 +99,7 @@ import CancelConfirmPopup from '../../../components/Common/Popup/CancelConfirmPo
 import RequestWithdrawal from '@/views/Profile/Advisor/Manage/RequestWithdrawal.vue'
 import { formatISODateWithHMS } from '@/scripts/logic/common.js';
 import { getMeetings } from '@/scripts/api/services/meetingService';
+import { getUsers } from '@/scripts/api/services/userService.js';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -127,6 +128,7 @@ export default {
     const sweetAlert = inject('sweetAlert');
     const text = dict['en']
     const userId = JSON.parse(localStorage.getItem('userProfile'))?.id;
+    const allUsers = ref([]);
 
     const fetchProfile = async () => {
       try {
@@ -178,7 +180,6 @@ export default {
 
     const validateExperience = () => {
       const wordCount = form.value.experience.trim().split(/\s+/).length;
-      console.log('Độ dài kinh nghiệm:', wordCount);
       if (wordCount < 5) {
         sweetAlert.showError('Kinh nghiệm phải có ít nhất 5 từ.');
         return false;
@@ -188,7 +189,6 @@ export default {
 
     const validateIntroduction = () => {
       const wordCount = form.value.intro.trim().split(/\s+/).length;
-      console.log('Độ dài giới thiệu:', wordCount);
       if (wordCount < 5) {
         sweetAlert.showError('Giới thiệu phải có ít nhất 5 từ.');
         return false;
@@ -233,9 +233,14 @@ export default {
         if (response?.items) {
           meetings.value = response.items
             .filter(_ => _.participants.find(_ => _.creatorId == userId))
-            .map(meeting => ({
-              ...meeting
-            }));
+            .map(meeting => {
+              var partnerParticipant = meeting.participants.find(_ => _.creatorId != userId);
+              var partner = allUsers.value?.find(_ => _.id == partnerParticipant?.creatorId);
+              return {
+                ...meeting,
+                displayTitle: partner ? 'Cuộc hẹn với ' + partner.fullName : 'Cuộc hẹn với người dùng'
+              }
+            });
         } else {
           meetings.value = [];
         }
@@ -252,9 +257,10 @@ export default {
       }
     };
 
-    onBeforeMount(() => {
-      fetchProfile();
-      loadMeetings();
+    onBeforeMount(async () => {
+      await fetchProfile();
+      allUsers.value = (await getUsers({pageSize: 60})).items;
+      await loadMeetings();
     });
 
     return {
@@ -454,7 +460,7 @@ textarea.form-control {
 
 .meeting-card {
   background: #fff;
-  padding: 20px;
+  padding: 20px 8px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

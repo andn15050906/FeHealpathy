@@ -21,8 +21,10 @@
         </div>
         <div v-for="(section, index) in sortedSections" :key="index" class="mb-5">
           <h2 class="h5 fw-bold mb-3">{{ section.header }}</h2>
-          <img v-if="section.media" :src="section.media.url" :alt="section.media.title"
-            class="img-fluid rounded mb-3" />
+          <div class="d-flex" style="justify-content: center;">
+            <img v-if="section.media" :src="section.media.url" :alt="section.media.title"
+              class="img-fluid rounded mb-3" style="max-width: 600px;" />
+          </div>
           <p class="text-secondary">{{ section.content }}</p>
         </div>
         <BlogCommentSection :blogId="blog.id" :currentUserId="currentUserId" class="mb-5" />
