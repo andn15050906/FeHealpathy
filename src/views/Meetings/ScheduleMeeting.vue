@@ -188,16 +188,16 @@ function isMeetingJoinable(startAt, endAt) {
 }
 
 async function loadMeetings() {
-  try {
-    const currentDate = new Date();
-    const firstDay = startOfMonth(currentDate);
-    const lastDay = endOfMonth(currentDate);
-    const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
-    const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
-    const cu = getUserProfile();
-    const me = cu.id;
-    userRole.value = cu.role;
+  const currentDate = new Date();
+  const firstDay = startOfMonth(currentDate);
+  const lastDay = endOfMonth(currentDate);
+  const fromDate = format(firstDay, 'yyyy-MM-dd') + 'T00:00:00';
+  const toDate = format(lastDay, 'yyyy-MM-dd') + 'T23:59:59';
+  const cu = getUserProfile();
+  const me = cu.id;
+  userRole.value = cu.role;
 
+  try {
     const creatorResp = await getMeetings({
       CreatorId: me,
       Start: fromDate,
@@ -209,14 +209,18 @@ async function loadMeetings() {
       ...m,
       advisorName: advisors.value.find(a => a.advisorId === m.advisorId)?.fullName || 'Chuyên gia',
     }));
+  } catch (error) {
+    meetings.value = [];
+  }
 
-    if (userRole.value === 1) {
+  if (userRole.value === 1) {
+    try {
       const advisorResp = await getMeetings({
         Participants: [me],
         Start: fromDate,
         End: toDate
       });
-
+      
       const advisorList = advisorResp.items || [];
       advisorMeetings.value = advisorList
         .filter(meeting => {
@@ -228,9 +232,9 @@ async function loadMeetings() {
           ...m,
           creatorName: m.creatorName || 'Khách hàng',
         }));
+    } catch (error) {
+      advisorMeetings.value = [];
     }
-  } catch (error) {
-    console.error('Error loading meetings:', error);
   }
 }
 
