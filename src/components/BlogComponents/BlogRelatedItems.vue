@@ -11,13 +11,13 @@
                         992: { slidesPerView: 3, spaceBetween: 10 }
                     }" class="related-articles-swiper">
                     <swiper-slide v-for="article in recommendedArticals" :key="article.id">
-                        <div class="card h-100 shadow-sm p-3 article-card" @click="navigateToArticle(article.objectID)">
-                            <div v-if="!article.Url" class="default-thumbnail"
-                                style="height: 180px; width: 100%; background-image: url(/assets/images/10.jpg); background-size: cover; border-radius: 0.25rem;">
+                        <div class="card h-100 shadow-sm article-card" @click="navigateToArticle(article.objectID)">
+                            <div class="image-container">
+                                <img :src="article.Url" class="card-img-top" alt="post image" />
                             </div>
                             <div class="card-content">
-                                <h5 class="fw-bold mb-1 title-truncate">{{ article.Title }}</h5>
-                                <p class="text-muted mb-0">{{ formatDate(article.CreationTime) }}</p>
+                                <h5 class="fw-bold title-truncate">{{ article.Title }}</h5>
+                                <p class="text-muted mb-0 date-text">{{ formatDate(article.CreationTime) }}</p>
                             </div>
                         </div>
                     </swiper-slide>
@@ -45,10 +45,8 @@ const swiperModules = [Navigation, Pagination];
 const fetchrecommendedArticals = async () => {
     try {
         const res = await getRecommendationArticals();
-        console.log(res)
         recommendedArticals.value = res || [];
     } catch (error) {
-        console.error("Lỗi khi tải bài viết đề xuất:", error);
     }
 };
 
@@ -57,7 +55,6 @@ const navigateToArticle = async (id) => {
         await router.push({ name: 'BlogDetail', params: { id } });
         window.location.reload();
     } catch (error) {
-        console.error("Lỗi khi chuyển trang:", error);
     }
 };
 
@@ -85,11 +82,32 @@ const formatDate = (dateString) => {
     max-width: 100%;
 }
 
+.image-container {
+    height: 200px;
+    overflow: hidden;
+    border-radius: 6px 6px 0 0;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s ease;
+}
+
+.article-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
 .card-content {
-    height: 75px;
+    min-height: 75px;
+    max-height: 85px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    padding: 0.75rem;
+    justify-content: space-between;
 }
 
 .title-truncate {
@@ -98,7 +116,12 @@ const formatDate = (dateString) => {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 44px;
+    line-height: 1.3;
+    max-height: 2.6em;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .swiper-button-next,
@@ -143,6 +166,8 @@ const formatDate = (dateString) => {
     display: flex;
     flex-direction: column;
     width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .article-card:hover {
