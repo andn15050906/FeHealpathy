@@ -48,14 +48,9 @@
       url="dummyUrl" @confirmUpdate="handleConfirmUpdate" @update:isVisible="confirmDialogVisible = $event" />
     <CancelConfirmPopup :isVisible="cancelDialogVisible" message="Bạn có chắc chắn muốn hủy các thay đổi?"
       @confirmCancel="handleConfirmCancel" @update:isVisible="cancelDialogVisible = $event" />
-    <v-dialog v-if="withdrawDialogVisible" persistent max-width="400px">
-        <v-card>
-            <v-card-title class="d-flex align-center title-section">
-                <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
-                <span class="title">Xác nhận hủy</span>
-            </v-card-title>
-            <RequestWithdrawal />
-        </v-card>
+    
+    <v-dialog v-model="withdrawDialogVisible" persistent max-width="600">
+      <RequestWithdrawal :close="() => withdrawDialogVisible = false" />
     </v-dialog>
   </div>
   <div>
@@ -214,6 +209,7 @@ export default {
 
     const openWithdrawalPopup = () => {
       withdrawDialogVisible.value = true;
+      console.log(withdrawDialogVisible.value);
     }
 
     const handleConfirmCancel = (confirm) => {
@@ -271,6 +267,7 @@ export default {
       openWithdrawalPopup,
       confirmDialogVisible,
       cancelDialogVisible,
+      withdrawDialogVisible,
       handleConfirmUpdate,
       handleConfirmCancel,
       formatISODateWithHMS,

@@ -31,8 +31,8 @@
               <div class="info-value" style="cursor: not-allowed;" title="Không thể chỉnh sửa trường này">{{ form.creationTime }}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Số khóa học đã đăng ký:</div>
-              <div class="info-value" style="cursor: not-allowed;" title="Không thể chỉnh sửa trường này">{{ form.enrollmentCount }}</div>
+              <div class="info-label">Premium:</div>
+              <div class="info-value" style="cursor: not-allowed;" title="Không thể chỉnh sửa trường này">{{ hidePremium ? 'Có' : 'Không' }}</div>
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@
           <RouterLink :to="'change-password'">Đổi mật khẩu</RouterLink>
         </button>
       </div>
-      <div class="premium-upgrade">
+      <div class="premium-upgrade" v-if="!hidePremium">
         <AccountUpgrade></AccountUpgrade>
       </div>
     </div>
@@ -247,6 +247,7 @@ export default {
       1: 'Cố vấn',
       2: 'Quản trị viên'
     };
+    const hidePremium = ref(false);
     const fetchProfile = async () => {
       try {
         loadingSpinner.showSpinner();
@@ -256,6 +257,9 @@ export default {
         userData.dateOfBirth = formatDate(userData.dateOfBirth);
         userData.creationTime = formatDate(userData.creationTime);
         userData.avatarUrl = getAvatarApiUrl(userData.avatarUrl);
+        setUserProfile(userData);
+        if (userData.isPremium)
+          hidePremium.value = true;
         Object.assign(form.value, userData);
         originalForm.value = { ...form.value };
       } catch (error) {
@@ -375,6 +379,7 @@ export default {
       openCancelPopup,
       confirmDialogVisible,
       cancelDialogVisible,
+      hidePremium,
       handleConfirmUpdate,
       handleConfirmCancel
     };

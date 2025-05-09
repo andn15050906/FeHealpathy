@@ -52,11 +52,6 @@ const handlePurchase = async (paymentOptions) => {
             );
             return;
         }
-
-        toast.success(
-            "Thanh toán thành công.",
-            { duration: 150, position: "bottom-center" }
-        );
         window.location.href = response.url;
     } catch (error) {
         console.error("Lỗi thanh toán", error);
