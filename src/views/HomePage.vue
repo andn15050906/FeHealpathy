@@ -278,7 +278,6 @@ export default {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    height: 436.5px;
 }
 
 .testimonial-card {

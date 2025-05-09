@@ -23,6 +23,18 @@ const categories = ref(categoriesData)
   margin-bottom: 20px;
 }
 
+@media (max-width: 1150px) {
+  .categories-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .categories-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 .category-card {
   background-color: #f9f9f9;
   border: 1px solid #ddd;

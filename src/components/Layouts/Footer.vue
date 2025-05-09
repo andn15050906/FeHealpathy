@@ -19,24 +19,6 @@
         </li>
       </ul>
 
-      <div class="socialIcons mb-3">
-        <a href="#" class="mx-2">
-          <i class="fab fa-facebook-f facebook-icon"></i>
-        </a>
-        <a href="#" class="mx-2">
-          <i class="fab fa-linkedin-in linkedin-icon"></i>
-        </a>
-        <a href="#" class="mx-2">
-          <i class="fab fa-instagram instagram-icon"></i>
-        </a>
-        <a href="#" class="mx-2">
-          <i class="fab fa-facebook-messenger messenger-icon"></i>
-        </a>
-        <a href="#" class="mx-2">
-          <i class="fab fa-twitter twitter-icon"></i>
-        </a>
-      </div>
-
       <div class="text-secondary py-3">
         © 2025 Healpathy. Tất cả quyền được bảo lưu.
       </div>
