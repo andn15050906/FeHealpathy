@@ -148,6 +148,56 @@ export default {
         this.isPartnerChat = this.singleRoom;
 
         if (this.isPartnerChat) {
+            if (!this.autoMessage) {
+                setTimeout(() => {
+                    var questions = [
+                        'Bạn thường làm gì khi khó ngủ?',
+                        'Điều gì mang lại cho bạn sự bình yên nhất?',
+                        'Bạn đối phó với căng thẳng như thế nào?',
+                        'Điều gì khiến bạn mỉm cười hôm nay?',
+                        'Hôm nay bạn đã làm gì cho bản thân chưa?',
+                        'Bạn biết ơn điều gì nhất?',
+                        'Điều gì khiến bạn cảm thấy sống động nhất?',
+                        'Bạn nạp lại năng lượng như thế nào khi cảm thấy quá tải?',
+                        'Điều nhỏ nhặt nào mang lại niềm vui cho bạn hôm nay?',
+                        'Điều gì giúp bạn duy trì động lực?'
+                    ];
+
+                    var question = questions[Math.floor(Math.random() * questions.length)];
+
+                    var response = {
+                        "id": "x5208e49-c001-44b2-97e6-4dc61e11fd0f",
+                        "creatorId": "00000000-0000-0000-0000-000000000001",
+                        "lastModifierId": "00000000-0000-0000-0000-000000000000",
+                        "creationTime": (new Date()).toISOString(),
+                        "lastModificationTime": (new Date()).toISOString(),
+                        "content": question,
+                        "status": 0,
+                        "conversationId": this.roomId,
+                        "attachments": [],
+                        "reactions": []
+                    }
+
+                    if (!this.fetchedMessagesData.items) {
+                        this.fetchMessages({ room: { roomId: this.roomId } });
+                        return;
+                    }
+
+                    this.fetchedMessagesData.items.push(response);
+                    if (response.conversationId == this.roomId) {
+                        let sender = this.allUsers.find(user => user?._id === response.creatorId);
+                        this.addMessageToContainer(
+                            this.messages,
+                            response,
+                            sender,
+                            this.currentUser.id == sender.id,
+                            this.formatReactions(response)
+                        );
+                    }
+                }, 60000);
+
+                this.autoMessage = true;
+            }
             this.menuActions = [
                 { name: 'toggleChat', title: 'Bật/Tắt cuộc trò chuyện' }
             ];
@@ -168,6 +218,7 @@ export default {
     },
     data() {
         return {
+            autoMessage: false,
             messagingHandler: {},
             allUsers: [],
             currentUser: {},
