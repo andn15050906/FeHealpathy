@@ -8,32 +8,58 @@
 
           <div class="input-group">
             <label for="username">Tên tài khoản</label>
-            <input type="text" id="username" v-model="username" placeholder="Nhập tài khoản của bạn" required />
+            <input
+              type="text"
+              id="username"
+              v-model="username"
+              placeholder="Nhập tài khoản của bạn"
+              required
+            />
           </div>
 
           <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" v-model="email" placeholder="Nhập địa chỉ email của bạn" required />
+            <input
+              type="email"
+              id="email"
+              v-model="email"
+              placeholder="Nhập địa chỉ email của bạn"
+              required
+            />
           </div>
 
           <div class="input-group">
             <label for="password">Mật khẩu</label>
-            <input type="password" id="password" v-model="password" placeholder="Nhập mật khẩu của bạn" required />
+            <input
+              type="password"
+              id="password"
+              v-model="password"
+              placeholder="Nhập mật khẩu của bạn"
+              required
+            />
             <p v-if="passwordError" class="error">{{ passwordError }}</p>
           </div>
 
           <div class="input-group">
             <label for="retype-password">Nhập lại mật khẩu</label>
-            <input type="password" id="retype-password" v-model="retypePassword" placeholder="Nhập lại mật khẩu của bạn"
-              required />
-            <p v-if="retypePasswordError" class="error">{{ retypePasswordError }}</p>
+            <input
+              type="password"
+              id="retype-password"
+              v-model="retypePassword"
+              placeholder="Nhập lại mật khẩu của bạn"
+              required
+            />
+            <p v-if="retypePasswordError" class="error">
+              {{ retypePasswordError }}
+            </p>
           </div>
 
           <button type="submit" class="register-button">Đăng ký</button>
         </form>
 
         <p class="login">
-          Đã có tài khoản rồi? <router-link to="/sign-in">Đăng nhập tại đây</router-link>
+          Đã có tài khoản rồi?
+          <router-link to="/sign-in">Đăng nhập tại đây</router-link>
         </p>
       </div>
     </div>
@@ -41,14 +67,14 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue';
-import { useRouter } from 'vue-router';
-import { register } from '@/scripts/api/services/authService';
+import { ref, inject } from "vue";
+import { useRouter } from "vue-router";
+import { register } from "@/scripts/api/services/authService";
 
 export default {
   setup() {
     const router = useRouter();
-    const loadingSpinner = inject('loadingSpinner');
+    const loadingSpinner = inject("loadingSpinner");
 
     const username = ref("");
     const email = ref("");
@@ -93,11 +119,130 @@ export default {
     };
 
     const validateEmail = () => {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
-      if (!emailPattern.test(email.value)) {
-        generalError.value = "Email phải kết thúc bằng .com";
+      const trimmedEmail = email.value.trim();
+
+      if (!trimmedEmail) {
+        generalError.value = "Vui lòng nhập địa chỉ email";
         return false;
       }
+      const emailPattern = /^[^\s@]+@(([^\s@\.]+)\.)+([^\s@\.]{2,})$/;
+
+      if (!emailPattern.test(trimmedEmail)) {
+        generalError.value =
+          "Email không hợp lệ. Vui lòng kiểm tra lại định dạng";
+        return false;
+      }
+
+      if (trimmedEmail.length > 255) {
+        generalError.value = "Email không được vượt quá 255 ký tự";
+        return false;
+      }
+
+      const localPart = trimmedEmail.split("@")[0];
+      if (localPart.length > 64) {
+        generalError.value = "Phần trước @ không được vượt quá 64 ký tự";
+        return false;
+      }
+
+      if (/\.{2,}/.test(trimmedEmail)) {
+        generalError.value = "Email không được chứa nhiều dấu chấm liên tiếp";
+        return false;
+      }
+
+      if (/^\.|\.$/.test(localPart)) {
+        generalError.value =
+          "Phần trước @ không được bắt đầu hoặc kết thúc bằng dấu chấm";
+        return false;
+      }
+
+      const domain = trimmedEmail.split("@")[1];
+
+      if (!/^[a-zA-Z0-9]/.test(domain) || !/[a-zA-Z0-9]$/.test(domain)) {
+        generalError.value = "Tên miền không hợp lệ";
+        return false;
+      }
+
+      const domainParts = domain.split(".");
+
+      for (const part of domainParts) {
+        if (part.length === 0) {
+          generalError.value =
+            "Tên miền chứa dấu chấm liên tiếp hoặc không hợp lệ";
+          return false;
+        }
+
+        if (part.length > 63) {
+          generalError.value =
+            "Mỗi phần của tên miền không được vượt quá 63 ký tự";
+          return false;
+        }
+
+        if (!/^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/.test(part)) {
+          generalError.value = "Tên miền chứa ký tự không hợp lệ";
+          return false;
+        }
+      }
+
+      const tld = domainParts[domainParts.length - 1];
+      if (tld.length < 2) {
+        generalError.value = "Đuôi tên miền không hợp lệ";
+        return false;
+      }
+
+      const popularDomains = [
+        "gmail.com",
+        "yahoo.com",
+        "outlook.com",
+        "hotmail.com",
+      ];
+      const emailDomain = domain.toLowerCase();
+
+      for (const popularDomain of popularDomains) {
+        const isDomainEnding = emailDomain.endsWith(popularDomain);
+        const isFullDomain = emailDomain === popularDomain;
+
+        if (
+          !isDomainEnding &&
+          !isFullDomain &&
+          emailDomain.length === popularDomain.length
+        ) {
+          const similarity = [...emailDomain].filter(
+            (char, i) => char === popularDomain[i]
+          ).length;
+          if (similarity >= popularDomain.length - 2) {
+            generalError.value = `Bạn có muốn nhập ${popularDomain} thay vì ${emailDomain}?`;
+            return false;
+          }
+        }
+
+        if (
+          popularDomain.includes(".") &&
+          emailDomain.endsWith(popularDomain.split(".").slice(-2).join("."))
+        ) {
+          const possibleSubDomain = popularDomain.split(".")[0];
+          const userSubDomain = emailDomain.split(".")[0];
+
+          if (
+            possibleSubDomain !== userSubDomain &&
+            Math.abs(possibleSubDomain.length - userSubDomain.length) <= 2
+          ) {
+            let similarity = 0;
+            const minLength = Math.min(
+              possibleSubDomain.length,
+              userSubDomain.length
+            );
+            for (let i = 0; i < minLength; i++) {
+              if (possibleSubDomain[i] === userSubDomain[i]) similarity++;
+            }
+
+            if (similarity >= minLength - 2) {
+              generalError.value = `Bạn có muốn nhập ${possibleSubDomain}.edu.vn thay vì ${emailDomain}?`;
+              return false;
+            }
+          }
+        }
+      }
+
       generalError.value = "";
       return true;
     };
@@ -114,12 +259,13 @@ export default {
           }
           await register(username.value, email.value, password.value);
           retypePasswordError.value = "";
-          generalError.value = 'Đăng ký thành công';
-          setTimeout(() => router.push({ name: 'signIn' }), 2000);
+          generalError.value = "Đăng ký thành công";
+          setTimeout(() => router.push({ name: "signIn" }), 2000);
         } catch (error) {
           if (error.response?.status === 409) {
-            const errorMessage = error.response?.data?.message || error.response?.data;
-            if (errorMessage?.toLowerCase().includes('email')) {
+            const errorMessage =
+              error.response?.data?.message || error.response?.data;
+            if (errorMessage?.toLowerCase().includes("email")) {
               generalError.value = "Email này đã được đăng ký";
             } else {
               generalError.value = "Tên tài khoản này đã được sử dụng";
@@ -127,14 +273,15 @@ export default {
           } else if (error.response?.data?.errors) {
             let errors = error.response.data.errors;
             for (let key in errors) {
-              if (errors[key][0].startsWith('400')) {
+              if (errors[key][0].startsWith("400")) {
                 retypePasswordError.value = "";
                 generalError.value = errors[key][0].substring(5);
                 break;
               }
             }
           } else {
-            generalError.value = 'Lỗi kết nối. Vui lòng kiểm tra kết nối và thử lại.';
+            generalError.value =
+              "Lỗi kết nối. Vui lòng kiểm tra kết nối và thử lại.";
           }
         } finally {
           if (loadingSpinner) {
@@ -152,9 +299,9 @@ export default {
       passwordError,
       retypePasswordError,
       generalError,
-      handleRegister
+      handleRegister,
     };
-  }
+  },
 };
 </script>
 
@@ -255,4 +402,3 @@ h2 {
   text-decoration: underline;
 }
 </style>
-
