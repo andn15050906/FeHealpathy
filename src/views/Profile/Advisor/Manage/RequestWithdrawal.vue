@@ -1,5 +1,8 @@
 <template>
-  <div class="withdrawal-container">
+  <div class="withdrawal-container" v-if="isVisible">
+    <v-card-actions class="justify-end action-section">
+      <v-btn text class="cancel-btn" @click="close">Hủy</v-btn>
+    </v-card-actions>
     <h2>Yêu cầu rút tiền</h2>
     <form class="withdrawal-form" @submit.prevent="submitForm">
       <div class="form-group">
@@ -22,12 +25,18 @@
       </div>
       <div class="form-group">
         <label for="bank">Ngân hàng</label>
-        <select id="bank" v-model="selectedBank" required>
+        <input
+          id="bank"
+          v-model="selectedBank"
+          required
+          placeholder="Nhập tên ngân hàng"
+        />
+        <!--<select id="bank" v-model="selectedBank" required>
           <option value="" disabled>Chọn ngân hàng</option>
           <option v-for="bank in banks" :key="bank.code" :value="bank.code">
             {{ bank.shortName }} - {{ bank.name }}
           </option>
-        </select>
+        </select>-->
       </div>
       <button class="submit-btn" type="submit">Gửi yêu cầu</button>
     </form>
@@ -35,17 +44,30 @@
 </template>
 
 <script>
+import { inject } from 'vue';
+
 export default {
   data() {
     return {
+      isVisible: true,
       accountNumber: '',
       accountName: '',
       selectedBank: '',
       banks: [],
+			sweetAlert: inject('sweetAlert')
     };
+  },
+  props: {
+    close:  {
+        type: Function,
+        required: false
+    }
   },
   methods: {
     submitForm() {
+      this.isVisible = false;
+      this.sweetAlert.showSuccess("Đã gửi yêu cầu rút tiền, hãy chờ admin phê duyệt!");
+      this.close();
     },
   },
 };
@@ -54,7 +76,6 @@ export default {
 <style scoped>
 .withdrawal-container {
   max-width: 500px;
-  margin: 40px auto;
   padding: 32px 24px 24px 24px;
   background: #fff;
   border-radius: 16px;
