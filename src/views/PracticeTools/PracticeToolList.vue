@@ -68,6 +68,18 @@ export default {
   align-items: center;
 }
 
+@media (max-width: 1150px) {
+  .tools-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .tools-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 .tool-card-container {
   width: 250px;
   height: 250px;

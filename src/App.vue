@@ -138,7 +138,7 @@ main {
   align-items: center;
   background-image: url("assets/background/chill.png");
   background-repeat: no-repeat;
-  background-size: 100% auto;
+  background-size: 100% 100vh;
   background-position: center top;
   background-attachment: fixed;
 }
@@ -151,9 +151,11 @@ main {
   padding: 40px;
 }
 
-/*.page-container:has(.left-sidebar) {
-  display: flex;
-}*/
+@media (max-width: 1150px) {
+  .page-container {
+    width: unset;
+  }
+}
 
 .page-container:has(.home-background) {
   padding: 0;
