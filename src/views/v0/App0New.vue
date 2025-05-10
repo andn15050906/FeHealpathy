@@ -1,263 +1,81 @@
 <template>
   <v-app :theme="currentTheme">
-    <LoadingSpinner ref="loadingSpinner" />
-    <SweetAlert ref="sweetAlert" />
-    <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
-    <main>
-      <div v-if="!router.currentRoute.value.meta.isAppMode">
-        <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
-          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 60px; box-shadow: none !important;">
-          <v-list-item class="py-2" :title="sidebarOpen ? 'Roadmap Progress' : ''" color="primary">
-            <template v-slot:prepend>
-              <v-avatar color="primary" variant="tonal" class="mr-2">
-                <v-icon>mdi-map-marker-path</v-icon>
-              </v-avatar>
-            </template>
-            <!--<template v-slot:append>
-              <v-btn variant="text" icon @click="toggleSidebar">
-                <v-icon>{{ sidebarOpen ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
-              </v-btn>
-            </template>-->
-          </v-list-item>
+    <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
+      class="rounded-tr-xl rounded-br-xl" elevation="4">
+      <v-list-item class="py-2" :title="sidebarOpen ? 'Roadmap Progress' : ''" color="primary">
+        <template v-slot:prepend>
+          <v-avatar color="primary" variant="tonal" class="mr-2">
+            <v-icon>mdi-map-marker-path</v-icon>
+          </v-avatar>
+        </template>
+        <template v-slot:append>
+          <v-btn variant="text" icon @click="toggleSidebar">
+            <v-icon>{{ sidebarOpen ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
+          </v-btn>
+        </template>
+      </v-list-item>
 
-          <v-divider></v-divider>
+      <v-divider></v-divider>
 
-          <v-list density="compact" nav class="pa-2">
-            <v-list-item v-for="(step, index) in roadmapSteps" :key="index" :value="index"
-              :active="currentStepIndex === index" @click="selectStep(index)" :title="sidebarOpen ? step.title : ''"
-              :prepend-icon="step.mdiIcon" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
-              :class="currentStepIndex === index ? 'elevation-2' : ''">
-              <template v-slot:prepend>
-                <v-avatar :color="currentStepIndex >= index ? 'primary' : 'grey-lighten-1'"
-                  :variant="currentStepIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
-                  <v-icon v-if="currentStepIndex > index">mdi-check</v-icon>
-                  <span v-else>{{ index + 1 }}</span>
-                </v-avatar>
-              </template>
-            </v-list-item>
-          </v-list>
-
-          <template v-slot:append>
-            <v-divider></v-divider>
-            <div class="pa-4">
-              <div class="d-flex align-center">
-                <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
-                <span v-if="sidebarOpen">Your progress: {{ progressPercentage }}%</span>
-              </div>
-            </div>
+      <v-list density="compact" nav class="pa-2">
+        <v-list-item v-for="(step, index) in roadmapSteps" :key="index" :value="index"
+          :active="currentStepIndex === index" @click="selectStep(index)" :title="sidebarOpen ? step.title : ''"
+          :prepend-icon="step.mdiIcon" :color="'primary'" rounded="xl"
+          class="mb-2 transition-all duration-300" :class="currentStepIndex === index ? 'elevation-2' : ''">
+          <template v-slot:prepend>
+            <v-avatar :color="currentStepIndex >= index ? 'primary' : 'grey-lighten-1'"
+              :variant="currentStepIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
+              <v-icon v-if="currentStepIndex > index">mdi-check</v-icon>
+              <span v-else>{{ index + 1 }}</span>
+            </v-avatar>
           </template>
-        </v-navigation-drawer>
-        <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
-        <div class="page-container">
-          <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
-            <PremiumBlocker></PremiumBlocker>
+        </v-list-item>
+      </v-list>
+
+      <template v-slot:append>
+        <v-divider></v-divider>
+        <div class="pa-4">
+          <div class="d-flex align-center">
+            <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
+            <span v-if="sidebarOpen">Your progress: {{ progressPercentage }}%</span>
           </div>
-          <!--<RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
-            @removeNotification="removeNotification" />-->
-
-          <v-main :class="mainBackground">
-            <v-container>
-              <div v-if="currentPath">
-                <RoadmapContent :current-path="currentPath" @phase-completed="handlePhaseCompleted"
-                  @update-progress="handleProgressUpdate" @path-completed="handlePathCompleted" />
-              </div>
-              <div v-else-if="showProgressTracker">
-                <ProgressTracker :active-days="activeDays" :total-days="totalDays" :completed-actions="completedActions"
-                  :total-required-actions="totalRequiredActions" :action-history="actionHistory"
-                  @suggest-new-route="startSurvey" @view-full-history="viewFullHistory" />
-              </div>
-              <div v-else>
-                <v-card class="mb-6 animate-fade-in" rounded="lg" elevation="3">
-                  <v-card-title class="text-h5">Welcome to Your Mental Health Journey</v-card-title>
-                  <v-card-text>
-                    <p class="text-body-1 mb-4">
-                      This personalized roadmap will guide you through evidence-based practices to support your mental
-                      wellbeing.
-                    </p>
-                    <p class="text-body-1 mb-4">
-                      To get started, please take our assessment so we can recommend the most suitable path for your
-                      needs.
-                    </p>
-                    <div class="d-flex justify-center mt-6">
-                      <v-btn color="primary" size="large" rounded="pill" @click="startSurvey" class="px-8">
-                        Start Assessment
-                        <v-icon right>mdi-arrow-right</v-icon>
-                      </v-btn>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </div>
-            </v-container>
-          </v-main>
-          <v-dialog v-model="showStatusPopup" max-width="500px" transition="dialog-bottom-transition">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                <span>How are you feeling today?</span>
-                <v-btn icon @click="showStatusPopup = false">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-card-title>
-
-              <v-card-text>
-                <p class="text-body-2 mb-6">
-                  Your responses help us personalize your roadmap and provide relevant resources.
-                </p>
-
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <p class="text-subtitle-2 mb-2">Overall mood today:</p>
-                      <v-btn-toggle v-model="selectedMood" mandatory divided color="primary" class="d-flex">
-                        <v-btn v-for="(mood, index) in moods" :key="index" :value="mood.value" class="flex-grow-1">
-                          {{ mood.label }}
-                        </v-btn>
-                      </v-btn-toggle>
-                    </v-col>
-
-                    <v-col cols="12" class="mt-4">
-                      <p class="text-subtitle-2 mb-2">What challenges are you facing? (Select all that apply)</p>
-                      <v-checkbox v-for="(challenge, index) in challenges" :key="index" v-model="selectedChallenges"
-                        :label="challenge" :value="challenge" color="primary" hide-details class="mb-1"></v-checkbox>
-                    </v-col>
-
-                    <v-col cols="12" class="mt-4">
-                      <p class="text-subtitle-2 mb-2">Any additional notes about how you're feeling:</p>
-                      <v-textarea v-model="statusNotes" placeholder="Share any thoughts or feelings..." rows="3"
-                        variant="outlined"></v-textarea>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn variant="text" @click="showStatusPopup = false">
-                  Cancel
-                </v-btn>
-                <v-btn color="primary" @click="submitStatus">
-                  Submit
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <InitialSurvey v-model="showInitialSurvey" :current-theme="currentTheme" @path-selected="handlePathSelected"
-            @close="showInitialSurvey = false" />
-
-          <route-completion v-model="showRouteCompletion" :current-theme="currentTheme"
-            :assessment-result="completionAssessmentResult" @close="showRouteCompletion = false"
-            @restart-assessment="startSurvey" @select-continue-option="handleContinueOptionSelected"
-            @select-alternative-route="handleAlternativeRouteSelected" />
         </div>
-        <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
-      </div>
-      <div v-else>
-        <CallWindow></CallWindow>
-      </div>
-      <div class="partner-chat" v-if="isAuthAndShown">
-        <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
-      </div>
-    </main>
-    <Footer />
+      </template>
+    </v-navigation-drawer>
+
+    <!-- App0 Header-->
+
+    <v-main :class="mainBackground">
+      <v-container>
+        <!-- App0 Container Content-->
+      </v-container>
+    </v-main>
+    <initial-survey 
+      v-model="showInitialSurvey"
+      :current-theme="currentTheme"
+      @path-selected="handlePathSelected"
+      @close="showInitialSurvey = false"
+    />
+    
+    <route-completion
+      v-model="showRouteCompletion"
+      :current-theme="currentTheme"
+      :assessment-result="completionAssessmentResult"
+      @close="showRouteCompletion = false"
+      @restart-assessment="startSurvey"
+      @select-continue-option="handleContinueOptionSelected"
+      @select-alternative-route="handleAlternativeRouteSelected"
+    />
   </v-app>
 </template>
 
 <script setup>
-import { ref, provide, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
-import { RouterView, useRouter } from 'vue-router';
-import { getUserProfile, isPremium } from '@/scripts/api/services/authService';
-import Header from './components/Layouts/Header.vue';
-import Footer from './components/Layouts/Footer.vue';
-import LoadingSpinner from './components/Common/Popup/LoadingSpinner.vue';
-import SweetAlert from './components/Common/Popup/SweetAlert.vue';
-import NotificationContainer from './components/NotificationComponents/NotificationContainer.vue';
-import ConversationWindow from './views/Community/ConversationWindow.vue';
-import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
-import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
-import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
-import InitialSurvey from './views/v0/components/InitialSurvey.vue'
-import RoadmapContent from './views/v0/components/RoadmapContent.vue'
-import ProgressTracker from './views/v0/components/ProgressTracker.vue'
-import RouteCompletion from './views/v0/components/RouteCompletion.vue'
-
-const loadingSpinner = ref(null);
-const sweetAlert = ref(null);
-const router = useRouter();
-const isAuthenticated = ref(false);
-const roadmapProgress = ref(null);
-const isPremiumUser = ref(isPremium());
-
-provide('loadingSpinner', {
-  showSpinner: () => loadingSpinner.value.showSpinner(),
-  hideSpinner: () => loadingSpinner.value.hideSpinner(),
-});
-
-provide('sweetAlert', {
-  showAlert: (options) => sweetAlert.value.showAlert(options),
-  showSuccess: (message) => sweetAlert.value.showAlert({ icon: 'success', title: 'Success', text: message }),
-  showError: (message) => sweetAlert.value.showAlert({ icon: 'error', title: 'Error', text: message }),
-  showWarning: (message) => sweetAlert.value.showAlert({ icon: 'warning', title: 'Warning', text: message }),
-  showInfo: (message) => sweetAlert.value.showAlert({ icon: 'info', title: 'Info', text: message }),
-});
-
-provide('roadmapProgress', {
-  getPersonalRoadmap: () => {
-    if (roadmapProgress.value)
-      return roadmapProgress.value.getPersonalRoadmap();
-    return null;
-  },
-  fetchPersonalRoadmap: () => {
-    if (roadmapProgress.value)
-      return roadmapProgress.value.fetchPersonalRoadmap();
-    return null;
-  }
-})
-
-onMounted(async () => {
-  router.beforeEach((to, from, next) => {
-    loadingSpinner.value?.showSpinner();
-    next();
-  });
-
-  router.afterEach(() => {
-    setTimeout(() => {
-      loadingSpinner.value?.hideSpinner();
-    }, 300);
-  });
-
-  if (await getUserProfile())
-    isAuthenticated.value = true;
-
-  setTheme(moodThemeMap[selectedMood.value] || 'refreshing');
-});
-
-const isAuthAndShown = computed(() => {
-  return !['register', 'signIn'].includes(router.currentRoute.value.name) && isAuthenticated.value;
-})
-
-const headerRef = ref(null);
-const handleAuthenticated = (isAuth) => {
-  isAuth = isAuth ?? true;
-  isAuthenticated.value = isAuth;
-  if (isAuthenticated.value)
-    headerRef.value.fetchUserProfile();
-  isPremiumUser.value = isPremium();
-}
-
-const notificationRef = ref(null);
-const addNotification = async (data) => {
-  setTimeout(() => {
-    notificationRef.value.addNotification(data);
-  }, 100);
-}
-const removeNotification = (data) => {
-  notificationRef.value.removeNotification(data);
-}
-
-const toggleChat = () => {
-  let style = document.getElementsByClassName('partner-chat')[0].style;
-  style.marginBottom = (style.marginBottom == '0px' || style.marginBottom == '') ? '-400px' : '0px';
-}
+import InitialSurvey from './components/InitialSurvey.vue'
+import RoadmapContent from './components/RoadmapContent.vue'
+import ProgressTracker from './components/ProgressTracker.vue'
+import RouteCompletion from './components/RouteCompletion.vue'
 
 const theme = useTheme()
 
@@ -517,6 +335,11 @@ const moodThemeMap = {
   'great': 'energetic'
 };
 
+// Initialize theme based on initial mood on component mount
+onMounted(() => {
+  setTheme(moodThemeMap[selectedMood.value] || 'refreshing');
+});
+
 watch(selectedMood, (newMood) => {
   setTheme(moodThemeMap[newMood] || 'refreshing');
 });
@@ -584,7 +407,7 @@ const startSurvey = () => {
 const handlePathSelected = (path) => {
   currentPath.value = path
   showInitialSurvey.value = false
-
+  
   // Reset progress tracking
   activeDays.value = 0
   totalDays.value = path.phases[0].duration
@@ -595,7 +418,7 @@ const handlePathSelected = (path) => {
 
 const handlePhaseCompleted = (data) => {
   console.log('Phase completed:', data)
-
+  
   // Update progress tracking for new phase
   const newPhase = currentPath.value.phases[data.newPhase]
   totalDays.value = newPhase.duration
@@ -604,7 +427,7 @@ const handlePhaseCompleted = (data) => {
 
 const handleProgressUpdate = (data) => {
   console.log('Progress update:', data)
-
+  
   // Update progress tracking
   activeDays.value = Math.min(activeDays.value + 1, totalDays.value)
   completedActions.value = data.completedActions
@@ -634,12 +457,6 @@ const viewFullHistory = () => {
 }
 </script>
 
-<script>
-export default {
-  emits: ["handleAuthenticated", "addNotification", "removeNotification"]
-}
-</script>
-
 <style>
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
@@ -650,7 +467,6 @@ export default {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -685,77 +501,5 @@ export default {
 
 .ring-4 {
   box-shadow: 0 0 0 4px rgba(var(--v-theme-primary), 0.2);
-}
-</style>
-
-<style scoped>
-main {
-  padding: 0 20px;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-position: center top;
-  background-attachment: fixed;
-}
-
-/**.page-container {
-  min-height: 100vh;
-  width: 1200px;
-  background-color: #fff;
-  margin-top: 60px;
-  padding: 40px;
-}**/
-
-@media (max-width: 1150px) {
-  .page-container {
-    width: unset;
-  }
-}
-
-.page-container:has(.home-background) {
-  padding: 0;
-}
-
-.left-sidebar {
-  position: fixed;
-  top: 80px;
-  left: 20px;
-  border-radius: 15px;
-  /*width: calc((100vw - 1200px)/2 - 8px);*/
-  width: 320px;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-  z-index: 1;
-}
-
-.partner-chat {
-  position: fixed;
-  bottom: 0;
-  right: 20px;
-  z-index: 1000;
-  height: 460px;
-  width: 360px;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-}
-
-footer {
-  z-index: 100;
-}
-</style>
-
-<style>
-.v-timeline-item__body,
-.v-step {
-  z-index: 0;
-}
-
-.v-tab__slider {
-  display: none !important;
-}
-
-.v-expansion-panel__shadow {
-  display: none;
 }
 </style>

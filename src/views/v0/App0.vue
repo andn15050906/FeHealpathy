@@ -77,84 +77,52 @@
 
     <v-main :class="mainBackground">
       <v-container>
-        <!-- Roadmap Visualization -->
-        <v-card class="mb-6" rounded="lg" elevation="3" :class="cardAnimation">
-          <v-card-title class="d-flex align-center">
-            <v-icon color="primary" class="mr-2">mdi-map-marker-path</v-icon>
-            Your Mental Health Journey
-          </v-card-title>
-          <v-card-text>
-            <!-- Roadmap Progress Bar -->
-            <v-progress-linear :model-value="progressPercentage" color="primary" height="10" rounded
-              class="mb-6"></v-progress-linear>
-
-            <!-- Roadmap Steps -->
-            <div class="d-flex justify-space-between mb-8">
-              <div v-for="(step, index) in roadmapSteps" :key="index" class="d-flex flex-column align-center"
-                :class="{ 'text-primary font-weight-medium': currentStepIndex >= index }">
-                <v-avatar :color="currentStepIndex >= index ? 'primary' : 'grey-lighten-1'"
-                  :class="currentStepIndex === index ? 'ring-4 ring-primary-lighten-4' : ''" size="32"
-                  class="mb-2 text-white">
-                  <v-icon v-if="currentStepIndex > index">mdi-check</v-icon>
-                  <span v-else>{{ index + 1 }}</span>
-                </v-avatar>
-                <span class="text-caption text-center" style="max-width: 80px">{{ step.title }}</span>
+        <div v-if="currentPath">
+          <roadmap-content 
+            :current-path="currentPath"
+            @phase-completed="handlePhaseCompleted"
+            @update-progress="handleProgressUpdate"
+            @path-completed="handlePathCompleted"
+          />
+        </div>
+        <div v-else-if="showProgressTracker">
+          <progress-tracker
+            :active-days="activeDays"
+            :total-days="totalDays"
+            :completed-actions="completedActions"
+            :total-required-actions="totalRequiredActions"
+            :action-history="actionHistory"
+            @suggest-new-route="startSurvey"
+            @view-full-history="viewFullHistory"
+          />
+        </div>
+        <div v-else>
+          <v-card class="mb-6 animate-fade-in" rounded="lg" elevation="3">
+            <v-card-title class="text-h5">Welcome to Your Mental Health Journey</v-card-title>
+            <v-card-text>
+              <p class="text-body-1 mb-4">
+                This personalized roadmap will guide you through evidence-based practices to support your mental wellbeing.
+              </p>
+              <p class="text-body-1 mb-4">
+                To get started, please take our assessment so we can recommend the most suitable path for your needs.
+              </p>
+              <div class="d-flex justify-center mt-6">
+                <v-btn
+                  color="primary"
+                  size="large"
+                  rounded="pill"
+                  @click="startSurvey"
+                  class="px-8"
+                >
+                  Start Assessment
+                  <v-icon right>mdi-arrow-right</v-icon>
+                </v-btn>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-
-        <!-- Current Step Description -->
-        <v-card rounded="lg" elevation="3" :class="cardAnimation">
-          <v-card-item>
-            <template v-slot:prepend>
-              <v-avatar color="primary" size="48" class="text-white elevation-2">
-                <v-icon size="large">{{ currentStep.mdiIcon }}</v-icon>
-              </v-avatar>
-            </template>
-            <v-card-title class="text-h5">{{ currentStep.title }}</v-card-title>
-          </v-card-item>
-
-          <v-card-text>
-            <p class="text-body-1 mb-4">{{ currentStep.description }}</p>
-
-            <h3 class="text-h6 font-weight-medium mt-6 mb-3 d-flex align-center">
-              <v-icon color="primary" class="mr-2">mdi-target</v-icon>
-              What to focus on:
-            </h3>
-            <v-list>
-              <v-list-item v-for="(item, index) in currentStep.focusPoints" :key="index" :title="item"
-                prepend-icon="mdi-arrow-right" density="compact" class="pl-0"></v-list-item>
-            </v-list>
-
-            <h3 class="text-h6 font-weight-medium mt-6 mb-3 d-flex align-center">
-              <v-icon color="primary" class="mr-2">mdi-star</v-icon>
-              Recommended activities:
-            </h3>
-            <v-row>
-              <v-col v-for="(activity, index) in currentStep.activities" :key="index" cols="12" md="6">
-                <v-card variant="outlined" hover class="h-100 activity-card" :class="{'highlighted-activity': activity.highlighted}">
-                  <v-card-title class="text-subtitle-1 d-flex align-center">
-                    <v-icon v-if="activity.highlighted" color="primary" class="mr-2">mdi-star</v-icon>
-                    {{ activity.title }}
-                    <v-chip v-if="activity.highlighted" color="primary" size="small" class="ml-2">Recommended</v-chip>
-                  </v-card-title>
-                  <v-card-text class="text-body-2">{{ activity.description }}</v-card-text>
-                  <v-card-actions>
-                    <v-btn variant="text" color="primary" size="small">
-                      Start Activity
-                      <v-icon right>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
+            </v-card-text>
+          </v-card>
+        </div>
       </v-container>
     </v-main>
-
-    <!-- Status Assessment Dialog -->
     <v-dialog v-model="showStatusPopup" max-width="500px" transition="dialog-bottom-transition">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
@@ -206,14 +174,32 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <SurveyPage v-model="showSurveyPage" :roadmap-steps="roadmapSteps" @select-roadmap="selectRoadmapFromSurvey" />
+    <initial-survey 
+      v-model="showInitialSurvey"
+      :current-theme="currentTheme"
+      @path-selected="handlePathSelected"
+      @close="showInitialSurvey = false"
+    />
+    
+    <route-completion
+      v-model="showRouteCompletion"
+      :current-theme="currentTheme"
+      :assessment-result="completionAssessmentResult"
+      @close="showRouteCompletion = false"
+      @restart-assessment="startSurvey"
+      @select-continue-option="handleContinueOptionSelected"
+      @select-alternative-route="handleAlternativeRouteSelected"
+    />
   </v-app>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
-import SurveyPage from './SurveyPage.vue'
+import InitialSurvey from './components/InitialSurvey.vue'
+import RoadmapContent from './components/RoadmapContent.vue'
+import ProgressTracker from './components/ProgressTracker.vue'
+import RouteCompletion from './components/RouteCompletion.vue'
 
 const theme = useTheme()
 
@@ -444,7 +430,6 @@ const showStatusPopup = ref(false)
 const selectedMood = ref('neutral')
 const selectedChallenges = ref([])
 const statusNotes = ref('')
-const showSurveyPage = ref(false)
 
 const moods = [
   { label: 'Struggling', value: 'struggling' },
@@ -465,7 +450,7 @@ const challenges = [
   'Physical health concerns'
 ]
 
-// Watch for mood changes to update theme
+// Theme update based on mood
 const moodThemeMap = {
   'struggling': 'calm',
   'okay': 'peaceful',
@@ -473,6 +458,11 @@ const moodThemeMap = {
   'good': 'focused',
   'great': 'energetic'
 };
+
+// Initialize theme based on initial mood on component mount
+onMounted(() => {
+  setTheme(moodThemeMap[selectedMood.value] || 'refreshing');
+});
 
 watch(selectedMood, (newMood) => {
   setTheme(moodThemeMap[newMood] || 'refreshing');
@@ -498,12 +488,96 @@ const submitStatus = () => {
   alert('Thank you for sharing your status! Your roadmap has been updated and the theme has been adjusted to match your mood.')
 }
 
+// Component states
+const showInitialSurvey = ref(false)
+const showRouteCompletion = ref(false)
+const showProgressTracker = ref(false)
+
+// Path and progress tracking
+const currentPath = ref(null)
+const activeDays = ref(0)
+const totalDays = ref(0)
+const completedActions = ref(0)
+const totalRequiredActions = ref(0)
+const actionHistory = ref([])
+
+// Completion assessment result
+const completionAssessmentResult = ref({
+  sentiment: 'Positive',
+  summary: 'You have made significant progress in your mental health journey.',
+  stats: {
+    daysActive: 24,
+    actionsCompleted: 42,
+    consistency: 85
+  },
+  achievements: [
+    'Established a regular mindfulness practice',
+    'Improved sleep quality',
+    'Developed effective stress management techniques',
+    'Built a stronger support network'
+  ],
+  improvementAreas: [
+    'Consistency in daily practice',
+    'Managing stress during high-pressure situations',
+    'Building more social connections'
+  ]
+})
+
+// Methods
 const startSurvey = () => {
-  showSurveyPage.value = true
+  showInitialSurvey.value = true
 }
 
-const selectRoadmapFromSurvey = (index) => {
-  currentStepIndex.value = index
+const handlePathSelected = (path) => {
+  currentPath.value = path
+  showInitialSurvey.value = false
+  
+  // Reset progress tracking
+  activeDays.value = 0
+  totalDays.value = path.phases[0].duration
+  completedActions.value = 0
+  totalRequiredActions.value = path.phases[0].requiredActions
+  actionHistory.value = []
+}
+
+const handlePhaseCompleted = (data) => {
+  console.log('Phase completed:', data)
+  
+  // Update progress tracking for new phase
+  const newPhase = currentPath.value.phases[data.newPhase]
+  totalDays.value = newPhase.duration
+  totalRequiredActions.value = newPhase.requiredActions
+}
+
+const handleProgressUpdate = (data) => {
+  console.log('Progress update:', data)
+  
+  // Update progress tracking
+  activeDays.value = Math.min(activeDays.value + 1, totalDays.value)
+  completedActions.value = data.completedActions
+}
+
+const handlePathCompleted = () => {
+  console.log('Path completed')
+  showRouteCompletion.value = true
+}
+
+const handleContinueOptionSelected = (option) => {
+  console.log('Continue option selected:', option)
+  // In a real app, this would set up the next phase of the journey
+  currentPath.value = null
+  showProgressTracker.value = true
+}
+
+const handleAlternativeRouteSelected = (route) => {
+  console.log('Alternative route selected:', route)
+  // In a real app, this would set up a new path
+  handlePathSelected(route)
+}
+
+const viewFullHistory = () => {
+  console.log('View full history')
+  // In a real app, this would show a detailed history view
 }
 </script>
 
