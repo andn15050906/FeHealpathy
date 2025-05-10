@@ -1,10 +1,11 @@
 <template>
   <div id="app">
-    <LoadingSpinner ref="loadingSpinner" />
+    <!--<LoadingSpinner ref="loadingSpinner" />
     <SweetAlert ref="sweetAlert" />
-    <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
+    <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />-->
     <main>
-      <div v-if="!router.currentRoute.value.meta.isAppMode">
+      <Page1></Page1>
+      <!--<div v-if="!router.currentRoute.value.meta.isAppMode">
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
@@ -20,7 +21,7 @@
       </div>
       <div class="partner-chat" v-if="isAuthAndShown">
         <ConversationWindow :single-room="true" @toggleChat="toggleChat" />
-      </div>
+      </div>-->
     </main>
     <Footer />
   </div>
@@ -39,6 +40,7 @@ import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
 import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
+import Page1 from './views/v0/Page1.vue';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -136,20 +138,20 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("assets/background/chill.png");
+  /**background-image: url("assets/background/chill.png");**/
   background-repeat: no-repeat;
   background-size: 100% 100vh;
   background-position: center top;
   background-attachment: fixed;
 }
 
-.page-container {
+/**.page-container {
   min-height: 100vh;
   width: 1200px;
   background-color: #fff;
   margin-top: 60px;
   padding: 40px;
-}
+}**/
 
 @media (max-width: 1150px) {
   .page-container {

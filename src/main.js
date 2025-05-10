@@ -9,7 +9,6 @@ import { createPinia } from "pinia";
 import VueFroala from "vue-froala-wysiwyg";
 import VueTour from "vue3-tour";
 
-// Styles
 import "vuestic-ui/css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "vuetify/styles";
@@ -24,14 +23,87 @@ import App from "./App.vue";
 import router from "./scripts/router";
 import vuesticGlobalConfig from "./scripts/plugins/vuestic-ui/global-config";
 
-// Cấu hình i18n
 const i18n = createI18n({
   legacy: false,
   locale: "en",
   fallbackLocale: "en",
 });
 
-// Cấu hình Vuetify
+const calmTheme = {
+  dark: false,
+  colors: {
+    primary: "#5C6BC0", // Soft indigo
+    secondary: "#78909C", // Blue grey
+    accent: "#B39DDB", // Light purple
+    error: "#EF9A9A", // Soft red
+    warning: "#FFCC80", // Soft orange
+    info: "#81D4FA", // Light blue
+    success: "#A5D6A7", // Soft green
+    background: "#F5F7FF", // Very light blue-tinted background
+    surface: "#FFFFFF",
+  },
+}
+
+const refreshingTheme = {
+  dark: false,
+  colors: {
+    primary: "#26A69A", // Teal
+    secondary: "#4DB6AC", // Lighter teal
+    accent: "#80CBC4", // Even lighter teal
+    error: "#EF5350", // Red
+    warning: "#FFA726", // Orange
+    info: "#29B6F6", // Light blue
+    success: "#66BB6A", // Green
+    background: "#E0F7FA", // Very light teal background
+    surface: "#FFFFFF",
+  },
+}
+
+const energeticTheme = {
+  dark: false,
+  colors: {
+    primary: "#FF7043", // Deep orange
+    secondary: "#FF9800", // Orange
+    accent: "#FFAB40", // Light orange
+    error: "#F44336", // Red
+    warning: "#FFB300", // Amber
+    info: "#29B6F6", // Light blue
+    success: "#7CB342", // Light green
+    background: "#FFF8E1", // Very light orange/yellow background
+    surface: "#FFFFFF",
+  },
+}
+
+const focusedTheme = {
+  dark: false,
+  colors: {
+    primary: "#5E35B1", // Deep purple
+    secondary: "#7E57C2", // Purple
+    accent: "#B39DDB", // Light purple
+    error: "#EF5350", // Red
+    warning: "#FFA726", // Orange
+    info: "#29B6F6", // Light blue
+    success: "#66BB6A", // Green
+    background: "#F3E5F5", // Very light purple background
+    surface: "#FFFFFF",
+  },
+}
+
+const peacefulTheme = {
+  dark: false,
+  colors: {
+    primary: "#42A5F5", // Blue
+    secondary: "#64B5F6", // Light blue
+    accent: "#90CAF9", // Even lighter blue
+    error: "#EF5350", // Red
+    warning: "#FFA726", // Orange
+    info: "#29B6F6", // Light blue
+    success: "#66BB6A", // Green
+    background: "#E3F2FD", // Very light blue background
+    surface: "#FFFFFF",
+  },
+}
+
 const vuetify = createVuetify({
   components: {
     ...components,
@@ -41,7 +113,12 @@ const vuetify = createVuetify({
   theme: {
     defaultTheme: "light",
     themes: {
-      light: {
+      calm: calmTheme,
+      refreshing: refreshingTheme,
+      energetic: energeticTheme,
+      focused: focusedTheme,
+      peaceful: peacefulTheme,
+      /*light: {
         dark: false,
         colors: {
           primary: "#154EC1",
@@ -56,7 +133,7 @@ const vuetify = createVuetify({
           secondary: "#767C88",
           background: "#121212",
         },
-      },
+      },*/
     },
   },
 });
