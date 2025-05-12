@@ -12,7 +12,10 @@
           Quay lại lộ trình
         </v-btn>
 
-        <v-card v-if="!showResults" class="mb-6">
+        <v-card
+          v-if="!showResults"
+          class="mb-6 suggestion-card"
+        >
           <v-card-title class="d-flex align-center">
             <v-icon color="primary" class="mr-2">mdi-lightbulb-outline</v-icon>
             Gợi ý lộ trình
@@ -326,5 +329,11 @@ export default {
   padding: 4px;
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+.suggestion-card {
+  min-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
 }
 </style>

@@ -188,7 +188,7 @@ export default {
 }
 
 .roadmap-content, .roadmap-grid {
-  max-width: 1800px;
+  max-width: 1500px;
   margin: 0 auto;
   justify-items: stretch;
 }
