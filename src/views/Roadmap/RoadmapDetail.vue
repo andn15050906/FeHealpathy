@@ -49,21 +49,22 @@
                 color="warning"
                 variant="tonal"
                 class="mt-4"
-                icon="mdi-information-outline"
               >
-                <v-alert-title>Lưu ý quan trọng</v-alert-title>
+                <div class="d-flex align-center mb-2">
+                  <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
+                  <span class="font-weight-bold" style="color: #ff9800; font-size: large;">Lưu ý quan trọng</span>
+                </div>
                 <p>
-                  📌 Liệu pháp Nhận thức Hành vi (CBT) đã được nhiều hiệp hội
-                  chuyên môn, đặc biệt là
-                  <strong>Hiệp hội Tâm lý học Hoa Kỳ (APA)</strong>, công nhận
-                  là một trong những liệu pháp tâm lý hiệu quả nhất.
+                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là
+                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
                   <a
                     href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/"
                     target="_blank"
                     class="text-primary text-decoration-none"
                   >
-                    Tìm hiểu thêm </a
-                  >.
+                    Tìm hiểu thêm
+                  </a>
+                  .
                 </p>
               </v-alert>
             </v-card-text>
@@ -290,5 +291,11 @@ export default {
 
 .bg-success-subtle {
   background-color: #f0fff4 !important;
+}
+
+.v-alert-title {
+  display: inline-block !important;
+  vertical-align: middle;
+  margin-bottom: 0 !important;
 }
 </style>

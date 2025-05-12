@@ -74,166 +74,170 @@
 
           <v-window v-model="activeTab">
             <v-window-item value="overview">
-              <v-card class="mb-6">
-                <v-card-title>Giới thiệu bước</v-card-title>
-                <v-card-text>
-                  <p class="text-body-1 mb-4">
-                    {{ getStepIntroduction() }}
-                  </p>
-
-                  <div v-if="step.videoUrl" class="mt-6">
-                    <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
-                    <div
-                      class="video-placeholder d-flex justify-center align-center"
-                    >
-                      <v-btn
-                        icon="mdi-play"
-                        color="primary"
-                        size="x-large"
-                        variant="flat"
-                      ></v-btn>
-                    </div>
-                  </div>
-
-                  <div
-                    v-if="step.requireConfirmation"
-                    class="mt-6 pa-4 bg-primary-lighten-5 rounded"
-                  >
-                    <h3 class="text-h6 text-primary-darken-1 mb-2"
-                      >Xác nhận vấn đề</h3
-                    >
-                    <p class="text-primary-darken-2 mb-4">
-                      Bước đầu tiên để giải quyết vấn đề là thừa nhận sự tồn tại
-                      của nó. Vui lòng xác nhận rằng bạn đang gặp phải vấn đề
-                      này và sẵn sàng làm việc để cải thiện nó.
+              <div class="step-tab-wrapper">
+                <v-card class="mb-6">
+                  <v-card-title>Giới thiệu bước</v-card-title>
+                  <v-card-text>
+                    <p class="text-body-1 mb-4">
+                      {{ getStepIntroduction() }}
                     </p>
 
-                    <v-radio-group v-model="confirmation">
-                      <v-radio
-                        label="Tôi thừa nhận đây là vấn đề của tôi và muốn cải thiện"
-                        value="acknowledge"
-                        color="primary"
-                      ></v-radio>
-                      <v-radio
-                        label="Tôi chưa sẵn sàng đối mặt với vấn đề này"
-                        value="notReady"
-                        color="primary"
-                      ></v-radio>
-                    </v-radio-group>
-                  </div>
-                </v-card-text>
-              </v-card>
+                    <div v-if="step.videoUrl" class="mt-6">
+                      <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
+                      <div
+                        class="video-placeholder d-flex justify-center align-center"
+                      >
+                        <v-btn
+                          icon="mdi-play"
+                          color="primary"
+                          size="x-large"
+                          variant="flat"
+                        ></v-btn>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="step.requireConfirmation"
+                      class="mt-6 pa-4 bg-primary-lighten-5 rounded"
+                    >
+                      <h3 class="text-h6 text-primary-darken-1 mb-2"
+                        >Xác nhận vấn đề</h3
+                      >
+                      <p class="text-primary-darken-2 mb-4">
+                        Bước đầu tiên để giải quyết vấn đề là thừa nhận sự tồn tại
+                        của nó. Vui lòng xác nhận rằng bạn đang gặp phải vấn đề
+                        này và sẵn sàng làm việc để cải thiện nó.
+                      </p>
+
+                      <v-radio-group v-model="confirmation">
+                        <v-radio
+                          label="Tôi thừa nhận đây là vấn đề của tôi và muốn cải thiện"
+                          value="acknowledge"
+                          color="primary"
+                        ></v-radio>
+                        <v-radio
+                          label="Tôi chưa sẵn sàng đối mặt với vấn đề này"
+                          value="notReady"
+                          color="primary"
+                        ></v-radio>
+                      </v-radio-group>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </div>
             </v-window-item>
 
             <v-window-item value="actions">
-              <v-row>
-                <v-col
-                  v-for="action in step.actions"
-                  :key="action.id"
-                  cols="12"
-                  md="6"
-                >
-                  <v-card :class="{ 'bg-success-subtle': action.completed }">
-                    <v-card-title
-                      class="d-flex justify-space-between align-center"
-                    >
-                      {{ action.title }}
-                      <v-chip
-                        :color="action.required ? 'error' : 'primary'"
-                        size="small"
-                      >
-                        {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
-                      </v-chip>
-                    </v-card-title>
-                    <v-card-subtitle class="d-flex align-center">
-                      <v-icon size="small" class="mr-1"
-                        >mdi-clock-outline</v-icon
-                      >
-                      {{ action.duration }}
-                    </v-card-subtitle>
-                    <v-card-text>
-                      <p>{{ action.description }}</p>
-
-                      <div
-                        v-if="action.moodTags && action.moodTags.length > 0"
-                        class="mt-2"
-                      >
-                        <v-chip
-                          v-for="tag in action.moodTags"
-                          :key="tag"
-                          size="small"
-                          color="accent"
-                          class="mr-1 mb-1"
-                          variant="outlined"
-                        >
-                          {{ tag }}
-                        </v-chip>
-                      </div>
-                    </v-card-text>
-                    <v-card-actions class="d-flex justify-space-between">
-                      <v-btn
-                        variant="text"
-                        size="small"
-                        @click="viewActionDetails(action.id)"
-                      >
-                        Chi tiết
-                      </v-btn>
-
-                      <v-checkbox
-                        v-model="action.completed"
-                        :label="
-                          action.completed
-                            ? 'Đã hoàn thành'
-                            : 'Đánh dấu hoàn thành'
-                        "
-                        hide-details
-                        density="compact"
-                        @change="updateProgress"
-                      ></v-checkbox>
-                    </v-card-actions>
-                  </v-card>
-                </v-col>
-              </v-row>
-
-              <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
-                <v-card-title>Bạn có muốn bỏ qua bước này không?</v-card-title>
-                <v-card-subtitle>
-                  Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
-                  thiện trải nghiệm của bạn
-                </v-card-subtitle>
-                <v-card-text>
-                  <v-radio-group v-model="skipReason">
-                    <v-radio
-                      label="Tôi cảm thấy tốt hôm nay, không cần thực hiện bước này"
-                      value="feelGood"
-                      color="warning"
-                    ></v-radio>
-                    <v-radio
-                      label="Bước này không liên quan đến tôi"
-                      value="notRelevant"
-                      color="warning"
-                    ></v-radio>
-                    <v-radio
-                      label="Tôi không có đủ thời gian ngay bây giờ"
-                      value="noTime"
-                      color="warning"
-                    ></v-radio>
-                  </v-radio-group>
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn variant="text" @click="showSkipConfirm = false">
-                    Hủy
-                  </v-btn>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="warning"
-                    @click="confirmSkip"
-                    :disabled="!skipReason"
+              <div class="step-tab-wrapper">
+                <v-row>
+                  <v-col
+                    v-for="action in step.actions"
+                    :key="action.id"
+                    cols="12"
+                    md="6"
                   >
-                    Xác nhận bỏ qua
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+                    <v-card :class="{ 'bg-success-subtle': action.completed }">
+                      <v-card-title
+                        class="d-flex justify-space-between align-center"
+                      >
+                        {{ action.title }}
+                        <v-chip
+                          :color="action.required ? 'error' : 'primary'"
+                          size="small"
+                        >
+                          {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
+                        </v-chip>
+                      </v-card-title>
+                      <v-card-subtitle class="d-flex align-center">
+                        <v-icon size="small" class="mr-1"
+                          >mdi-clock-outline</v-icon
+                        >
+                        {{ action.duration }}
+                      </v-card-subtitle>
+                      <v-card-text>
+                        <p>{{ action.description }}</p>
+
+                        <div
+                          v-if="action.moodTags && action.moodTags.length > 0"
+                          class="mt-2"
+                        >
+                          <v-chip
+                            v-for="tag in action.moodTags"
+                            :key="tag"
+                            size="small"
+                            color="accent"
+                            class="mr-1 mb-1"
+                            variant="outlined"
+                          >
+                            {{ tag }}
+                          </v-chip>
+                        </div>
+                      </v-card-text>
+                      <v-card-actions class="d-flex justify-space-between">
+                        <v-btn
+                          variant="text"
+                          size="small"
+                          @click="viewActionDetails(action.id)"
+                        >
+                          Chi tiết
+                        </v-btn>
+
+                        <v-checkbox
+                          v-model="action.completed"
+                          :label="
+                            action.completed
+                              ? 'Đã hoàn thành'
+                              : 'Đánh dấu hoàn thành'
+                          "
+                          hide-details
+                          density="compact"
+                          @change="updateProgress"
+                        ></v-checkbox>
+                      </v-card-actions>
+                    </v-card>
+                  </v-col>
+                </v-row>
+
+                <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
+                  <v-card-title>Bạn có muốn bỏ qua bước này không?</v-card-title>
+                  <v-card-subtitle>
+                    Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
+                    thiện trải nghiệm của bạn
+                  </v-card-subtitle>
+                  <v-card-text>
+                    <v-radio-group v-model="skipReason">
+                      <v-radio
+                        label="Tôi cảm thấy tốt hôm nay, không cần thực hiện bước này"
+                        value="feelGood"
+                        color="warning"
+                      ></v-radio>
+                      <v-radio
+                        label="Bước này không liên quan đến tôi"
+                        value="notRelevant"
+                        color="warning"
+                      ></v-radio>
+                      <v-radio
+                        label="Tôi không có đủ thời gian ngay bây giờ"
+                        value="noTime"
+                        color="warning"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn variant="text" @click="showSkipConfirm = false">
+                      Hủy
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="warning"
+                      @click="confirmSkip"
+                      :disabled="!skipReason"
+                    >
+                      Xác nhận bỏ qua
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </div>
             </v-window-item>
           </v-window>
 
@@ -447,5 +451,13 @@ export default {
 
 .bg-success-subtle {
   background-color: #f0fff4 !important;
+}
+
+.step-tab-wrapper {
+  max-width: 1300px;
+  min-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 </style>
