@@ -3,15 +3,15 @@
     <RoadmapSidebar :steps="roadmapSteps" :activeStep="parseInt(id)" />
     <div class="roadmap-content">
       <RoadmapHeader />
-      <v-container>
+      <v-container class="pt-16">
         <v-btn
           variant="text"
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/')"
+          @click="$router.push('/overview')"
         >
-          Back to Roadmap
+          Quay lại lộ trình
         </v-btn>
 
         <StepDetail :step="currentStep" />
@@ -22,7 +22,7 @@
               <v-icon color="primary" class="mr-2"
                 >mdi-clipboard-check-outline</v-icon
               >
-              <span class="text-h6">Your Progress</span>
+              <span class="text-h6">Tiến độ của bạn</span>
             </div>
 
             <v-progress-linear
@@ -33,8 +33,8 @@
             ></v-progress-linear>
 
             <div class="d-flex justify-space-between">
-              <span class="text-caption">Just started</span>
-              <span class="text-caption">1/4 activities completed</span>
+              <span class="text-caption">Mới bắt đầu</span>
+              <span class="text-caption">1/4 hoạt động đã hoàn thành</span>
             </div>
           </v-card-text>
         </v-card>
@@ -46,7 +46,7 @@
             size="large"
             prepend-icon="mdi-arrow-right"
           >
-            Continue to Next Step
+            Tiếp tục bước tiếp theo
           </v-btn>
         </div>
       </v-container>
@@ -77,77 +77,77 @@ export default {
       roadmapSteps: [
         {
           id: 1,
-          title: "Self-Awareness",
+          title: "Nhận thức bản thân",
           completed: true,
           icon: "mdi-eye-outline",
         },
         {
           id: 2,
-          title: "Seeking Support",
+          title: "Tìm kiếm hỗ trợ",
           completed: true,
           icon: "mdi-hand-heart-outline",
         },
         {
           id: 3,
-          title: "Building Healthy Habits",
+          title: "Xây dựng thói quen lành mạnh",
           completed: false,
           active: true,
           icon: "mdi-sprout-outline",
         },
         {
           id: 4,
-          title: "Developing Coping Strategies",
+          title: "Phát triển chiến lược đối phó",
           completed: false,
           icon: "mdi-brain",
         },
         {
           id: 5,
-          title: "Maintaining Mental Wellness",
+          title: "Duy trì sức khỏe tinh thần",
           completed: false,
           icon: "mdi-heart-pulse",
         },
       ],
       currentStep: {
         id: 3,
-        title: "Building Healthy Habits",
+        title: "Xây dựng thói quen lành mạnh",
         description:
-          "Developing consistent healthy habits creates a foundation for good mental health. Small, sustainable changes to your daily routine can have a significant positive impact over time.",
+          "Phát triển thói quen lành mạnh nhất quán tạo nền tảng cho sức khỏe tinh thần tốt. Những thay đổi nhỏ, bền vững trong thói quen hàng ngày của bạn có thể tạo ra tác động tích cực đáng kể theo thời gian.",
         focusAreas: [
-          "Establish regular sleep patterns",
-          "Incorporate physical activity into your routine",
-          "Develop healthy eating habits",
-          "Create boundaries between work and personal time",
+          "Thiết lập mô hình giấc ngủ đều đặn",
+          "Đưa hoạt động thể chất vào thói quen của bạn",
+          "Phát triển thói quen ăn uống lành mạnh",
+          "Tạo ranh giới giữa thời gian làm việc và cá nhân",
         ],
         activities: [
           {
             id: 1,
-            title: "Sleep Hygiene Checklist",
+            title: "Danh sách kiểm tra vệ sinh giấc ngủ",
             description:
-              "Create and implement a bedtime routine to improve sleep quality.",
+              "Tạo và thực hiện thói quen trước khi đi ngủ để cải thiện chất lượng giấc ngủ.",
             recommended: true,
             icon: "mdi-sleep",
           },
           {
             id: 2,
-            title: "Movement Calendar",
+            title: "Lịch vận động",
             description:
-              "Schedule regular physical activity that you enjoy, even if it's just a short daily walk.",
+              "Lên lịch hoạt động thể chất thường xuyên mà bạn thích, ngay cả khi đó chỉ là đi bộ ngắn hàng ngày.",
             recommended: true,
             icon: "mdi-run",
           },
           {
             id: 3,
-            title: "Meal Planning",
+            title: "Lập kế hoạch bữa ăn",
             description:
-              "Plan balanced meals that include mood-supporting foods like omega-3s and complex carbohydrates.",
+              "Lên kế hoạch các bữa ăn cân bằng bao gồm thực phẩm hỗ trợ tâm trạng như omega-3 và carbohydrate phức hợp.",
             recommended: false,
             icon: "mdi-food-apple-outline",
           },
           {
             id: 4,
-            title: "Digital Boundaries",
+            title: "Ranh giới kỹ thuật số",
             description:
-              "Set specific times to disconnect from work emails and notifications.",
+              "Đặt thời gian cụ thể để ngắt kết nối khỏi email và thông báo công việc.",
             recommended: false,
             icon: "mdi-cellphone-off",
           },
@@ -162,10 +162,12 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 .roadmap-content {
   flex: 1;
+  width: 100%;
   padding: 0;
 }
 </style>

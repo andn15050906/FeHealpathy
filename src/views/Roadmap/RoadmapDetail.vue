@@ -1,19 +1,15 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <AppHeader
-        @take-assessment="goToSuggestion"
-        @update-status="updateStatus"
-      />
-      <v-container>
+      <v-container fluid class="pt-16">
         <v-btn
           variant="text"
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/')"
+          @click="$router.push('/overview')"
         >
-          Back to Roadmaps
+          Quay lại danh sách lộ trình
         </v-btn>
 
         <div
@@ -38,7 +34,7 @@
               <v-icon color="primary" class="mr-2"
                 >mdi-information-outline</v-icon
               >
-              Introduction
+              Giới thiệu
             </v-card-title>
             <v-card-text>
               <div
@@ -55,25 +51,25 @@
                 class="mt-4"
                 icon="mdi-information-outline"
               >
-                <v-alert-title>Important Note</v-alert-title>
+                <v-alert-title>Lưu ý quan trọng</v-alert-title>
                 <p>
-                  📌 Cognitive Behavioral Therapy (CBT) has been recognized by
-                  many professional associations, especially the
-                  <strong>American Psychological Association (APA)</strong>, as
-                  one of the most effective psychological therapies.
+                  📌 Liệu pháp Nhận thức Hành vi (CBT) đã được nhiều hiệp hội
+                  chuyên môn, đặc biệt là
+                  <strong>Hiệp hội Tâm lý học Hoa Kỳ (APA)</strong>, công nhận
+                  là một trong những liệu pháp tâm lý hiệu quả nhất.
                   <a
                     href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/"
                     target="_blank"
                     class="text-primary text-decoration-none"
                   >
-                    Learn more </a
+                    Tìm hiểu thêm </a
                   >.
                 </p>
               </v-alert>
             </v-card-text>
           </v-card>
 
-          <h2 class="text-h5 mb-4">Roadmap Steps</h2>
+          <h2 class="text-h5 mb-4">Các bước trong lộ trình</h2>
           <div class="mb-6">
             <v-timeline align="start">
               <v-timeline-item
@@ -83,7 +79,7 @@
                 size="small"
               >
                 <template v-slot:opposite>
-                  <div class="text-caption">Step {{ index + 1 }}</div>
+                  <div class="text-caption">Bước {{ index + 1 }}</div>
                 </template>
                 <v-card
                   :class="{
@@ -99,7 +95,7 @@
                       size="small"
                       class="ml-2"
                     >
-                      Current
+                      Hiện tại
                     </v-chip>
                     <v-chip
                       v-if="step.completed"
@@ -107,7 +103,7 @@
                       size="small"
                       class="ml-2"
                     >
-                      Completed
+                      Hoàn thành
                     </v-chip>
                   </v-card-title>
                   <v-card-text>
@@ -117,7 +113,7 @@
                       class="d-flex align-center mt-2 text-primary"
                     >
                       <v-icon size="small" class="mr-1">mdi-video</v-icon>
-                      <span class="text-caption">Has video guide</span>
+                      <span class="text-caption">Có hướng dẫn video</span>
                     </div>
                   </v-card-text>
                   <v-card-actions>
@@ -130,10 +126,10 @@
                       <v-icon v-if="step.current" start>mdi-play</v-icon>
                       {{
                         step.current
-                          ? "Start This Step"
+                          ? "Bắt đầu bước này"
                           : step.completed
-                          ? "Review"
-                          : "Locked"
+                          ? "Xem lại"
+                          : "Đã khóa"
                       }}
                     </v-btn>
                   </v-card-actions>
@@ -149,7 +145,7 @@
               prepend-icon="mdi-play"
               @click="startRoadmap"
             >
-              Start Roadmap
+              Bắt đầu lộ trình
             </v-btn>
           </div>
         </div>
@@ -185,56 +181,57 @@ export default {
       setTimeout(() => {
         this.roadmap = {
           id: this.id,
-          title: this.id === "1" ? "Overcoming Anxiety" : "Building Confidence",
-          description: "Learn to identify and overcome common anxiety symptoms",
+          title: this.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
+          description:
+            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
           progress: 0,
           introText: [
-            "This roadmap is designed based on Cognitive Behavioral Therapy (CBT), a method proven effective in treating anxiety.",
-            "During the process, you will learn to identify negative thoughts, challenge them, and replace them with more positive ones.",
-            "Each step in the roadmap will help you build the necessary skills to effectively manage anxiety and improve your overall mental health.",
+            "Lộ trình này được thiết kế dựa trên Liệu pháp Nhận thức Hành vi (CBT), một phương pháp đã được chứng minh hiệu quả trong điều trị lo âu.",
+            "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
+            "Mỗi bước trong lộ trình sẽ giúp bạn xây dựng các kỹ năng cần thiết để quản lý lo âu hiệu quả và cải thiện sức khỏe tinh thần tổng thể.",
           ],
           steps: [
             {
               id: "1",
-              title: "Identifying the Problem",
+              title: "Nhận diện vấn đề",
               description:
-                "Recognize anxiety symptoms and understand their origins",
+                "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
               videoUrl: "/videos/step1.mp4",
               completed: false,
               current: true,
             },
             {
               id: "2",
-              title: "Immediate Relief",
+              title: "Giảm nhẹ tức thì",
               description:
-                "Learn quick relaxation techniques to reduce anxiety in urgent situations",
+                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
               videoUrl: "/videos/step2.mp4",
               completed: false,
               current: false,
             },
             {
               id: "3",
-              title: "Stabilizing the Mind",
+              title: "Ổn định tâm trí",
               description:
-                "Practice mindfulness and meditation exercises to stabilize your mind",
+                "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
               videoUrl: "/videos/step3.mp4",
               completed: false,
               current: false,
             },
             {
               id: "4",
-              title: "Facing the Problem",
+              title: "Đối mặt với vấn đề",
               description:
-                "Develop strategies to face anxiety-inducing situations",
+                "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
               videoUrl: "/videos/step4.mp4",
               completed: false,
               current: false,
             },
             {
               id: "5",
-              title: "Evaluation & Maintenance",
+              title: "Đánh giá & Duy trì",
               description:
-                "Evaluate progress and build a long-term maintenance plan",
+                "Đánh giá tiến độ và xây dựng kế hoạch duy trì lâu dài",
               videoUrl: "/videos/step5.mp4",
               completed: false,
               current: false,
@@ -277,10 +274,14 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: calc(100% - 320px); /* Trừ đi chiều rộng của sidebar */
+  margin-left: 320px; /* Thêm margin-left bằng với chiều rộng của sidebar */
 }
 
 .roadmap-content {
   flex: 1;
+  width: 100%;
+  padding: 0 40px; /* Thêm padding để nội dung không sát cạnh */
 }
 
 .border-primary {

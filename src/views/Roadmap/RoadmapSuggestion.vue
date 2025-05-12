@@ -1,14 +1,13 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <AppHeader @take-assessment="resetSurvey" @update-status="updateStatus" />
-      <v-container>
+      <v-container fluid class="pt-16">
         <v-btn
           variant="text"
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/')"
+          @click="$router.push('/overview')"
         >
           Quay lại lộ trình
         </v-btn>
@@ -19,7 +18,8 @@
             Gợi ý lộ trình
           </v-card-title>
           <v-card-subtitle>
-            Trả lời một vài câu hỏi để chúng tôi gợi ý lộ trình phù hợp nhất cho bạn
+            Trả lời một vài câu hỏi để chúng tôi gợi ý lộ trình phù hợp nhất cho
+            bạn
           </v-card-subtitle>
 
           <v-card-text>
@@ -52,7 +52,9 @@
 
                 <v-stepper-window-item :value="2">
                   <v-card-text>
-                    <h3 class="text-h6 mb-4">Nguồn gây căng thẳng chính của bạn là gì?</h3>
+                    <h3 class="text-h6 mb-4"
+                      >Nguồn gây căng thẳng chính của bạn là gì?</h3
+                    >
                     <v-radio-group v-model="answers.stressSource">
                       <v-radio
                         v-for="option in stressSourceOptions"
@@ -66,7 +68,9 @@
 
                 <v-stepper-window-item :value="3">
                   <v-card-text>
-                    <h3 class="text-h6 mb-4">Bạn muốn cải thiện điều gì nhất?</h3>
+                    <h3 class="text-h6 mb-4"
+                      >Bạn muốn cải thiện điều gì nhất?</h3
+                    >
                     <v-radio-group v-model="answers.improvementGoal">
                       <v-radio
                         v-for="option in improvementGoalOptions"
@@ -140,7 +144,11 @@
           </v-row>
 
           <div class="text-center mt-6">
-            <v-btn variant="outlined" style="margin-top: 30px;" @click="$router.push('/overview')">
+            <v-btn
+              variant="outlined"
+              style="margin-top: 30px"
+              @click="$router.push('/overview')"
+            >
               Xem tất cả lộ trình
             </v-btn>
           </div>
@@ -157,7 +165,7 @@ import { roadmapSteps } from "@/scripts/data/roadmapData.js";
 export default {
   name: "RoadmapSuggestion",
   components: {
-    MentalProfile
+    MentalProfile,
   },
   data() {
     return {
@@ -299,10 +307,11 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  padding-left: 170px;
 }
 
 .roadmap-content {
-  flex: 1;
+  flex: 1; 
 }
 
 .border-primary {

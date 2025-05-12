@@ -1,11 +1,7 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <AppHeader
-        @take-assessment="goToSuggestion"
-        @update-status="updateStatus"
-      />
-      <v-container>
+      <v-container fluid class="pt-16">
         <v-btn
           variant="text"
           color="primary"
@@ -13,7 +9,7 @@
           prepend-icon="mdi-arrow-left"
           @click="$router.push(`/roadmap/${roadmapId}`)"
         >
-          Back to Roadmap
+          Quay lại lộ trình
         </v-btn>
 
         <div
@@ -40,7 +36,7 @@
             </div>
 
             <div class="mood-selector mt-4 md:mt-0">
-              <p class="text-subtitle-2 mb-2">How are you feeling today?</p>
+              <p class="text-subtitle-2 mb-2">Hôm nay bạn cảm thấy thế nào?</p>
               <div class="d-flex">
                 <v-btn
                   v-for="emoji in ['😔', '😐', '🙂', '😊']"
@@ -58,7 +54,7 @@
 
           <div class="mb-4">
             <div class="d-flex align-center mb-2">
-              <p class="text-body-2 text-grey-darken-1 mr-2">Step progress:</p>
+              <p class="text-body-2 text-grey-darken-1 mr-2">Tiến độ bước:</p>
               <v-progress-linear
                 :model-value="step.progress"
                 color="primary"
@@ -70,23 +66,23 @@
           </div>
 
           <v-tabs v-model="activeTab" class="mb-6">
-            <v-tab value="overview">Overview</v-tab>
+            <v-tab value="overview">Tổng quan</v-tab>
             <v-tab value="actions">
-              Actions ({{ completedActionsCount }}/{{ step.actions.length }})
+              Hành động ({{ completedActionsCount }}/{{ step.actions.length }})
             </v-tab>
           </v-tabs>
 
           <v-window v-model="activeTab">
             <v-window-item value="overview">
               <v-card class="mb-6">
-                <v-card-title>Step Introduction</v-card-title>
+                <v-card-title>Giới thiệu bước</v-card-title>
                 <v-card-text>
                   <p class="text-body-1 mb-4">
                     {{ getStepIntroduction() }}
                   </p>
 
                   <div v-if="step.videoUrl" class="mt-6">
-                    <h3 class="text-h6 mb-2">Video Guide</h3>
+                    <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
                     <div
                       class="video-placeholder d-flex justify-center align-center"
                     >
@@ -104,22 +100,22 @@
                     class="mt-6 pa-4 bg-primary-lighten-5 rounded"
                   >
                     <h3 class="text-h6 text-primary-darken-1 mb-2"
-                      >Problem Confirmation</h3
+                      >Xác nhận vấn đề</h3
                     >
                     <p class="text-primary-darken-2 mb-4">
-                      The first step to solving a problem is acknowledging its
-                      existence. Please confirm that you are experiencing this
-                      issue and are ready to work on improving it.
+                      Bước đầu tiên để giải quyết vấn đề là thừa nhận sự tồn tại
+                      của nó. Vui lòng xác nhận rằng bạn đang gặp phải vấn đề
+                      này và sẵn sàng làm việc để cải thiện nó.
                     </p>
 
                     <v-radio-group v-model="confirmation">
                       <v-radio
-                        label="I acknowledge this is my issue and want to improve"
+                        label="Tôi thừa nhận đây là vấn đề của tôi và muốn cải thiện"
                         value="acknowledge"
                         color="primary"
                       ></v-radio>
                       <v-radio
-                        label="I'm not ready to face this issue yet"
+                        label="Tôi chưa sẵn sàng đối mặt với vấn đề này"
                         value="notReady"
                         color="primary"
                       ></v-radio>
@@ -146,7 +142,7 @@
                         :color="action.required ? 'error' : 'primary'"
                         size="small"
                       >
-                        {{ action.required ? "Required" : "Optional" }}
+                        {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
                       </v-chip>
                     </v-card-title>
                     <v-card-subtitle class="d-flex align-center">
@@ -180,13 +176,15 @@
                         size="small"
                         @click="viewActionDetails(action.id)"
                       >
-                        Details
+                        Chi tiết
                       </v-btn>
 
                       <v-checkbox
                         v-model="action.completed"
                         :label="
-                          action.completed ? 'Completed' : 'Mark as completed'
+                          action.completed
+                            ? 'Đã hoàn thành'
+                            : 'Đánh dấu hoàn thành'
                         "
                         hide-details
                         density="compact"
@@ -198,24 +196,25 @@
               </v-row>
 
               <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
-                <v-card-title>Do you want to skip this step?</v-card-title>
+                <v-card-title>Bạn có muốn bỏ qua bước này không?</v-card-title>
                 <v-card-subtitle>
-                  Please let us know why so we can improve your experience
+                  Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
+                  thiện trải nghiệm của bạn
                 </v-card-subtitle>
                 <v-card-text>
                   <v-radio-group v-model="skipReason">
                     <v-radio
-                      label="I feel good today, don't need to do this step"
+                      label="Tôi cảm thấy tốt hôm nay, không cần thực hiện bước này"
                       value="feelGood"
                       color="warning"
                     ></v-radio>
                     <v-radio
-                      label="This step is not relevant to me"
+                      label="Bước này không liên quan đến tôi"
                       value="notRelevant"
                       color="warning"
                     ></v-radio>
                     <v-radio
-                      label="I don't have enough time right now"
+                      label="Tôi không có đủ thời gian ngay bây giờ"
                       value="noTime"
                       color="warning"
                     ></v-radio>
@@ -223,7 +222,7 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-btn variant="text" @click="showSkipConfirm = false">
-                    Cancel
+                    Hủy
                   </v-btn>
                   <v-spacer></v-spacer>
                   <v-btn
@@ -231,7 +230,7 @@
                     @click="confirmSkip"
                     :disabled="!skipReason"
                   >
-                    Confirm Skip
+                    Xác nhận bỏ qua
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -244,7 +243,7 @@
               variant="outlined"
               @click="showSkipConfirm = true"
             >
-              Skip this step
+              Bỏ qua bước này
             </v-btn>
             <div v-else></div>
 
@@ -257,7 +256,7 @@
               <v-icon start>{{
                 step.isLast ? "mdi-check-circle" : "mdi-arrow-right"
               }}</v-icon>
-              {{ step.isLast ? "Complete Roadmap" : "Continue" }}
+              {{ step.isLast ? "Hoàn thành lộ trình" : "Tiếp tục" }}
             </v-btn>
           </div>
         </div>
@@ -315,50 +314,53 @@ export default {
     this.fetchStepDetails();
   },
   methods: {
+    getStepIntroduction() {
+      if (this.stepId === "1") {
+        return "Bước đầu tiên để vượt qua lo âu là nhận diện và thừa nhận vấn đề. Trong bước này, bạn sẽ học cách nhận biết các triệu chứng lo âu, hiểu nguồn gốc của chúng và tác động của chúng đến cuộc sống hàng ngày của bạn.";
+      } else {
+        return "Sau khi đã nhận diện vấn đề, bước tiếp theo là học các kỹ thuật giảm nhẹ tức thì. Những kỹ thuật này sẽ giúp bạn đối phó với các tình huống gây lo âu và giảm triệu chứng ngay lập tức.";
+      }
+    },
     fetchStepDetails() {
       // In a real app, this would be an API call
       setTimeout(() => {
         this.step = {
           id: this.stepId,
           roadmapId: this.roadmapId,
-          title:
-            this.stepId === "1"
-              ? "Identifying the Problem"
-              : "Immediate Relief",
+          title: this.stepId === "1" ? "Nhận diện vấn đề" : "Giảm nhẹ tức thì",
           description:
             this.stepId === "1"
-              ? "Recognize anxiety symptoms and understand their origins"
-              : "Learn quick relaxation techniques to reduce anxiety in urgent situations",
+              ? "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng"
+              : "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
           videoUrl: "/videos/step1.mp4",
           actions: [
             {
               id: "1",
-              title: "Emotion Journal",
+              title: "Nhật ký cảm xúc",
               description:
-                "Record situations that cause anxiety and your emotions",
-              duration: "10 minutes",
+                "Ghi lại các tình huống gây lo âu và cảm xúc của bạn",
+              duration: "10 phút",
               completed: false,
               required: true,
-              moodTags: ["Good for when sad", "Helpful for anxiety"],
+              moodTags: ["Tốt khi buồn", "Hữu ích cho lo âu"],
             },
             {
               id: "2",
-              title: "Deep Breathing Exercise",
-              description:
-                "Practice deep breathing techniques to reduce anxiety",
-              duration: "5 minutes",
+              title: "Bài tập thở sâu",
+              description: "Thực hành kỹ thuật thở sâu để giảm lo âu",
+              duration: "5 phút",
               completed: false,
               required: false,
-              moodTags: ["Quick relief", "For immediate stress"],
+              moodTags: ["Giảm nhẹ nhanh", "Cho stress tức thì"],
             },
             {
               id: "3",
-              title: "Thought Analysis",
-              description: "Identify and challenge negative thoughts",
-              duration: "15 minutes",
+              title: "Phân tích suy nghĩ",
+              description: "Nhận diện và thách thức suy nghĩ tiêu cực",
+              duration: "15 phút",
               completed: false,
               required: true,
-              moodTags: ["For overthinking", "Mental clarity"],
+              moodTags: ["Cho suy nghĩ quá mức", "Làm rõ tâm trí"],
             },
           ],
           progress: 0,
@@ -374,13 +376,6 @@ export default {
     getNextStepId() {
       const currentId = parseInt(this.stepId);
       return currentId < 5 ? (currentId + 1).toString() : undefined;
-    },
-    getStepIntroduction() {
-      if (this.stepId === "1") {
-        return "The first step in overcoming anxiety is identifying and acknowledging the problem. In this step, you will learn to recognize anxiety symptoms, understand their origins, and their impact on your daily life.";
-      } else {
-        return "Once you have identified the problem, the next step is to learn immediate relief techniques. These techniques will help you cope with anxiety-inducing situations and reduce symptoms immediately.";
-      }
     },
     updateProgress() {
       if (!this.step) return;
@@ -434,10 +429,14 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: calc(100% - 320px); /* Trừ đi chiều rộng của sidebar */
+  margin-left: 320px; /* Thêm margin-left bằng với chiều rộng của sidebar */
 }
 
 .roadmap-content {
   flex: 1;
+  width: 100%;
+  padding: 0 40px; /* Thêm padding để nội dung không sát cạnh */
 }
 
 .video-placeholder {

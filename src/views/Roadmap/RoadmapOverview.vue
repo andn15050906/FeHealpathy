@@ -1,11 +1,7 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <AppHeader
-        @take-assessment="goToSuggestion"
-        @update-status="updateStatus"
-      />
-      <v-container>
+      <v-container fluid class="pt-16" style="margin-top: 15px;">
         <div
           class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6"
         >
@@ -34,14 +30,14 @@
 
         <v-window v-model="activeTab">
           <v-window-item value="suggested">
-            <v-row>
-              <v-col
+            <div class="roadmap-grid">
+              <RoadmapCard
                 v-for="roadmap in suggestedRoadmaps"
                 :key="roadmap.id"
-              >
-                <RoadmapCard :roadmap="roadmap" @view="viewRoadmap" />
-              </v-col>
-            </v-row>
+                :roadmap="roadmap"
+                @view="viewRoadmap"
+              />
+            </div>
           </v-window-item>
 
           <v-window-item value="all">
@@ -172,11 +168,13 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: calc(100% - 320px); /* Trừ đi chiều rộng của sidebar */
+  margin-left: 320px;
 }
 
 .roadmap-content {
   flex: 1;
-  min-width: 0;
+  width: 100%;
   padding: 0 24px;
   box-sizing: border-box;
 }
@@ -186,11 +184,13 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   padding: 20px 0;
-  align-items: stretch;
+  justify-items: stretch;
 }
 
 .roadmap-content, .roadmap-grid {
-  max-width: 800px;
+  max-width: 1800px;
   margin: 0 auto;
+  justify-items: stretch;
 }
+
 </style>

@@ -3,7 +3,7 @@
     <RoadmapSidebar :steps="roadmapSteps" :activeStep="0" />
     <div class="roadmap-content">
       <RoadmapHeader />
-      <v-container>
+      <v-container class="pt-16">
         <v-card class="mb-6 mt-4" elevation="1">
           <v-card-text>
             <div class="d-flex align-center mb-4">
@@ -385,10 +385,12 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 .roadmap-content {
   flex: 1;
+  width: 100%;
   padding: 0;
 }
 

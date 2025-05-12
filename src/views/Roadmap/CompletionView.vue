@@ -3,13 +3,13 @@
     <RoadmapSidebar :steps="roadmapSteps" :activeStep="5" />
     <div class="roadmap-content">
       <RoadmapHeader />
-      <v-container>
+      <v-container class="pt-16">
         <v-btn
           variant="text"
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/')"
+          @click="$router.push('/overview')"
         >
           Quay lại lộ trình
         </v-btn>
@@ -245,11 +245,12 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 .roadmap-content {
   flex: 1;
-  padding: 0;
+  width: 100%;
 }
 
 .coupon-code {

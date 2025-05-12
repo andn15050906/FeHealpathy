@@ -1,11 +1,7 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <AppHeader
-        @take-assessment="goToSuggestion"
-        @update-status="updateStatus"
-      />
-      <v-container>
+      <v-container fluid class="pt-16">
         <v-btn
           variant="text"
           color="primary"
@@ -13,7 +9,7 @@
           prepend-icon="mdi-arrow-left"
           @click="$router.push(`/roadmap/${id}`)"
         >
-          Back to Roadmap
+          Quay lại lộ trình
         </v-btn>
 
         <v-card
@@ -21,12 +17,10 @@
           elevation="1"
         >
           <v-icon size="64" class="mb-2">mdi-trophy-outline</v-icon>
-          <h2 class="text-h4 mb-2"
-            >Congratulations on Completing Your Roadmap!</h2
-          >
+          <h2 class="text-h4 mb-2">Chúc mừng bạn đã hoàn thành lộ trình!</h2>
           <p class="text-body-1">
-            This is an achievement to be proud of. Continue maintaining the good
-            habits you've built.
+            Đây là một thành tựu đáng tự hào. Hãy tiếp tục duy trì những thói
+            quen tốt bạn đã xây dựng.
           </p>
         </v-card>
 
@@ -37,9 +31,9 @@
                 <v-icon color="primary" size="48" class="mb-2"
                   >mdi-calendar-check</v-icon
                 >
-                <h3 class="text-h5 mb-1">Active Days</h3>
+                <h3 class="text-h5 mb-1">Số ngày hoạt động</h3>
                 <p class="text-h3 text-primary font-weight-bold">14</p>
-                <p class="text-body-2 text-grey">days</p>
+                <p class="text-body-2 text-grey">ngày</p>
               </v-card-text>
             </v-card>
           </v-col>
@@ -50,9 +44,9 @@
                 <v-icon color="success" size="48" class="mb-2"
                   >mdi-check-circle</v-icon
                 >
-                <h3 class="text-h5 mb-1">Actions Completed</h3>
+                <h3 class="text-h5 mb-1">Hành động đã hoàn thành</h3>
                 <p class="text-h3 text-success font-weight-bold">23</p>
-                <p class="text-body-2 text-grey">actions</p>
+                <p class="text-body-2 text-grey">hành động</p>
               </v-card-text>
             </v-card>
           </v-col>
@@ -63,7 +57,7 @@
                 <v-icon color="amber-darken-2" size="48" class="mb-2"
                   >mdi-medal</v-icon
                 >
-                <h3 class="text-h5 mb-1">Emotional Progress</h3>
+                <h3 class="text-h5 mb-1">Tiến bộ cảm xúc</h3>
                 <div class="d-flex justify-center align-center my-2">
                   <v-progress-linear
                     model-value="68"
@@ -73,32 +67,32 @@
                   ></v-progress-linear>
                   <span class="ml-2 font-weight-medium">68%</span>
                 </div>
-                <p class="text-body-2 text-grey">improvement</p>
+                <p class="text-body-2 text-grey">cải thiện</p>
               </v-card-text>
             </v-card>
           </v-col>
         </v-row>
 
         <v-card class="my-6">
-          <v-card-title>Rate Your Improvement</v-card-title>
+          <v-card-title>Đánh giá sự cải thiện của bạn</v-card-title>
           <v-card-subtitle>
-            Please let us know how much you've improved after completing this
-            roadmap
+            Vui lòng cho chúng tôi biết mức độ cải thiện của bạn sau khi hoàn
+            thành lộ trình này
           </v-card-subtitle>
           <v-card-text>
             <v-radio-group v-model="improvement">
               <v-radio
-                label="I've improved a little"
+                label="Tôi đã cải thiện một chút"
                 value="little"
                 color="primary"
               ></v-radio>
               <v-radio
-                label="I've improved moderately"
+                label="Tôi đã cải thiện vừa phải"
                 value="moderate"
                 color="primary"
               ></v-radio>
               <v-radio
-                label="I've improved significantly"
+                label="Tôi đã cải thiện đáng kể"
                 value="significant"
                 color="primary"
               ></v-radio>
@@ -111,7 +105,7 @@
               @click="submitSurvey"
               :disabled="!improvement"
             >
-              Submit Feedback
+              Gửi phản hồi
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -121,7 +115,7 @@
           class="my-6 border-dashed border-2 border-amber"
         >
           <v-card-title class="text-center text-amber-darken-2"
-            >Special Discount Code</v-card-title
+            >Mã giảm giá đặc biệt</v-card-title
           >
           <v-card-text class="text-center">
             <div class="coupon-code mb-4">
@@ -130,16 +124,16 @@
               >
             </div>
             <p class="text-body-2 text-amber-darken-1">
-              Use this code for a 25% discount on our "Applied Psychology"
-              course
+              Sử dụng mã này để được giảm 25% cho khóa học "Tâm lý học ứng dụng"
+              của chúng tôi
             </p>
           </v-card-text>
         </v-card>
 
         <v-card v-if="improvement === 'little'" class="my-6 bg-blue-lighten-5">
-          <v-card-title>Advanced Roadmap Suggestions</v-card-title>
+          <v-card-title>Gợi ý lộ trình nâng cao</v-card-title>
           <v-card-subtitle>
-            Based on your feedback, we suggest these additional roadmaps
+            Dựa trên phản hồi của bạn, chúng tôi gợi ý các lộ trình bổ sung sau
           </v-card-subtitle>
           <v-card-text>
             <v-list bg-color="transparent">
@@ -148,14 +142,14 @@
                   <v-icon color="amber-darken-2">mdi-star</v-icon>
                 </template>
                 <v-list-item-title
-                  >Advanced Roadmap: Overcoming Anxiety</v-list-item-title
+                  >Lộ trình nâng cao: Vượt qua lo âu</v-list-item-title
                 >
                 <v-list-item-subtitle
-                  >Advanced techniques for dealing with chronic
-                  anxiety</v-list-item-subtitle
+                  >Các kỹ thuật nâng cao để đối phó với lo âu mãn
+                  tính</v-list-item-subtitle
                 >
                 <template v-slot:append>
-                  <v-btn variant="outlined" size="small">View Details</v-btn>
+                  <v-btn variant="outlined" size="small">Xem chi tiết</v-btn>
                 </template>
               </v-list-item>
 
@@ -163,13 +157,13 @@
                 <template v-slot:prepend>
                   <v-icon color="amber-darken-2">mdi-star</v-icon>
                 </template>
-                <v-list-item-title>Daily Meditation</v-list-item-title>
+                <v-list-item-title>Thiền định hàng ngày</v-list-item-title>
                 <v-list-item-subtitle
-                  >Build a meditation habit to improve mental
-                  health</v-list-item-subtitle
+                  >Xây dựng thói quen thiền định để cải thiện sức khỏe tinh
+                  thần</v-list-item-subtitle
                 >
                 <template v-slot:append>
-                  <v-btn variant="outlined" size="small">View Details</v-btn>
+                  <v-btn variant="outlined" size="small">Xem chi tiết</v-btn>
                 </template>
               </v-list-item>
             </v-list>
@@ -183,7 +177,7 @@
             prepend-icon="mdi-home"
             @click="$router.push('/')"
           >
-            Return to Home
+            Quay lại trang chủ
           </v-btn>
         </div>
       </v-container>
@@ -232,10 +226,12 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 .roadmap-content {
   flex: 1;
+  width: 100%;
 }
 
 .coupon-code {
