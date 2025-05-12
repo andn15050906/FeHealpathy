@@ -52,8 +52,8 @@
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
             <PremiumBlocker></PremiumBlocker>
           </div>
-          <!--<RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
-            @removeNotification="removeNotification" />-->
+          <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
+            @removeNotification="removeNotification" />
 
           <v-main :class="mainBackground">
             <v-container>

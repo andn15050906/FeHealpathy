@@ -86,6 +86,12 @@ import UpdateRoadmap from '@/views/Profile/Advisor/Manage/UpdateRoadmap.vue'
 import RoadmapProgress from '@/components/RoadmapComponents/RoadmapProgress.vue'
 import CreateRoadmap from '@/views/Profile/Advisor/Manage/CreateRoadmap.vue';
 
+import RoadmapOverview from "@/views/Roadmap/RoadmapOverview.vue"
+import RoadmapSuggestion from "@/views/Roadmap/RoadmapSuggestion.vue"
+import RoadmapDetail from "@/views/Roadmap/RoadmapDetail.vue"
+import StepDetail from "@/views/Roadmap/StepDetail.vue"
+import RoadmapCompletion from "@/views/Roadmap/RoadmapCompletion.vue"
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -577,9 +583,37 @@ const router = createRouter({
       name: 'ViewReports',
       meta: { requiresAuth: true, requiresAdmin: true },
       component: ViewReports
-    }
+    },
 
-    //
+    // Roadmap v0
+    {
+      path: "/overview",
+      name: "overview",
+      component: RoadmapOverview,
+    },
+    {
+      path: "/suggest",
+      name: "suggest",
+      component: RoadmapSuggestion,
+    },
+    {
+      path: "/roadmap/:id",
+      name: "roadmap-detail",
+      component: RoadmapDetail,
+      props: true,
+    },
+    {
+      path: "/roadmap/:roadmapId/step/:stepId",
+      name: "step-detail",
+      component: StepDetail,
+      props: true,
+    },
+    {
+      path: "/roadmap/:id/complete",
+      name: "roadmap-completion",
+      component: RoadmapCompletion,
+      props: true,
+    }
   ]
 })
 
