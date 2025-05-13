@@ -45,18 +45,22 @@
                 <p>{{ text }}</p>
               </div>
 
-              <v-alert
-                color="warning"
-                variant="tonal"
-                class="mt-4"
-              >
+              <v-alert color="warning" variant="tonal" class="mt-4">
                 <div class="d-flex align-center mb-2">
-                  <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
-                  <span class="font-weight-bold" style="color: #ff9800; font-size: large;">Lưu ý quan trọng</span>
+                  <v-icon color="warning" class="mr-2"
+                    >mdi-information-outline</v-icon
+                  >
+                  <span
+                    class="font-weight-bold"
+                    style="color: #ff9800; font-size: large"
+                    >Lưu ý quan trọng</span
+                  >
                 </div>
                 <p>
-                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là
-                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
+                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp
+                  hội chuyên môn, đặc biệt là
+                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một
+                  trong những liệu pháp tâm lý hiệu quả nhất.
                   <a
                     href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/"
                     target="_blank"
@@ -157,6 +161,9 @@
 
 <script>
 import { roadmapSteps } from "@/scripts/data/roadmapData.js";
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useEventBus } from "../../scripts/logic/evenBus";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   name: "RoadmapDetail",
@@ -166,23 +173,100 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      loading: true,
-      roadmapSteps,
-      roadmap: null,
+  setup(props) {
+    const route = useRoute();
+    const router = useRouter();
+    const loading = ref(true);
+    const roadmap = ref(null);
+    const completedPhases = ref({
+      1: false,
+      2: false,
+      3: false,
+      4: false,
+      5: false,
+    });
+
+    // Cấu trúc của roadmap
+    const phaseStructure = {
+      1: {
+        // Phase 1
+        name: "Nhận thức và Hiểu biết",
+        steps: ["1"],
+        nextPhase: 2,
+      },
+      2: {
+        // Phase 2
+        name: "Giảm nhẹ tức thì",
+        steps: ["2"],
+        nextPhase: 3,
+      },
+      3: {
+        // Phase 3
+        name: "Ổn định tâm trí",
+        steps: ["3"],
+        nextPhase: 4,
+      },
+      4: {
+        // Phase 4
+        name: "Đối mặt với vấn đề",
+        steps: ["4"],
+        nextPhase: 5,
+      },
+      5: {
+        // Phase 5
+        name: "Đánh giá và Duy trì",
+        steps: ["5"],
+        nextPhase: null,
+      },
     };
-  },
-  mounted() {
-    this.fetchRoadmap();
-  },
-  methods: {
-    fetchRoadmap() {
+
+    // Khôi phục trạng thái hoàn thành của các phase từ localStorage
+    const loadCompletedPhases = () => {
+      const savedPhases = localStorage.getItem("completedPhases");
+      if (savedPhases) {
+        completedPhases.value = JSON.parse(savedPhases);
+      }
+    };
+
+    // Lưu trạng thái hoàn thành của các phase vào localStorage
+    const saveCompletedPhases = () => {
+      localStorage.setItem(
+        "completedPhases",
+        JSON.stringify(completedPhases.value)
+      );
+    };
+
+    // Cập nhật trạng thái của các step trong roadmap
+    const updateStepStatus = () => {
+      if (!roadmap.value || !roadmap.value.steps) return;
+
+      let foundCurrent = false;
+
+      for (const step of roadmap.value.steps) {
+        const phaseId = step.phaseId;
+
+        // Nếu phase đã hoàn thành, đánh dấu step là đã hoàn thành
+        if (completedPhases.value[phaseId]) {
+          step.completed = true;
+          step.current = false;
+        } else if (!foundCurrent) {
+          // Đánh dấu step đầu tiên chưa hoàn thành là current
+          step.current = true;
+          foundCurrent = true;
+        } else {
+          // Các step còn lại không phải current và chưa hoàn thành
+          step.current = false;
+          step.completed = false;
+        }
+      }
+    };
+
+    const fetchRoadmap = () => {
       // In a real app, this would be an API call
       setTimeout(() => {
-        this.roadmap = {
-          id: this.id,
-          title: this.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
+        roadmap.value = {
+          id: props.id,
+          title: props.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
           description:
             "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
           progress: 0,
@@ -200,6 +284,7 @@ export default {
               videoUrl: "/videos/step1.mp4",
               completed: false,
               current: true,
+              phaseId: 1,
             },
             {
               id: "2",
@@ -209,6 +294,7 @@ export default {
               videoUrl: "/videos/step2.mp4",
               completed: false,
               current: false,
+              phaseId: 2,
             },
             {
               id: "3",
@@ -218,6 +304,7 @@ export default {
               videoUrl: "/videos/step3.mp4",
               completed: false,
               current: false,
+              phaseId: 3,
             },
             {
               id: "4",
@@ -227,6 +314,7 @@ export default {
               videoUrl: "/videos/step4.mp4",
               completed: false,
               current: false,
+              phaseId: 4,
             },
             {
               id: "5",
@@ -236,13 +324,19 @@ export default {
               videoUrl: "/videos/step5.mp4",
               completed: false,
               current: false,
+              phaseId: 5,
             },
           ],
         };
-        this.loading = false;
+
+        // Cập nhật trạng thái step dựa trên completedPhases
+        updateStepStatus();
+
+        loading.value = false;
       }, 1000);
-    },
-    getStepColor(step) {
+    };
+
+    const getStepColor = (step) => {
       if (step.completed) {
         return "success";
       }
@@ -250,23 +344,62 @@ export default {
         return "primary";
       }
       return "grey";
-    },
-    startRoadmap() {
-      const currentStep = this.roadmap.steps.find((step) => step.current);
+    };
+
+    const startRoadmap = () => {
+      const currentStep = roadmap.value.steps.find((step) => step.current);
       if (currentStep) {
-        this.goToStep(currentStep.id);
+        goToStep(currentStep.id);
       }
-    },
-    goToStep(stepId) {
-      this.$router.push(`/roadmap/${this.roadmap.id}/step/${stepId}`);
-    },
-    goToSuggestion() {
-      this.$router.push("/suggest");
-    },
-    updateStatus() {
+    };
+
+    const goToStep = (stepId) => {
+      router.push(`/roadmap/${roadmap.value.id}/step/${stepId}`);
+    };
+
+    const goToSuggestion = () => {
+      router.push("/suggest");
+    };
+
+    const updateStatus = () => {
       // In a real app, this would update the user's status
       alert("Status updated!");
-    },
+    };
+
+    // Sử dụng event bus
+    const eventBus = useEventBus();
+
+    // Lắng nghe sự kiện cập nhật từ StepDetail
+    const handleUpdateRoadmapPhases = (phases) => {
+      completedPhases.value = phases;
+      saveCompletedPhases();
+      updateStepStatus();
+    };
+
+    onMounted(() => {
+      loadCompletedPhases();
+      fetchRoadmap();
+
+      // Đăng ký lắng nghe sự kiện
+      eventBus.on("update-roadmap-phases", handleUpdateRoadmapPhases);
+    });
+
+    onBeforeUnmount(() => {
+      // Hủy đăng ký sự kiện
+      eventBus.off("update-roadmap-phases", handleUpdateRoadmapPhases);
+    });
+
+    return {
+      loading,
+      roadmap,
+      completedPhases,
+      phaseStructure,
+      getStepColor,
+      startRoadmap,
+      goToStep,
+      goToSuggestion,
+      updateStatus,
+    };
   },
 };
 </script>
