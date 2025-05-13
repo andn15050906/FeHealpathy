@@ -15,6 +15,38 @@ a,
   padding: 3px;
 }
 
+.bg-background {
+  background-color: #f5eeff !important;
+}
+
+.text-primary {
+  color: #6a39ca !important;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.bg-primary-lighten-5 {
+  background-color: #ede7f6 !important;
+}
+
+.bg-success-subtle {
+  background-color: #f0fff4 !important;
+}
+
+.bg-warning-lighten-5 {
+  background-color: #fff8e1 !important;
+}
+
+.text-primary-darken-1 {
+  color: #5e35b1 !important;
+}
+
+.text-primary-darken-2 {
+  color: #512da8 !important;
+}
+
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);

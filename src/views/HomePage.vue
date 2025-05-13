@@ -1,6 +1,7 @@
 <template>
     <div class="home-container">
         <main v-if="!isLoggedIn" class="main-content">
+            <!-- Phần landing page cho người chưa đăng nhập -->
             <section class="hero-section">
                 <h1 class="hero-title">{{ HomePage.Title }}</h1>
                 <p class="hero-subtitle">{{ HomePage.SubTitle }}</p>
@@ -58,10 +59,49 @@
                     </GlowingCard>
                 </div>
             </section>
+            
             <AccountUpgrade></AccountUpgrade>
         </main>
+        
         <main v-if="isLoggedIn" class="main-content home-background">
-            <PersonalRoadmap></PersonalRoadmap>
+            <!-- Dashboard cho người đã đăng nhập -->
+            <v-container>
+                <v-row>
+                    <v-col cols="12">
+                        <h1 class="text-h4 mb-4">Xin chào, {{ user.fullName }}</h1>
+                    </v-col>
+                </v-row>
+                
+                <!-- Phần lời động viên và lời khuyên -->
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <RecommendationCard
+                            v-if="dailyMotivation"
+                            :content="dailyMotivation.content"
+                            :is-motivation="true"
+                            :source="dailyMotivation.source"
+                        />
+                    </v-col>
+                    
+                    <v-col cols="12" md="6">
+                        <RecommendationCard
+                            v-if="dailyRecommendation"
+                            :content="dailyRecommendation.content"
+                            :is-motivation="false"
+                            :source="dailyRecommendation.source"
+                            @follow-recommendation="followRecommendation"
+                            @skip-recommendation="skipRecommendation"
+                        />
+                    </v-col>
+                </v-row>
+                
+                <!-- Phần lộ trình cá nhân -->
+                <v-row>
+                    <v-col cols="12">
+                        <PersonalRoadmap></PersonalRoadmap>
+                    </v-col>
+                </v-row>
+            </v-container>
         </main>
     </div>
 </template>
@@ -75,6 +115,7 @@ import GlowingCard from '@/components/Common/GlowingCard.vue';
 import GlowingButton from '@/components/Common/GlowingButton.vue';
 import PersonalRoadmap from '@/components/RoadmapComponents/PersonalRoadmap.vue';
 import AccountUpgrade from '@/components/PaymentComponents/AccountUpgrade.vue';
+import RecommendationCard from '@/components/Roadmap/RecommendationCard.vue';
 
 export default {
     name: 'HomePage',
@@ -85,20 +126,59 @@ export default {
         navigateToSettingUp: function (notiId) {
             this.$router.push({ name: 'SettingUp' });
             this.$emit('removeNotification', notiId);
+        },
+        followRecommendation() {
+            // Lưu trạng thái đã làm theo lời khuyên
+            this.isFollowingRecommendation = true;
+            
+            // Chuyển đến trang chi tiết của lời khuyên hoặc hiển thị hướng dẫn
+            if (this.dailyRecommendation.actionUrl) {
+                this.$router.push(this.dailyRecommendation.actionUrl);
+            } else {
+                // Hiển thị hướng dẫn trong modal
+                // Implement later
+            }
+        },
+        skipRecommendation() {
+            // Gọi API để lấy lời khuyên mới
+            this.fetchDailyRecommendation();
+        },
+        async fetchDailyMotivation() {
+            // Giả lập API call
+            setTimeout(() => {
+                this.dailyMotivation = {
+                    content: "Mỗi bước nhỏ bạn thực hiện hôm nay đều đưa bạn gần hơn đến mục tiêu sức khỏe tinh thần tốt hơn.",
+                    source: "FeHealpathy"
+                };
+            }, 500);
+        },
+        async fetchDailyRecommendation() {
+            // Giả lập API call
+            setTimeout(() => {
+                this.dailyRecommendation = {
+                    content: "Dành 5 phút hôm nay để thực hành bài tập thở sâu. Điều này có thể giúp giảm căng thẳng và cải thiện tâm trạng của bạn.",
+                    source: "Lộ trình Vượt qua lo âu",
+                    actionUrl: "/practice/breathing"
+                };
+            }, 500);
         }
     },
     data() {
         return {
             user: null,
             isLoggedIn: false,
-            HomePage: json.HomePage
+            HomePage: json.HomePage,
+            dailyMotivation: null,
+            dailyRecommendation: null,
+            isFollowingRecommendation: false
         }
     },
     components: {
         GlowingButton,
         GlowingCard,
         PersonalRoadmap,
-        AccountUpgrade
+        AccountUpgrade,
+        RecommendationCard
     },
     beforeMount() {
         // handle auth
@@ -131,6 +211,11 @@ export default {
             return;
 
         this.isLoggedIn = true;
+        
+        // Fetch daily motivation and recommendation
+        this.fetchDailyMotivation();
+        this.fetchDailyRecommendation();
+        
         if (!this.user.roadmapId) {
             this.$router.push({ name: 'SettingUp' });
         }
