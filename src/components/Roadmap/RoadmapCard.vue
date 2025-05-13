@@ -59,10 +59,20 @@ export default {
 .roadmap-card {
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  border-radius: 12px !important;
+  overflow: hidden;
+  height: auto !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .roadmap-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.v-card-actions {
+  margin-top: auto;
+  padding: 16px;
 }
 </style>
