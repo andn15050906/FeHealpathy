@@ -66,7 +66,7 @@
                   :total-required-actions="totalRequiredActions" :action-history="actionHistory"
                   @suggest-new-route="startSurvey" @view-full-history="viewFullHistory" />
               </div>
-              <div v-else>
+              <!-- <div v-else>
                 <v-card class="mb-6 animate-fade-in" rounded="lg" elevation="3">
                   <v-card-title class="text-h5">Welcome to Your Mental Health Journey</v-card-title>
                   <v-card-text>
@@ -86,7 +86,7 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </div>
+              </div> -->
             </v-container>
           </v-main>
           <v-dialog v-model="showStatusPopup" max-width="500px" transition="dialog-bottom-transition">
