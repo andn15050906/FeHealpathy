@@ -104,9 +104,9 @@
                         >Xác nhận vấn đề</h3
                       >
                       <p class="text-primary-darken-2 mb-4">
-                        Bước đầu tiên để giải quyết vấn đề là thừa nhận sự tồn
-                        tại của nó. Vui lòng xác nhận rằng bạn đang gặp phải vấn
-                        đề này và sẵn sàng làm việc để cải thiện nó.
+                        Bước đầu tiên để giải quyết vấn đề là thừa nhận sự tồn tại
+                        của nó. Vui lòng xác nhận rằng bạn đang gặp phải vấn đề
+                        này và sẵn sàng làm việc để cải thiện nó.
                       </p>
 
                       <v-radio-group v-model="confirmation">
@@ -198,13 +198,8 @@
                   </v-col>
                 </v-row>
 
-                <v-card
-                  v-if="showSkipConfirm"
-                  class="mt-6 bg-warning-lighten-5"
-                >
-                  <v-card-title
-                    >Bạn có muốn bỏ qua bước này không?</v-card-title
-                  >
+                <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
+                  <v-card-title>Bạn có muốn bỏ qua bước này không?</v-card-title>
                   <v-card-subtitle>
                     Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
                     thiện trải nghiệm của bạn
@@ -271,7 +266,7 @@
         </div>
       </v-container>
     </div>
-
+    
     <!-- Dialog đánh giá cuối phase -->
     <PhaseCompletionDialog
       :show="showPhaseCompletion"
@@ -292,7 +287,7 @@ import PhaseCompletionDialog from "@/components/Roadmap/PhaseCompletionDialog.vu
 export default {
   name: "StepDetail",
   components: {
-    PhaseCompletionDialog,
+    PhaseCompletionDialog
   },
   props: {
     roadmapId: {
@@ -314,42 +309,30 @@ export default {
       confirmation: null,
       skipReason: null,
       showSkipConfirm: false,
-
+      
       // Dữ liệu cho PhaseCompletionDialog
       showPhaseCompletion: false,
       currentPhaseId: "phase1",
       currentPhaseTitle: "Nhận thức và Hiểu biết",
       phaseDocuments: [
-        {
-          title: "Hiểu về lo âu và các triệu chứng",
-          url: "/docs/anxiety-symptoms",
-        },
-        {
-          title: "Kỹ thuật thở để giảm lo âu",
-          url: "/docs/breathing-techniques",
-        },
-        {
-          title: "Nhận diện và thách thức suy nghĩ tiêu cực",
-          url: "/docs/negative-thoughts",
-        },
+        { title: "Hiểu về lo âu và các triệu chứng", url: "/docs/anxiety-symptoms" },
+        { title: "Kỹ thuật thở để giảm lo âu", url: "/docs/breathing-techniques" },
+        { title: "Nhận diện và thách thức suy nghĩ tiêu cực", url: "/docs/negative-thoughts" }
       ],
       phaseCriteria: [
-        {
-          title: "Nhận diện triệu chứng",
-          description:
-            "Bạn có thể nhận diện được các triệu chứng lo âu của mình",
+        { 
+          title: "Nhận diện triệu chứng", 
+          description: "Bạn có thể nhận diện được các triệu chứng lo âu của mình" 
         },
-        {
-          title: "Hiểu nguồn gốc",
-          description:
-            "Bạn hiểu được nguồn gốc của lo âu và các yếu tố kích hoạt",
+        { 
+          title: "Hiểu nguồn gốc", 
+          description: "Bạn hiểu được nguồn gốc của lo âu và các yếu tố kích hoạt" 
         },
-        {
-          title: "Áp dụng kỹ thuật",
-          description:
-            "Bạn đã thử và áp dụng được ít nhất một kỹ thuật giảm lo âu",
-        },
-      ],
+        { 
+          title: "Áp dụng kỹ thuật", 
+          description: "Bạn đã thử và áp dụng được ít nhất một kỹ thuật giảm lo âu" 
+        }
+      ]
     };
   },
   computed: {
@@ -372,7 +355,7 @@ export default {
     isLastMilestoneInPhase() {
       // Hardcode: giả sử milestone id 3 là milestone cuối cùng trong phase
       return this.stepId === "3";
-    },
+    }
   },
   mounted() {
     this.fetchStepDetails();
@@ -487,7 +470,7 @@ export default {
     submitPhaseEvaluation(evaluationData) {
       // Đóng dialog
       this.showPhaseCompletion = false;
-
+      
       // Chuyển đến milestone tiếp theo hoặc trang hoàn thành
       if (evaluationData.moveToNextPhase === "yes") {
         if (this.step.nextStepId) {
