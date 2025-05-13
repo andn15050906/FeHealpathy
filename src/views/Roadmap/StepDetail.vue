@@ -978,8 +978,6 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
-  width: calc(100% - 320px); /* Trừ đi chiều rộng của sidebar */
-  margin-left: 320px; /* Thêm margin-left bằng với chiều rộng của sidebar */
 }
 
 .roadmap-content {

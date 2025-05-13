@@ -233,7 +233,6 @@ export default {
   flex: 1;
   width: 60vw !important;
   max-width: 60vw !important;
-  margin-left: 180px;
 }
 
 .coupon-code {
