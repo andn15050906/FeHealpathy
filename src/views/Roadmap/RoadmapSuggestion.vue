@@ -55,7 +55,6 @@
                       <v-radio label="Người cao tuổi" value="elderly"></v-radio>
                       <v-radio label="Khác" value="other"></v-radio>
                     </v-radio-group>
-                    <v-btn text @click="skipStep(1)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
 
@@ -82,7 +81,6 @@
                         outlined
                         dense
                       ></v-text-field>
-                      <v-btn text @click="skipStep(2)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
@@ -99,14 +97,13 @@
                         <v-radio label="Trên mạng xã hội" value="social"></v-radio>
                         <v-radio label="Không rõ" value="unknown"></v-radio>
                       </v-radio-group>
-                      <v-btn text @click="skipStep(3)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
                   <v-stepper-window-item :value="4">
                     <v-card-text>
                       <div style="color:#388e3c; font-size:0.97rem; margin-bottom:4px;">
-                        Thường xảy ra vào thời gian nào? (Có thể chọn nhiều)
+                        Thường xảy ra vào thời gian nào?
                       </div>
                       <v-radio-group v-model="answers.when">
                         <v-radio label="Buổi sáng" value="morning"></v-radio>
@@ -115,14 +112,13 @@
                         <v-radio label="Khi đi học/làm" value="at_work"></v-radio>
                         <v-radio label="Luôn luôn" value="always"></v-radio>
                       </v-radio-group>
-                      <v-btn text @click="skipStep(4)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
                   <v-stepper-window-item :value="5">
                     <v-card-text>
                       <div style="color:#388e3c; font-size:0.97rem; margin-bottom:4px;">
-                        Ai thường liên quan đến vấn đề này? (Có thể chọn nhiều)
+                        Ai thường liên quan đến vấn đề này?
                       </div>
                       <v-radio-group v-model="answers.related">
                         <v-radio label="Bố mẹ" value="parent"></v-radio>
@@ -132,7 +128,6 @@
                         <v-radio label="Chính bản thân mình" value="myself"></v-radio>
                         <v-radio label="Không rõ" value="unknown"></v-radio>
                       </v-radio-group>
-                      <v-btn text @click="skipStep(5)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
                 </template>
@@ -170,8 +165,7 @@
                 <v-spacer></v-spacer>
                 <v-btn
                   color="primary"
-                  @click="handleNext"
-                  :disabled="!canProceed"
+                  @click="onNextClick"
                 >
                   {{ currentStep < 5 ? "Tiếp theo" : "Hoàn thành" }}
                 </v-btn>
@@ -314,18 +308,22 @@ export default {
       if (this.currentStep === 1) {
         return !!this.answers.userType;
       } else if (this.currentStep === 2) {
-        return !!this.answers.issue;
-      } else if (this.currentStep === 3) {
-        return !!this.answers.where;
-      } else if (this.currentStep === 4) {
-        return !!this.answers.when;
-      } else if (this.currentStep === 5) {
-        return !!this.answers.related;
+        return !!this.answers.issue && (this.answers.issue !== 'other' || !!this.answers.issueOther);
       }
-      return false;
+      return true;
     },
   },
   methods: {
+    onNextClick() {
+      if (this.currentStep === 2) {
+        if (!this.answers.issue || (this.answers.issue === 'other' && !this.answers.issueOther)) {
+          this.skippedIssue = true;
+          this.currentStep = 2;
+          return;
+        }
+      }
+      this.handleNext();
+    },
     handleNext() {
       if (this.currentStep < 5) {
         this.currentStep++;
