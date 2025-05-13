@@ -7,7 +7,7 @@
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/overview')"
+          @click="$router.push('/roadmaps/recommended')"
         >
           Quay lại lộ trình
         </v-btn>
@@ -149,7 +149,7 @@
                       <v-btn color="primary" class="mr-4" @click="backToFirstQuestion">
                         Quay lại trả lời
                       </v-btn>
-                      <v-btn outlined color="grey" @click="$router.push('/overview')">
+                      <v-btn outlined color="grey" @click="$router.push('/roadmaps/recommended')">
                         Bỏ qua & Xem các lộ trình
                       </v-btn>
                     </v-card-text>
@@ -249,7 +249,7 @@
               <v-btn
                 variant="outlined"
                 style="margin-top: 30px"
-                @click="$router.push('/overview')"
+                @click="$router.push('/roadmaps/recommended')"
               >
                 Xem tất cả lộ trình
               </v-btn>

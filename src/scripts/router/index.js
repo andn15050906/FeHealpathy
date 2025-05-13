@@ -459,7 +459,7 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/assignments/:id/overview',
+      path: '/assignments/:id/roadmaps/recommended',
       name: 'OverviewAssignment',
       component: OverviewAssignment,
       meta: { requiresAuth: true }
@@ -587,7 +587,7 @@ const router = createRouter({
 
     // Roadmap v0
     {
-      path: "/overview",
+      path: "/roadmaps/recommended",
       name: "overview",
       component: RoadmapOverview,
     },

@@ -172,6 +172,7 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  margin-left: 100px;
 }
 
 .roadmap-content {
