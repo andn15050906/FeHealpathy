@@ -1,265 +1,171 @@
 <template>
-  <div class="container-fluid py-4">
-    <div class="bg-dark text-white py-4 mb-4">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 mb-4 mb-md-0">
-            <div class="course-thumbnail position-relative">
-              <img v-if="course.thumbnail ?? course.thumbUrl" :src="course.thumbnail ?? course.thumbUrl" :alt="course.title" class="img-fluid rounded" />
-              <div v-else class="bg-secondary d-flex align-items-center justify-content-center rounded"
-                style="height: 220px">
-                <ImageIcon class="icon text-light" style="width: 64px; height: 64px" />
-              </div>
-            </div>
-          </div>
+  <div class="container-fluid" style="margin-top: 80px">
+    <div v-if="loading" class="d-flex justify-content-center align-items-center" style="height: 400px">
+      <LoadingSpinner />
+    </div>
 
-          <div class="col-md-8">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <button @click="goBack" class="btn btn-link text-light p-0">
-                <ArrowLeftIcon class="icon" style="width: 20px; height: 20px" />
-              </button>
-              <span class="badge bg-primary">
-                {{ course.category }}
-              </span>
-            </div>
-
-            <h1 class="h2 fw-bold mb-3">
-              {{ course.title }}
-            </h1>
-
-            <p class="text-light mb-4">{{ course.description }}</p>
-
-            <div class="row mb-4">
-              <div class="col-6 col-sm-3 mb-3 mb-sm-0">
-                <p class="text-light-50 small mb-1">Giảng viên</p>
-                <p class="mb-0 fw-medium">{{ course.instructor }}</p>
-              </div>
-              <div class="col-6 col-sm-3 mb-3 mb-sm-0">
-                <p class="text-light-50 small mb-1">Thời lượng</p>
-                <p class="mb-0 fw-medium">{{ course.duration }} giờ</p>
-              </div>
-              <div class="col-6 col-sm-3">
-                <p class="text-light-50 small mb-1">Trình độ</p>
-                <p class="mb-0 fw-medium text-capitalize">{{ course.level }}</p>
-              </div>
-              <div class="col-6 col-sm-3">
-                <p class="text-light-50 small mb-1">Cập nhật lần cuối</p>
-                <p class="mb-0 fw-medium">
-                  {{ formatDate(course.lastUpdated) }}
-                </p>
-              </div>
-            </div>
-
-            <div class="d-flex flex-wrap gap-4">
-              <div class="d-flex align-items-center">
-                <div class="d-flex">
-                  <StarIcon v-for="i in 5" :key="i" style="width: 20px; height: 20px"
-                    :class="[i <= Math.round(course.rating) ? 'icon text-warning' : 'icon text-secondary']" />
+    <div v-else>
+      <div class="bg-dark text-white py-4 mb-4">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+              <div class="course-thumbnail position-relative rounded overflow-hidden">
+                <img v-if="course.thumbUrl" :src="course.thumbUrl" :alt="course.title" class="img-fluid w-100" />
+                <div v-else class="bg-secondary d-flex align-items-center justify-content-center" style="height: 220px">
+                  <div class="icon-circle bg-dark-subtle">
+                    <LucideImageIcon />
+                  </div>
                 </div>
-                <span class="ms-2 text-light">
-                  {{ course.rating }} ({{ course.reviewCount }} đánh giá)
+              </div>
+            </div>
+
+            <div class="col-md-8">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <button @click="goBack" class="btn btn-icon rounded-circle bg-dark-subtle border-0">
+                  <LucideArrowLeftIcon />
+                </button>
+                <span class="badge bg-success rounded-pill px-3 py-3">
+                  {{ course.category }}
                 </span>
               </div>
 
-              <div class="d-flex align-items-center">
-                <UsersIcon class="icon text-light-50 me-2" style="width: 20px; height: 20px" />
-                <span>{{ course.students }} học viên</span>
+              <h1 class="h2 fw-bold mb-3">{{ course.title }}</h1>
+              <p class="text-light mb-4">{{ course.description }}</p>
+
+              <div class="row mb-4">
+                <div class="col-6 col-sm-3 mb-3 mb-sm-0">
+                  <p class="text-light-50 small mb-1">Giảng viên</p>
+                  <p class="mb-0 fw-medium">{{ course.instructor }}</p>
+                </div>
+                <div class="col-6 col-sm-3 mb-3 mb-sm-0">
+                  <p class="text-light-50 small mb-1">Thời lượng</p>
+                  <p class="mb-0 fw-medium">{{ course.duration }} giờ</p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="text-light-50 small mb-1">Trình độ</p>
+                  <p class="mb-0 fw-medium text-capitalize">{{ course.level }}</p>
+                </div>
+                <div class="col-6 col-sm-3">
+                  <p class="text-light-50 small mb-1">Cập nhật lần cuối</p>
+                  <p class="mb-0 fw-medium">
+                    {{ formatDate(course.lastUpdated) }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-4">
+                <div class="d-flex align-items-center">
+                  <div class="d-flex">
+                    <LucideStarIcon v-for="i in 5" :key="i" :class="i <= Math.round(course.rating)
+                      ? 'text-warning'
+                      : 'text-secondary'
+                      " />
+                  </div>
+                  <span class="ms-2 text-light">
+                    {{ course.rating }} ({{ course.reviewCount }} đánh giá)
+                  </span>
+                </div>
+
+                <div class="d-flex align-items-center">
+                  <div class="me-2">
+                    <LucideUsersIcon />
+                  </div>
+                  <span>{{ course.students }} học viên</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 mb-4 mb-lg-0">
-          <div v-if="course.enrolled" class="card shadow-sm mb-4">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3 class="h6 fw-bold mb-0">Tiến trình của bạn</h3>
-                <span class="text-muted">{{ course.progress }}% hoàn thành</span>
-              </div>
-              <div class="progress" style="height: 10px">
-                <div class="progress-bar bg-primary" role="progressbar" :style="{ width: `${course.progress}%` }"
-                  :aria-valuenow="course.progress" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-              <div class="mt-3 d-flex justify-content-between">
-                <span class="small text-muted">
-                  {{ completedLectures }} / {{ course.lectures?.length ?? 0 }} bài giảng hoàn thành
-                </span>
-                <span v-if="course.hasCertificate" class="small text-muted">
-                  <AwardIcon class="icon me-1" style="width: 16px; height: 16px" />
-                  Có chứng chỉ sau khi hoàn thành
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white">
-              <h2 class="h5 fw-bold mb-0">Nội dung khóa học</h2>
-              <p class="text-muted small mb-0">
-                {{ course.lectures?.length ?? 0  }} bài giảng • {{ course.duration }} giờ tổng
-              </p>
-            </div>
-
-            <div class="list-group list-group-flush">
-              <div v-for="(lecture, lectureIndex) in course.lectures" :key="lecture.id"
-                class="list-group-item d-flex align-items-center hover-bg-light">
-                <div class="me-3">
-                  <CheckCircleIcon v-if="lecture.completed" class="icon text-success"
-                    style="width: 20px; height: 20px" />
-                  <CircleIcon v-else class="icon text-muted" style="width: 20px; height: 20px" />
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mb-4 mb-lg-0">
+            <div v-if="course.enrolled" class="card shadow-hover mb-4">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h3 class="h6 fw-bold mb-0">Tiến trình của bạn</h3>
+                  <span class="text-muted">{{ course.progress }}% hoàn thành</span>
                 </div>
-
-                <div class="flex-1">
-                  <div class="d-flex align-items-center">
-                    <component :is="getLectureIcon(lecture.type)" class="icon text-muted me-2"
-                      style="width: 16px; height: 16px" />
-                    <span class="text-dark lecture-link" @click="navigateToLecture(lecture.id)">
-                      {{ lecture.title }}
-                    </span>
-                  </div>
-                  <p v-if="lecture.description" class="small text-muted mt-1 mb-0">
-                    {{ lecture.description }}
-                  </p>
+                <div class="progress" style="height: 10px">
+                  <div class="progress-bar bg-primary" role="progressbar" :style="{ width: `${course.progress}%` }" />
                 </div>
-
-                <div class="d-flex align-items-center">
-                  <span v-if="lecture.preview" class="badge bg-primary me-3">
-                    Xem trước
+                <div class="mt-3 d-flex justify-content-between">
+                  <span class="small text-muted">
+                    {{ completedLectures }} / {{ course.lectures.length }} bài
+                    giảng hoàn thành
                   </span>
-                  <span class="small text-muted">{{ lecture.duration }} phút</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex flex-column flex-sm-row justify-content-between gap-3">
-              <h2 class="h5 fw-bold mb-0">Đánh giá của học viên</h2>
-              <div class="d-flex align-items-center">
-                <span class="me-2 small text-muted">Sắp xếp theo:</span>
-                <select v-model="reviewSortOption" class="form-select form-select-sm">
-                  <option value="recent">Mới nhất</option>
-                  <option value="highest">Đánh giá cao</option>
-                  <option value="lowest">Đánh giá thấp</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="card-body border-bottom">
-              <div class="row">
-                <div class="col-md-4 text-center mb-4 mb-md-0">
-                  <div class="display-4 fw-bold text-dark mb-2">{{ course.rating }}</div>
-                  <div class="d-flex justify-content-center mb-1">
-                    <StarIcon v-for="i in 5" :key="i" style="width: 20px; height: 20px"
-                      :class="[i <= Math.round(course.rating) ? 'icon text-warning' : 'icon text-muted']" />
-                  </div>
-                  <div class="small text-muted">{{ course.reviewCount }} đánh giá</div>
-                </div>
-
-                <div class="col-md-8">
-                  <div v-for="i in 5" :key="i" class="d-flex align-items-center mb-2">
-                    <div class="small text-muted w-8">{{ 6 - i }}</div>
-                    <div class="flex-1 mx-2">
-                      <div class="progress" style="height: 8px">
-                        <div class="progress-bar bg-warning" role="progressbar"
-                          :style="{ width: `${getRatingPercentage(6 - i)}%` }"
-                          :aria-valuenow="getRatingPercentage(6 - i)" aria-valuemin="0" aria-valuemax="100"></div>
+                  <span v-if="course.hasCertificate" class="small text-muted">
+                    <div class="d-inline-flex align-items-center">
+                      <div class="icon-circle bg-light me-1">
+                        <LucideAwardIcon />
                       </div>
+                      Có chứng chỉ sau khi hoàn thành
                     </div>
-                    <div class="small text-muted w-8">{{ getRatingCount(6 - i) }}</div>
-                  </div>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div v-if="(sortedReviews ?? []).length === 0" class="card-body text-center py-5">
-              <MessageSquareIcon class="icon text-muted mb-3" style="width: 48px; height: 48px" />
-              <p class="text-muted mb-4">Chưa có đánh giá</p>
-              <button v-if="course.enrolled" @click="showReviewForm = true" class="btn btn-dark">
-                Viết đánh giá
-              </button>
-            </div>
-
-            <div v-else>
-              <div v-if="showReviewForm" class="p-4 border-bottom bg-light">
-                <h3 class="h6 fw-bold mb-3">Viết đánh giá</h3>
-                <div class="mb-3">
-                  <label class="form-label small fw-medium">Điểm</label>
-                  <div class="d-flex">
-                    <StarIcon v-for="i in 5" :key="i" @click="newReview.rating = i" style="width: 24px; height: 24px"
-                      :class="['icon cursor-pointer', i <= newReview.rating ? 'text-warning' : 'text-muted']" />
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small fw-medium">Nội dung</label>
-                  <textarea v-model="newReview.content" rows="4" class="form-control"
-                    placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
-                </div>
-                <div class="d-flex justify-content-end gap-2">
-                  <button @click="showReviewForm = false" class="btn btn-light">Hủy</button>
-                  <button @click="submitReview" class="btn btn-dark">Gửi đánh giá</button>
-                </div>
+            <div class="card shadow-hover mb-4">
+              <div class="card-header bg-white py-3">
+                <h2 class="h5 fw-bold mb-1">Nội dung khóa học</h2>
+                <p class="text-muted small mb-0">
+                  {{ course.lectures.length }} bài giảng •
+                  {{ course.duration }} giờ tổng
+                </p>
               </div>
 
               <div class="list-group list-group-flush">
-                <div v-for="(review, index) in sortedReviews" :key="index" class="list-group-item p-4">
-                  <div class="d-flex justify-content-between mb-2">
-                    <div class="d-flex">
-                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3"
-                        style="width: 40px; height: 40px">
-                        <UserIcon class="icon text-muted" style="width: 20px; height: 20px" />
-                      </div>
-                      <div>
-                        <div class="fw-medium text-dark">{{ review.userName }}</div>
-                        <div class="small text-muted">{{ formatDate(review.date) }}</div>
-                      </div>
-                    </div>
-                    <div class="d-flex">
-                      <StarIcon v-for="i in 5" :key="i" style="width: 16px; height: 16px"
-                        :class="['icon', i <= review.rating ? 'text-warning' : 'text-muted']" />
-                    </div>
+                <div v-for="lecture in course.lectures" :key="lecture.id"
+                  class="list-group-item d-flex align-items-center p-3 hover-bg-light cursor-pointer"
+                  @click="navigateToLecture(lecture.id)">
+                  <div class="me-3">
+                    <component :is="lecture.completed
+                      ? LucideCheckCircleIcon
+                      : LucideCircleIcon
+                      " />
                   </div>
-                  <p class="text-dark mb-0">{{ review.content }}</p>
+                  <div class="flex-1">
+                    <div class="d-flex align-items-center">
+                      <div class="icon-circle bg-light me-2">
+                        <component :is="getLectureIcon(lecture.type)" />
+                      </div>
+                      <span class="text-dark fw-medium">
+                        {{ lecture.title }}
+                      </span>
+                    </div>
+                    <p v-if="lecture.description" class="small text-muted mt-1 mb-0">
+                      {{ lecture.description }}
+                    </p>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span v-if="lecture.preview" class="badge bg-primary rounded-pill me-3">Xem trước</span>
+                    <span class="small text-muted">{{ lecture.duration }} phút</span>
+                  </div>
                 </div>
-              </div>
-
-              <!-- Phân trang -->
-              <div v-if="sortedReviews.length > 5" class="card-footer d-flex justify-content-center">
-                <nav aria-label="Phân trang đánh giá">
-                  <ul class="pagination mb-0">
-                    <li class="page-item"><a class="page-link" href="#" aria-label="Trước">&laquo;</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#" aria-label="Tiếp">&raquo;</a></li>
-                  </ul>
-                </nav>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-lg-4">
-          <div class="card shadow-sm sticky-top" style="top: 20px">
-            <div class="card-body">
-              <h3 class="h6 fw-bold mb-3">Chia sẻ khóa học:</h3>
-              <div class="d-flex gap-2">
-                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
-                  <FacebookIcon class="icon text-primary" style="width: 20px; height: 20px" />
-                </button>
-                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
-                  <TwitterIcon class="icon text-info" style="width: 20px; height: 20px" />
-                </button>
-                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
-                  <LinkedinIcon class="icon text-primary" style="width: 20px; height: 20px" />
-                </button>
-                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
-                  <MailIcon class="icon text-dark" style="width: 20px; height: 20px" />
-                </button>
+          <div class="col-lg-4">
+            <div class="card shadow-hover sticky-top" style="top: 20px">
+              <div class="card-body p-4">
+                <h3 class="h6 fw-bold mb-3">Chia sẻ khóa học:</h3>
+                <div class="d-flex gap-2">
+                  <button class="btn-icon social-icon">
+                    <LucideFacebookIcon />
+                  </button>
+                  <button class="btn-icon social-icon">
+                    <LucideTwitterIcon />
+                  </button>
+                  <button class="btn-icon social-icon">
+                    <LucideLinkedinIcon />
+                  </button>
+                  <button class="btn-icon social-icon">
+                    <LucideMailIcon />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -269,319 +175,154 @@
   </div>
 </template>
 
-
 <script>
 import { ref, computed, onBeforeMount } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import {
+  ArrowLeft as LucideArrowLeftIcon,
+  Image as LucideImageIcon,
+  Star as LucideStarIcon,
+  Users as LucideUsersIcon,
+  CheckCircle as LucideCheckCircleIcon,
+  Circle as LucideCircleIcon,
+  Award as LucideAwardIcon,
+  Video as LucideVideoIcon,
+  FileText as LucideFileTextIcon,
+  Film as LucideFilmIcon,
+  File as LucideFileIcon,
+  Facebook as LucideFacebookIcon,
+  Twitter as LucideTwitterIcon,
+  Linkedin as LucideLinkedinIcon,
+  Mail as LucideMailIcon,
+} from "lucide-vue-next";
 import { getCourseById } from "@/scripts/api/services/courseService";
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
 import { getLectures } from "@/scripts/api/services/lectureService";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 import { getUserProfile } from "@/scripts/api/services/authService";
-import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
 import { getUserById } from "@/scripts/api/services/userService";
+import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
 import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
-import { getRecommendationCourses } from "@/scripts/api/services/courseService";
-import { Swiper, SwiperSlide } from "swiper/vue";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import {
-  ArrowLeftIcon,
-  ImageIcon,
-  StarIcon,
-  UsersIcon,
-  CheckCircleIcon,
-  CircleIcon,
-  MessageSquareIcon,
-  UserIcon,
-  FacebookIcon,
-  TwitterIcon,
-  LinkedinIcon,
-  MailIcon,
-  AwardIcon,
-} from "lucide-vue-next";
 
 export default {
   name: "CourseDetail",
   components: {
     LoadingSpinner,
-    Swiper,
-    SwiperSlide,
+    LucideArrowLeftIcon,
+    LucideImageIcon,
+    LucideStarIcon,
+    LucideUsersIcon,
+    LucideCheckCircleIcon,
+    LucideCircleIcon,
+    LucideAwardIcon,
+    LucideVideoIcon,
+    LucideFileTextIcon,
+    LucideFilmIcon,
+    LucideFileIcon,
+    LucideFacebookIcon,
+    LucideTwitterIcon,
+    LucideLinkedinIcon,
+    LucideMailIcon,
   },
   setup() {
     const router = useRouter();
     const route = useRoute();
     const courseId = route.params.id;
-    const course = ref(null);
-    const instructorName = ref("Đang tải...");
-    const lectures = ref([]);
-    const isLoadingCourse = ref(true);
-    const isLoadingLectures = ref(true);
-    const isEnrolled = ref(false);
-    const isLoadingEnrollment = ref(true);
-    const isOwner = ref(false);
-    const currentUser = ref(null);
-    const recommendedCourses = ref([]);
-    const isLoadingRecommendations = ref(false);
-    const swiperModules = [Navigation, Pagination];
-
-    const getCurrentUserInfo = () => {
-      try {
-        currentUser.value = getUserProfile();
-      } catch (error) {
-        currentUser.value = null;
-      }
-    };
-
-    const fetchCourseInfo = async () => {
-      isLoadingCourse.value = true;
-      try {
-        const courseData = await getCourseById(courseId);
-        console.log(1);
-        if (courseData) {
-          course.value = {
-            id: courseData.id,
-            title: courseData.title,
-            thumbUrl: courseData.thumbUrl,
-            intro: courseData.intro,
-            description: courseData.description,
-            price: courseData.price,
-            discount: courseData.discount,
-            learnerCount: courseData.learnerCount,
-            ratingCount: courseData.ratingCount,
-            totalRating: courseData.totalRating,
-            outcomes: courseData.outcomes || "Thông tin đang được cập nhật.",
-            requirements:
-              courseData.requirements || "Thông tin đang được cập nhật.",
-            creatorId: courseData.creatorId,
-          };
-          if (courseData.creatorId) {
-            try {
-              const instructorData = await getUserById(courseData.creatorId);
-              instructorName.value =
-                instructorData?.fullName || instructorData?.name || "Không rõ";
-            } catch (userError) {
-              instructorName.value = "Không rõ";
-            }
-          } else {
-            instructorName.value = "Không rõ";
-          }
-          if (currentUser.value && course.value) {
-            isOwner.value = course.value.creatorId === currentUser.value.id;
-          }
-          return true;
-        } else {
-          isOwner.value = false;
-          return false;
-        }
-      } catch (error) {
-        isOwner.value = false;
-        return false;
-      } finally {
-        isLoadingCourse.value = false;
-      }
-    };
-
-    const fetchLectures = async () => {
-      if (!courseId) return;
-      isLoadingLectures.value = true;
-      try {
-        const response = await getLectures(courseId);
-        const lectureList = response?.items || [];
-        lectures.value = lectureList.map((lecture) => {
-          const firstImageMaterial = lecture.materials?.find(
-            (material) => material.type === 1
-          );
-          return {
-            ...lecture,
-            firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null,
-          };
-        });
-      } catch (error) {
-        lectures.value = [];
-      } finally {
-        isLoadingLectures.value = false;
-      }
-    };
-
-    const checkEnrollmentStatus = async () => {
-      if (!courseId) return;
-      isLoadingEnrollment.value = true;
-      try {
-        const response = await getEnrollments({ pageSize: 100 });
-
-        if (response && response.items) {
-          const enrolled = response.items.some(
-            (enrollment) => enrollment.courseId === courseId
-          );
-          isEnrolled.value = enrolled;
-        } else {
-          isEnrolled.value = false;
-        }
-      } catch (error) {
-        isEnrolled.value = false;
-      } finally {
-        isLoadingEnrollment.value = false;
-      }
-    };
-
-    const fetchRecommendedCourses = async () => {
-      if (!courseId) return;
-      isLoadingRecommendations.value = true;
-      try {
-        const response = await getRecommendationCourses();
-        recommendedCourses.value = response || [];
-        recommendedCourses.value = recommendedCourses.value.filter(
-          (c) => c.id !== courseId
-        );
-      } catch (error) {
-        recommendedCourses.value = [];
-      } finally {
-        isLoadingRecommendations.value = false;
-      }
-    };
-
-    const isLoading = computed(
-      () =>
-        isLoadingCourse.value ||
-        isLoadingLectures.value ||
-        isLoadingEnrollment.value
+    const course = ref({ lectures: [] });
+    const loading = ref(true);
+    const completedLectures = computed(
+      () => course.value.lectures.filter((l) => l.completed).length
     );
 
-    const discountedPrice = computed(() => {
-      if (!course.value) return 0;
-      const discount = Number(course.value.discount) || 0;
-      const price = Number(course.value.price) || 0;
-      return Math.floor(discount > 0 ? price * (1 - discount) : price);
-    });
+    const goBack = () => router.back();
 
-    const averageRating = computed(() => {
-      if (!course.value || !course.value.ratingCount) return "N/A";
-      return (course.value.totalRating / course.value.ratingCount).toFixed(1);
-    });
+    const navigateToLecture = (lectureId) => {
+      router.push(`/courses/${courseId}/lectures/${lectureId}`);
+    };
 
-    const handlePurchase = async () => {
-      if (!course.value?.id) {
-        toast.error("Không xác định được khóa học");
-        return;
-      }
+    const fetchData = async () => {
+      loading.value = true;
       try {
-        const data = await purchaseCourse(course.value.id);
-        if (!data?.url) {
-          toast.error("Không nhận được URL thanh toán");
-          return;
-        }
-        window.location.href = data.url;
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message ||
-          "Có lỗi xảy ra khi tiến hành thanh toán"
+        const currentUser = getUserProfile();
+        const data = await getCourseById(courseId);
+        const instructorInfo = await getUserById(data.creatorId);
+        const lectureRes = await getLectures(courseId);
+        const enrollmentRes = await getEnrollments({ pageSize: 100 });
+
+        const isEnrolled = enrollmentRes.items.some(
+          (e) => e.courseId === courseId
         );
+        const progress = isEnrolled ? Math.floor(Math.random() * 100) : 0;
+
+        course.value = {
+          id: data.id,
+          title: data.title,
+          thumbUrl: data.thumbnail || data.thumbUrl,
+          description: data.description,
+          price: data.price,
+          discount: data.discount,
+          reviewCount: data.ratingCount || 0,
+          rating: data.totalRating / (data.ratingCount || 1) || 0,
+          duration: data.duration || 0,
+          category: data.category || "Chưa phân loại",
+          level: data.level || "cơ bản",
+          lastUpdated: data.lastUpdated || new Date().toISOString(),
+          students: data.learnerCount || 0,
+          hasCertificate: data.hasCertificate,
+          enrolled: isEnrolled,
+          progress: progress,
+          lectures: lectureRes.items.map((l) => ({
+            ...l,
+            duration: l.duration || 0,
+            completed: isEnrolled && Math.random() > 0.5,
+            preview: Boolean(l.isPreview),
+            description: l.description || "",
+          })),
+          instructor:
+            instructorInfo.fullName || instructorInfo.name || "Không rõ",
+        };
+      } catch (error) {
+        toast.error("Không thể tải dữ liệu khóa học");
+        console.error("Error fetching course data:", error);
+      } finally {
+        loading.value = false;
       }
     };
 
-    const viewLecture = (lectureId) => {
-      if (!lectureId) {
-        return;
-      }
-
-      router.push({
-        name: "lectureDetail",
-        params: { id: lectureId },
-        query: { courseId: course.value.id },
-      });
-    };
-
-    const navigateToCourse = (id) => {
-      if (id === courseId) return;
-
-      router.push({
-        name: "courseDetail",
-        params: { id: id },
-      });
-    };
-
-    const formatDiscountPrice = (course) => {
-      if (!course) return "";
-      const discount = Number(course.discount) || 0;
-      const price = Number(course.price) || 0;
-      const finalPrice = Math.floor(
-        discount > 0 ? price * (1 - discount) : price
-      );
-
-      return finalPrice === 0
-        ? "Miễn phí"
-        : `${finalPrice.toLocaleString("vi-VN")} VND`;
-    };
-
-    const getRatingPercentage = (rating) => {
-      return rating / 5 * 100;
-    }
-
-    onBeforeMount(async () => {
-      getCurrentUserInfo();
-
-      await Promise.all([
-        fetchCourseInfo(),
-        fetchLectures(),
-        checkEnrollmentStatus(),
-      ]);
-
-      await fetchRecommendedCourses();
-    });
-
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString("vi-VN", {
+    const formatDate = (date) =>
+      new Date(date).toLocaleDateString("vi-VN", {
         year: "numeric",
         month: "long",
         day: "numeric",
-        timeZone: "UTC",
       });
+
+    const getLectureIcon = (type) => {
+      const map = {
+        0: LucideFileTextIcon,
+        1: LucideVideoIcon,
+        2: LucideFilmIcon,
+      };
+      return map[type] || LucideFileIcon;
     };
 
-    const getRatingCount = (rating) => {
-      return rating;
-    }
+    onBeforeMount(fetchData);
 
     return {
-      isLoading,
-      isLoadingCourse,
-      isLoadingLectures,
-      isLoadingEnrollment,
-      isEnrolled,
-      isOwner,
       course,
-      lectures,
-      instructorName,
-      discountedPrice,
-      averageRating,
-      viewLecture,
-      handlePurchase,
-      recommendedCourses,
-      navigateToCourse,
-      formatDiscountPrice,
-      getRatingPercentage,
-      swiperModules,
+      loading,
+      completedLectures,
+      goBack,
       formatDate,
-      getRatingCount
+      getLectureIcon,
+      navigateToLecture,
+      LucideCheckCircleIcon,
+      LucideCircleIcon,
     };
   },
 };
 </script>
 
 <style scoped>
-.icon {
-  width: 16px;
-  height: 16px;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
 .flex-1 {
   flex: 1;
 }
@@ -590,44 +331,74 @@ export default {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.hover-bg-light:hover {
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background-color: #f8f9fa;
 }
 
-.lecture-link {
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.social-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
   cursor: pointer;
-  text-decoration: none;
 }
 
-.lecture-link:hover {
-  color: #0d6efd !important;
-  text-decoration: underline;
-}
-
-.w-8 {
-  width: 32px;
+.social-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card {
   border: none;
-  transition: box-shadow 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
 }
 
-.card:hover {
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.shadow-sm {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+.shadow-hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.sticky-top {
-  z-index: 1020;
+.hover-bg-light:hover {
+  background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.rounded-pill {
+  border-radius: 50rem;
 }
 </style>
