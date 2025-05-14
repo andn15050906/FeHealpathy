@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-md-4 mb-4 mb-md-0">
             <div class="course-thumbnail position-relative">
-              <img v-if="course.thumbnail" :src="course.thumbnail" :alt="course.title" class="img-fluid rounded" />
+              <img v-if="course.thumbnail ?? course.thumbUrl" :src="course.thumbnail ?? course.thumbUrl" :alt="course.title" class="img-fluid rounded" />
               <div v-else class="bg-secondary d-flex align-items-center justify-content-center rounded"
                 style="height: 220px">
                 <ImageIcon class="icon text-light" style="width: 64px; height: 64px" />
@@ -86,7 +86,7 @@
               </div>
               <div class="mt-3 d-flex justify-content-between">
                 <span class="small text-muted">
-                  {{ completedLectures }} / {{ course.lectures.length }} bài giảng hoàn thành
+                  {{ completedLectures }} / {{ course.lectures?.length ?? 0 }} bài giảng hoàn thành
                 </span>
                 <span v-if="course.hasCertificate" class="small text-muted">
                   <AwardIcon class="icon me-1" style="width: 16px; height: 16px" />
@@ -100,7 +100,7 @@
             <div class="card-header bg-white">
               <h2 class="h5 fw-bold mb-0">Nội dung khóa học</h2>
               <p class="text-muted small mb-0">
-                {{ course.lectures.length }} bài giảng • {{ course.duration }} giờ tổng
+                {{ course.lectures?.length ?? 0  }} bài giảng • {{ course.duration }} giờ tổng
               </p>
             </div>
 
@@ -176,7 +176,7 @@
               </div>
             </div>
 
-            <div v-if="sortedReviews.length === 0" class="card-body text-center py-5">
+            <div v-if="(sortedReviews ?? []).length === 0" class="card-body text-center py-5">
               <MessageSquareIcon class="icon text-muted mb-3" style="width: 48px; height: 48px" />
               <p class="text-muted mb-4">Chưa có đánh giá</p>
               <button v-if="course.enrolled" @click="showReviewForm = true" class="btn btn-dark">
@@ -271,7 +271,7 @@
 
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { getCourseById } from "@/scripts/api/services/courseService";
 import { purchaseCourse } from "@/scripts/api/services/paymentService";
@@ -340,6 +340,7 @@ export default {
       isLoadingCourse.value = true;
       try {
         const courseData = await getCourseById(courseId);
+        console.log(1);
         if (courseData) {
           course.value = {
             id: courseData.id,
@@ -516,7 +517,11 @@ export default {
         : `${finalPrice.toLocaleString("vi-VN")} VND`;
     };
 
-    onMounted(async () => {
+    const getRatingPercentage = (rating) => {
+      return rating / 5 * 100;
+    }
+
+    onBeforeMount(async () => {
       getCurrentUserInfo();
 
       await Promise.all([
@@ -537,6 +542,10 @@ export default {
       });
     };
 
+    const getRatingCount = (rating) => {
+      return rating;
+    }
+
     return {
       isLoading,
       isLoadingCourse,
@@ -554,8 +563,10 @@ export default {
       recommendedCourses,
       navigateToCourse,
       formatDiscountPrice,
+      getRatingPercentage,
       swiperModules,
       formatDate,
+      getRatingCount
     };
   },
 };
