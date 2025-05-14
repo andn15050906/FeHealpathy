@@ -2,26 +2,13 @@
   <div class="roadmap-container">
     <div class="roadmap-content">
       <v-container fluid class="pt-16">
-        <v-btn
-          variant="text"
-          color="primary"
-          class="mb-4"
-          prepend-icon="mdi-arrow-left"
-          @click="$router.push('/roadmaps/recommended')"
-        >
+        <v-btn variant="text" color="primary" class="mb-4" prepend-icon="mdi-arrow-left"
+          @click="$router.push('/roadmaps/recommended')">
           Quay lại danh sách lộ trình
         </v-btn>
 
-        <div
-          v-if="loading"
-          class="d-flex justify-center align-center"
-          style="height: 400px"
-        >
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            size="64"
-          ></v-progress-circular>
+        <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
+          <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
         </div>
 
         <div v-else-if="roadmap">
@@ -31,41 +18,24 @@
 
           <v-card class="mb-6">
             <v-card-title class="d-flex align-center">
-              <v-icon color="primary" class="mr-2"
-                >mdi-information-outline</v-icon
-              >
+              <v-icon color="primary" class="mr-2">mdi-information-outline</v-icon>
               Giới thiệu
             </v-card-title>
             <v-card-text>
-              <div
-                v-for="(text, index) in roadmap.introText"
-                :key="index"
-                class="mb-2"
-              >
+              <div v-for="(text, index) in roadmap.introText" :key="index" class="mb-2">
                 <p>{{ text }}</p>
               </div>
 
               <v-alert color="warning" variant="tonal" class="mt-4">
                 <div class="d-flex align-center mb-2">
-                  <v-icon color="warning" class="mr-2"
-                    >mdi-information-outline</v-icon
-                  >
-                  <span
-                    class="font-weight-bold"
-                    style="color: #ff9800; font-size: large"
-                    >Lưu ý quan trọng</span
-                  >
+                  <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
+                  <span class="font-weight-bold" style="color: #ff9800; font-size: large;">Lưu ý quan trọng</span>
                 </div>
                 <p>
-                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp
-                  hội chuyên môn, đặc biệt là
-                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một
-                  trong những liệu pháp tâm lý hiệu quả nhất.
-                  <a
-                    href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/"
-                    target="_blank"
-                    class="text-primary text-decoration-none"
-                  >
+                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là
+                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
+                  <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank"
+                    class="text-primary text-decoration-none">
                     Tìm hiểu thêm
                   </a>
                   .
@@ -74,67 +44,45 @@
             </v-card-text>
           </v-card>
 
-          <h2 class="text-h5 mb-4">Các bước trong lộ trình</h2>
+          <h2 class="text-h5 mb-4">Các phase trong lộ trình</h2>
           <div class="mb-6">
             <v-timeline align="start">
-              <v-timeline-item
-                v-for="(step, index) in roadmap.steps"
-                :key="step.id"
-                :dot-color="getStepColor(step)"
-                size="small"
-              >
+              <v-timeline-item v-for="(phase, index) in roadmap.phases" :key="phase.id"
+                :dot-color="getPhaseColor(phase)" size="small">
                 <template v-slot:opposite>
-                  <div class="text-caption">Bước {{ index + 1 }}</div>
+                  <div class="text-caption">Phase {{ index + 1 }}</div>
                 </template>
-                <v-card
-                  :class="{
-                    'border-primary': step.current,
-                    'bg-success-subtle': step.completed,
-                  }"
-                >
+                <v-card :class="{
+                  'border-primary': phase.current,
+                  'bg-success-subtle': phase.completed,
+                }">
                   <v-card-title class="d-flex align-center">
-                    {{ step.title }}
-                    <v-chip
-                      v-if="step.current"
-                      color="primary"
-                      size="small"
-                      class="ml-2"
-                    >
+                    {{ phase.title }}
+                    <v-chip v-if="phase.current" color="primary" size="small" class="ml-2">
                       Hiện tại
                     </v-chip>
-                    <v-chip
-                      v-if="step.completed"
-                      color="success"
-                      size="small"
-                      class="ml-2"
-                    >
+                    <v-chip v-if="phase.completed" color="success" size="small" class="ml-2">
                       Hoàn thành
                     </v-chip>
                   </v-card-title>
                   <v-card-text>
-                    <p>{{ step.description }}</p>
-                    <div
-                      v-if="step.videoUrl"
-                      class="d-flex align-center mt-2 text-primary"
-                    >
+                    <p>{{ phase.description }}</p>
+                    <div v-if="phase.videoUrl" class="d-flex align-center mt-2 text-primary">
                       <v-icon size="small" class="mr-1">mdi-video</v-icon>
                       <span class="text-caption">Có hướng dẫn video</span>
                     </div>
                   </v-card-text>
                   <v-card-actions>
-                    <v-btn
-                      :color="step.current ? 'success' : undefined"
-                      :variant="step.current ? 'elevated' : 'outlined'"
-                      :disabled="!step.current && !step.completed"
-                      @click="goToStep(step.id)"
-                    >
-                      <v-icon v-if="step.current" start>mdi-play</v-icon>
+                    <v-btn :color="phase.current ? 'success' : undefined"
+                      :variant="phase.current ? 'elevated' : 'outlined'" :disabled="!phase.current && !phase.completed"
+                      @click="goToPhase(phase.id)">
+                      <v-icon v-if="phase.current" start>mdi-play</v-icon>
                       {{
-                        step.current
-                          ? "Bắt đầu bước này"
-                          : step.completed
-                          ? "Xem lại"
-                          : "Đã khóa"
+                        phase.current
+                          ? "Bắt đầu phase này"
+                          : phase.completed
+                            ? "Xem lại"
+                            : "Đã khóa"
                       }}
                     </v-btn>
                   </v-card-actions>
@@ -144,12 +92,7 @@
           </div>
 
           <div class="text-center mb-8">
-            <v-btn
-              size="large"
-              color="primary"
-              prepend-icon="mdi-play"
-              @click="startRoadmap"
-            >
+            <v-btn size="large" color="primary" prepend-icon="mdi-play" @click="startRoadmap">
               Bắt đầu lộ trình
             </v-btn>
           </div>
@@ -160,10 +103,9 @@
 </template>
 
 <script>
-import { roadmapSteps } from "@/scripts/data/roadmapData.js";
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { useEventBus } from "../../scripts/logic/evenBus";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useEventBus } from '@/scripts/logic/eventBus';
+import { useRoute, useRouter } from 'vue-router';
 
 export default {
   name: "RoadmapDetail",
@@ -183,80 +125,60 @@ export default {
       2: false,
       3: false,
       4: false,
-      5: false,
+      5: false
     });
 
-    // Cấu trúc của roadmap
-    const phaseStructure = {
-      1: {
-        // Phase 1
-        name: "Nhận thức và Hiểu biết",
-        steps: ["1"],
-        nextPhase: 2,
-      },
-      2: {
-        // Phase 2
-        name: "Giảm nhẹ tức thì",
-        steps: ["2"],
-        nextPhase: 3,
-      },
-      3: {
-        // Phase 3
-        name: "Ổn định tâm trí",
-        steps: ["3"],
-        nextPhase: 4,
-      },
-      4: {
-        // Phase 4
-        name: "Đối mặt với vấn đề",
-        steps: ["4"],
-        nextPhase: 5,
-      },
-      5: {
-        // Phase 5
-        name: "Đánh giá và Duy trì",
-        steps: ["5"],
-        nextPhase: null,
-      },
+    // Tạo key lưu trữ dựa trên ID lộ trình
+    const getStorageKey = () => `completedPhases_roadmap_${props.id}`;
+
+    // Lưu trạng thái hoàn thành của các phase vào localStorage
+    const saveCompletedPhases = () => {
+      localStorage.setItem(getStorageKey(), JSON.stringify(completedPhases.value));
     };
 
     // Khôi phục trạng thái hoàn thành của các phase từ localStorage
     const loadCompletedPhases = () => {
-      const savedPhases = localStorage.getItem("completedPhases");
+      const savedPhases = localStorage.getItem(getStorageKey());
       if (savedPhases) {
         completedPhases.value = JSON.parse(savedPhases);
+      } else {
+        // Reset về trạng thái mặc định nếu không có dữ liệu
+        resetCompletedPhases();
       }
     };
 
-    // Lưu trạng thái hoàn thành của các phase vào localStorage
-    const saveCompletedPhases = () => {
-      localStorage.setItem(
-        "completedPhases",
-        JSON.stringify(completedPhases.value)
-      );
+    // Reset trạng thái hoàn thành về mặc định
+    const resetCompletedPhases = () => {
+      completedPhases.value = {
+        1: false,
+        2: false,
+        3: false,
+        4: false,
+        5: false
+      };
     };
 
-    // Cập nhật trạng thái của các step trong roadmap
-    const updateStepStatus = () => {
-      if (!roadmap.value || !roadmap.value.steps) return;
+    // Cập nhật trạng thái của các phase trong roadmap
+    const updatePhaseStatus = () => {
+      if (!roadmap.value || !roadmap.value.phases) return;
 
       let foundCurrent = false;
 
-      for (const step of roadmap.value.steps) {
-        const phaseId = step.phaseId;
+      for (const phase of roadmap.value.phases) {
+        const phaseId = parseInt(phase.id);
 
-        // Nếu phase đã hoàn thành, đánh dấu step là đã hoàn thành
+        // Nếu phase đã hoàn thành, đánh dấu phase là đã hoàn thành
         if (completedPhases.value[phaseId]) {
-          step.completed = true;
-          step.current = false;
+          phase.completed = true;
+          phase.current = false;
         } else if (!foundCurrent) {
-          // Đánh dấu step đầu tiên chưa hoàn thành là current
-          step.current = true;
+          // Đánh dấu phase đầu tiên chưa hoàn thành là current
+          phase.current = true;
           foundCurrent = true;
         } else {
-          // Các step còn lại không phải current và chưa hoàn thành
-          step.current = false;
-          step.completed = false;
+          // Các phase còn lại không phải current và chưa hoàn thành
+          phase.current = false;
+          phase.completed = false;
         }
       }
     };
@@ -273,88 +195,88 @@ export default {
           introText: [
             "Lộ trình này được thiết kế dựa trên Liệu pháp Nhận thức Hành vi (CBT), một phương pháp đã được chứng minh hiệu quả trong điều trị lo âu.",
             "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-            "Mỗi bước trong lộ trình sẽ giúp bạn xây dựng các kỹ năng cần thiết để quản lý lo âu hiệu quả và cải thiện sức khỏe tinh thần tổng thể.",
+            "Mỗi phase trong lộ trình sẽ giúp bạn xây dựng các kỹ năng cần thiết để quản lý lo âu hiệu quả và cải thiện sức khỏe tinh thần tổng thể.",
           ],
-          steps: [
+          phases: [
             {
               id: "1",
               title: "Nhận diện vấn đề",
               description:
                 "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
-              videoUrl: "/videos/step1.mp4",
+              videoUrl: "/videos/phase1.mp4",
               completed: false,
               current: true,
-              phaseId: 1,
+              themeColor: "indigo"
             },
             {
               id: "2",
               title: "Giảm nhẹ tức thì",
               description:
-                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-              videoUrl: "/videos/step2.mp4",
+                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống kh��n cấp",
+              videoUrl: "/videos/phase2.mp4",
               completed: false,
               current: false,
-              phaseId: 2,
+              themeColor: "teal"
             },
             {
               id: "3",
               title: "Ổn định tâm trí",
               description:
                 "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-              videoUrl: "/videos/step3.mp4",
+              videoUrl: "/videos/phase3.mp4",
               completed: false,
               current: false,
-              phaseId: 3,
+              themeColor: "purple"
             },
             {
               id: "4",
               title: "Đối mặt với vấn đề",
               description:
                 "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-              videoUrl: "/videos/step4.mp4",
+              videoUrl: "/videos/phase4.mp4",
               completed: false,
               current: false,
-              phaseId: 4,
+              themeColor: "blue"
             },
             {
               id: "5",
               title: "Đánh giá & Duy trì",
               description:
                 "Đánh giá tiến độ và xây dựng kế hoạch duy trì lâu dài",
-              videoUrl: "/videos/step5.mp4",
+              videoUrl: "/videos/phase5.mp4",
               completed: false,
               current: false,
-              phaseId: 5,
+              themeColor: "green"
             },
           ],
         };
 
-        // Cập nhật trạng thái step dựa trên completedPhases
-        updateStepStatus();
+        // Cập nhật trạng thái phase dựa trên completedPhases
+        updatePhaseStatus();
 
         loading.value = false;
       }, 1000);
     };
 
-    const getStepColor = (step) => {
-      if (step.completed) {
+    const getPhaseColor = (phase) => {
+      if (phase.completed) {
         return "success";
       }
-      if (step.current) {
+      if (phase.current) {
         return "primary";
       }
       return "grey";
     };
 
     const startRoadmap = () => {
-      const currentStep = roadmap.value.steps.find((step) => step.current);
-      if (currentStep) {
-        goToStep(currentStep.id);
+      const currentPhase = roadmap.value.phases.find((phase) => phase.current);
+      if (currentPhase) {
+        goToPhase(currentPhase.id);
       }
     };
 
-    const goToStep = (stepId) => {
-      router.push(`/roadmap/${roadmap.value.id}/step/${stepId}`);
+    const goToPhase = (phaseId) => {
+      router.push(`/roadmap/${roadmap.value.id}/phase/${phaseId}`);
     };
 
     const goToSuggestion = () => {
@@ -370,10 +292,14 @@ export default {
     const eventBus = useEventBus();
 
     // Lắng nghe sự kiện cập nhật từ StepDetail
-    const handleUpdateRoadmapPhases = (phases) => {
-      completedPhases.value = phases;
-      saveCompletedPhases();
-      updateStepStatus();
+    const handleUpdateRoadmapPhases = (data) => {
+      // Chỉ cập nhật nếu sự kiện thuộc về lộ trình hiện tại
+      if (data.roadmapId === props.id) {
+        console.log(`Received update for roadmap ${data.roadmapId}:`, data.phases);
+        completedPhases.value = data.phases;
+        saveCompletedPhases();
+        updatePhaseStatus();
+      }
     };
 
     onMounted(() => {
@@ -381,26 +307,27 @@ export default {
       fetchRoadmap();
 
       // Đăng ký lắng nghe sự kiện
-      eventBus.on("update-roadmap-phases", handleUpdateRoadmapPhases);
+      eventBus.on('update-roadmap-phases', handleUpdateRoadmapPhases);
+      console.log(`RoadmapDetail mounted for roadmap ${props.id}, eventBus listener registered`);
     });
 
     onBeforeUnmount(() => {
       // Hủy đăng ký sự kiện
-      eventBus.off("update-roadmap-phases", handleUpdateRoadmapPhases);
+      eventBus.off('update-roadmap-phases', handleUpdateRoadmapPhases);
+      console.log(`RoadmapDetail unmounted for roadmap ${props.id}, eventBus listener removed`);
     });
 
     return {
       loading,
       roadmap,
       completedPhases,
-      phaseStructure,
-      getStepColor,
+      getPhaseColor,
       startRoadmap,
-      goToStep,
+      goToPhase,
       goToSuggestion,
-      updateStatus,
+      updateStatus
     };
-  },
+  }
 };
 </script>
 
@@ -413,7 +340,7 @@ export default {
 .roadmap-content {
   flex: 1;
   width: 100%;
-  padding: 0 40px; /* Thêm padding để nội dung không sát cạnh */
+  padding: 0 40px;
 }
 
 .border-primary {
