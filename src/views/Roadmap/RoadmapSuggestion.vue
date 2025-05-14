@@ -391,6 +391,12 @@ export default {
           description: "Học cách nhận biết và vượt qua các triệu chứng lo âu thường gặp",
           match: 95,
           steps: 5,
+          advisor: {
+            name: "TS. Nguyễn An Tâm",
+            title: "Chuyên gia tâm lý trị liệu",
+            avatar: "img/advisor.jpg",
+            quote: "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+          }
         },
         {
           id: "2",
@@ -398,6 +404,12 @@ export default {
           description: "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
           match: 87,
           steps: 4,
+          advisor: {
+            name: "ThS. Lê Minh Quân",
+            title: "Chuyên gia phát triển bản thân",
+            avatar: "img/advisor.jpg",
+            quote: "Tự tin là chìa khóa mở ra mọi cánh cửa thành công."
+          }
         },
         {
           id: "3",
@@ -405,6 +417,12 @@ export default {
           description: "Học cách nhận biết và điều chỉnh cảm xúc tiêu cực",
           match: 82,
           steps: 3,
+          advisor: {
+            name: "TS. Trần Hồng Phúc",
+            title: "Chuyên gia tâm lý học cảm xúc",
+            avatar: "img/advisor.jpg",
+            quote: "Cảm xúc là người bạn đồng hành, không phải kẻ thù."
+          }
         },
       ];
     },

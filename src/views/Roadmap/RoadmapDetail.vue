@@ -12,6 +12,62 @@
           Quay lại danh sách lộ trình
         </v-btn>
 
+        <!-- Lời chào và động viên -->
+        <div v-if="roadmap" class="healing-header mb-4">
+          <h2 class="text-h5 font-weight-bold mb-1" style="color:#6a39ca;">
+            Chào mừng bạn đến với hành trình {{ roadmap.title }}
+          </h2>
+          <div class="text-body-1" style="color:#444;">
+            Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ. Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu hành trình này.
+          </div>
+        </div>
+
+        <!-- Card advisor -->
+        <v-card class="advisor-card mb-6 d-flex align-center" style="max-width:420px;">
+          <v-avatar size="56" class="mr-3">
+            <img :src="advisorImg" alt="Advisor" />
+          </v-avatar>
+          <div>
+            <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
+            <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
+            <div class="text-body-2 mt-1" style="font-style:italic; color:#6a39ca;">
+              "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+            </div>
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
+            <v-icon>mdi-message-text-outline</v-icon>
+          </v-btn>
+          <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
+            <v-icon>mdi-account-group-outline</v-icon>
+          </v-btn>
+        </v-card>
+
+        <!-- Giới thiệu lộ trình (diễn giải lại) -->
+        <v-card v-if="roadmap" class="mb-6">
+          <v-card-title class="d-flex align-center">
+            <v-icon color="primary" class="mr-2">mdi-information-outline</v-icon>
+            Giới thiệu lộ trình
+          </v-card-title>
+          <v-card-text>
+            <div class="mb-2">
+              <p v-for="(line, idx) in (roadmap.intro ? roadmap.intro.split('\n') : [])" :key="idx">{{ line }}</p>
+            </div>
+            <v-alert color="warning" variant="tonal" class="mt-4">
+              <div class="d-flex align-center mb-2">
+                <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
+                <span class="font-weight-bold" style="color: #ff9800; font-size: large">Lưu ý quan trọng</span>
+              </div>
+              <p>
+                📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
+                <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank" class="text-primary text-decoration-none">
+                  Tìm hiểu thêm
+                </a>.
+              </p>
+            </v-alert>
+          </v-card-text>
+        </v-card>
+
         <div
           v-if="loading"
           class="d-flex justify-center align-center"
@@ -28,51 +84,6 @@
           <div class="d-flex align-center mb-6">
             <h1 class="text-h4 font-weight-bold">{{ roadmap.title }}</h1>
           </div>
-
-          <v-card class="mb-6">
-            <v-card-title class="d-flex align-center">
-              <v-icon color="primary" class="mr-2"
-                >mdi-information-outline</v-icon
-              >
-              Giới thiệu
-            </v-card-title>
-            <v-card-text>
-              <div
-                v-for="(text, index) in roadmap.introText"
-                :key="index"
-                class="mb-2"
-              >
-                <p>{{ text }}</p>
-              </div>
-
-              <v-alert color="warning" variant="tonal" class="mt-4">
-                <div class="d-flex align-center mb-2">
-                  <v-icon color="warning" class="mr-2"
-                    >mdi-information-outline</v-icon
-                  >
-                  <span
-                    class="font-weight-bold"
-                    style="color: #ff9800; font-size: large"
-                    >Lưu ý quan trọng</span
-                  >
-                </div>
-                <p>
-                  📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp
-                  hội chuyên môn, đặc biệt là
-                  <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một
-                  trong những liệu pháp tâm lý hiệu quả nhất.
-                  <a
-                    href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/"
-                    target="_blank"
-                    class="text-primary text-decoration-none"
-                  >
-                    Tìm hiểu thêm
-                  </a>
-                  .
-                </p>
-              </v-alert>
-            </v-card-text>
-          </v-card>
 
           <h2 class="text-h5 mb-4">Các bước trong lộ trình</h2>
           <div class="mb-6">
@@ -164,6 +175,7 @@ import { roadmapSteps } from "@/scripts/data/roadmapData.js";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "../../scripts/logic/evenBus";
 import { useRoute, useRouter } from "vue-router";
+import advisorImg from '@/img/advisor.jpg';
 
 export default {
   name: "RoadmapDetail",
@@ -270,11 +282,7 @@ export default {
           description:
             "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
           progress: 0,
-          introText: [
-            "Lộ trình này được thiết kế dựa trên Liệu pháp Nhận thức Hành vi (CBT), một phương pháp đã được chứng minh hiệu quả trong điều trị lo âu.",
-            "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-            "Mỗi bước trong lộ trình sẽ giúp bạn xây dựng các kỹ năng cần thiết để quản lý lo âu hiệu quả và cải thiện sức khỏe tinh thần tổng thể.",
-          ],
+          intro: "Lộ trình này được thiết kế dựa trên Liệu pháp Nhận thức Hành vi (CBT), một phương pháp đã được chứng minh hiệu quả trong điều trị lo âu.",
           steps: [
             {
               id: "1",
@@ -399,6 +407,7 @@ export default {
       goToStep,
       goToSuggestion,
       updateStatus,
+      advisorImg,
     };
   },
 };

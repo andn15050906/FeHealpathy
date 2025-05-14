@@ -39,6 +39,7 @@
                 v-for="roadmap in suggestedRoadmaps"
                 :key="roadmap.id"
                 :roadmap="roadmap"
+                :isReturningUser="false"
                 @view="viewRoadmap"
               />
             </div>
@@ -50,6 +51,7 @@
                 v-for="roadmap in allRoadmaps"
                 :key="roadmap.id"
                 :roadmap="roadmap"
+                :isReturningUser="false"
                 @view="viewRoadmap"
               />
             </div>
@@ -84,6 +86,12 @@ export default {
           featured: true,
           completionRate: 78,
           image: "/images/anxiety.jpg",
+          advisor: {
+            name: "TS. Nguyễn An Tâm",
+            title: "Chuyên gia tâm lý trị liệu",
+            avatar: "img/advisor.jpg",
+            quote: "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+          }
         },
         {
           id: "2",
@@ -95,6 +103,12 @@ export default {
           featured: true,
           completionRate: 85,
           image: "/images/confidence.jpg",
+          advisor: {
+            name: "ThS. Lê Minh Quân",
+            title: "Chuyên gia phát triển bản thân",
+            avatar: "img/advisor.jpg",
+            quote: "Tự tin là chìa khóa mở ra mọi cánh cửa thành công."
+          }
         },
       ],
       allRoadmaps: [
@@ -108,6 +122,12 @@ export default {
           featured: true,
           completionRate: 78,
           image: "/images/anxiety.jpg",
+          advisor: {
+            name: "TS. Nguyễn An Tâm",
+            title: "Chuyên gia tâm lý trị liệu",
+            avatar: "img/advisor.jpg",
+            quote: "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+          }
         },
         {
           id: "2",
@@ -119,6 +139,12 @@ export default {
           featured: true,
           completionRate: 85,
           image: "/images/confidence.jpg",
+          advisor: {
+            name: "ThS. Lê Minh Quân",
+            title: "Chuyên gia phát triển bản thân",
+            avatar: "img/advisor.jpg",
+            quote: "Tự tin là chìa khóa mở ra mọi cánh cửa thành công."
+          }
         },
         {
           id: "3",
@@ -129,6 +155,12 @@ export default {
           featured: false,
           completionRate: 62,
           image: "/images/emotions.jpg",
+          advisor: {
+            name: "TS. Trần Hồng Phúc",
+            title: "Chuyên gia tâm lý học cảm xúc",
+            avatar: "img/advisor.jpg",
+            quote: "Cảm xúc là người bạn đồng hành, không phải kẻ thù."
+          }
         },
         {
           id: "4",
@@ -139,6 +171,12 @@ export default {
           featured: false,
           completionRate: 70,
           image: "/images/balance.jpg",
+          advisor: {
+            name: "ThS. Nguyễn Thị Bình",
+            title: "Chuyên gia quản trị cuộc sống",
+            avatar: "img/advisor.jpg",
+            quote: "Cân bằng là chìa khóa của hạnh phúc lâu dài."
+          }
         },
         {
           id: "5",
@@ -149,6 +187,12 @@ export default {
           featured: false,
           completionRate: 90,
           image: "/images/sleep.jpg",
+          advisor: {
+            name: "BS. Lê Quốc Hưng",
+            title: "Chuyên gia giấc ngủ & sức khỏe",
+            avatar: "img/advisor.jpg",
+            quote: "Giấc ngủ tốt là nền tảng cho sức khỏe tinh thần."
+          }
         },
       ],
     };
