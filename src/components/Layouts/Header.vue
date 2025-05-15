@@ -47,10 +47,10 @@
       </div>
       <div class="user-actions">
         <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu" ref="profileMenu">
           <span>Xin chào, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
-          <ul v-if="showProfileMenu" class="dropdown-menu">
+          <ul v-if="showProfileMenu" class="dropdown-menu" ref="dropdownMenu">
             <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
             <li><router-link to="/statistics/self-assessment">Thống kê</router-link></li>
             <li><router-link to="/settings">Cài đặt</router-link></li>
@@ -172,8 +172,8 @@ export default {
     },
 
     handleClickOutside(event) {
-      const dropdown = this.$el.querySelector('.dropdown-menu');
-      const profileMenu = this.$el.querySelector('.profile-menu');
+      const profileMenu = this.$refs.profileMenu;
+      const dropdown = this.$refs.dropdownMenu;
 
       if (profileMenu && !profileMenu.contains(event.target) && dropdown && !dropdown.contains(event.target)) {
         this.showProfileMenu = false;
