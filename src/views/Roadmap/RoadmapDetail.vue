@@ -194,21 +194,12 @@
                     <v-btn
                       :color="phase.current ? 'success' : undefined"
                       :variant="phase.current ? 'elevated' : 'outlined'"
-                      :disabled="
-                        (!phase.current && !phase.completed) || !roadmap.isPaid
-                      "
-                      @click="
-                        !roadmap.isPaid
-                          ? (showUpgradeDialog = true)
-                          : goToPhase(phase.id)
-                      "
+                      :disabled="!phase.current && !phase.completed"
+                      @click="goToPhase(phase.id)"
                     >
                       <v-icon v-if="phase.current" start>mdi-play</v-icon>
-                      <v-icon v-if="!roadmap.isPaid" start>mdi-lock</v-icon>
                       {{
-                        !roadmap.isPaid
-                          ? "Thanh toán để mở khóa"
-                          : phase.current
+                        phase.current
                           ? "Bắt đầu bước này"
                           : phase.completed
                           ? "Xem lại"
@@ -230,178 +221,8 @@
             >
               Bắt đầu lộ trình
             </v-btn>
-            <v-btn
-              v-if="!roadmap.isPaid"
-              size="large"
-              color="primary"
-              class="ml-4"
-              prepend-icon="mdi-credit-card"
-              @click="showUpgradeDialog = true"
-            >
-              Thanh toán để mở khóa
-            </v-btn>
           </div>
         </div>
-
-        <!-- Payment Dialog -->
-        <v-dialog v-model="showUpgradeDialog" max-width="550" persistent>
-          <v-card class="payment-dialog">
-            <v-card-title
-              class="text-h5 d-flex align-center bg-primary text-white pa-4"
-            >
-              <v-icon color="white" class="mr-3" size="28"
-                >mdi-credit-card</v-icon
-              >
-              <span>Thanh toán lộ trình</span>
-              <v-spacer></v-spacer>
-              <v-btn
-                icon
-                variant="text"
-                color="white"
-                @click="showUpgradeDialog = false"
-              >
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </v-card-title>
-
-            <v-card-text class="pa-6">
-              <div class="text-center mb-6">
-                <v-avatar color="primary" size="80" class="mb-4">
-                  <v-icon color="white" size="40">mdi-star</v-icon>
-                </v-avatar>
-                <h3 class="text-h5 mb-2">Nâng cấp trải nghiệm của bạn</h3>
-                <p class="text-body-1"
-                  >Mở khóa tất cả các tính năng cao cấp và nội dung độc quyền</p
-                >
-              </div>
-
-              <v-divider class="mb-6"></v-divider>
-
-              <h3 class="text-h6 mb-4 d-flex align-center">
-                <v-icon color="primary" class="mr-2">mdi-check-decagram</v-icon>
-                Với gói trả phí, bạn sẽ nhận được:
-              </h3>
-
-              <v-list class="feature-list mb-6" rounded="lg" border>
-                <v-list-item
-                  v-for="(feature, i) in roadmap?.paidFeatures || []"
-                  :key="i"
-                  class="feature-item"
-                >
-                  <template v-slot:prepend>
-                    <v-avatar color="primary" size="36">
-                      <v-icon color="white">mdi-check</v-icon>
-                    </v-avatar>
-                  </template>
-                  <v-list-item-title>{{ feature }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-
-              <v-divider class="mb-6"></v-divider>
-
-              <div class="pricing-section mb-6">
-                <div class="d-flex justify-space-between align-center">
-                  <div>
-                    <h3 class="text-h6">Gói Premium</h3>
-                    <p class="text-caption">Truy cập trọn đời</p>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-caption text-decoration-line-through"
-                      >600.000 VND</div
-                    >
-                    <div class="text-h5 font-weight-bold text-primary"
-                      >500.000 VND</div
-                    >
-                    <div class="text-caption text-success">Tiết kiệm 17%</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="payment-methods mb-6">
-                <h3 class="text-subtitle-1 mb-3">Phương thức thanh toán:</h3>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn variant="outlined" class="payment-method-btn">
-                    <v-img
-                      src="/src/components/PaymentComponents/payment-system/visa.png"
-                      width="40"
-                    ></v-img>
-                  </v-btn>
-                  <v-btn variant="outlined" class="payment-method-btn">
-                    <v-img
-                      src="/src/components/PaymentComponents/payment-system/mastercard.png"
-                      width="40"
-                    ></v-img>
-                  </v-btn>
-                  <v-btn variant="outlined" class="payment-method-btn">
-                    <v-img
-                      src="/src/components/PaymentComponents/payment-system/momo.png"
-                      width="40"
-                    ></v-img>
-                  </v-btn>
-                  <v-btn variant="outlined" class="payment-method-btn">
-                    <v-img
-                      src="/src/components/PaymentComponents/payment-system/zalopay.png"
-                      width="40"
-                    ></v-img>
-                  </v-btn>
-                </div>
-              </div>
-
-              <v-alert color="info" variant="tonal" class="mb-6">
-                <div class="d-flex align-center">
-                  <v-icon color="info" class="mr-2">mdi-shield-check</v-icon>
-                  <span
-                    >Thanh toán an toàn và bảo mật. Bạn có thể hủy bất kỳ lúc
-                    nào.</span
-                  >
-                </div>
-              </v-alert>
-            </v-card-text>
-
-            <v-card-actions class="pa-6 pt-0">
-              <v-btn
-                block
-                color="primary"
-                size="large"
-                class="mb-2"
-                @click="processUpgrade"
-              >
-                <v-icon start>mdi-credit-card</v-icon>
-                Thanh toán ngay
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
-        <!-- Payment Success Dialog -->
-        <v-dialog v-model="showUpgradeSuccess" max-width="450" persistent>
-          <v-card class="success-dialog">
-            <v-card-text class="text-center pa-8">
-              <div class="success-animation mb-6">
-                <v-avatar color="success" size="96" class="success-icon">
-                  <v-icon color="white" size="48">mdi-check-circle</v-icon>
-                </v-avatar>
-              </div>
-
-              <h2 class="text-h4 mb-2">Thanh toán thành công!</h2>
-              <p class="text-body-1 mb-6">
-                Cảm ơn bạn đã thanh toán. Bạn đã có thể truy cập đầy đủ nội dung
-                của lộ trình.
-              </p>
-
-              <v-btn
-                color="primary"
-                size="large"
-                block
-                @click="upgradeComplete"
-                class="success-btn"
-              >
-                <v-icon start>mdi-arrow-right</v-icon>
-                Tiếp tục
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
       </v-container>
     </div>
   </div>
@@ -433,8 +254,6 @@ export default {
       4: false,
       5: false,
     });
-    const showUpgradeDialog = ref(false);
-    const showUpgradeSuccess = ref(false);
 
     // Tạo key lưu trữ dựa trên ID lộ trình
     const getStorageKey = () => `completedPhases_roadmap_${props.id}`;
@@ -497,29 +316,16 @@ export default {
     const fetchRoadmap = () => {
       // In a real app, this would be an API call
       setTimeout(() => {
-        // Kiểm tra xem có phải roadmap đã thanh toán không
-        const isPaid =
-          localStorage.getItem(`paid_roadmap_${props.id}`) === "true";
-
         roadmap.value = {
           id: props.id,
           title: props.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
           description:
             "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
           progress: 0,
-          isPaid: isPaid,
           introText: [
             "Lộ trình này được thiết kế dựa trên các phương pháp đã được chứng minh hiệu quả trong việc hỗ trợ sức khỏe tinh thần.",
             "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
             "Mỗi bước trong lộ trình sẽ cung cấp cho bạn các công cụ và kỹ thuật thực tế để cải thiện sức khỏe tinh thần.",
-          ],
-          paidFeatures: [
-            "Truy cập đầy đủ tất cả các bước và công cụ",
-            "Bài tập thực hành chuyên sâu",
-            "Tài liệu hướng dẫn chi tiết",
-            "Âm nhạc và thiền định cao cấp",
-            "Theo dõi tiến độ cá nhân",
-            "Hỗ trợ từ chuyên gia",
           ],
           phases: [
             {
@@ -602,42 +408,12 @@ export default {
     const startRoadmap = () => {
       const currentPhase = roadmap.value.phases.find((phase) => phase.current);
       if (currentPhase) {
-        if (!roadmap.value.isPaid) {
-          showUpgradeDialog.value = true;
-        } else {
-          goToPhase(currentPhase.id);
-        }
+        goToPhase(currentPhase.id);
       }
     };
 
     const goToPhase = (phaseId) => {
-      // Nếu lộ trình chưa thanh toán, hiển thị dialog thanh toán
-      if (!roadmap.value.isPaid) {
-        showUpgradeDialog.value = true;
-        return;
-      }
-
       router.push(`/roadmap/${roadmap.value.id}/phase/${phaseId}`);
-    };
-
-    const processUpgrade = () => {
-      // Giả lập quá trình thanh toán
-      setTimeout(() => {
-        showUpgradeDialog.value = false;
-        showUpgradeSuccess.value = true;
-      }, 1500);
-    };
-
-    const upgradeComplete = () => {
-      // Lưu trạng thái đã thanh toán vào localStorage
-      localStorage.setItem(`paid_roadmap_${props.id}`, "true");
-
-      // Cập nhật trạng thái roadmap
-      if (roadmap.value) {
-        roadmap.value.isPaid = true;
-      }
-
-      showUpgradeSuccess.value = false;
     };
 
     // Sử dụng event bus
@@ -680,13 +456,9 @@ export default {
       loading,
       roadmap,
       completedPhases,
-      showUpgradeDialog,
-      showUpgradeSuccess,
       getPhaseColor,
       startRoadmap,
       goToPhase,
-      processUpgrade,
-      upgradeComplete,
       advisorImg,
     };
   },
@@ -719,77 +491,6 @@ export default {
   margin-bottom: 0 !important;
 }
 
-/* Remove these CSS classes
-.paid-locked {
-  position: relative;
-  overflow: hidden;
-}
-
-.paid-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #6a39ca;
-  z-index: 1;
-  backdrop-filter: blur(2px);
-}
-
-.paid-overlay span {
-  margin-top: 8px;
-  font-weight: 500;
-}
-*/
-
-/* Payment Dialog Styling */
-.payment-dialog {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.feature-list {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-}
-
-.feature-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.feature-item:last-child {
-  border-bottom: none;
-}
-
-.payment-method-btn {
-  min-width: 80px;
-  height: 50px;
-  border-radius: 8px;
-}
-
-/* Success Dialog Styling */
-.success-dialog {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.success-animation {
-  animation: successPop 0.5s ease-out;
-}
-
-.success-icon {
-  box-shadow: 0 0 0 8px rgba(76, 175, 80, 0.2);
-}
-
-.success-btn {
-  animation: fadeInUp 0.5s ease-out 0.3s both;
-}
-
 /* Advisor card styling */
 .advisor-card {
   border-radius: 12px;
@@ -808,30 +509,5 @@ export default {
   padding: 16px 20px;
   border-radius: 12px;
   border-left: 4px solid #6a39ca;
-}
-
-@keyframes successPop {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>
