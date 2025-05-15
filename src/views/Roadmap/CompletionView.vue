@@ -9,7 +9,7 @@
           color="primary"
           class="mb-4"
           prepend-icon="mdi-arrow-left"
-          @click="$router.push('/overview')"
+          @click="$router.push('/roadmaps/recommended')"
         >
           Quay lại lộ trình
         </v-btn>

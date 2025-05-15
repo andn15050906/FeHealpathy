@@ -72,7 +72,7 @@
             </v-card>
           </v-col>
         </v-row>
-
+        <div style="height: 32px;"></div>
         <v-card class="my-6">
           <v-card-title>Đánh giá sự cải thiện của bạn</v-card-title>
           <v-card-subtitle>
@@ -231,7 +231,8 @@ export default {
 
 .roadmap-content {
   flex: 1;
-  width: 100%;
+  width: 60vw !important;
+  max-width: 60vw !important;
 }
 
 .coupon-code {
