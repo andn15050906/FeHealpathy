@@ -522,6 +522,35 @@ export default {
     },
     removeLecture(index) {
       this.course.lectures.splice(index, 1);
+      
+      // Nếu xóa bài giảng cuối cùng
+      if (this.course.lectures.length === 0) {
+        this.activeTab = 0;
+        return;
+      }
+
+      // Nếu xóa bài giảng đang được chọn
+      if (index === this.activeTab) {
+        // Nếu không phải bài giảng đầu tiên, chuyển sang bài giảng trước đó
+        if (index > 0) {
+          this.activeTab = index - 1;
+        } else {
+          // Nếu là bài giảng đầu tiên, chuyển sang bài giảng tiếp theo
+          this.activeTab = 0;
+        }
+      } else if (index < this.activeTab) {
+        // Nếu xóa bài giảng trước bài giảng đang chọn, giảm activeTab đi 1
+        this.activeTab--;
+      }
+
+      // Đảm bảo DOM đã được cập nhật trước khi chuyển tab
+      this.$nextTick(() => {
+        // Tìm và click vào tab mới
+        const newTab = document.querySelector(`.nav-tabs .nav-link:nth-child(${this.activeTab + 1})`);
+        if (newTab) {
+          newTab.click();
+        }
+      });
     },
     removeLectureMedia(lectureIndex, mediaIndex) {
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);

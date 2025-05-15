@@ -128,6 +128,7 @@ export default {
 
 <style scoped>
 .container-fluid {
+    width: 72vw;
     height: 100%;
 }
 

@@ -104,8 +104,7 @@ export default {
 
 <style scoped>
 .yoga-container {
-  max-width: 1200px;
-  margin: 60px auto 40px;
+  width: 72vw;
   /* Thêm margin-top để chừa chỗ cho total-count */
   padding: 0 20px;
   position: relative;
