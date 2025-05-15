@@ -88,7 +88,10 @@
               <p class="course-requirements">{{ course.requirements }}</p>
             </div>
 
-            <div class="course-section" v-if="isEnrolled">
+            
+          </div>
+        </div>
+        <div class="course-section" v-if="isEnrolled">
               <h3 class="section-subtitle">📊 Tiến độ học tập</h3>
               <div class="progress-container">
                 <div class="progress-stats">
@@ -110,9 +113,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
         <div class="card border-0 shadow-sm mb-4">
           <div class="card-body">
             <div class="section-header">

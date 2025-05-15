@@ -36,15 +36,13 @@
             </v-list-item>
           </v-list>
 
-          <template v-slot:append>
-            <v-divider></v-divider>
-            <div class="pa-4">
-              <div class="d-flex align-center">
-                <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
-                <span v-if="sidebarOpen">Your progress: {{ courseProgressPercentage }}%</span>
-              </div>
+          <v-divider class="mt-2"></v-divider>
+          <div class="pa-4">
+            <div class="d-flex align-center">
+              <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
+              <span>Tiến độ: {{ courseProgressPercentage || 0 }}%</span>
             </div>
-          </template>
+          </div>
         </v-navigation-drawer>
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
@@ -649,6 +647,8 @@ const currentLectureIndex = ref(null);
 const courseProgressPercentage = ref(0);
 const completedLectures = ref(0);
 const totalLectures = ref(0);
+const isOwner = ref(false);
+const isEnrolled = ref(false);
 
 // Add new methods for course progress
 const fetchCourseData = async (courseId) => {
@@ -680,8 +680,8 @@ const checkEnrollmentStatus = async (courseId) => {
   try {
     const response = await getEnrollments({ pageSize: 100 });
     if (response?.items) {
-      const enrolled = response.items.some(enrollment => enrollment.courseId === courseId);
-      if (enrolled) {
+      isEnrolled.value = response.items.some(enrollment => enrollment.courseId === courseId);
+      if (isEnrolled.value) {
         // Mock data for completed lectures - replace with actual API call
         completedLectures.value = Math.floor(Math.random() * totalLectures.value);
         courseProgressPercentage.value = Math.round((completedLectures.value / totalLectures.value) * 100);
@@ -689,12 +689,16 @@ const checkEnrollmentStatus = async (courseId) => {
     }
   } catch (error) {
     console.error('Error checking enrollment status:', error);
+    isEnrolled.value = false;
   }
 };
 
 const selectLecture = (index) => {
   const lecture = currentCourse.value.lectures[index];
-  if (lecture) {
+  if (!lecture) return;
+
+  // Allow access if user is enrolled, is owner, or lecture is previewable
+  if (isOwner.value || isEnrolled.value || lecture.isPreviewable) {
     currentLectureIndex.value = index;
     router.push({
       name: "lectureDetail",
