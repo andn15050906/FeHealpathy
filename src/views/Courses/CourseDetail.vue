@@ -1,206 +1,274 @@
 <template>
-  <div>
-    <LoadingSpinner :isVisible="isLoading" />
+  <div class="container-fluid py-4">
+    <div class="bg-dark text-white py-4 mb-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4 mb-md-0">
+            <div class="course-thumbnail position-relative">
+              <img v-if="course.thumbnail" :src="course.thumbnail" :alt="course.title" class="img-fluid rounded" />
+              <div v-else class="bg-secondary d-flex align-items-center justify-content-center rounded"
+                style="height: 220px">
+                <ImageIcon class="icon text-light" style="width: 64px; height: 64px" />
+              </div>
+            </div>
+          </div>
 
-    <div v-show="!isLoading">
-      <div class="course-detail-container" v-if="course">
-        <div class="course-header">
-          <div class="course-media-actions">
-            <img
-              :src="course.thumbUrl"
-              alt="Course Thumbnail"
-              class="course-thumb"
-            />
-
-            <div class="owner-status" v-if="isOwner">
-              <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
+          <div class="col-md-8">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <button @click="goBack" class="btn btn-link text-light p-0">
+                <ArrowLeftIcon class="icon" style="width: 20px; height: 20px" />
+              </button>
+              <span class="badge bg-primary">
+                {{ course.category }}
+              </span>
             </div>
 
-            <div
-              class="course-actions"
-              v-else-if="!isEnrolled && !isLoadingEnrollment"
-            >
-              <div class="course-pricing">
-                <span class="price-label">Giá:</span>
-                <div class="price-container">
-                  <div class="old-price-row" v-if="course.discount > 0">
-                    <del>{{ course.price?.toLocaleString("vi-VN") }} VND</del>
-                    <span class="discount-badge"
-                      >{{ Math.floor(course.discount * 100) }}% OFF</span
-                    >
+            <h1 class="h2 fw-bold mb-3">
+              {{ course.title }}
+            </h1>
+
+            <p class="text-light mb-4">{{ course.description }}</p>
+
+            <div class="row mb-4">
+              <div class="col-6 col-sm-3 mb-3 mb-sm-0">
+                <p class="text-light-50 small mb-1">Giảng viên</p>
+                <p class="mb-0 fw-medium">{{ course.instructor }}</p>
+              </div>
+              <div class="col-6 col-sm-3 mb-3 mb-sm-0">
+                <p class="text-light-50 small mb-1">Thời lượng</p>
+                <p class="mb-0 fw-medium">{{ course.duration }} giờ</p>
+              </div>
+              <div class="col-6 col-sm-3">
+                <p class="text-light-50 small mb-1">Trình độ</p>
+                <p class="mb-0 fw-medium text-capitalize">{{ course.level }}</p>
+              </div>
+              <div class="col-6 col-sm-3">
+                <p class="text-light-50 small mb-1">Cập nhật lần cuối</p>
+                <p class="mb-0 fw-medium">
+                  {{ formatDate(course.lastUpdated) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-4">
+              <div class="d-flex align-items-center">
+                <div class="d-flex">
+                  <StarIcon v-for="i in 5" :key="i" style="width: 20px; height: 20px"
+                    :class="[i <= Math.round(course.rating) ? 'icon text-warning' : 'icon text-secondary']" />
+                </div>
+                <span class="ms-2 text-light">
+                  {{ course.rating }} ({{ course.reviewCount }} đánh giá)
+                </span>
+              </div>
+
+              <div class="d-flex align-items-center">
+                <UsersIcon class="icon text-light-50 me-2" style="width: 20px; height: 20px" />
+                <span>{{ course.students }} học viên</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+          <div v-if="course.enrolled" class="card shadow-sm mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="h6 fw-bold mb-0">Tiến trình của bạn</h3>
+                <span class="text-muted">{{ course.progress }}% hoàn thành</span>
+              </div>
+              <div class="progress" style="height: 10px">
+                <div class="progress-bar bg-primary" role="progressbar" :style="{ width: `${course.progress}%` }"
+                  :aria-valuenow="course.progress" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="mt-3 d-flex justify-content-between">
+                <span class="small text-muted">
+                  {{ completedLectures }} / {{ course.lectures.length }} bài giảng hoàn thành
+                </span>
+                <span v-if="course.hasCertificate" class="small text-muted">
+                  <AwardIcon class="icon me-1" style="width: 16px; height: 16px" />
+                  Có chứng chỉ sau khi hoàn thành
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+              <h2 class="h5 fw-bold mb-0">Nội dung khóa học</h2>
+              <p class="text-muted small mb-0">
+                {{ course.lectures.length }} bài giảng • {{ course.duration }} giờ tổng
+              </p>
+            </div>
+
+            <div class="list-group list-group-flush">
+              <div v-for="(lecture, lectureIndex) in course.lectures" :key="lecture.id"
+                class="list-group-item d-flex align-items-center hover-bg-light">
+                <div class="me-3">
+                  <CheckCircleIcon v-if="lecture.completed" class="icon text-success"
+                    style="width: 20px; height: 20px" />
+                  <CircleIcon v-else class="icon text-muted" style="width: 20px; height: 20px" />
+                </div>
+
+                <div class="flex-1">
+                  <div class="d-flex align-items-center">
+                    <component :is="getLectureIcon(lecture.type)" class="icon text-muted me-2"
+                      style="width: 16px; height: 16px" />
+                    <span class="text-dark lecture-link" @click="navigateToLecture(lecture.id)">
+                      {{ lecture.title }}
+                    </span>
                   </div>
-                  <div class="new-price">
-                    <strong>{{
-                      discountedPrice == 0
-                        ? "Miễn phí"
-                        : discountedPrice.toLocaleString("vi-VN") + " VND"
-                    }}</strong>
+                  <p v-if="lecture.description" class="small text-muted mt-1 mb-0">
+                    {{ lecture.description }}
+                  </p>
+                </div>
+
+                <div class="d-flex align-items-center">
+                  <span v-if="lecture.preview" class="badge bg-primary me-3">
+                    Xem trước
+                  </span>
+                  <span class="small text-muted">{{ lecture.duration }} phút</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex flex-column flex-sm-row justify-content-between gap-3">
+              <h2 class="h5 fw-bold mb-0">Đánh giá của học viên</h2>
+              <div class="d-flex align-items-center">
+                <span class="me-2 small text-muted">Sắp xếp theo:</span>
+                <select v-model="reviewSortOption" class="form-select form-select-sm">
+                  <option value="recent">Mới nhất</option>
+                  <option value="highest">Đánh giá cao</option>
+                  <option value="lowest">Đánh giá thấp</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="card-body border-bottom">
+              <div class="row">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                  <div class="display-4 fw-bold text-dark mb-2">{{ course.rating }}</div>
+                  <div class="d-flex justify-content-center mb-1">
+                    <StarIcon v-for="i in 5" :key="i" style="width: 20px; height: 20px"
+                      :class="[i <= Math.round(course.rating) ? 'icon text-warning' : 'icon text-muted']" />
+                  </div>
+                  <div class="small text-muted">{{ course.reviewCount }} đánh giá</div>
+                </div>
+
+                <div class="col-md-8">
+                  <div v-for="i in 5" :key="i" class="d-flex align-items-center mb-2">
+                    <div class="small text-muted w-8">{{ 6 - i }}</div>
+                    <div class="flex-1 mx-2">
+                      <div class="progress" style="height: 8px">
+                        <div class="progress-bar bg-warning" role="progressbar"
+                          :style="{ width: `${getRatingPercentage(6 - i)}%` }"
+                          :aria-valuenow="getRatingPercentage(6 - i)" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                    </div>
+                    <div class="small text-muted w-8">{{ getRatingCount(6 - i) }}</div>
                   </div>
                 </div>
               </div>
-              <div class="buy-button-container">
-                <button class="btn-buy" @click="handlePurchase">
-                  💰 Mua ngay
+            </div>
+
+            <div v-if="sortedReviews.length === 0" class="card-body text-center py-5">
+              <MessageSquareIcon class="icon text-muted mb-3" style="width: 48px; height: 48px" />
+              <p class="text-muted mb-4">Chưa có đánh giá</p>
+              <button v-if="course.enrolled" @click="showReviewForm = true" class="btn btn-dark">
+                Viết đánh giá
+              </button>
+            </div>
+
+            <div v-else>
+              <div v-if="showReviewForm" class="p-4 border-bottom bg-light">
+                <h3 class="h6 fw-bold mb-3">Viết đánh giá</h3>
+                <div class="mb-3">
+                  <label class="form-label small fw-medium">Điểm</label>
+                  <div class="d-flex">
+                    <StarIcon v-for="i in 5" :key="i" @click="newReview.rating = i" style="width: 24px; height: 24px"
+                      :class="['icon cursor-pointer', i <= newReview.rating ? 'text-warning' : 'text-muted']" />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-medium">Nội dung</label>
+                  <textarea v-model="newReview.content" rows="4" class="form-control"
+                    placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                  <button @click="showReviewForm = false" class="btn btn-light">Hủy</button>
+                  <button @click="submitReview" class="btn btn-dark">Gửi đánh giá</button>
+                </div>
+              </div>
+
+              <div class="list-group list-group-flush">
+                <div v-for="(review, index) in sortedReviews" :key="index" class="list-group-item p-4">
+                  <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex">
+                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3"
+                        style="width: 40px; height: 40px">
+                        <UserIcon class="icon text-muted" style="width: 20px; height: 20px" />
+                      </div>
+                      <div>
+                        <div class="fw-medium text-dark">{{ review.userName }}</div>
+                        <div class="small text-muted">{{ formatDate(review.date) }}</div>
+                      </div>
+                    </div>
+                    <div class="d-flex">
+                      <StarIcon v-for="i in 5" :key="i" style="width: 16px; height: 16px"
+                        :class="['icon', i <= review.rating ? 'text-warning' : 'text-muted']" />
+                    </div>
+                  </div>
+                  <p class="text-dark mb-0">{{ review.content }}</p>
+                </div>
+              </div>
+
+              <!-- Phân trang -->
+              <div v-if="sortedReviews.length > 5" class="card-footer d-flex justify-content-center">
+                <nav aria-label="Phân trang đánh giá">
+                  <ul class="pagination mb-0">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="Trước">&laquo;</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="Tiếp">&raquo;</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card shadow-sm sticky-top" style="top: 20px">
+            <div class="card-body">
+              <h3 class="h6 fw-bold mb-3">Chia sẻ khóa học:</h3>
+              <div class="d-flex gap-2">
+                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
+                  <FacebookIcon class="icon text-primary" style="width: 20px; height: 20px" />
+                </button>
+                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
+                  <TwitterIcon class="icon text-info" style="width: 20px; height: 20px" />
+                </button>
+                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
+                  <LinkedinIcon class="icon text-primary" style="width: 20px; height: 20px" />
+                </button>
+                <button class="btn btn-light rounded-circle" style="width: 40px; height: 40px">
+                  <MailIcon class="icon text-dark" style="width: 20px; height: 20px" />
                 </button>
               </div>
             </div>
-            <div
-              class="enrollment-status"
-              v-else-if="isEnrolled && !isLoadingEnrollment"
-            >
-              <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
-            </div>
-            <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
-              <p>Đang kiểm tra trạng thái...</p>
-            </div>
-          </div>
-
-          <div class="course-info">
-            <h1 class="course-title">{{ course.title }}</h1>
-            <p class="course-meta">
-              <span>🧑‍🏫 Giảng viên: {{ instructorName }}</span>
-              <span>🎓 {{ course.learnerCount || 0 }} Học viên</span>
-              <span>⭐ {{ averageRating }}/5</span>
-            </p>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">🎯 Giới thiệu</h3>
-              <p class="course-intro">{{ course.intro }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">💡 Mô tả chi tiết</h3>
-              <p class="course-description">{{ course.description }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">🎯 Kết quả đạt được</h3>
-              <p class="course-outcomes">{{ course.outcomes }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">💡 Yêu cầu khóa học</h3>
-              <p class="course-requirements">{{ course.requirements }}</p>
-            </div>
-          </div>
-        </div>
-
-        <h2 class="section-title">📚 Bài giảng</h2>
-
-        <div v-if="lectures.length > 0" class="lecture-grid">
-          <div
-            v-for="lecture in lectures"
-            :key="lecture.id"
-            class="lecture-card"
-          >
-            <template v-if="lecture.firstImageUrl">
-              <img
-                :src="lecture.firstImageUrl"
-                alt="Lecture Image"
-                class="lecture-thumb"
-                @error="
-                  (e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                  }
-                "
-              />
-              <div class="lecture-thumb-placeholder" style="display: none">
-                Không thể tải ảnh
-              </div>
-            </template>
-            <template v-else>
-              <div class="lecture-thumb-placeholder">
-                Không có ảnh xem trước
-              </div>
-            </template>
-
-            <div class="lecture-content">
-              <h3>{{ lecture.title }}</h3>
-              <p class="lecture-summary">{{ lecture.contentSummary }}</p>
-              <span v-if="lecture.isPreviewable" class="preview-badge"
-                >🔓 Xem trước miễn phí</span
-              >
-            </div>
-            <button
-              class="btn-view"
-              @click="viewLecture(lecture.id)"
-              :disabled="!lecture.isPreviewable && !isOwner && !isEnrolled"
-              :title="
-                lecture.isPreviewable
-                  ? 'Xem bài giảng'
-                  : isOwner || isEnrolled
-                  ? 'Xem bài giảng'
-                  : 'Bạn cần mua khóa học để xem bài giảng này'
-              "
-            >
-              ▶️ Xem bài giảng
-            </button>
-          </div>
-        </div>
-        <div v-else-if="!isLoadingLectures && course">
-          <p>Chưa có bài giảng nào cho khóa học này.</p>
-        </div>
-      </div>
-      <div v-else-if="!isLoadingCourse && !course && !isLoadingEnrollment">
-        <p class="loading-placeholder">⚠️ Không thể tải thông tin khóa học.</p>
-      </div>
-
-      <div
-        class="card border-0 shadow-sm mb-2 mt-4"
-        v-if="recommendedCourses.length > 0"
-      >
-        <div class="card-body">
-          <h4 class="fw-bold text-dark card-title mb-4">
-            Khóa học bạn có thể thích
-          </h4>
-
-          <div class="position-relative">
-            <swiper
-              :modules="swiperModules"
-              :slides-per-view="1"
-              :space-between="10"
-              :navigation="true"
-              :pagination="{ clickable: true }"
-              :breakpoints="{
-                576: { slidesPerView: 1 },
-                768: { slidesPerView: 2, spaceBetween: 10 },
-                992: { slidesPerView: 3, spaceBetween: 10 },
-              }"
-              class="related-courses-swiper"
-            >
-              <swiper-slide
-                v-for="recCourse in recommendedCourses"
-                :key="recCourse.objectID"
-              >
-                <a
-                  :href="`/courses/${recCourse.objectID}`"
-                  class="card h-100 shadow-sm article-card text-decoration-none"
-                >
-                  <div class="image-container">
-                    <img
-                      :src="recCourse.ThumbUrl"
-                      class="card-img-top"
-                      alt="course image"
-                    />
-                  </div>
-                  <div class="card-content">
-                    <h5 class="fw-bold title-truncate">
-                      {{ recCourse.Title }}
-                    </h5>
-                    <p class="text-muted mb-0 date-text">
-                      {{ formatDate(recCourse.CreationTime) }}
-                    </p>
-                  </div>
-                </a>
-              </swiper-slide>
-            </swiper>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, computed, onMounted } from "vue";
@@ -220,6 +288,21 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import {
+  ArrowLeftIcon,
+  ImageIcon,
+  StarIcon,
+  UsersIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  MessageSquareIcon,
+  UserIcon,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  MailIcon,
+  AwardIcon,
+} from "lucide-vue-next";
 
 export default {
   name: "CourseDetail",
@@ -394,7 +477,7 @@ export default {
       } catch (error) {
         toast.error(
           error.response?.data?.message ||
-            "Có lỗi xảy ra khi tiến hành thanh toán"
+          "Có lỗi xảy ra khi tiến hành thanh toán"
         );
       }
     };
@@ -479,521 +562,61 @@ export default {
 </script>
 
 <style scoped>
-.course-detail-container {
-  margin: 0px auto;
-  background: white;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.06);
+.icon {
+  width: 16px;
+  height: 16px;
 }
 
-.course-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 48px;
-  margin-bottom: 50px;
+.cursor-pointer {
+  cursor: pointer;
 }
 
-.course-media-actions {
-  width: 350px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.flex-1 {
+  flex: 1;
 }
 
-.course-thumb {
-  width: 100%;
-  height: 210px;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.text-light-50 {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.course-thumb:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
-
-.course-info {
-  flex-grow: 1;
-}
-
-.course-title {
-  font-size: 32px;
-  margin: 0 0 15px 0;
-  font-weight: 700;
-  color: #222;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-.course-meta {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.course-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.hover-bg-light:hover {
   background-color: #f8f9fa;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-weight: 500;
 }
 
-.course-section {
-  margin-bottom: 25px;
+.lecture-link {
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.section-subtitle {
-  font-size: 20px;
-  font-weight: 600;
-  color: #0056b3;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #eef2f7;
+.lecture-link:hover {
+  color: #0d6efd !important;
+  text-decoration: underline;
 }
 
-.course-intro,
-.course-description,
-.course-outcomes,
-.course-requirements {
-  font-size: 16px;
-  color: #444;
-  line-height: 1.7;
-  margin-top: 0;
+.w-8 {
+  width: 32px;
 }
 
-.course-actions {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-}
-
-.course-pricing {
-  font-size: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background-color: #f8f9fa;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-}
-
-.price-label {
-  font-weight: 500;
-  color: #444;
-  margin-bottom: 5px;
-}
-
-.price-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.old-price-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.old-price-row del {
-  color: #999;
-  font-size: 14px;
-}
-
-.discount-badge {
-  background: linear-gradient(135deg, #f0ad4e, #ec971f);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(240, 173, 78, 0.4);
-}
-
-.new-price strong {
-  font-weight: 700;
-  font-size: 24px;
-  color: #d9534f;
-}
-
-.buy-button-container {
-  margin-top: 5px;
-}
-
-.btn-buy {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  color: white;
-  padding: 16px 30px;
-  font-size: 18px;
+.card {
   border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
-  width: 100%;
-  text-align: center;
-  letter-spacing: 0.5px;
+  transition: box-shadow 0.3s ease;
 }
 
-.btn-buy:hover {
-  background: linear-gradient(135deg, #218838, #1a6b2d);
-  box-shadow: 0 8px 18px rgba(40, 167, 69, 0.4);
-  transform: translateY(-3px);
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
-.section-title {
-  font-size: 24px;
-  margin-bottom: 30px;
-  border-bottom: 3px solid #0056b3;
-  padding-bottom: 10px;
-  color: #222;
-  position: relative;
-  display: inline-block;
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
-.section-title:after {
-  content: "";
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background-color: #28a745;
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 1rem;
 }
 
-.lecture-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
-  margin-top: 25px;
-}
-
-.lecture-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid #f0f0f0;
-  overflow: hidden;
-}
-
-.lecture-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-}
-
-.lecture-thumb {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 10px;
-  background-color: #f5f5f5;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.lecture-content h3 {
-  font-size: 18px;
-  margin: 0 0 10px 0;
-  color: #333;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.lecture-summary {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 15px;
-  line-height: 1.6;
-}
-
-.preview-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #17a2b8, #138496);
-  color: #fff;
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-weight: 500;
-  box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
-}
-
-.btn-view {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 12px;
-  font-size: 15px;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  text-align: center;
-  margin-top: 15px;
-  width: 100%;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
-}
-
-.btn-view:hover {
-  background: linear-gradient(135deg, #0056b3, #004494);
-  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
-  transform: translateY(-2px);
-}
-
-.btn-view:disabled {
-  background: linear-gradient(135deg, #adb5bd, #868e96);
-  color: #fff;
-  cursor: not-allowed;
-  opacity: 0.8;
-  box-shadow: none;
-}
-
-.btn-view:disabled:hover {
-  background: linear-gradient(135deg, #adb5bd, #868e96);
-  transform: none;
-}
-
-@media (max-width: 768px) {
-  .course-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-  }
-
-  .course-media-actions {
-    width: 100%;
-    max-width: 450px;
-    align-items: center;
-  }
-
-  .course-thumb {
-    max-width: 400px;
-    height: auto;
-  }
-
-  .course-info {
-    width: 100%;
-  }
-
-  .course-pricing {
-    justify-content: center;
-  }
-
-  .btn-buy {
-    width: 100%;
-  }
-
-  .lecture-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .course-detail-container {
-    padding: 25px;
-  }
-}
-
-.loading-placeholder {
-  text-align: center;
-  padding: 60px;
-  font-size: 1.3em;
-  color: #555;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  margin: 40px auto;
-  max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.lecture-thumb-placeholder {
-  width: 100%;
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f5f5f5;
-  color: #888;
-  font-size: 14px;
-  text-align: center;
-  border-radius: 10px;
-  border: 1px dashed #ddd;
-  margin-bottom: 18px;
-}
-
-.enrollment-status {
-  margin-top: 20px;
-  padding: 18px;
-  background-color: #e9f7ef;
-  border: 1px solid #c8e6d2;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.1);
-}
-
-.enrolled-message {
-  color: #155724;
-  font-weight: 600;
-  margin: 0;
-  font-size: 16px;
-}
-
-.enrollment-loading {
-  margin-top: 20px;
-  text-align: center;
-  color: #6c757d;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-}
-
-.owner-status {
-  margin-top: 20px;
-  padding: 18px;
-  background-color: #fff8e1;
-  border: 1px solid #ffe082;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.1);
-}
-
-.owner-message {
-  color: #856404;
-  font-weight: 600;
-  margin: 0;
-  font-size: 16px;
-}
-
-.related-courses-swiper {
-  padding: 0 15px;
-  padding-bottom: 2.5rem;
-  max-width: 100%;
-}
-
-.image-container {
-  height: 200px;
-  overflow: hidden;
-  border-radius: 6px 6px 0 0;
-}
-
-.card-img-top {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.5s ease;
-}
-
-.article-card:hover .card-img-top {
-  transform: scale(1.05);
-}
-
-.card-content {
-  min-height: 75px;
-  max-height: 85px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  justify-content: space-between;
-}
-
-.title-truncate {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-  max-height: 2.6em;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-.swiper-button-next,
-.swiper-button-prev {
-  color: #6c757d;
-  font-weight: bold;
-  top: 45%;
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.swiper-button-next::after,
-.swiper-button-prev::after {
-  font-weight: bold;
-  font-size: 20px;
-}
-
-.swiper-pagination-bullet-active {
-  background: #6c757d;
-}
-
-:deep(.swiper-pagination) {
-  bottom: 0 !important;
-  margin-bottom: 0.5rem;
-}
-
-:deep(.swiper-button-prev) {
-  left: 0;
-}
-
-:deep(.swiper-button-next) {
-  right: 0;
-}
-
-.article-card {
-  height: 320px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-  position: relative;
-}
-
-.article-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-}
-
-:deep(.swiper-wrapper) {
-  width: 100%;
-}
-
-:deep(.swiper-slide) {
-  width: auto;
-  display: flex;
-  justify-content: center;
-}
-
-.card-body {
-  padding: 1.25rem 0.75rem;
+.sticky-top {
+  z-index: 1020;
 }
 </style>

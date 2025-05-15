@@ -1,188 +1,222 @@
 <template>
-  <div class="container">
-    <LoadingSpinner ref="loadingSpinner" />
-    <div class="card shadow custom-card">
-      <div class="card-header bg-primary text-white text-center py-3">
-        <h1 class="h3 mb-0">
-          <i class="fas fa-book-open me-2 bold-icon"></i>
-          <span class="bold-text">Tạo khóa học mới</span>
-        </h1>
+  <div class="container-fluid">
+    <div class="row mb-4 p-2">
+      <div class="col-12">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-secondary me-3 d-flex align-items-center" @click="goBack">
+            <ArrowLeftIcon class="icon me-1" /> Quay lại
+          </button>
+          <h1 class="h3 mb-0">Thêm khóa học mới</h1>
+        </div>
       </div>
-      <div class="card-body">
-        <form @submit.prevent="openSavePopup">
-          <div class="mb-3">
-            <label for="title" class="form-label required">
-              <i class="fas fa-pen-nib me-1 bold-icon"></i>
-              <span class="bold-text">Tiêu đề khóa học</span>
-            </label>
-            <input type="text" id="title" v-model="course.title" class="form-control" placeholder="Nhập tiêu đề khóa học"
-              required />
-          </div>
-          <div class="mb-3">
-            <label for="intro" class="form-label required">
-              <i class="fas fa-book me-1 bold-icon"></i>
-              <span class="bold-text">Giới thiệu khóa học</span>
-            </label>
-            <textarea id="intro" v-model="course.intro" class="form-control"
-              placeholder="Viết một giới thiệu ngắn cho khóa học" rows="3" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label required">
-              <i class="fas fa-align-left me-1 bold-icon"></i>
-              <span class="bold-text">Mô tả chi tiết khóa học</span>
-            </label>
-            <textarea id="description" v-model="course.description" class="form-control"
-              placeholder="Mô tả chi tiết khóa học" rows="5" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="thumb" class="form-label required">
-              <i class="fas fa-image me-1 bold-icon"></i>
-              <span class="bold-text">Hình ảnh khóa học</span>
-            </label>
-            <input type="file" id="thumb" @change="handleImageUpload" class="form-control" accept="image/*"
-              required />
-            <div v-if="previewImage" class="mt-2 text-center">
-              <img :src="previewImage" alt="Course Thumbnail" class="img-thumbnail" style="max-width: 200px;" />
-            </div>
-          </div>
-          <!-- <div class="mb-3">
-            <label for="category" class="form-label">
-              <i class="fas fa-folder-open me-1 bold-icon"></i>
-              <span class="bold-text">Course Category</span>
-            </label>
-            <select id="category" v-model="course.leafCategoryId" required class="form-select">
-              <option value="" disabled>Choose a category</option>
-              <option v-for="(category, index) in availableCategories" :key="index" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </div> -->
+    </div>
 
-          <div class="mb-3">
-            <label for="price" class="form-label required">
-              <i class="fas fa-dollar-sign me-1 bold-icon"></i>
-              <span class="bold-text">Giá khóa học</span>
-            </label>
-            <input type="number" id="price" v-model="course.price" class="form-control" 
-              placeholder="Nhập giá (VND)" min="10000" required />
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white py-3">
+            <h5 class="mb-0">Thông tin khóa học</h5>
           </div>
-          <div class="mb-3">
-            <label for="level" class="form-label required">
-              <i class="fas fa-signal me-1 bold-icon"></i>
-              <span class="bold-text">Cấp độ khóa học</span>
-            </label>
-            <select id="level" v-model="course.level" class="form-select" required>
-              <option value="" disabled>Chọn cấp độ</option>
-              <option value="0">Người mới bắt đầu</option>
-              <option value="1">Trung bình</option>
-              <option value="2">Nâng cao</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="outcomes" class="form-label required">
-              <i class="fas fa-award me-1 bold-icon"></i>
-              <span class="bold-text">Kết quả học tập</span>
-            </label>
-            <textarea id="outcomes" v-model="course.outcomes" class="form-control"
-              placeholder="Kết quả học tập mong đợi" rows="3" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="requirements" class="form-label required">
-              <i class="fas fa-info-circle me-1 bold-icon"></i>
-              <span class="bold-text">Yêu cầu khóa học</span>
-            </label>
-            <textarea id="requirements" v-model="course.requirements" class="form-control"
-              placeholder="Điều kiện tiên quyết" rows="3" required></textarea>
-          </div>
-          <div class="mb-4">
-            <h2 class="h5 mb-3">
-              <i class="fas fa-list-ul me-1 bold-icon"></i>
-              <span class="bold-text">Bài giảng khóa học</span>
-            </h2>
-            <div class="mb-4 border rounded p-3" v-for="(lecture, index) in course.lectures" :key="index">
+          <div class="card-body">
+            <form @submit.prevent="saveCourse">
               <div class="mb-3">
-                <label class="form-label required">
-                  <i class="fas fa-sticky-note me-1 bold-icon"></i>
-                  <span class="bold-text">Tiêu đề bài giảng {{ index + 1 }}</span>
-                </label>
-                <input type="text" v-model="lecture.title" class="form-control" 
-                  placeholder="Tiêu đề bài giảng" required />
+                <label for="courseName" class="form-label">Tên khóa học</label>
+                <input type="text" class="form-control" id="courseName" v-model="course.name"
+                  placeholder="Nhập tên khóa học" required />
               </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="courseCategory" class="form-label">Danh mục</label>
+                  <select class="form-select" id="courseCategory" v-model="course.category" required>
+                    <option value="" disabled>Chọn danh mục</option>
+                    <option v-for="category in categories" :key="category" :value="category">
+                      {{ category }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="coursePrice" class="form-label">Giá ($)</label>
+                  <input type="number" class="form-control" id="coursePrice" v-model="course.price" min="0" step="0.01"
+                    placeholder="0.00" required />
+                </div>
+              </div>
+
               <div class="mb-3">
-                <label class="form-label required">
-                  <i class="fas fa-align-left me-1 bold-icon"></i>
-                  <span class="bold-text">Nội dung bài giảng</span>
-                </label>
-                <textarea v-model="lecture.content" class="form-control" 
-                  placeholder="Nội dung bài giảng" rows="4" required></textarea>
+                <label for="courseDescription" class="form-label">Mô tả</label>
+                <textarea class="form-control" id="courseDescription" v-model="course.description" rows="4"
+                  placeholder="Mô tả khóa học" required></textarea>
               </div>
+
               <div class="mb-3">
-                <label class="form-label required">
-                  <i class="fas fa-align-left me-1 bold-icon"></i>
-                  <span class="bold-text">Tóm tắt nội dung</span>
-                </label>
-                <textarea v-model="lecture.contentSummary" class="form-control" 
-                  placeholder="Tóm tắt nội dung bài giảng" rows="4" required></textarea>
+                <label for="courseImage" class="form-label">Ảnh khóa học</label>
+                <div class="input-group">
+                  <input type="file" class="form-control" id="courseImage" @change="handleImageUpload"
+                    accept="image/*" />
+                  <label class="input-group-text d-flex align-items-center" for="courseImage">
+                    <UploadIcon class="icon me-1" /> Tải lên
+                  </label>
+                </div>
+                <small class="text-muted">Kích thước khuyến nghị: 1280x720px (16:9)</small>
+
+                <div v-if="course.imagePreview" class="mt-3">
+                  <img :src="course.imagePreview" alt="Xem trước ảnh" class="img-thumbnail" style="max-height: 200px" />
+                </div>
               </div>
-              <div class="form-check form-switch mb-3">
-                <input type="checkbox" class="form-check-input" 
-                  v-model="lecture.isPreviewable" :id="'previewable-' + index" />
-                <label class="form-check-label bold-text" :for="'previewable-' + index">
-                  <i class="fas fa-eye me-1 bold-icon"></i>
-                  <span class="bold-text">Có thể xem trước</span>
-                </label>
-              </div>
+
               <div class="mb-3">
-                <label class="form-label required">
-                  <i class="fas fa-upload me-1 bold-icon"></i>
-                  <span class="bold-text">Tải lên tài liệu bài giảng</span>
-                </label>
-                <input type="file" class="form-control" @change="handleLectureMediaUpload($event, index)"
-                  accept="image/*,video/*,application/pdf" multiple required />
-                <div v-if="lecture.medias.length > 0" class="mt-2">
-                  <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
-                    class="d-flex align-items-center mb-2 p-2 border rounded">
-                    <template v-if="media.type === 'image'">
-                      <img :src="media.preview" alt="Lecture Image" class="img-thumbnail me-2"
-                        style="max-width: 100px;" />
-                    </template>
-                    <template v-else-if="media.type === 'video'">
-                      <video controls :src="media.preview" class="me-2"
-                        style="max-width: 100px; border-radius: 5px;"></video>
-                    </template>
-                    <template v-else>
-                      <a :href="media.url" target="_blank" class="me-2">
-                        <i class="fas fa-file-alt me-1 bold-icon"></i>
-                        <span class="bold-text">{{ media.title }}</span>
-                      </a>
-                    </template>
-                    <button class="btn btn-danger btn-sm ms-auto" @click="removeLectureMedia(index, mediaIndex)">
-                      <i class="fas fa-times bold-icon"></i>
+                <label class="form-label d-block">Trạng thái</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="courseStatus" id="statusDraft" value="Draft"
+                    v-model="course.status" />
+                  <label class="form-check-label" for="statusDraft">Bản nháp</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="courseStatus" id="statusActive" value="Active"
+                    v-model="course.status" />
+                  <label class="form-check-label" for="statusActive">Hoạt động</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="courseStatus" id="statusInactive" value="Inactive"
+                    v-model="course.status" />
+                  <label class="form-check-label" for="statusInactive">Không hoạt động</label>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+
+              <h5 class="mb-3">Bài giảng</h5>
+
+              <div v-for="(lecture, index) in course.lectures" :key="index" class="card mb-3">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Bài giảng {{ index + 1 }}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                      @click="removeLecture(index)">
+                      <TrashIcon class="icon me-1" /> Xóa
                     </button>
+                  </div>
+
+                  <div class="mb-3">
+                    <label :for="`lectureTitle${index}`" class="form-label">Tiêu đề</label>
+                    <input type="text" class="form-control" :id="`lectureTitle${index}`" v-model="lecture.title"
+                      placeholder="Tiêu đề bài giảng" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label :for="`lectureDescription${index}`" class="form-label">Mô tả</label>
+                    <textarea class="form-control" :id="`lectureDescription${index}`" v-model="lecture.description"
+                      rows="2" placeholder="Mô tả bài giảng"></textarea>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label :for="`lectureDuration${index}`" class="form-label">Thời lượng (phút)</label>
+                      <input type="number" class="form-control" :id="`lectureDuration${index}`"
+                        v-model="lecture.duration" min="1" placeholder="Thời lượng" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label :for="`lectureType${index}`" class="form-label">Loại</label>
+                      <select class="form-select" :id="`lectureType${index}`" v-model="lecture.type">
+                        <option value="Video">Video</option>
+                        <option value="Text">Văn bản</option>
+                        <option value="Quiz">Trắc nghiệm</option>
+                        <option value="Assignment">Bài tập</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
-              <button class="btn btn-danger btn-sm" @click="removeLecture(index)">
-                <i class="fas fa-trash-alt me-1 bold-icon"></i>
-                <span class="bold-text">Xóa bài giảng</span>
+
+              <button type="button" class="btn btn-outline-primary mb-4 d-flex align-items-center" @click="addLecture">
+                <PlusIcon class="icon me-1" /> Thêm bài giảng
               </button>
+
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-danger me-2 d-flex align-items-center"
+                  @click="goBack">Hủy</button>
+                <button type="submit" class="btn btn-outline-primary d-flex align-items-center">
+                  <SaveIcon class="icon me-1" /> Lưu khóa học
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white py-3">
+            <h5 class="mb-0">Cài đặt khóa học</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="courseLanguage" class="form-label">Ngôn ngữ</label>
+              <select class="form-select" id="courseLanguage" v-model="course.language">
+                <option value="English">Tiếng Anh</option>
+                <option value="Spanish">Tiếng Tây Ban Nha</option>
+                <option value="French">Tiếng Pháp</option>
+                <option value="German">Tiếng Đức</option>
+                <option value="Chinese">Tiếng Trung</option>
+                <option value="Japanese">Tiếng Nhật</option>
+              </select>
             </div>
-            <button class="btn btn-secondary custom-btn" @click="addLecture">
-              <i class="fas fa-plus me-1 bold-icon"></i>
-              <span class="bold-text">Thêm bài giảng</span>
-            </button>
+
+            <div class="mb-3">
+              <label for="courseDifficulty" class="form-label">Trình độ</label>
+              <select class="form-select" id="courseDifficulty" v-model="course.difficulty">
+                <option value="Beginner">Người mới bắt đầu</option>
+                <option value="Intermediate">Trung cấp</option>
+                <option value="Advanced">Nâng cao</option>
+                <option value="All Levels">Mọi trình độ</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tính năng khóa học</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="hasCertificate" v-model="course.hasCertificate" />
+                <label class="form-check-label" for="hasCertificate">
+                  Chứng chỉ hoàn thành
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="hasDownloadable" v-model="course.hasDownloadable" />
+                <label class="form-check-label" for="hasDownloadable">
+                  Tài nguyên có thể tải về
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="hasAssignments" v-model="course.hasAssignments" />
+                <label class="form-check-label" for="hasAssignments">
+                  Bài tập
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="hasForumSupport" v-model="course.hasForumSupport" />
+                <label class="form-check-label" for="hasForumSupport">
+                  Hỗ trợ diễn đàn
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="mb-3">
+              <label for="coursePrerequisites" class="form-label">Yêu cầu trước khi học</label>
+              <textarea class="form-control" id="coursePrerequisites" v-model="course.prerequisites" rows="3"
+                placeholder="Học viên cần biết gì trước khi tham gia khóa học?"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="courseTargetAudience" class="form-label">Đối tượng học</label>
+              <textarea class="form-control" id="courseTargetAudience" v-model="course.targetAudience" rows="3"
+                placeholder="Khóa học này dành cho ai?"></textarea>
+            </div>
           </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-success custom-btn-lg">
-              <i class="fas fa-check me-1 bold-icon"></i>
-              <span class="bold-text">Tạo khóa học</span>
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
-    <SaveConfirmPopUp :message="'Bạn có chắc chắn muốn tạo khóa học này?'" :isVisible="showSavePopup"
-      @confirmSave="handleSave" @update:isVisible="showSavePopup = $event" />
   </div>
 </template>
 
@@ -192,12 +226,19 @@ import { createCourse } from '@/scripts/api/services/courseService';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
+import {
+  ArrowLeftIcon,
+  PlusIcon,
+  TrashIcon,
+  SaveIcon,
+  UploadIcon,
+} from "lucide-vue-next";
 
 export default {
   name: "CreateCourse",
-  components: { 
+  components: {
     SaveConfirmPopUp,
-    LoadingSpinner 
+    LoadingSpinner
   },
   data() {
     return {
@@ -220,7 +261,7 @@ export default {
   methods: {
     handleImageUpload(event) {
       const file = event.target.files[0];
-      if (file) { 
+      if (file) {
         this.course.thumb.file = file;
         this.course.thumb.title = file.name;
         const reader = new FileReader();
@@ -259,7 +300,7 @@ export default {
         isPreviewable: false,
         medias: []
       });
-      
+
       toast.info("Vui lòng điền đầy đủ thông tin và tải lên tài liệu cho bài giảng mới", {
         autoClose: 3000,
         position: toast.POSITION.TOP_RIGHT
@@ -270,7 +311,7 @@ export default {
     },
     removeLectureMedia(lectureIndex, mediaIndex) {
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
-      
+
       if (this.course.lectures[lectureIndex].medias.length === 0) {
         toast.warning(`Bài giảng ${lectureIndex + 1}: Vui lòng tải lên ít nhất một tài liệu`, {
           autoClose: 3000,
@@ -335,7 +376,7 @@ export default {
       if (this.course.lectures.length > 0) {
         for (let i = 0; i < this.course.lectures.length; i++) {
           const lecture = this.course.lectures[i];
-          
+
           // Validate lecture title
           if (!lecture.title || !lecture.title.trim()) {
             toast.error(`Bài giảng ${i + 1}: Vui lòng nhập tiêu đề bài giảng`);
@@ -383,7 +424,7 @@ export default {
 
     async handleSave(confirm) {
       if (!confirm) return;
-      
+
       if (!this.validateForm()) {
         return;
       }
@@ -427,7 +468,7 @@ export default {
 
         const response = await createCourse(formData);
         console.log('Course created successfully:', response);
-        
+
         toast.success("Tạo khóa học thành công!", {
           autoClose: 3000,
           position: toast.POSITION.TOP_RIGHT
@@ -473,84 +514,8 @@ export default {
 </script>
 
 <style scoped>
-body {
-  background-color: #f8f9fa;
-}
-
-.custom-card {
-  border: none;
-  border-radius: 10px;
-  max-width: 100%;
-  margin: auto;
-}
-
-.form-label {
-  font-weight: 700;
-  color: #495057;
-  font-size: 1.1rem;
-}
-
-.bold-icon {
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.bold-text {
-  font-weight: 700;
-}
-
-.btn,
-.custom-btn,
-.custom-btn-lg {
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  font-size: 1.1rem;
-  padding: 12px 20px;
-  border-radius: 5px;
-  border: none;
-}
-
-.btn:hover,
-.custom-btn:hover,
-.custom-btn-lg:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-
-.btn-success.custom-btn-lg {
-  background: linear-gradient(45deg, #28a745, #218838);
-  color: #fff;
-}
-
-.btn-danger {
-  background: linear-gradient(45deg, #ff6868, #e63946);
-  color: #fff;
-}
-
-.btn-secondary.custom-btn {
-  background: linear-gradient(45deg, #6c757d, #5a6268);
-  color: #fff;
-}
-
-.img-thumbnail {
-  border: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.border {
-  border-color: #dee2e6 !important;
-}
-
-.shadow {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-}
-
-:deep(.loading-spinner) {
-  z-index: 9999;
-}
-
-.form-label.required::after {
-  content: " *";
-  color: red;
-  font-weight: bold;
+.icon {
+  width: 16px;
+  height: 16px;
 }
 </style>
