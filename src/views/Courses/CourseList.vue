@@ -23,8 +23,16 @@
     </div>
 
     <div class="courses-container">
-      <div class="course-grid">
-        <CourseCard v-for="course in courses" :key="course.id" :course="course" />
+      <div v-if="courses.length > 0" class="course-grid">
+        <CourseCard 
+          v-for="course in courses" 
+          :key="course.id" 
+          :course="course"
+          :is-enrolled="enrolledCourses.includes(course.id) || ownCourses.includes(course.id)"
+        />
+      </div>
+      <div v-else class="text-center py-5">
+        <p class="text-muted">Không tìm thấy khóa học phù hợp</p>
       </div>
     </div>
 
@@ -37,6 +45,8 @@ import { ref, watch, onBeforeMount } from 'vue';
 import CourseCard from '@/components/CourseComponents/CourseCard.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 import { getCourses } from '@/scripts/api/services/courseService.js';
+import { getEnrollments } from '@/scripts/api/services/enrollmentService.js';
+import { getUserProfile } from '@/scripts/api/services/authService.js';
 
 const searchQuery = ref('');
 const selectedTags = ref([]);
@@ -47,6 +57,29 @@ const courses = ref([]);
 const filters = ref([]);
 const totalPages = ref(1);
 const totalItems = ref(0);
+const enrolledCourses = ref([]);
+const currentUser = ref(null);
+const ownCourses = ref([]);
+
+async function loadEnrolledCourses() {
+  try {
+    const response = await getEnrollments({ pageSize: 100 });
+    if (response?.items) {
+      enrolledCourses.value = response.items.map(enrollment => enrollment.courseId);
+    }
+  } catch (error) {
+    console.error('Error loading enrolled courses:', error);
+  }
+}
+
+async function getCurrentUserInfo() {
+  try {
+    currentUser.value = await getUserProfile();
+  } catch (error) {
+    console.error('Error getting user info:', error);
+    currentUser.value = null;
+  }
+}
 
 async function loadCourses(page = 1) {
   currentPage.value = page;
@@ -60,9 +93,18 @@ async function loadCourses(page = 1) {
     };
 
     const response = await getCourses(params);
-    courses.value = response.items || [];
-    totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
-    totalItems.value = response.totalCount || 0;
+    if (response?.items) {
+      courses.value = response.items;
+      // Update ownCourses list
+      if (currentUser.value) {
+        ownCourses.value = response.items
+          .filter(course => course.creatorId === currentUser.value.id)
+          .map(course => course.id);
+      }
+      
+      totalPages.value = response.pageCount || Math.ceil(response.totalCount / itemsPerPage);
+      totalItems.value = response.totalCount || 0;
+    }
   } catch (e) {
     console.error('Không thể tải khóa học', e);
   }
@@ -89,7 +131,11 @@ function sortCourses() {
 }
 
 onBeforeMount(async () => {
-  await loadCategories();
+  await Promise.all([
+    loadCategories(),
+    loadEnrolledCourses(),
+    getCurrentUserInfo()
+  ]);
   loadCourses();
 });
 
