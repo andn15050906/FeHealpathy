@@ -76,7 +76,6 @@
                       outlined
                       dense
                     ></v-text-field>
-                    <v-btn text @click="skipStep(1)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
 
@@ -112,7 +111,6 @@
                         outlined
                         dense
                       ></v-text-field>
-                      <v-btn text @click="skipStep(2)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
@@ -150,7 +148,6 @@
                         outlined
                         dense
                       ></v-text-field>
-                      <v-btn text @click="skipStep(3)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
@@ -163,7 +160,7 @@
                           margin-bottom: 4px;
                         "
                       >
-                        Thường xảy ra vào thời gian nào? (Có thể chọn nhiều)
+                        Thường xảy ra vào thời gian nào?
                       </div>
                       <v-radio-group v-model="answers.when">
                         <v-radio label="Buổi sáng" value="morning"></v-radio>
@@ -186,7 +183,6 @@
                         outlined
                         dense
                       ></v-text-field>
-                      <v-btn text @click="skipStep(4)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
 
@@ -199,7 +195,7 @@
                           margin-bottom: 4px;
                         "
                       >
-                        Ai thường liên quan đến vấn đề này? (Có thể chọn nhiều)
+                        Ai thường liên quan đến vấn đề này?
                       </div>
                       <v-radio-group v-model="answers.related">
                         <v-radio label="Bố mẹ" value="parent"></v-radio>
@@ -229,7 +225,6 @@
                         outlined
                         dense
                       ></v-text-field>
-                      <v-btn text @click="skipStep(5)">Bỏ qua</v-btn>
                     </v-card-text>
                   </v-stepper-window-item>
                 </template>
@@ -284,8 +279,7 @@
                 <v-spacer></v-spacer>
                 <v-btn
                   color="primary"
-                  @click="handleNext"
-                  :disabled="!canProceed"
+                  @click="onNextClick"
                 >
                   {{ currentStep < 5 ? "Tiếp theo" : "Hoàn thành" }}
                 </v-btn>
@@ -694,18 +688,22 @@ export default {
       if (this.currentStep === 1) {
         return !!this.answers.userType;
       } else if (this.currentStep === 2) {
-        return !!this.answers.issue;
-      } else if (this.currentStep === 3) {
-        return !!this.answers.where;
-      } else if (this.currentStep === 4) {
-        return !!this.answers.when;
-      } else if (this.currentStep === 5) {
-        return !!this.answers.related;
+        return !!this.answers.issue && (this.answers.issue !== 'other' || !!this.answers.issueOther);
       }
-      return false;
+      return true;
     },
   },
   methods: {
+    onNextClick() {
+      if (this.currentStep === 2) {
+        if (!this.answers.issue || (this.answers.issue === 'other' && !this.answers.issueOther)) {
+          this.skippedIssue = true;
+          this.currentStep = 2;
+          return;
+        }
+      }
+      this.handleNext();
+    },
     handleNext() {
       if (this.currentStep < 5) {
         this.currentStep++;
@@ -811,6 +809,33 @@ export default {
     },
     getIssueText(issueValue) {
       const issueOptions = this.getIssueOptions(this.answers.userType);
+      const found = issueOptions.find(opt => opt.value === this.answers.issue);
+      if (this.answers.issue === 'other' && this.answers.issueOther) {
+        stressSource = this.answers.issueOther;
+      } else if (found) {
+        stressSource = found.text;
+      } else {
+        severity = "nhẹ";
+      }
+
+      // Thêm các triệu chứng dựa trên các câu trả lời khác
+      if (this.answers.when === "always") {
+        symptoms.push("triệu chứng xuất hiện liên tục");
+      }
+
+      if (this.answers.related === "myself") {
+        symptoms.push("tự đánh giá tiêu cực về bản thân");
+      }
+
+      // Lưu kết quả phân tích
+      this.analysisResult = {
+        issues: issues,
+        severity: severity,
+        symptoms: symptoms,
+      };
+    },
+    getIssueText(issueValue) {
+      const issueOptions = this.getIssueOptions(this.answers.userType);
       const issue = issueOptions.find((option) => option.value === issueValue);
       return issue ? issue.text.toLowerCase() : issueValue;
     },
@@ -865,165 +890,48 @@ export default {
     generatePersonalizedRoadmaps(stressLevel, depressionRisk) {
       const roadmaps = [];
 
-      // Dựa vào userType và issue để tạo roadmap phù hợp
-      if (this.answers.userType === "student") {
-        if (["study_pressure", "future_worry"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "1",
-            title: "Vượt qua áp lực học tập",
-            description:
-              "Phương pháp giảm căng thẳng và cải thiện hiệu suất học tập",
-            match: 95,
-            steps: 5,
-            isPaid: true,
-            price: 500000,
-            features: [
-              "5 bài tập thư giãn chuyên sâu",
-              "Hướng dẫn quản lý thời gian hiệu quả",
-              "Kỹ thuật học tập tối ưu",
-              "Tư vấn 1-1 với chuyên gia",
-              "Theo dõi tiến độ cá nhân",
-            ],
-          });
-        }
-
-        if (["bullying", "no_close_friend"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "2",
-            title: "Xây dựng kỹ năng xã hội",
-            description: "Phát triển sự tự tin và kỹ năng giao tiếp hiệu quả",
-            match: 90,
-            steps: 5,
-            isPaid: true,
-            price: 450000,
-            features: [
-              "Bài tập rèn luyện sự tự tin",
-              "Kỹ thuật giao tiếp hiệu quả",
-              "Xử lý tình huống khó khăn",
-              "Hỗ trợ từ cộng đồng",
-              "Tài liệu chuyên sâu về kỹ năng xã hội",
-            ],
-          });
-        }
-      }
-
-      if (this.answers.userType === "university") {
-        if (["career_confusion", "future_worry"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "3",
-            title: "Định hướng nghề nghiệp",
-            description:
-              "Khám phá đam mê và xây dựng lộ trình sự nghiệp rõ ràng",
-            match: 93,
-            steps: 5,
-            isPaid: true,
-            price: 550000,
-            features: [
-              "Bài kiểm tra định hướng nghề nghiệp",
-              "Tư vấn 1-1 với chuyên gia hướng nghiệp",
-              "Kế hoạch phát triển cá nhân",
-              "Kỹ năng phỏng vấn và tìm việc",
-              "Mạng lưới kết nối chuyên nghiệp",
-            ],
-          });
-        }
-
-        if (["loneliness", "boredom"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "4",
-            title: "Sống trọn vẹn đời sinh viên",
-            description:
-              "Tận hưởng và phát triển bản thân trong thời gian đại học",
-            match: 88,
-            steps: 5,
-            isPaid: false,
-            price: 0,
-          });
-        }
-      }
-
-      if (this.answers.userType === "worker") {
-        if (["work_stress", "work_life_balance"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "5",
-            title: "Cân bằng công việc - cuộc sống",
-            description: "Phương pháp quản lý stress và tạo sự cân bằng",
-            match: 96,
-            steps: 5,
-            isPaid: true,
-            price: 600000,
-            features: [
-              "5 kỹ thuật quản lý thời gian",
-              "Phương pháp thiền mindfulness",
-              "Kỹ năng đặt ranh giới lành mạnh",
-              "Tư vấn 1-1 với chuyên gia",
-              "Theo dõi mức độ stress hàng ngày",
-            ],
-          });
-        }
-
-        if (["no_passion", "not_recognized"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "6",
-            title: "Tìm lại đam mê trong công việc",
-            description: "Khám phá lại ý nghĩa và niềm vui trong sự nghiệp",
-            match: 92,
-            steps: 5,
-            isPaid: true,
-            price: 500000,
-            features: [
-              "Bài tập khám phá giá trị cốt lõi",
-              "Kỹ thuật đặt mục tiêu SMART",
-              "Phương pháp tạo động lực nội tại",
-              "Tư vấn phát triển sự nghiệp",
-              "Công cụ đánh giá sự hài lòng",
-            ],
-          });
-        }
-      }
-
-      // Luôn thêm ít nhất một lộ trình miễn phí
-      roadmaps.push({
-        id: "7",
-        title: "Thư giãn với âm nhạc",
-        description:
-          "Bộ sưu tập nhạc thư giãn và thiền định giúp giảm căng thẳng",
-        match: 85,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      });
-
-      roadmaps.push({
-        id: "8",
-        title: "Yoga cơ bản",
-        description:
-          "Các bài tập yoga đơn giản giúp thư giãn cơ thể và tâm trí",
-        match: 80,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      });
-
-      // Nếu tâm lý bình thường, thêm lộ trình duy trì sức khỏe tinh thần
-      if (this.isNormalMentalHealth) {
-        roadmaps.push({
-          id: "9",
-          title: "Duy trì sức khỏe tinh thần",
-          description:
-            "Các hoạt động và thói quen giúp duy trì trạng thái tâm lý tích cực",
-          match: 98,
+      // Tạo danh sách lộ trình đề xuất
+      this.suggestedRoadmaps = [
+        {
+          id: "1",
+          title: "Vượt qua lo âu",
+          description: "Học cách nhận biết và vượt qua các triệu chứng lo âu thường gặp",
+          match: 95,
           steps: 5,
-          isPaid: false,
-          price: 0,
-        });
-      }
-
-      // Sắp xếp theo độ phù hợp
-      roadmaps.sort((a, b) => b.match - a.match);
-
-      // Giới hạn số lượng roadmap
-      return roadmaps.slice(0, 4);
+          advisor: {
+            name: "TS. Nguyễn An Tâm",
+            title: "Chuyên gia tâm lý trị liệu",
+            avatar: "img/advisor.jpg",
+            quote: "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+          }
+        },
+        {
+          id: "2",
+          title: "Xây dựng sự tự tin",
+          description: "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
+          match: 87,
+          steps: 4,
+          advisor: {
+            name: "ThS. Lê Minh Quân",
+            title: "Chuyên gia phát triển bản thân",
+            avatar: "img/advisor.jpg",
+            quote: "Tự tin là chìa khóa mở ra mọi cánh cửa thành công."
+          }
+        },
+        {
+          id: "3",
+          title: "Kiểm soát cảm xúc",
+          description: "Học cách nhận biết và điều chỉnh cảm xúc tiêu cực",
+          match: 82,
+          steps: 3,
+          advisor: {
+            name: "TS. Trần Hồng Phúc",
+            title: "Chuyên gia tâm lý học cảm xúc",
+            avatar: "img/advisor.jpg",
+            quote: "Cảm xúc là người bạn đồng hành, không phải kẻ thù."
+          }
+        },
+      ];
     },
 
     selectRoadmap(roadmap) {
