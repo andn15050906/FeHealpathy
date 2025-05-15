@@ -44,6 +44,19 @@
             </div>
           </div>
         </v-navigation-drawer>
+
+        <!-- Add floating button to open sidebar when collapsed -->
+        <v-btn
+          v-if="!sidebarOpen"
+          icon
+          color="primary"
+          class="sidebar-toggle-btn"
+          @click="toggleSidebar"
+          elevation="2"
+        >
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
@@ -839,6 +852,22 @@ main {
 
 footer {
   z-index: 100;
+}
+
+.sidebar-toggle-btn {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(135deg, #0d6efd, #0a58ca);
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  transform: translateY(-50%) translateX(4px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
 }
 </style>
 
