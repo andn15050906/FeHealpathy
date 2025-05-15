@@ -1,16 +1,7 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <v-container fluid class="pt-16">
-        <v-btn
-          variant="text"
-          color="primary"
-          class="mb-4"
-          prepend-icon="mdi-arrow-left"
-          @click="$router.push('/roadmaps/recommended')"
-        >
-          Quay lại lộ trình
-        </v-btn>
+      <v-container fluid class="pt-16" style="margin-top: 25px;">
 
         <v-card v-if="!showResults" class="mb-6 suggestion-card">
           <v-card-title class="d-flex align-center">
