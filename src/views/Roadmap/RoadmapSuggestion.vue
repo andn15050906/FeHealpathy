@@ -163,7 +163,7 @@
                           margin-bottom: 4px;
                         "
                       >
-                        Thường xảy ra vào thời gian nào? (Có thể chọn nhiều)
+                        Thường xảy ra vào thời gian nào?
                       </div>
                       <v-radio-group v-model="answers.when">
                         <v-radio label="Buổi sáng" value="morning"></v-radio>
@@ -199,7 +199,7 @@
                           margin-bottom: 4px;
                         "
                       >
-                        Ai thường liên quan đến vấn đề này? (Có thể chọn nhiều)
+                        Ai thường liên quan đến vấn đề này?
                       </div>
                       <v-radio-group v-model="answers.related">
                         <v-radio label="Bố mẹ" value="parent"></v-radio>
@@ -913,7 +913,7 @@ export default {
             id: "3",
             title: "Định hướng nghề nghiệp",
             description:
-              "Khám phá đam mê và xây dựng lộ trình sự nghiệp rõ ràng",
+              "Khám phá đam mê v�� xây dựng lộ trình sự nghiệp rõ ràng",
             match: 93,
             steps: 5,
             isPaid: true,
@@ -1117,27 +1117,60 @@ export default {
       }
 
       // Học sinh
-      if (userType === "student" && issue === "study_pressure") {
-        return "Chúng tôi hiểu rằng áp lực học tập có thể khiến bạn cảm thấy choáng ngợp. Nhiều học sinh xuất sắc cũng từng trải qua cảm giác này. Điều quan trọng là bạn đã nhận ra vấn đề và đang tìm cách giải quyết - đó là bước đầu tiên quan trọng nhất. Lộ trình chúng tôi đề xuất sẽ giúp bạn không chỉ đối phó với áp lực mà còn chuyển hóa nó thành động lực để phát triển.";
-      }
-      if (userType === "student" && issue === "bullying") {
-        return "Việc bị bắt nạt hoặc cô lập có thể gây tổn thương sâu sắc và ảnh hưởng đến cảm nhận về giá trị bản thân. Bạn không đáng phải trải qua điều này và không phải lỗi của bạn. Nhiều người thành công hiện nay cũng từng trải qua những khó khăn tương tự. Chúng tôi đã phát triển lộ trình giúp bạn xây dựng sức mạnh nội tại và kỹ năng xã hội để vượt qua tình huống này.";
+      if (userType === "student") {
+        if (issue === "study_pressure") {
+          return "Áp lực học tập có thể khiến bạn cảm thấy choáng ngợp và kiệt sức. Đây là trải nghiệm phổ biến mà nhiều học sinh xuất sắc đều từng trải qua. Việc bạn nhận ra vấn đề và chủ động tìm kiếm hỗ trợ cho thấy bạn có tinh thần trách nhiệm và sự trưởng thành. Lộ trình chúng tôi đề xuất sẽ giúp bạn xây dựng các kỹ năng quản lý áp lực học tập hiệu quả, cải thiện phương pháp học và tìm lại niềm vui trong việc học.";
+        }
+        if (issue === "bullying") {
+          return "Việc bị bắt nạt hoặc cô lập ở trường là trải nghiệm vô cùng đau đớn và không ai đáng phải trải qua điều này. Điều quan trọng là bạn hiểu rằng đây không phải lỗi của bạn. Nhiều người thành công hiện nay cũng từng trải qua những khó khăn tương tự. Bạn đã rất dũng cảm khi chia sẻ điều này. Lộ trình của chúng tôi sẽ giúp bạn xây dựng sức mạnh nội tại, kỹ năng xã hội và các chiến lược để đối phó với tình huống này một cách an toàn và hiệu quả.";
+        }
+        if (issue === "no_close_friend") {
+          return "Cảm giác không có bạn thân có thể tạo ra sự cô đơn và thiếu kết nối. Điều này hoàn toàn bình thường, đặc biệt trong giai đoạn học sinh khi các mối quan hệ đang phát triển và thay đổi. Việc bạn nhận ra mong muốn có những kết nối sâu sắc hơn là dấu hiệu của sự trưởng thành về mặt cảm xúc. Lộ trình của chúng tôi sẽ giúp bạn phát triển kỹ năng giao tiếp, xây dựng sự tự tin và tạo dựng các mối quan hệ bạn bè có ý nghĩa.";
+        }
+        if (issue === "parent_conflict") {
+          return "Mâu thuẫn với cha mẹ là một phần tự nhiên của quá trình trưởng thành và tìm kiếm bản sắc riêng. Điều này không có nghĩa là bạn hoặc cha mẹ có lỗi - đôi khi chỉ là do khác biệt về quan điểm và cách giao tiếp. Việc bạn muốn cải thiện mối quan hệ này cho thấy sự trưởng thành và tình cảm sâu sắc của bạn. Lộ trình của chúng tôi sẽ giúp bạn phát triển kỹ năng giao tiếp hiệu quả, hiểu biết hơn về động lực gia đình và xây dựng mối quan hệ hài hòa hơn với cha mẹ.";
+        }
+        if (issue === "no_motivation") {
+          return "Cảm giác mất động lực học tập có thể đến từ nhiều nguyên nhân khác nhau - từ áp lực quá lớn, thiếu mục tiêu rõ ràng, đến cảm giác choáng ngợp. Đây là trải nghiệm phổ biến mà nhiều học sinh xuất sắc cũng từng trải qua. Việc bạn nhận ra vấn đề này là bước đầu tiên quan trọng. Lộ trình của chúng tôi sẽ giúp bạn tìm lại niềm vui trong học tập, xây dựng thói quen hiệu quả và kết nối lại với mục tiêu cá nhân để tạo động lực nội tại bền vững.";
+        }
       }
 
       // Sinh viên
-      if (userType === "university" && issue === "future_worry") {
-        return "Lo lắng về tương lai là điều hoàn toàn tự nhiên, đặc biệt trong giai đoạn đại học - thời điểm bạn đang đứng trước nhiều lựa chọn quan trọng. Những cảm xúc này cho thấy bạn là người có trách nhiệm và quan tâm đến con đường phía trước. Lộ trình chúng tôi đề xuất sẽ giúp bạn chuyển đổi những lo lắng thành kế hoạch hành động cụ thể, giúp bạn tự tin hơn về tương lai của mình.";
-      }
-      if (userType === "university" && issue === "loneliness") {
-        return "Cảm giác cô đơn trong môi trường đại học là trải nghiệm phổ biến hơn bạn nghĩ. Nhiều sinh viên cảm thấy khó khăn khi xây dựng kết nối ý nghĩa, đặc biệt trong môi trường mới. Điều này không phản ánh giá trị của bạn mà chỉ là một giai đoạn chuyển tiếp. Lộ trình của chúng tôi sẽ giúp bạn phát triển kỹ năng kết nối và tìm thấy cộng đồng phù hợp với mình.";
+      if (userType === "university") {
+        if (issue === "future_worry") {
+          return "Lo lắng về tương lai là điều hoàn toàn tự nhiên, đặc biệt trong giai đoạn đại học - thời điểm bạn đang đứng trước nhiều lựa chọn quan trọng. Những cảm xúc này cho thấy bạn là người có trách nhiệm và quan tâm đến con đường phía trước. Nhiều người thành công cũng từng trải qua giai đoạn bất định tương tự. Lộ trình của chúng tôi sẽ giúp bạn xây dựng tầm nhìn rõ ràng về tương lai, phát triển kế hoạch hành động cụ thể và xây dựng sự tự tin để đối mặt với những thách thức sắp tới.";
+        }
+        if (issue === "career_confusion") {
+          return "Cảm giác mất định hướng nghề nghiệp là trải nghiệm phổ biến của nhiều sinh viên, ngay cả những người có thành tích học tập xuất sắc. Trong thế giới với vô số lựa chọn nghề nghiệp, việc cảm thấy choáng ngợp là điều dễ hiểu. Việc bạn đang tìm kiếm sự rõ ràng cho thấy bạn đang chủ động với tương lai của mình. Lộ trình của chúng tôi sẽ giúp bạn khám phá đam mê, nhận diện điểm mạnh, và xây dựng lộ trình sự nghiệp phù hợp với giá trị cốt lõi của bạn.";
+        }
+        if (issue === "loneliness") {
+          return "Cảm giác cô đơn trong môi trường đại học là trải nghiệm phổ biến hơn bạn nghĩ. Nhiều sinh viên cảm thấy khó khăn khi xây dựng kết nối ý nghĩa, đặc biệt trong môi trường mới và áp lực học tập cao. Điều này không phản ánh giá trị của bạn mà chỉ là một giai đoạn chuyển tiếp. Lộ trình của chúng tôi sẽ giúp bạn phát triển kỹ năng kết nối, tìm kiếm cộng đồng phù hợp và xây dựng các mối quan hệ có ý nghĩa trong thời gian đại học.";
+        }
+        if (issue === "boredom") {
+          return "Cảm giác chán nản với việc học đại học có thể đến từ nhiều nguyên nhân - từ việc chọn sai ngành, thiếu kết nối với nội dung học, đến cảm giác thiếu thách thức. Đây là trải nghiệm mà nhiều sinh viên xuất sắc cũng từng gặp phải. Việc bạn nhận ra vấn đề này là bước đầu tiên để tìm lại niềm đam mê. Lộ trình của chúng tôi sẽ giúp bạn kết nối lại với mục tiêu học tập, khám phá những khía cạnh mới của ngành học và tìm cách áp dụng kiến thức vào các dự án thực tế có ý nghĩa.";
+        }
+        if (issue === "intern_stress") {
+          return "Áp lực từ thực tập và thi cử có thể tạo ra cảm giác choáng ngợp và lo âu. Đây là trải nghiệm phổ biến khi bạn phải cân bằng giữa học tập và áp lực thực tế của môi trường làm việc. Việc bạn nhận ra và tìm cách đối phó với stress này cho thấy bạn có tinh thần trách nhiệm cao. Lộ trình của chúng tôi sẽ giúp bạn phát triển các kỹ năng quản lý stress, cân bằng cuộc sống-học tập và xây dựng sự tự tin trong môi trường chuyên nghiệp.";
+        }
       }
 
       // Người đi làm
-      if (userType === "worker" && issue === "work_stress") {
-        return "Căng thẳng công việc là thách thức phổ biến trong cuộc sống hiện đại, đặc biệt khi bạn là người có trách nhiệm cao. Cảm giác này cho thấy bạn thực sự quan tâm đến công việc của mình. Tuy nhiên, căng thẳng kéo dài có thể ảnh hưởng đến sức khỏe và hiệu suất. Lộ trình chúng tôi đề xuất sẽ giúp bạn quản lý căng thẳng hiệu quả mà không làm giảm năng suất, thậm chí còn giúp bạn phát huy tốt hơn tiềm năng của mình.";
-      }
-      if (userType === "worker" && issue === "no_passion") {
-        return "Cảm giác mất đam mê với công việc thường xuất hiện ở những người từng rất nhiệt huyết. Đây có thể là dấu hiệu cho thấy bạn đã phát triển vượt qua vị trí hiện tại hoặc đang cần những thách thức mới. Nhiều người thành công đã trải qua giai đoạn này trước khi tìm được hướng đi đúng đắn. Lộ trình của chúng tôi sẽ giúp bạn kết nối lại với động lực nội tại và khám phá những khía cạnh mới trong sự nghiệp.";
+      if (userType === "worker") {
+        if (issue === "work_stress") {
+          return "Căng thẳng công việc là thách thức phổ biến trong cuộc sống hiện đại, đặc biệt khi bạn là người có trách nhiệm cao và mong muốn hoàn thành tốt nhiệm vụ. Cảm giác này cho thấy bạn thực sự quan tâm đến công việc của mình. Tuy nhiên, căng thẳng kéo dài có thể ảnh hưởng đến sức khỏe và hiệu suất. Lộ trình của chúng tôi sẽ giúp bạn phát triển các kỹ năng quản lý stress hiệu quả, thiết lập ranh giới lành mạnh và tìm lại niềm vui trong công việc mà không làm giảm năng suất.";
+        }
+        if (issue === "colleague_conflict") {
+          return "Mâu thuẫn với đồng nghiệp có thể tạo ra môi trường làm việc căng thẳng và ảnh hưởng đến sự hài lòng trong công việc. Đây là tình huống phổ biến trong môi trường làm việc, ngay cả với những người có kỹ năng chuyên môn xuất sắc. Việc bạn muốn cải thiện tình hình cho thấy bạn có tinh thần xây dựng và chuyên nghiệp. Lộ trình của chúng tôi sẽ giúp bạn phát triển kỹ năng giao tiếp hiệu quả, giải quyết xung đột và xây dựng mối quan hệ đồng nghiệp hài hòa, tích cực.";
+        }
+        if (issue === "not_recognized") {
+          return "Cảm giác không được công nhận đóng góp trong công việc có thể gây nên sự thất vọng và mất động lực. Đây là trải nghiệm mà nhiều người tài năng đã từng gặp phải. Việc bạn nhận ra giá trị bản thân và mong muốn được ghi nhận xứng đáng là điều hoàn toàn hợp lý. Lộ trình của chúng tôi sẽ giúp bạn phát triển các chiến lược để nâng cao sự hiện diện chuyên nghiệp, truyền đạt giá trị đóng góp hiệu quả và xây dựng sự tự tin trong môi trường làm việc.";
+        }
+        if (issue === "no_passion") {
+          return "Cảm giác mất đam mê với công việc thường xuất hiện ở những người từng rất nhiệt huyết. Đây có thể là dấu hiệu cho thấy bạn đã phát triển vượt qua vị trí hiện tại hoặc đang cần những thách thức mới. Nhiều người thành công đã trải qua giai đoạn này trước khi tìm được hướng đi đúng đắn. Lộ trình của chúng tôi sẽ giúp bạn kết nối lại với giá trị cốt lõi, khám phá những khía cạnh mới trong sự nghiệp và tìm lại niềm vui cũng như ý nghĩa trong công việc.";
+        }
+        if (issue === "work_life_balance") {
+          return "Mất cân bằng giữa công việc và cuộc sống cá nhân là thách thức lớn trong thời đại số hiện nay. Ranh giới giữa công việc và đời sống ngày càng mờ nhạt, đặc biệt với những người có trách nhiệm cao và tận tâm. Việc bạn nhận ra sự mất cân bằng này là bước đầu tiên quan trọng. Lộ trình của chúng tôi sẽ giúp bạn thiết lập ranh giới lành mạnh, phát triển thói quen tự chăm sóc bản thân và xây dựng lối sống cân bằng, bền vững mà vẫn duy trì hiệu suất công việc cao.";
+        }
       }
 
       // Trường hợp khác
