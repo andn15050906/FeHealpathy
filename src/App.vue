@@ -5,7 +5,7 @@
     <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
     <main>
       <div v-if="!router.currentRoute.value.meta.isAppMode">
-        <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
+        <!-- <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
           class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 60px; box-shadow: none !important;">
           <v-list-item class="py-2" :title="sidebarOpen ? 'Roadmap Progress' : ''" color="primary">
             <template v-slot:prepend>
@@ -13,11 +13,11 @@
                 <v-icon>mdi-map-marker-path</v-icon>
               </v-avatar>
             </template>
-            <!--<template v-slot:append>
+            <template v-slot:append>
               <v-btn variant="text" icon @click="toggleSidebar">
                 <v-icon>{{ sidebarOpen ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
               </v-btn>
-            </template>-->
+            </template>
           </v-list-item>
 
           <v-divider></v-divider>
@@ -46,7 +46,7 @@
               </div>
             </div>
           </template>
-        </v-navigation-drawer>
+        </v-navigation-drawer> -->
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
