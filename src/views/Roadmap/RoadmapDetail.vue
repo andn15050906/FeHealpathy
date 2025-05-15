@@ -7,118 +7,6 @@
           Quay lại danh sách lộ trình
         </v-btn>
 
-        <!-- Lời chào và động viên -->
-        <div v-if="roadmap" class="healing-header mb-4">
-          <h2 class="text-h5 font-weight-bold mb-1" style="color:#6a39ca;">
-            Chào mừng bạn đến với hành trình {{ roadmap.title }}
-          </h2>
-          <div class="text-body-1" style="color:#444;">
-            Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ. Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu hành trình này.
-          </div>
-        </div>
-
-        <!-- Card advisor -->
-        <v-card class="advisor-card mb-6 d-flex align-center" style="max-width:420px;">
-          <v-avatar size="56" class="mr-3">
-            <img :src="advisorImg" alt="Advisor" />
-          </v-avatar>
-          <div>
-            <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
-            <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
-            <div class="text-body-2 mt-1" style="font-style:italic; color:#6a39ca;">
-              "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
-            </div>
-          </div>
-          <v-spacer></v-spacer>
-          <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
-            <v-icon>mdi-message-text-outline</v-icon>
-          </v-btn>
-          <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
-            <v-icon>mdi-account-group-outline</v-icon>
-          </v-btn>
-        </v-card>
-
-        <!-- Giới thiệu lộ trình (diễn giải lại) -->
-        <v-card v-if="roadmap" class="mb-6">
-          <v-card-title class="d-flex align-center">
-            <v-icon color="primary" class="mr-2">mdi-information-outline</v-icon>
-            Giới thiệu lộ trình
-          </v-card-title>
-          <v-card-text>
-            <div class="mb-2">
-              <p v-for="(line, idx) in (roadmap.intro ? roadmap.intro.split('\n') : [])" :key="idx">{{ line }}</p>
-            </div>
-            <v-alert color="warning" variant="tonal" class="mt-4">
-              <div class="d-flex align-center mb-2">
-                <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
-                <span class="font-weight-bold" style="color: #ff9800; font-size: large">Lưu ý quan trọng</span>
-              </div>
-              <p>
-                📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
-                <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank" class="text-primary text-decoration-none">
-                  Tìm hiểu thêm
-                </a>.
-              </p>
-            </v-alert>
-          </v-card-text>
-        </v-card>
-
-        <!-- Lời chào và động viên -->
-        <div v-if="roadmap" class="healing-header mb-4">
-          <h2 class="text-h5 font-weight-bold mb-1" style="color:#6a39ca;">
-            Chào mừng bạn đến với hành trình {{ roadmap.title }}
-          </h2>
-          <div class="text-body-1" style="color:#444;">
-            Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ. Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu hành trình này.
-          </div>
-        </div>
-
-        <!-- Card advisor -->
-        <v-card class="advisor-card mb-6 d-flex align-center" style="max-width:420px;">
-          <v-avatar size="56" class="mr-3">
-            <img :src="advisorImg" alt="Advisor" />
-          </v-avatar>
-          <div>
-            <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
-            <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
-            <div class="text-body-2 mt-1" style="font-style:italic; color:#6a39ca;">
-              "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
-            </div>
-          </div>
-          <v-spacer></v-spacer>
-          <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
-            <v-icon>mdi-message-text-outline</v-icon>
-          </v-btn>
-          <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
-            <v-icon>mdi-account-group-outline</v-icon>
-          </v-btn>
-        </v-card>
-
-        <!-- Giới thiệu lộ trình (diễn giải lại) -->
-        <v-card v-if="roadmap" class="mb-6">
-          <v-card-title class="d-flex align-center">
-            <v-icon color="primary" class="mr-2">mdi-information-outline</v-icon>
-            Giới thiệu lộ trình
-          </v-card-title>
-          <v-card-text>
-            <div class="mb-2">
-              <p v-for="(line, idx) in (roadmap.intro ? roadmap.intro.split('\n') : [])" :key="idx">{{ line }}</p>
-            </div>
-            <v-alert color="warning" variant="tonal" class="mt-4">
-              <div class="d-flex align-center mb-2">
-                <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
-                <span class="font-weight-bold" style="color: #ff9800; font-size: large">Lưu ý quan trọng</span>
-              </div>
-              <p>
-                📌 <b>Liệu pháp Nhận thức Hành vi (CBT)</b> đã được nhiều hiệp hội chuyên môn, đặc biệt là <b>Hiệp hội Tâm lý học Hoa Kỳ (APA)</b>, công nhận là một trong những liệu pháp tâm lý hiệu quả nhất.
-                <a href="https://www.radiashealth.org/what-is-cognitive-behavioral-therapy/" target="_blank" class="text-primary text-decoration-none">
-                  Tìm hiểu thêm
-                </a>.
-              </p>
-            </v-alert>
-          </v-card-text>
-        </v-card>
-
         <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
           <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
         </div>
@@ -215,11 +103,9 @@
 </template>
 
 <script>
-import { roadmapSteps } from "@/scripts/data/roadmapData.js";
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { useEventBus } from "../../scripts/logic/evenBus";
-import { useRoute, useRouter } from "vue-router";
-import advisorImg from '@/img/advisor.jpg';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useEventBus } from '@/scripts/logic/eventBus';
+import { useRoute, useRouter } from 'vue-router';
 
 export default {
   name: "RoadmapDetail",
@@ -440,7 +326,6 @@ export default {
       goToPhase,
       goToSuggestion,
       updateStatus
-      advisorImg,
     };
   }
 };
