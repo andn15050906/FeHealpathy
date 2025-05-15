@@ -55,7 +55,7 @@
           <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
             @removeNotification="removeNotification" />
 
-          <v-main :class="mainBackground">
+          <!--<v-main :class="mainBackground">
             <v-container>
               <div v-if="currentPath">
                 <RoadmapContent :current-path="currentPath" @phase-completed="handlePhaseCompleted"
@@ -64,88 +64,13 @@
               <div v-else-if="showProgressTracker">
                 <ProgressTracker :active-days="activeDays" :total-days="totalDays" :completed-actions="completedActions"
                   :total-required-actions="totalRequiredActions" :action-history="actionHistory"
-                  @suggest-new-route="startSurvey" @view-full-history="viewFullHistory" />
+                  @suggest-new-route="() => {}/*startSurvey*/" @view-full-history="viewFullHistory" />
               </div>
-              <!-- <div v-else>
-                <v-card class="mb-6 animate-fade-in" rounded="lg" elevation="3">
-                  <v-card-title class="text-h5">Welcome to Your Mental Health Journey</v-card-title>
-                  <v-card-text>
-                    <p class="text-body-1 mb-4">
-                      This personalized roadmap will guide you through evidence-based practices to support your mental
-                      wellbeing.
-                    </p>
-                    <p class="text-body-1 mb-4">
-                      To get started, please take our assessment so we can recommend the most suitable path for your
-                      needs.
-                    </p>
-                    <div class="d-flex justify-center mt-6">
-                      <v-btn color="primary" size="large" rounded="pill" @click="startSurvey" class="px-8">
-                        Start Assessment
-                        <v-icon right>mdi-arrow-right</v-icon>
-                      </v-btn>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </div> -->
             </v-container>
-          </v-main>
-          <v-dialog v-model="showStatusPopup" max-width="500px" transition="dialog-bottom-transition">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                <span>How are you feeling today?</span>
-                <v-btn icon @click="showStatusPopup = false">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-card-title>
-
-              <v-card-text>
-                <p class="text-body-2 mb-6">
-                  Your responses help us personalize your roadmap and provide relevant resources.
-                </p>
-
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <p class="text-subtitle-2 mb-2">Overall mood today:</p>
-                      <v-btn-toggle v-model="selectedMood" mandatory divided color="primary" class="d-flex">
-                        <v-btn v-for="(mood, index) in moods" :key="index" :value="mood.value" class="flex-grow-1">
-                          {{ mood.label }}
-                        </v-btn>
-                      </v-btn-toggle>
-                    </v-col>
-
-                    <v-col cols="12" class="mt-4">
-                      <p class="text-subtitle-2 mb-2">What challenges are you facing? (Select all that apply)</p>
-                      <v-checkbox v-for="(challenge, index) in challenges" :key="index" v-model="selectedChallenges"
-                        :label="challenge" :value="challenge" color="primary" hide-details class="mb-1"></v-checkbox>
-                    </v-col>
-
-                    <v-col cols="12" class="mt-4">
-                      <p class="text-subtitle-2 mb-2">Any additional notes about how you're feeling:</p>
-                      <v-textarea v-model="statusNotes" placeholder="Share any thoughts or feelings..." rows="3"
-                        variant="outlined"></v-textarea>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn variant="text" @click="showStatusPopup = false">
-                  Cancel
-                </v-btn>
-                <v-btn color="primary" @click="submitStatus">
-                  Submit
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <InitialSurvey v-model="showInitialSurvey" :current-theme="currentTheme" @path-selected="handlePathSelected"
-            @close="showInitialSurvey = false" />
-
-          <route-completion v-model="showRouteCompletion" :current-theme="currentTheme"
+          </v-main>-->
+          <RouteCompletion v-model="showRouteCompletion" :current-theme="currentTheme"
             :assessment-result="completionAssessmentResult" @close="showRouteCompletion = false"
-            @restart-assessment="startSurvey" @select-continue-option="handleContinueOptionSelected"
+            @restart-assessment="() => {}/*startSurvey*/" @select-continue-option="handleContinueOptionSelected"
             @select-alternative-route="handleAlternativeRouteSelected" />
         </div>
         <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
@@ -175,10 +100,6 @@ import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
 import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
-import InitialSurvey from './views/v0/components/InitialSurvey.vue'
-import RoadmapContent from './views/v0/components/RoadmapContent.vue'
-import ProgressTracker from './views/v0/components/ProgressTracker.vue'
-import RouteCompletion from './views/v0/components/RouteCompletion.vue'
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -484,10 +405,7 @@ const selectStep = (index) => {
 }
 
 // Status popup state
-const showStatusPopup = ref(false)
 const selectedMood = ref('neutral')
-const selectedChallenges = ref([])
-const statusNotes = ref('')
 
 const moods = [
   { label: 'Struggling', value: 'struggling' },
@@ -521,28 +439,6 @@ watch(selectedMood, (newMood) => {
   setTheme(moodThemeMap[newMood] || 'refreshing');
 });
 
-const submitStatus = () => {
-  // Here you would typically send this data to your backend
-  console.log({
-    mood: selectedMood.value,
-    challenges: selectedChallenges.value,
-    notes: statusNotes.value
-  })
-
-  // Reset form
-  selectedChallenges.value = []
-  statusNotes.value = ''
-
-  // Close popup
-  showStatusPopup.value = false
-
-  // You could also update recommendations based on the status
-  // For this demo, we'll just show an alert
-  alert('Thank you for sharing your status! Your roadmap has been updated and the theme has been adjusted to match your mood.')
-}
-
-// Component states
-const showInitialSurvey = ref(false)
 const showRouteCompletion = ref(false)
 const showProgressTracker = ref(false)
 
@@ -576,16 +472,8 @@ const completionAssessmentResult = ref({
   ]
 })
 
-// Methods
-const startSurvey = () => {
-  showInitialSurvey.value = true
-}
-
 const handlePathSelected = (path) => {
   currentPath.value = path
-  showInitialSurvey.value = false
-
-  // Reset progress tracking
   activeDays.value = 0
   totalDays.value = path.phases[0].duration
   completedActions.value = 0
