@@ -225,7 +225,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 import { getCourseById } from "@/scripts/api/services/courseService";
 import { getUserById } from "@/scripts/api/services/userService";
@@ -248,6 +248,75 @@ const loading = ref(true);
 const currentPage = ref(0);
 const totalPages = ref(0);
 const pageSize = 10;
+const searchQuery = ref('');
+const filterStatus = ref('all');
+
+const enrolledCourses = computed(() => {
+  return enrollments.value.map(enrollment => ({
+    ...courseDetails.value[enrollment.courseId],
+    progress: enrollment.progress || 0,
+    enrolled: true,
+    lastAccessed: enrollment.lastAccessed
+  })).filter(course => course && course.id);
+});
+
+const completedCourses = computed(() => {
+  return enrolledCourses.value.filter(course => course.progress === 100);
+});
+
+const inProgressCourses = computed(() => {
+  return enrolledCourses.value.filter(course => course.progress > 0 && course.progress < 100);
+});
+
+const totalHoursLearned = computed(() => {
+  return enrolledCourses.value.reduce((total, course) => total + (course.duration || 0), 0);
+});
+
+const filteredCourses = computed(() => {
+  let courses = enrolledCourses.value;
+  
+  // Filter by search query
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    courses = courses.filter(course => 
+      course.title.toLowerCase().includes(query) ||
+      course.category.toLowerCase().includes(query)
+    );
+  }
+  
+  // Filter by status
+  if (filterStatus.value !== 'all') {
+    switch (filterStatus.value) {
+      case 'in-progress':
+        courses = courses.filter(course => course.progress > 0 && course.progress < 100);
+        break;
+      case 'completed':
+        courses = courses.filter(course => course.progress === 100);
+        break;
+      case 'not-started':
+        courses = courses.filter(course => course.progress === 0);
+        break;
+    }
+  }
+  
+  return courses;
+});
+
+const getCategoryClass = (category) => {
+  const classes = {
+    'primary': 'bg-primary bg-opacity-10 text-primary',
+    'success': 'bg-success bg-opacity-10 text-success',
+    'warning': 'bg-warning bg-opacity-10 text-warning',
+    'danger': 'bg-danger bg-opacity-10 text-danger',
+    'info': 'bg-info bg-opacity-10 text-info',
+    'purple': 'bg-purple bg-opacity-10 text-purple',
+    'orange': 'bg-orange bg-opacity-10 text-orange',
+    'teal': 'bg-teal bg-opacity-10 text-teal',
+    'pink': 'bg-pink bg-opacity-10 text-pink'
+  };
+  
+  return classes[category?.toLowerCase()] || 'bg-secondary bg-opacity-10 text-secondary';
+};
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("vi-VN", {
@@ -337,6 +406,16 @@ const changePage = (page) => {
   if (page >= 0 && page < totalPages.value) {
     fetchEnrollments(page);
   }
+};
+
+const navigateToCourse = (courseId) => {
+  // Implement navigation logic
+  console.log('Navigate to course:', courseId);
+};
+
+const enrollInCourse = (courseId) => {
+  // Implement enrollment logic
+  console.log('Enroll in course:', courseId);
 };
 
 onMounted(() => {

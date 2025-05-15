@@ -62,9 +62,9 @@ const formatDate = (dateString) => {
 };
 
 const getLevelText = (level) => {
-    if (level === 0) return "Mới bắt đầu";
+    if (level === 0) return "Sơ cấp";
     if (level === 1) return "Trung cấp";
-    if (level === 2) return "Nâng cao";
+    if (level === 2) return "Cao cấp";
     return "Unknown";
 };
 

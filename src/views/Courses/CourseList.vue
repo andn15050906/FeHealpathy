@@ -8,6 +8,13 @@
       </div>
     </div>
 
+    <div class="filter-section">
+      <button v-for="filter in filters" :key="filter.value"
+        :class="['filter-btn', selectedTags.includes(filter.value) ? 'active' : '']" @click="toggleTag(filter.value)">
+        {{ filter.label }}
+      </button>
+    </div>
+
     <div class="sort-section">
       <select v-model="sortOption" @change="sortCourses" class="form-select sort-select">
         <option value="name-asc">Tiêu đề A-Z</option>
@@ -32,10 +39,12 @@ import Pagination from '@/components/Common/Pagination.vue';
 import { getCourses } from '@/scripts/api/services/courseService.js';
 
 const searchQuery = ref('');
+const selectedTags = ref([]);
 const sortOption = ref('name-asc');
 const itemsPerPage = 12;
 const currentPage = ref(1);
 const courses = ref([]);
+const filters = ref([]);
 const totalPages = ref(1);
 const totalItems = ref(0);
 
@@ -45,7 +54,9 @@ async function loadCourses(page = 1) {
   try {
     const params = {
       pageIndex: currentPage.value - 1,
-      pageSize: itemsPerPage
+      pageSize: itemsPerPage,
+      categories: selectedTags.value,
+      title: searchQuery.value
     };
 
     const response = await getCourses(params);
@@ -57,11 +68,28 @@ async function loadCourses(page = 1) {
   }
 }
 
+async function loadCategories() {
+  try {
+    const categoryResp = await getPagedCategories();
+    filters.value = categoryResp.map(category => ({ value: category.id, label: category.title }));
+  } catch (e) {
+    console.error('Không thể tải danh mục', e);
+  }
+}
+
+function toggleTag(tagId) {
+  const idx = selectedTags.value.indexOf(tagId);
+  if (idx === -1) selectedTags.value.push(tagId);
+  else selectedTags.value.splice(idx, 1);
+  loadCourses(1);
+}
+
 function sortCourses() {
   loadCourses(1);
 }
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  await loadCategories();
   loadCourses();
 });
 
@@ -84,6 +112,29 @@ watch(searchQuery, onSearchChange);
   height: 50px;
 }
 
+.filter-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.filter-btn.active {
+  background: #5488c7;
+  color: white;
+  border-color: #5488c7;
+}
+
 .sort-section {
   display: flex;
   justify-content: flex-end;
@@ -96,7 +147,7 @@ watch(searchQuery, onSearchChange);
 
 .course-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -109,5 +160,24 @@ watch(searchQuery, onSearchChange);
 
 .courses-container {
   margin: 0 auto 40px;
+  width: 72vw;
+}
+
+@media (max-width: 1200px) {
+  .course-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .course-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

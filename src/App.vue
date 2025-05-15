@@ -5,12 +5,12 @@
     <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
     <main>
       <div v-if="!router.currentRoute.value.meta.isAppMode">
-        <!-- <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
+        <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
           class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 60px; box-shadow: none !important;">
-          <v-list-item class="py-2" :title="sidebarOpen ? 'Roadmap Progress' : ''" color="primary">
+          <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''" color="primary">
             <template v-slot:prepend>
               <v-avatar color="primary" variant="tonal" class="mr-2">
-                <v-icon>mdi-map-marker-path</v-icon>
+                <v-icon>mdi-book-open-page-variant</v-icon>
               </v-avatar>
             </template>
             <template v-slot:append>
@@ -23,15 +23,14 @@
           <v-divider></v-divider>
 
           <v-list density="compact" nav class="pa-2">
-            <v-list-item v-for="(step, index) in roadmapSteps" :key="index" :value="index"
-              :active="currentStepIndex === index" @click="selectStep(index)" :title="sidebarOpen ? step.title : ''"
-              :prepend-icon="step.mdiIcon" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
-              :class="currentStepIndex === index ? 'elevation-2' : ''">
+            <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
+              :active="currentLectureIndex === index" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
+              :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
+              :class="currentLectureIndex === index ? 'elevation-2' : ''">
               <template v-slot:prepend>
-                <v-avatar :color="currentStepIndex >= index ? 'primary' : 'grey-lighten-1'"
-                  :variant="currentStepIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
-                  <v-icon v-if="currentStepIndex > index">mdi-check</v-icon>
-                  <span v-else>{{ index + 1 }}</span>
+                <v-avatar :color="currentLectureIndex === index ? 'primary' : 'grey-lighten-1'"
+                  :variant="currentLectureIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
+                  <span>{{ index + 1 }}</span>
                 </v-avatar>
               </template>
             </v-list-item>
@@ -42,11 +41,11 @@
             <div class="pa-4">
               <div class="d-flex align-center">
                 <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
-                <span v-if="sidebarOpen">Your progress: {{ progressPercentage }}%</span>
+                <span v-if="sidebarOpen">Your progress: {{ courseProgressPercentage }}%</span>
               </div>
             </div>
           </template>
-        </v-navigation-drawer> -->
+        </v-navigation-drawer>
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
@@ -179,6 +178,9 @@ import InitialSurvey from './views/v0/components/InitialSurvey.vue'
 import RoadmapContent from './views/v0/components/RoadmapContent.vue'
 import ProgressTracker from './views/v0/components/ProgressTracker.vue'
 import RouteCompletion from './views/v0/components/RouteCompletion.vue'
+import { getCourseById } from "@/scripts/api/services/courseService";
+import { getLectures } from "@/scripts/api/services/lectureService";
+import { getEnrollments } from "@/scripts/api/services/enrollmentService";
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -211,7 +213,15 @@ provide('roadmapProgress', {
       return roadmapProgress.value.fetchPersonalRoadmap();
     return null;
   }
-})
+});
+
+// Add new provide for lecture management
+provide('lectureManager', {
+  setCurrentLectureIndex: (index) => {
+    currentLectureIndex.value = index;
+  },
+  getCurrentLectureIndex: () => currentLectureIndex.value
+});
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
@@ -632,6 +642,88 @@ const viewFullHistory = () => {
   console.log('View full history')
   // In a real app, this would show a detailed history view
 }
+
+// Add new refs for course data
+const currentCourse = ref(null);
+const currentLectureIndex = ref(null);
+const courseProgressPercentage = ref(0);
+const completedLectures = ref(0);
+const totalLectures = ref(0);
+
+// Add new methods for course progress
+const fetchCourseData = async (courseId) => {
+  try {
+    const courseData = await getCourseById(courseId);
+    if (courseData) {
+      currentCourse.value = courseData;
+      await fetchLectures(courseId);
+      await checkEnrollmentStatus(courseId);
+    }
+  } catch (error) {
+    console.error('Error fetching course data:', error);
+  }
+};
+
+const fetchLectures = async (courseId) => {
+  try {
+    const response = await getLectures(courseId);
+    if (response?.items) {
+      currentCourse.value.lectures = response.items.sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
+      totalLectures.value = currentCourse.value.lectures.length;
+    }
+  } catch (error) {
+    console.error('Error fetching lectures:', error);
+  }
+};
+
+const checkEnrollmentStatus = async (courseId) => {
+  try {
+    const response = await getEnrollments({ pageSize: 100 });
+    if (response?.items) {
+      const enrolled = response.items.some(enrollment => enrollment.courseId === courseId);
+      if (enrolled) {
+        // Mock data for completed lectures - replace with actual API call
+        completedLectures.value = Math.floor(Math.random() * totalLectures.value);
+        courseProgressPercentage.value = Math.round((completedLectures.value / totalLectures.value) * 100);
+      }
+    }
+  } catch (error) {
+    console.error('Error checking enrollment status:', error);
+  }
+};
+
+const selectLecture = (index) => {
+  const lecture = currentCourse.value.lectures[index];
+  if (lecture) {
+    currentLectureIndex.value = index;
+    router.push({
+      name: "lectureDetail",
+      params: { id: lecture.id },
+      query: { courseId: currentCourse.value.id },
+    });
+  }
+};
+
+// Watch for route changes to update course data
+watch(() => router.currentRoute.value, (newRoute) => {
+  const courseId = newRoute.params.id;
+  const lectureId = newRoute.params.lectureId;
+
+  if (courseId) {
+    fetchCourseData(courseId);
+    // Only highlight lecture if we're on a lecture page
+    if (lectureId && currentCourse.value?.lectures) {
+      const index = currentCourse.value.lectures.findIndex(lecture => lecture.id === lectureId);
+      currentLectureIndex.value = index !== -1 ? index : null;
+    } else {
+      currentLectureIndex.value = null;
+    }
+  } else {
+    currentCourse.value = null;
+    currentLectureIndex.value = null;
+    courseProgressPercentage.value = 0;
+  }
+}, { immediate: true, deep: true });
 </script>
 
 <script>
@@ -699,6 +791,7 @@ main {
   background-size: 100% 100vh;
   background-position: center top;
   background-attachment: fixed;
+  margin-top: 100px;
 }
 
 /**.page-container {
