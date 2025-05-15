@@ -24,14 +24,20 @@
 
           <v-list density="compact" nav class="pa-2">
             <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
-              :active="currentLectureIndex === index" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
+              :active="isActiveLecture(index)" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
               :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
-              :class="currentLectureIndex === index ? 'elevation-2' : ''">
+              :class="[
+                isActiveLecture(index) ? 'elevation-2 bg-primary-lighten-4' : '',
+                'hover:bg-primary-lighten-5'
+              ]">
               <template v-slot:prepend>
-                <v-avatar :color="currentLectureIndex === index ? 'primary' : 'grey-lighten-1'"
-                  :variant="currentLectureIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
+                <v-avatar :color="isActiveLecture(index) ? 'primary' : 'grey-lighten-1'"
+                  :variant="isActiveLecture(index) ? 'elevated' : 'flat'" size="small" class="text-white">
                   <span>{{ index + 1 }}</span>
                 </v-avatar>
+              </template>
+              <template v-slot:append v-if="isActiveLecture(index)">
+                <v-icon color="primary">mdi-check-circle</v-icon>
               </template>
             </v-list-item>
           </v-list>
@@ -62,7 +68,10 @@
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
             <PremiumBlocker></PremiumBlocker>
           </div>
-          <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
+          <RouterView v-else 
+            :key="$route.fullPath"
+            @authenticated="handleAuthenticated" 
+            @addNotification="addNotification"
             @removeNotification="removeNotification" />
 
           <v-main :class="mainBackground">
@@ -706,41 +715,92 @@ const checkEnrollmentStatus = async (courseId) => {
   }
 };
 
-const selectLecture = (index) => {
+const selectLecture = async (index) => {
   const lecture = currentCourse.value.lectures[index];
   if (!lecture) return;
 
-  // Allow access if user is enrolled, is owner, or lecture is previewable
-  if (isOwner.value || isEnrolled.value || lecture.isPreviewable) {
-    currentLectureIndex.value = index;
-    router.push({
-      name: "lectureDetail",
-      params: { id: lecture.id },
-      query: { courseId: currentCourse.value.id },
+  // Update the index immediately
+  currentLectureIndex.value = index;
+
+  try {
+    // Allow access if user is enrolled, is owner, or lecture is previewable
+    if (isOwner.value || isEnrolled.value || lecture.isPreviewable) {
+      // Then update the route
+      await router.replace({
+        name: "lectureDetail",
+        params: { id: lecture.id },
+        query: { courseId: currentCourse.value.id },
+      });
+    } else {
+      // Reset the index if access is denied
+      currentLectureIndex.value = null;
+      // Show premium blocker or access denied message
+      sweetAlert.value.showAlert({
+        icon: 'warning',
+        title: 'Access Denied',
+        text: 'Please enroll in this course to access the lecture content.'
+      });
+    }
+  } catch (error) {
+    // Reset the index if there's an error
+    currentLectureIndex.value = null;
+    console.error('Error selecting lecture:', error);
+    sweetAlert.value.showAlert({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to navigate to lecture. Please try again.'
     });
   }
 };
 
-// Watch for route changes to update course data
-watch(() => router.currentRoute.value, (newRoute) => {
-  const courseId = newRoute.params.id;
+// Update the route watch logic
+watch(() => router.currentRoute.value, async (newRoute) => {
+  const courseId = newRoute.query.courseId || newRoute.params.id;
   const lectureId = newRoute.params.lectureId;
 
   if (courseId) {
-    fetchCourseData(courseId);
-    // Only highlight lecture if we're on a lecture page
-    if (lectureId && currentCourse.value?.lectures) {
-      const index = currentCourse.value.lectures.findIndex(lecture => lecture.id === lectureId);
-      currentLectureIndex.value = index !== -1 ? index : null;
-    } else {
-      currentLectureIndex.value = null;
+    try {
+      // Only fetch course data if we don't have it or if it's a different course
+      if (!currentCourse.value || currentCourse.value.id !== courseId) {
+        await fetchCourseData(courseId);
+      }
+      
+      // Update lecture index if we're on a lecture page
+      if (lectureId && currentCourse.value?.lectures) {
+        const index = currentCourse.value.lectures.findIndex(lecture => lecture.id === lectureId);
+        if (index !== -1) {
+          currentLectureIndex.value = index;
+        }
+      } else {
+        // Reset currentLectureIndex when not on a lecture page
+        currentLectureIndex.value = null;
+      }
+    } catch (error) {
+      console.error('Error handling route change:', error);
+      sweetAlert.value.showAlert({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to load course data. Please try again.'
+      });
     }
   } else {
-    currentCourse.value = null;
+    // Reset currentLectureIndex when not on a course page
     currentLectureIndex.value = null;
-    courseProgressPercentage.value = 0;
   }
 }, { immediate: true, deep: true });
+
+// Add a computed property for the current lecture
+const currentLecture = computed(() => {
+  if (currentCourse.value?.lectures && currentLectureIndex.value !== null) {
+    return currentCourse.value.lectures[currentLectureIndex.value];
+  }
+  return null;
+});
+
+// Add this computed property in the script setup section
+const isActiveLecture = computed(() => (index) => {
+  return currentLectureIndex.value === index;
+});
 </script>
 
 <script>
