@@ -27,9 +27,16 @@
       <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
       {{ roadmap.steps }} bước
       <v-spacer></v-spacer>
-      <span v-if="roadmap.completionRate" class="text-success">
-        {{ roadmap.completionRate }}% hoàn thành
-      </span>
+      <template v-if="isReturningUser && roadmap.completionRate">
+        <span class="text-success">
+          {{ roadmap.completionRate }}% hoàn thành
+        </span>
+      </template>
+      <template v-else>
+        <span class="text-primary font-italic" style="font-size:0.97rem;">
+          Hành trình này dành riêng cho bạn
+        </span>
+      </template>
     </v-card-subtitle>
 
     <v-card-text>
@@ -37,7 +44,9 @@
     </v-card-text>
 
     <v-card-actions>
-      <v-btn block color="primary" variant="tonal"> Xem chi tiết </v-btn>
+      <v-btn block color="primary" variant="tonal">
+        {{ isReturningUser ? 'Tiếp tục' : 'Bắt đầu hành trình' }}
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -49,6 +58,10 @@ export default {
     roadmap: {
       type: Object,
       required: true,
+    },
+    isReturningUser: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ["view"],
