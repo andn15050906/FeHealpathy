@@ -6,7 +6,7 @@
     <main>
       <div v-if="!router.currentRoute.value.meta.isAppMode">
         <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
-          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 60px; box-shadow: none !important;">
+          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 70px; box-shadow: none !important;">
           <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''" color="primary">
             <template v-slot:prepend>
               <v-avatar color="primary" variant="tonal" class="mr-2">
