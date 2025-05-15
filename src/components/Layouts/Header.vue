@@ -286,7 +286,7 @@ ul {
   transform: translateX(-50%);
   width: 0;
   height: 3px;
-  background: linear-gradient(to right, #3db83b, #2e8b57);
+  background: linear-gradient(to right, #3b82f6, #2563eb);
   transition: width 0.3s ease;
   border-radius: 2px;
 }
@@ -320,16 +320,16 @@ ul {
   font-weight: 600;
   cursor: pointer;
   border-radius: 25px;
-  background: linear-gradient(135deg, #3db83b, #2e8b57);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   padding: 8px 20px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(61, 184, 59, 0.2);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
 .profile-menu:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(61, 184, 59, 0.3);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
 .profile-menu span {
@@ -400,14 +400,14 @@ ul {
 
 .dropdown-menu li a:hover,
 .dropdown-menu li button:hover {
-  background-color: #f0f7f0;
-  color: #3db83b;
+  background-color: #f0f7ff;
+  color: #3b82f6;
   padding-left: 25px;
 }
 
 .menu-divider {
   border: none;
-  border-bottom: 1px solid #e8f5e8;
+  border-bottom: 1px solid #e8f2ff;
   margin: 8px 0;
 }
 
@@ -419,16 +419,16 @@ ul {
   font-weight: 600;
   cursor: pointer;
   border-radius: 25px;
-  background: linear-gradient(135deg, #3db83b, #2e8b57);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   padding: 8px 20px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(61, 184, 59, 0.2);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(61, 184, 59, 0.3);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
 .hovered-link {
@@ -437,7 +437,7 @@ ul {
 }
 
 .hovered-link:hover {
-  color: #3db83b;
+  color: #3b82f6;
 }
 
 @media (max-width: 768px) {
@@ -482,7 +482,7 @@ ul {
   }
 
   .menu-toggle:hover {
-    color: #3db83b;
+    color: #3b82f6;
   }
 
   .menu.show {

@@ -148,19 +148,19 @@ export default {
   padding: 8px;
   border-radius: 50%;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, #3db83b, #2e8b57);
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
   color: white;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(61, 184, 59, 0.2);
+  box-shadow: 0 4px 15px rgba(96, 165, 250, 0.2);
 }
 
 .bell-icon:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(61, 184, 59, 0.3);
+  box-shadow: 0 6px 20px rgba(96, 165, 250, 0.3);
 }
 
 .notification-count {
@@ -199,8 +199,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid #e8f5e8;
-  background: linear-gradient(135deg, #3db83b, #2e8b57);
+  border-bottom: 1px solid #e8f2ff;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
   color: white;
   border-radius: 16px 16px 0 0;
 }
@@ -239,17 +239,17 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 15px 20px;
-  border-bottom: 1px solid #e8f5e8;
+  border-bottom: 1px solid #e8f2ff;
   background: white;
   transition: all 0.3s ease;
 }
 
 .notification-item:hover {
-  background: #f0f7f0;
+  background: #f8faff;
 }
 
 .notification-item.unread {
-  background: #f0f7f0;
+  background: #f8faff;
 }
 
 .notification-text {
@@ -285,14 +285,14 @@ export default {
 
 .unread-dot {
   font-size: 0.6rem;
-  color: #3db83b;
+  color: #60a5fa;
 }
 
 .mark-read {
   background: none;
   border: none;
   font-size: 0.8rem;
-  color: #3db83b;
+  color: #60a5fa;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 12px;
@@ -300,7 +300,7 @@ export default {
 }
 
 .mark-read:hover {
-  background: rgba(61, 184, 59, 0.1);
+  background: rgba(96, 165, 250, 0.1);
 }
 
 /* Custom scrollbar */
@@ -314,12 +314,12 @@ export default {
 }
 
 .notification-dropdown::-webkit-scrollbar-thumb {
-  background: #3db83b;
+  background: #60a5fa;
   border-radius: 3px;
 }
 
 .notification-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #2e8b57;
+  background: #3b82f6;
 }
 
 .fade-enter-active,
