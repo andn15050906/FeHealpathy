@@ -43,6 +43,9 @@
   </script>
   
   <style scoped>
+  .container{
+    width: 72vw;
+  }
   .hover-scale {
     transition: transform 0.3s ease;
   }

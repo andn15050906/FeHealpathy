@@ -171,7 +171,7 @@ const submitCallback = async (questionsWithAnswer) => {
 
 <style scoped>
 .container {
-  margin: 0 auto;
+  width: 72vw;
   padding: 0 15px;
 }
 

@@ -448,6 +448,9 @@ export default {
 
 
 <style scoped>
+.container {
+  width: 72vw;
+}
 .nav-tabs .nav-link {
   font-weight: 500;
 }

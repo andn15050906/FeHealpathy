@@ -161,5 +161,6 @@ watch(searchQuery, onSearchChange);
 
 .blogs-container {
   margin: 0 auto 40px;
+  width: 72vw;
 }
 </style>

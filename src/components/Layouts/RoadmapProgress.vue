@@ -1,5 +1,5 @@
 <template>
-    <v-stepper-vertical v-if="steps.length" v-model="currentPhaseIndex">
+    <!-- <v-stepper-vertical v-if="steps.length" v-model="currentPhaseIndex">
         <v-stepper-vertical-item v-for="(step, index) in steps" :key="step.value" :complete="step.value < currentPhaseIndex"
             :subtitle="step.subtitle" :title="step.title" :value="index + 1" :hide-actions="true"
             :class="step.value < currentPhaseIndex ? 'completed-step' : step.value == currentPhaseIndex ? 'current-step' : 'locked-step'">
@@ -7,7 +7,7 @@
             <v-btn :class="isFollowBtnGlowing ? 'glowing-btn' : ''" @click="goTo(step.reference, index == steps.length - 1)">
                 {{ index != steps.length - 1 ? text.FollowStep : text.NewRoadmap }}
             </v-btn>
-            <!--<v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>-->
+            <v-stepper-actions :disabled="false" @click:next="step=step+1" @click:prev="step=step-1"></v-stepper-actions>
         </v-stepper-vertical-item>
     </v-stepper-vertical>
     <div v-else-if="loading"></div>
@@ -16,7 +16,7 @@
             <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
             <span class="sidebar-title" @click="goTo('', true)">{{ text.SetUpFirst }}</span>
         </v-card-title>
-    </v-card>
+    </v-card> -->
 </template>
 
 <script setup>
