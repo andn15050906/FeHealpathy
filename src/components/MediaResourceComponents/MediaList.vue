@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="media-list-container">
         <table class="table table-bordered table-hover table-responsive-md">
             <thead class="table-primary text-center">
                 <tr>
@@ -68,11 +68,18 @@ export default {
 </script>
 
 <style scoped>
+.media-list-container {
+    width: 72vw;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 .table {
     background-color: #ffffff;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .table th {

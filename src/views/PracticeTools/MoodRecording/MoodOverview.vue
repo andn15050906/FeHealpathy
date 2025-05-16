@@ -56,12 +56,13 @@
 
 <style scoped>
 .mood-pattern-hero {
+    width: 72vw;
     border-radius: 24px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background-color: rgba(19, 17, 29, 1);
-    width: 100%;
+
     padding: 219px 0 0;
 }
 
