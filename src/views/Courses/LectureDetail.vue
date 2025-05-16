@@ -550,7 +550,7 @@ export default {
 
 <style scoped>
 .lecture-detail-container {
-  max-width: 1100px;
+  width: 72vw;
   margin: 40px auto;
   background: white;
   padding: 40px;

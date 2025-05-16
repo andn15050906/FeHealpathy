@@ -15,10 +15,10 @@
       </div>
       <div class="user-actions">
         <NotificationBell v-if="isLoggedIn" id="bell" ref="notificationBell" :isAuthenticated="isLoggedIn" :userId="user.id"/>
-        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu">
+        <div v-if="isLoggedIn" class="hovered-link login-btn profile-menu dropdown" @click="toggleProfileMenu" ref="profileMenu">
           <span>Xin chào, {{ user.userName }}</span>
           <img :src="user.avatarUrl" class="user-avatar" alt="User avatar">
-          <ul v-if="showProfileMenu" class="dropdown-menu">
+          <ul :class="['dropdown-menu', { show: showProfileMenu }]" ref="dropdownMenu">
             <li><router-link to="/profile">Thông tin cá nhân</router-link></li>
             <li><router-link to="/statistics/self-assessment">Thống kê</router-link></li>
             <li><router-link to="/settings">Cài đặt</router-link></li>
@@ -118,7 +118,8 @@ export default {
       }
     },
 
-    toggleProfileMenu() {
+    toggleProfileMenu(event) {
+      event.stopPropagation();
       this.showProfileMenu = !this.showProfileMenu;
     },
 
@@ -194,67 +195,138 @@ ul {
 
 .header {
   width: 100%;
-  height: 60px;
-  background-color: #fff;
+  height: 70px;
+  background: linear-gradient(to right, #ffffff, #f8f9fa);
   position: fixed;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .header .navbar {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  height: 60px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 30px;
 }
 
 .menu ul {
   display: flex;
   margin-left: 45px;
+  gap: 10px;
 }
 
 .menu ul li {
-  padding: 0 25px;
+  padding: 0 15px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 60px;
+  line-height: 70px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.menu ul li::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.menu ul li:hover::after {
+  width: 80%;
 }
 
 #bell {
-  margin-right: 10px;
+  margin-right: 15px;
   margin-top: 3px;
 }
 
 .user-actions {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
 .notification,
 .profile-menu {
   position: relative;
-  margin-left: 10px;
   cursor: pointer;
+}
+
+.profile-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.profile-menu:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+.profile-menu span {
+  color: white;
+  font-weight: 500;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  transition: all 0.3s ease;
+}
+
+.profile-menu:hover .user-avatar {
+  transform: scale(1.1);
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 10px);
+  right: 0;
   background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   display: block;
-  width: max-content;
-  left: 0;
-  width: 100%;
+  width: 240px;
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+  visibility: visible;
 }
 
 .dropdown-menu li {
@@ -262,111 +334,122 @@ ul {
   font-size: 14px;
   cursor: pointer;
   color: #333;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .dropdown-menu li a,
 .dropdown-menu li button {
-  display: block;
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
   font-size: 14px;
   color: #333;
   text-decoration: none;
   border: none;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .dropdown-menu li a:hover,
 .dropdown-menu li button:hover {
-  background-color: #f3f3f3;
+  background-color: #f0f7ff;
+  color: #3b82f6;
+  padding-left: 25px;
 }
 
 .menu-divider {
   border: none;
-  border-bottom: 1px solid #ccc;
-  margin: 5px 0;
+  border-bottom: 1px solid #e8f2ff;
+  margin: 8px 0;
 }
+
 .login-btn {
   display: flex;
   align-items: center;
-  gap: 10px; 
+  gap: 10px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 20px;
-  background-color: #f3ef51;
-  padding: 5px 15px 5px 20px;
-  transition: background-color 0.3s;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
 .login-btn:hover {
-  background-color: #e0dc42;
-}
-
-.logout-icon {
-  margin-left: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  color: #000;
-}
-
-.logout-icon:hover {
-  color: #ff0000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
 .hovered-link {
-  color: #000;
+  color: #333;
+  transition: all 0.3s ease;
 }
 
 .hovered-link:hover {
-  opacity: 1;
-  color: #3db83b;
-}
-
-.user-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-left: auto;
+  color: #3b82f6;
 }
 
 @media (max-width: 768px) {
   .menu {
     display: none;
     flex-direction: column;
-    background-color: #f8f9fa;
+    background-color: white;
     position: absolute;
-    top: 60px;
+    top: 70px;
     left: 0;
     width: 100%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
   }
 
   .menu ul {
     flex-direction: column;
-    padding: 10px 0;
+    margin: 0;
+    padding: 0;
   }
 
   .menu ul li {
-    margin: 10px 0;
+    padding: 15px 0;
     text-align: center;
+    line-height: 1.5;
+  }
+
+  .menu ul li::after {
+    display: none;
   }
 
   .navbar {
-    flex-wrap: wrap;
+    padding: 0 20px;
   }
 
   .menu-toggle {
     display: block !important;
     cursor: pointer;
     font-size: 24px;
+    color: #333;
+    transition: color 0.3s ease;
+  }
+
+  .menu-toggle:hover {
+    color: #3b82f6;
   }
 
   .menu.show {
     display: flex;
+  }
+
+  .user-actions {
+    gap: 10px;
+  }
+
+  .login-btn {
+    padding: 6px 15px;
+    font-size: 13px;
   }
 }
 
@@ -382,4 +465,19 @@ ul {
   outline: none;
 }
 
+/* Animation for dropdown menu */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu {
+  animation: none; /* Remove the animation */
+}
 </style>

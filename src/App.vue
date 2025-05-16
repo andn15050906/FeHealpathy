@@ -5,12 +5,12 @@
     <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
     <main>
       <div v-if="!router.currentRoute.value.meta.isAppMode">
-        <!-- <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
-          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 60px; box-shadow: none !important;">
-          <v-list-item class="py-2" :title="sidebarOpen ? 'Roadmap Progress' : ''" color="primary">
+        <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
+          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 70px; box-shadow: none !important;">
+          <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''" color="primary">
             <template v-slot:prepend>
               <v-avatar color="primary" variant="tonal" class="mr-2">
-                <v-icon>mdi-map-marker-path</v-icon>
+                <v-icon>mdi-book-open-page-variant</v-icon>
               </v-avatar>
             </template>
             <template v-slot:append>
@@ -23,36 +23,55 @@
           <v-divider></v-divider>
 
           <v-list density="compact" nav class="pa-2">
-            <v-list-item v-for="(step, index) in roadmapSteps" :key="index" :value="index"
-              :active="currentStepIndex === index" @click="selectStep(index)" :title="sidebarOpen ? step.title : ''"
-              :prepend-icon="step.mdiIcon" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
-              :class="currentStepIndex === index ? 'elevation-2' : ''">
+            <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
+              :active="isActiveLecture(index)" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
+              :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
+              :class="[
+                isActiveLecture(index) ? 'elevation-2 bg-primary-lighten-4' : '',
+                'hover:bg-primary-lighten-5'
+              ]">
               <template v-slot:prepend>
-                <v-avatar :color="currentStepIndex >= index ? 'primary' : 'grey-lighten-1'"
-                  :variant="currentStepIndex === index ? 'elevated' : 'flat'" size="small" class="text-white">
-                  <v-icon v-if="currentStepIndex > index">mdi-check</v-icon>
-                  <span v-else>{{ index + 1 }}</span>
+                <v-avatar :color="isActiveLecture(index) ? 'primary' : 'grey-lighten-1'"
+                  :variant="isActiveLecture(index) ? 'elevated' : 'flat'" size="small" class="text-white">
+                  <span>{{ index + 1 }}</span>
                 </v-avatar>
+              </template>
+              <template v-slot:append v-if="isActiveLecture(index)">
+                <v-icon color="primary">mdi-check-circle</v-icon>
               </template>
             </v-list-item>
           </v-list>
 
-          <template v-slot:append>
-            <v-divider></v-divider>
-            <div class="pa-4">
-              <div class="d-flex align-center">
-                <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
-                <span v-if="sidebarOpen">Your progress: {{ progressPercentage }}%</span>
-              </div>
+          <v-divider class="mt-2"></v-divider>
+          <div class="pa-4">
+            <div class="d-flex align-center">
+              <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
+              <span>Tiến độ: {{ courseProgressPercentage || 0 }}%</span>
             </div>
-          </template>
-        </v-navigation-drawer> -->
+          </div>
+        </v-navigation-drawer>
+
+        <!-- Add floating button to open sidebar when collapsed -->
+        <v-btn
+          v-if="!sidebarOpen"
+          icon
+          color="primary"
+          class="sidebar-toggle-btn"
+          @click="toggleSidebar"
+          elevation="2"
+        >
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
             <PremiumBlocker></PremiumBlocker>
           </div>
-          <RouterView v-else @authenticated="handleAuthenticated" @addNotification="addNotification"
+          <RouterView v-else 
+            :key="$route.fullPath"
+            @authenticated="handleAuthenticated" 
+            @addNotification="addNotification"
             @removeNotification="removeNotification" />
 
           <!--<v-main :class="mainBackground">
@@ -132,7 +151,15 @@ provide('roadmapProgress', {
       return roadmapProgress.value.fetchPersonalRoadmap();
     return null;
   }
-})
+});
+
+// Add new provide for lecture management
+provide('lectureManager', {
+  setCurrentLectureIndex: (index) => {
+    currentLectureIndex.value = index;
+  },
+  getCurrentLectureIndex: () => currentLectureIndex.value
+});
 
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
@@ -520,6 +547,145 @@ const viewFullHistory = () => {
   console.log('View full history')
   // In a real app, this would show a detailed history view
 }
+
+// Add new refs for course data
+const currentCourse = ref(null);
+const currentLectureIndex = ref(null);
+const courseProgressPercentage = ref(0);
+const completedLectures = ref(0);
+const totalLectures = ref(0);
+const isOwner = ref(false);
+const isEnrolled = ref(false);
+
+// Add new methods for course progress
+const fetchCourseData = async (courseId) => {
+  try {
+    const courseData = await getCourseById(courseId);
+    if (courseData) {
+      currentCourse.value = courseData;
+      await fetchLectures(courseId);
+      await checkEnrollmentStatus(courseId);
+    }
+  } catch (error) {
+    console.error('Error fetching course data:', error);
+  }
+};
+
+const fetchLectures = async (courseId) => {
+  try {
+    const response = await getLectures(courseId);
+    if (response?.items) {
+      currentCourse.value.lectures = response.items.sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
+      totalLectures.value = currentCourse.value.lectures.length;
+    }
+  } catch (error) {
+    console.error('Error fetching lectures:', error);
+  }
+};
+
+const checkEnrollmentStatus = async (courseId) => {
+  try {
+    const response = await getEnrollments({ pageSize: 100 });
+    if (response?.items) {
+      isEnrolled.value = response.items.some(enrollment => enrollment.courseId === courseId);
+      if (isEnrolled.value) {
+        // Mock data for completed lectures - replace with actual API call
+        completedLectures.value = Math.floor(Math.random() * totalLectures.value);
+        courseProgressPercentage.value = Math.round((completedLectures.value / totalLectures.value) * 100);
+      }
+    }
+  } catch (error) {
+    console.error('Error checking enrollment status:', error);
+    isEnrolled.value = false;
+  }
+};
+
+const selectLecture = async (index) => {
+  const lecture = currentCourse.value.lectures[index];
+  if (!lecture) return;
+
+  // Update the index immediately
+  currentLectureIndex.value = index;
+
+  try {
+    // Allow access if user is enrolled, is owner, or lecture is previewable
+    if (isOwner.value || isEnrolled.value || lecture.isPreviewable) {
+      // Then update the route
+      await router.replace({
+        name: "lectureDetail",
+        params: { id: lecture.id },
+        query: { courseId: currentCourse.value.id },
+      });
+    } else {
+      // Reset the index if access is denied
+      currentLectureIndex.value = null;
+      // Show premium blocker or access denied message
+      sweetAlert.value.showAlert({
+        icon: 'warning',
+        title: 'Access Denied',
+        text: 'Please enroll in this course to access the lecture content.'
+      });
+    }
+  } catch (error) {
+    // Reset the index if there's an error
+    currentLectureIndex.value = null;
+    console.error('Error selecting lecture:', error);
+    sweetAlert.value.showAlert({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to navigate to lecture. Please try again.'
+    });
+  }
+};
+
+// Update the route watch logic
+watch(() => router.currentRoute.value, async (newRoute) => {
+  const courseId = newRoute.query.courseId || newRoute.params.id;
+  const lectureId = newRoute.params.lectureId;
+
+  if (courseId) {
+    try {
+      // Only fetch course data if we don't have it or if it's a different course
+      if (!currentCourse.value || currentCourse.value.id !== courseId) {
+        await fetchCourseData(courseId);
+      }
+      
+      // Update lecture index if we're on a lecture page
+      if (lectureId && currentCourse.value?.lectures) {
+        const index = currentCourse.value.lectures.findIndex(lecture => lecture.id === lectureId);
+        if (index !== -1) {
+          currentLectureIndex.value = index;
+        }
+      } else {
+        // Reset currentLectureIndex when not on a lecture page
+        currentLectureIndex.value = null;
+      }
+    } catch (error) {
+      console.error('Error handling route change:', error);
+      sweetAlert.value.showAlert({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to load course data. Please try again.'
+      });
+    }
+  } else {
+    // Reset currentLectureIndex when not on a course page
+    currentLectureIndex.value = null;
+  }
+}, { immediate: true, deep: true });
+
+// Add a computed property for the current lecture
+const currentLecture = computed(() => {
+  if (currentCourse.value?.lectures && currentLectureIndex.value !== null) {
+    return currentCourse.value.lectures[currentLectureIndex.value];
+  }
+  return null;
+});
+
+// Add this computed property in the script setup section
+const isActiveLecture = computed(() => (index) => {
+  return currentLectureIndex.value === index;
+});
 </script>
 
 <script>
@@ -587,6 +753,7 @@ main {
   background-size: 100% 100vh;
   background-position: center top;
   background-attachment: fixed;
+  margin-top: 100px;
 }
 
 /**.page-container {
@@ -630,6 +797,22 @@ main {
 
 footer {
   z-index: 100;
+}
+
+.sidebar-toggle-btn {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(135deg, #0d6efd, #0a58ca);
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  transform: translateY(-50%) translateX(4px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
 }
 </style>
 

@@ -1,164 +1,164 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <v-container fluid class="pt-16">
-        <v-btn variant="text" color="primary" class="mb-4" prepend-icon="mdi-arrow-left"
-          @click="$router.push(`/roadmap/${roadmapId}`)">
-          Quay lại lộ trình
-        </v-btn>
 
-        <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
-          <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-        </div>
+      <v-btn variant="text" color="primary" class="mb-4" prepend-icon="mdi-arrow-left"
+        @click="$router.push(`/roadmap/${roadmapId}`)">
+        Quay lại lộ trình
+      </v-btn>
 
-        <div v-else-if="phase">
-          <div class="d-flex flex-column md:flex-row justify-space-between align-start mb-6">
-            <div>
-              <h1 class="text-h4 font-weight-bold">{{ phase.title }}</h1>
-              <p class="text-subtitle-1 text-grey-darken-1">{{
-                phase.description
-              }}</p>
-              <div class="d-flex align-center mt-2">
-                <v-chip color="primary">Phase {{ currentPhase }}</v-chip>
-              </div>
-            </div>
+      <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
+        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      </div>
 
-            <div class="mood-selector mt-4 md:mt-0">
-              <p class="text-subtitle-2 mb-2">Hôm nay bạn cảm thấy thế nào?</p>
-              <div class="d-flex">
-                <v-btn v-for="emoji in ['😔', '😐', '🙂', '😊']" :key="emoji"
-                  :variant="mood === emoji ? 'elevated' : 'outlined'" :color="mood === emoji ? 'primary' : undefined"
-                  class="mx-1" @click="mood = emoji">
-                  {{ emoji }}
-                </v-btn>
-              </div>
+      <div v-else-if="phase">
+        <div class="d-flex flex-column md:flex-row justify-space-between align-start mb-6">
+          <div>
+            <h1 class="text-h4 font-weight-bold">{{ phase.title }}</h1>
+            <p class="text-subtitle-1 text-grey-darken-1">{{
+              phase.description
+            }}</p>
+            <div class="d-flex align-center mt-2">
+              <v-chip color="primary">Phase {{ currentPhase }}</v-chip>
             </div>
           </div>
 
-          <v-tabs v-model="activeTab" class="mb-6">
-            <v-tab value="overview">Tổng quan</v-tab>
-            <v-tab value="actions">
-              Hành động ({{ completedActionsCount }}/{{ phase.actions.length }})
-            </v-tab>
-          </v-tabs>
+          <div class="mood-selector mt-4 md:mt-0">
+            <p class="text-subtitle-2 mb-2">Hôm nay bạn cảm thấy thế nào?</p>
+            <div class="d-flex">
+              <v-btn v-for="emoji in ['😔', '😐', '🙂', '😊']" :key="emoji"
+                :variant="mood === emoji ? 'elevated' : 'outlined'" :color="mood === emoji ? 'primary' : undefined"
+                class="mx-1" @click="mood = emoji">
+                {{ emoji }}
+              </v-btn>
+            </div>
+          </div>
+        </div>
 
-          <v-window v-model="activeTab">
-            <v-window-item value="overview">
-              <div class="step-tab-wrapper">
-                <v-card class="mb-6" :color="phase.themeColor + '-lighten-5'">
-                  <v-card-title>Giới thiệu phase</v-card-title>
-                  <v-card-text>
-                    <p class="text-body-1 mb-4">
-                      {{ phase.introduction }}
-                    </p>
+        <v-tabs v-model="activeTab" class="mb-6">
+          <v-tab value="overview">Tổng quan</v-tab>
+          <v-tab value="actions">
+            Hành động ({{ completedActionsCount }}/{{ phase.actions.length }})
+          </v-tab>
+        </v-tabs>
 
-                    <div v-if="phase.videoUrl" class="mt-6">
-                      <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
-                      <div class="video-placeholder d-flex justify-center align-center"
-                        :style="{ backgroundColor: phase.themeColor + '-lighten-4' }">
-                        <v-btn icon="mdi-play" :color="phase.themeColor" size="x-large" variant="flat"></v-btn>
-                      </div>
+        <v-window v-model="activeTab">
+          <v-window-item value="overview">
+            <div class="step-tab-wrapper">
+              <v-card class="mb-6" :color="phase.themeColor + '-lighten-5'">
+                <v-card-title>Giới thiệu phase</v-card-title>
+                <v-card-text>
+                  <p class="text-body-1 mb-4">
+                    {{ phase.introduction }}
+                  </p>
+
+                  <div v-if="phase.videoUrl" class="mt-6">
+                    <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
+                    <div class="video-placeholder d-flex justify-center align-center"
+                      :style="{ backgroundColor: phase.themeColor + '-lighten-4' }">
+                      <v-btn icon="mdi-play" :color="phase.themeColor" size="x-large" variant="flat"></v-btn>
                     </div>
+                  </div>
 
-                    <div v-if="phase.tips && phase.tips.length > 0" class="mt-6">
-                      <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
-                      <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
-                        <v-list-item v-for="(tip, index) in phase.tips" :key="index" :title="tip.title"
-                          :subtitle="tip.content" class="mb-2">
-                          <template v-slot:prepend>
-                            <v-icon :color="phase.themeColor">{{ tip.icon }}</v-icon>
-                          </template>
-                        </v-list-item>
-                      </v-list>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </div>
-            </v-window-item>
+                  <div v-if="phase.tips && phase.tips.length > 0" class="mt-6">
+                    <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
+                    <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
+                      <v-list-item v-for="(tip, index) in phase.tips" :key="index" :title="tip.title"
+                        :subtitle="tip.content" class="mb-2">
+                        <template v-slot:prepend>
+                          <v-icon :color="phase.themeColor">{{ tip.icon }}</v-icon>
+                        </template>
+                      </v-list-item>
+                    </v-list>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-window-item>
 
-            <v-window-item value="actions">
-              <div class="step-tab-wrapper">
-                <v-row>
-                  <v-col v-for="action in phase.actions" :key="action.id" cols="12" md="6">
-                    <v-card :class="{ 'bg-success-subtle': action.completed }">
-                      <v-card-title class="d-flex justify-space-between align-center">
-                        {{ action.title }}
-                        <v-chip :color="action.required ? 'error' : phase.themeColor" size="small">
-                          {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
+          <v-window-item value="actions">
+            <div class="step-tab-wrapper">
+              <v-row>
+                <v-col v-for="action in phase.actions" :key="action.id" cols="12" md="6">
+                  <v-card :class="{ 'bg-success-subtle': action.completed }">
+                    <v-card-title class="d-flex justify-space-between align-center">
+                      {{ action.title }}
+                      <v-chip :color="action.required ? 'error' : phase.themeColor" size="small">
+                        {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
+                      </v-chip>
+                    </v-card-title>
+                    <v-card-subtitle class="d-flex align-center">
+                      <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
+                      {{ action.duration }}
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p>{{ action.description }}</p>
+
+                      <div v-if="action.moodTags && action.moodTags.length > 0" class="mt-2">
+                        <v-chip v-for="tag in action.moodTags" :key="tag" size="small" :color="phase.themeColor"
+                          class="mr-1 mb-1" variant="outlined">
+                          {{ tag }}
                         </v-chip>
-                      </v-card-title>
-                      <v-card-subtitle class="d-flex align-center">
-                        <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
-                        {{ action.duration }}
-                      </v-card-subtitle>
-                      <v-card-text>
-                        <p>{{ action.description }}</p>
+                      </div>
+                    </v-card-text>
+                    <v-card-actions class="d-flex justify-space-between">
+                      <v-btn variant="text" size="small" @click="viewActionDetails(action)">
+                        Chi tiết
+                      </v-btn>
 
-                        <div v-if="action.moodTags && action.moodTags.length > 0" class="mt-2">
-                          <v-chip v-for="tag in action.moodTags" :key="tag" size="small" :color="phase.themeColor"
-                            class="mr-1 mb-1" variant="outlined">
-                            {{ tag }}
-                          </v-chip>
-                        </div>
-                      </v-card-text>
-                      <v-card-actions class="d-flex justify-space-between">
-                        <v-btn variant="text" size="small" @click="viewActionDetails(action)">
-                          Chi tiết
-                        </v-btn>
+                      <v-checkbox v-model="action.completed" :label="action.completed
+                        ? 'Đã hoàn thành'
+                        : 'Đánh dấu hoàn thành'
+                        " hide-details density="compact"></v-checkbox>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
 
-                        <v-checkbox v-model="action.completed" :label="action.completed
-                          ? 'Đã hoàn thành'
-                          : 'Đánh dấu hoàn thành'
-                          " hide-details density="compact"></v-checkbox>
-                      </v-card-actions>
-                    </v-card>
-                  </v-col>
-                </v-row>
+              <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
+                <v-card-title>Bạn có muốn bỏ qua phase này không?</v-card-title>
+                <v-card-subtitle>
+                  Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
+                  thiện trải nghiệm của bạn
+                </v-card-subtitle>
+                <v-card-text>
+                  <v-radio-group v-model="skipReason">
+                    <v-radio label="Tôi cảm thấy tốt hôm nay, không cần thực hiện phase này" value="feelGood"
+                      color="warning"></v-radio>
+                    <v-radio label="Phase này không liên quan đến tôi" value="notRelevant" color="warning"></v-radio>
+                    <v-radio label="Tôi không có đủ thời gian ngay bây giờ" value="noTime" color="warning"></v-radio>
+                  </v-radio-group>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn variant="text" @click="showSkipConfirm = false">
+                    Hủy
+                  </v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn color="warning" @click="confirmSkip" :disabled="!skipReason">
+                    Xác nhận bỏ qua
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
+          </v-window-item>
+        </v-window>
 
-                <v-card v-if="showSkipConfirm" class="mt-6 bg-warning-lighten-5">
-                  <v-card-title>Bạn có muốn bỏ qua phase này không?</v-card-title>
-                  <v-card-subtitle>
-                    Vui lòng cho chúng tôi biết lý do để chúng tôi có thể cải
-                    thiện trải nghiệm của bạn
-                  </v-card-subtitle>
-                  <v-card-text>
-                    <v-radio-group v-model="skipReason">
-                      <v-radio label="Tôi cảm thấy tốt hôm nay, không cần thực hiện phase này" value="feelGood"
-                        color="warning"></v-radio>
-                      <v-radio label="Phase này không liên quan đến tôi" value="notRelevant" color="warning"></v-radio>
-                      <v-radio label="Tôi không có đủ thời gian ngay bây giờ" value="noTime" color="warning"></v-radio>
-                    </v-radio-group>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-btn variant="text" @click="showSkipConfirm = false">
-                      Hủy
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn color="warning" @click="confirmSkip" :disabled="!skipReason">
-                      Xác nhận bỏ qua
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </div>
-            </v-window-item>
-          </v-window>
+        <div class="d-flex justify-space-between mt-8">
+          <v-btn v-if="phase.canSkip && !showSkipConfirm" variant="outlined" @click="showSkipConfirm = true">
+            Bỏ qua phase này
+          </v-btn>
+          <div v-else></div>
 
-          <div class="d-flex justify-space-between mt-8">
-            <v-btn v-if="phase.canSkip && !showSkipConfirm" variant="outlined" @click="showSkipConfirm = true">
-              Bỏ qua phase này
-            </v-btn>
-            <div v-else></div>
-
-            <v-btn size="large" :color="canContinue ? 'success' : phase.themeColor" :disabled="!canContinue"
-              @click="completePhase">
-              <v-icon start>{{
-                isLastPhase ? "mdi-check-circle" : "mdi-arrow-right"
-              }}</v-icon>
-              {{ isLastPhase ? "Hoàn thành lộ trình" : "Hoàn thành phase" }}
-            </v-btn>
-          </div>
+          <v-btn size="large" :color="canContinue ? 'success' : phase.themeColor" :disabled="!canContinue"
+            @click="completePhase">
+            <v-icon start>{{
+              isLastPhase ? "mdi-check-circle" : "mdi-arrow-right"
+            }}</v-icon>
+            {{ isLastPhase ? "Hoàn thành lộ trình" : "Hoàn thành phase" }}
+          </v-btn>
         </div>
-      </v-container>
+      </div>
+
     </div>
 
     <!-- Dialog đánh giá cuối phase -->
@@ -825,6 +825,7 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
+  margin-bottom: 25px;
 }
 
 .roadmap-content {

@@ -29,7 +29,12 @@
                             <span v-else>Chưa có đánh giá</span>
                         </span>
                     </div>
-                    <div class="price-container">
+                    <div v-if="isEnrolled" class="access-btn">
+                        <RouterLink :to="`/courses/${course.id}`" class="btn btn-primary btn-sm">
+                            Truy cập
+                        </RouterLink>
+                    </div>
+                    <div v-else class="price-container">
                         <span v-if="course.discount > 0" class="original-price">{{ formatPriceVND(course.price)
                             }}</span>
                         <span class="final-price">{{ displayPrice(calculateFinalPrice(course)) }}</span>
@@ -48,6 +53,10 @@ const props = defineProps({
         type: Object,
         required: true,
         default: () => ({})
+    },
+    isEnrolled: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -62,9 +71,9 @@ const formatDate = (dateString) => {
 };
 
 const getLevelText = (level) => {
-    if (level === 0) return "Mới bắt đầu";
+    if (level === 0) return "Sơ cấp";
     if (level === 1) return "Trung cấp";
-    if (level === 2) return "Nâng cao";
+    if (level === 2) return "Cao cấp";
     return "Unknown";
 };
 
@@ -228,5 +237,23 @@ function formatPrice(price) {
     color: #e74c3c;
     font-weight: 600;
     font-size: 14px;
+}
+
+.access-btn {
+    text-align: right;
+}
+
+.access-btn .btn {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.access-btn .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }
 </style>
