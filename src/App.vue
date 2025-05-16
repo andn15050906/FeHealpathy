@@ -7,7 +7,8 @@
       <div v-if="!router.currentRoute.value.meta.isAppMode">
         <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
           class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 70px; box-shadow: none !important;">
-          <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''" color="primary">
+          <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''"
+            color="primary">
             <template v-slot:prepend>
               <v-avatar color="primary" variant="tonal" class="mr-2">
                 <v-icon>mdi-book-open-page-variant</v-icon>
@@ -25,8 +26,8 @@
           <v-list density="compact" nav class="pa-2">
             <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
               :active="isActiveLecture(index)" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
-              :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl" class="mb-2 transition-all duration-300"
-              :class="[
+              :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl"
+              class="mb-2 transition-all duration-300" :class="[
                 isActiveLecture(index) ? 'elevation-2 bg-primary-lighten-4' : '',
                 'hover:bg-primary-lighten-5'
               ]">
@@ -52,14 +53,7 @@
         </v-navigation-drawer>
 
         <!-- Add floating button to open sidebar when collapsed -->
-        <v-btn
-          v-if="!sidebarOpen"
-          icon
-          color="primary"
-          class="sidebar-toggle-btn"
-          @click="toggleSidebar"
-          elevation="2"
-        >
+        <v-btn v-if="!sidebarOpen" icon color="primary" class="sidebar-toggle-btn" @click="toggleSidebar" elevation="2">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
 
@@ -68,11 +62,8 @@
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
             <PremiumBlocker></PremiumBlocker>
           </div>
-          <RouterView v-else 
-            :key="$route.fullPath"
-            @authenticated="handleAuthenticated" 
-            @addNotification="addNotification"
-            @removeNotification="removeNotification" />
+          <RouterView v-else :key="$route.fullPath" @authenticated="handleAuthenticated"
+            @addNotification="addNotification" @removeNotification="removeNotification" />
 
           <!--<v-main :class="mainBackground">
             <v-container>
@@ -89,7 +80,7 @@
           </v-main>-->
           <RouteCompletion v-model="showRouteCompletion" :current-theme="currentTheme"
             :assessment-result="completionAssessmentResult" @close="showRouteCompletion = false"
-            @restart-assessment="() => {}/*startSurvey*/" @select-continue-option="handleContinueOptionSelected"
+            @restart-assessment="() => { }/*startSurvey*/" @select-continue-option="handleContinueOptionSelected"
             @select-alternative-route="handleAlternativeRouteSelected" />
         </div>
         <NotificationContainer v-if="isAuthAndShown" ref="notificationRef" />
@@ -649,7 +640,7 @@ watch(() => router.currentRoute.value, async (newRoute) => {
       if (!currentCourse.value || currentCourse.value.id !== courseId) {
         await fetchCourseData(courseId);
       }
-      
+
       // Update lecture index if we're on a lecture page
       if (lectureId && currentCourse.value?.lectures) {
         const index = currentCourse.value.lectures.findIndex(lecture => lecture.id === lectureId);
@@ -748,7 +739,7 @@ main {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /*align-items: center; will break login screen*/
   background-repeat: no-repeat;
   background-size: 100% 100vh;
   background-position: center top;

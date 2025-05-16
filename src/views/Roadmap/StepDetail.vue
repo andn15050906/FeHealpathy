@@ -173,6 +173,7 @@ import PhaseCompletionDialog from "@/components/Roadmap/PhaseCompletionDialog.vu
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEventBus } from '@/scripts/logic/eventBus';
+import { phaseDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "StepDetail",
@@ -206,25 +207,8 @@ export default {
     const nextPhase = ref(2);
     const currentPhaseId = ref("phase1");
     const currentPhaseTitle = ref("Nhận diện vấn đề");
-    const phaseDocuments = ref([
-      { title: "Hiểu về lo âu và các triệu chứng", url: "/docs/anxiety-symptoms" },
-      { title: "Kỹ thuật thở để giảm lo âu", url: "/docs/breathing-techniques" },
-      { title: "Nhận diện và thách thức suy nghĩ tiêu cực", url: "/docs/negative-thoughts" }
-    ]);
-    const phaseCriteria = ref([
-      {
-        title: "Nhận diện triệu chứng",
-        description: "Bạn có thể nhận diện được các triệu chứng lo âu của mình"
-      },
-      {
-        title: "Hiểu nguồn gốc",
-        description: "Bạn hiểu được nguồn gốc của lo âu và các yếu tố kích hoạt"
-      },
-      {
-        title: "Áp dụng kỹ thuật",
-        description: "Bạn đã thử và áp dụng được ít nhất một kỹ thuật giảm lo âu"
-      }
-    ]);
+    const phaseDocuments = ref([]);
+    const phaseCriteria = ref([]);
 
     // Trạng thái hoàn thành của các phase
     const completedPhases = ref({
@@ -265,283 +249,6 @@ export default {
       };
     };
 
-    // Dữ liệu cho các phase
-    const phaseData = {
-      "1": {
-        id: "1",
-        roadmapId: props.roadmapId,
-        title: "Nhận diện triệu chứng lo âu",
-        description: "Học cách nhận biết các dấu hiệu và triệu chứng của lo âu",
-        themeColor: "indigo",
-        introduction: "Bước đầu tiên để vượt qua lo âu là nhận diện và thừa nhận vấn đề. Trong phase này, bạn sẽ học cách nhận biết các triệu chứng lo âu, hiểu nguồn gốc của chúng và tác động của chúng đến cuộc sống hàng ngày của bạn.",
-        videoUrl: "/videos/phase1.mp4",
-        tips: [
-          {
-            title: "Lắng nghe cơ thể",
-            content: "Chú ý đến các phản ứng thể chất như tim đập nhanh, khó thở, hoặc căng cơ",
-            icon: "mdi-heart-pulse"
-          },
-          {
-            title: "Ghi chú hàng ngày",
-            content: "Ghi lại các triệu chứng và tình huống gây lo âu để nhận diện mẫu hình",
-            icon: "mdi-notebook"
-          }
-        ],
-        actions: [
-          {
-            id: "1-1",
-            title: "Nhật ký triệu chứng",
-            description:
-              "Ghi lại các triệu chứng lo âu bạn gặp phải trong ngày",
-            duration: "10 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Tự nhận thức", "Theo dõi triệu chứng"],
-          },
-          {
-            id: "1-2",
-            title: "Đánh giá mức độ lo âu",
-            description: "Đánh giá mức độ lo âu của bạn trên thang điểm từ 1-10",
-            duration: "5 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Đo lường", "Tự đánh giá"],
-          },
-          {
-            id: "1-3",
-            title: "Xác định yếu tố kích hoạt",
-            description: "Nhận diện các tình huống hoặc suy nghĩ gây ra lo âu",
-            duration: "15 phút",
-            completed: false,
-            required: false,
-            moodTags: ["Phân tích", "Nhận thức"],
-          },
-        ],
-        canSkip: false,
-        requireConfirmation: false, // Đã bỏ yêu cầu xác nhận
-        nextPhaseId: "2"
-      },
-      "2": {
-        id: "2",
-        roadmapId: props.roadmapId,
-        title: "Giảm nhẹ tức thì",
-        description: "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-        themeColor: "teal",
-        introduction: "Sau khi đã nhận diện vấn đề, phase tiếp theo là học các kỹ thuật giảm nhẹ tức thì. Những kỹ thuật này sẽ giúp bạn đối phó với các tình huống gây lo âu và giảm triệu chứng ngay lập tức khi chúng xuất hiện.",
-        videoUrl: "/videos/phase2.mp4",
-        tips: [
-          {
-            title: "Thực hành thường xuyên",
-            content: "Các kỹ thuật thở và thư giãn hiệu quả hơn khi được thực hành thường xuyên",
-            icon: "mdi-repeat"
-          },
-          {
-            title: "Tìm không gian yên tĩnh",
-            content: "Nếu có thể, hãy tìm một nơi yên tĩnh để thực hành các kỹ thuật này",
-            icon: "mdi-meditation"
-          }
-        ],
-        actions: [
-          {
-            id: "2-1",
-            title: "Kỹ thuật thở 4-7-8",
-            description:
-              "Hít vào trong 4 giây, giữ 7 giây, và thở ra trong 8 giây",
-            duration: "5 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Giảm nhẹ nhanh", "Kiểm soát hơi thở"],
-          },
-          {
-            id: "2-2",
-            title: "Thư giãn cơ bắp tiến triển",
-            description: "Căng và thả lỏng từng nhóm cơ để giảm căng thẳng",
-            duration: "10 phút",
-            completed: false,
-            required: false,
-            moodTags: ["Thư giãn cơ thể", "Giảm căng thẳng"],
-          },
-          {
-            id: "2-3",
-            title: "Kỹ thuật neo đậu 5-4-3-2-1",
-            description: "Sử dụng 5 giác quan để kéo bạn trở lại hiện tại",
-            duration: "5 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Chánh niệm", "Tập trung"],
-          },
-        ],
-        canSkip: true,
-        requireConfirmation: false,
-        nextPhaseId: "3"
-      },
-      "3": {
-        id: "3",
-        roadmapId: props.roadmapId,
-        title: "Ổn định tâm trí",
-        description: "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-        themeColor: "purple",
-        introduction: "Suy nghĩ tiêu cực thường là nguyên nhân chính gây ra lo âu. Trong phase này, bạn sẽ học cách nhận diện, thách thức và thay đổi các mẫu suy nghĩ tiêu cực để giảm lo âu và cải thiện sức khỏe tinh thần.",
-        videoUrl: "/videos/phase3.mp4",
-        tips: [
-          {
-            title: "Tìm bằng chứng",
-            content: "Khi có suy nghĩ tiêu cực, hãy tìm bằng chứng ủng hộ và phản bác nó",
-            icon: "mdi-scale-balance"
-          },
-          {
-            title: "Đặt câu hỏi",
-            content: "Hỏi bản thân: 'Điều tồi tệ nhất có thể xảy ra là gì? Khả năng xảy ra là bao nhiêu?'",
-            icon: "mdi-help-circle"
-          },
-          {
-            title: "Thay thế suy nghĩ",
-            content: "Thực hành thay thế suy nghĩ tiêu cực bằng suy nghĩ cân bằng hơn",
-            icon: "mdi-swap-horizontal"
-          }
-        ],
-        actions: [
-          {
-            id: "3-1",
-            title: "Nhật ký suy nghĩ",
-            description:
-              "Ghi lại các suy nghĩ tiêu cực và tác động của chúng",
-            duration: "15 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Nhận thức", "Phân tích"],
-          },
-          {
-            id: "3-2",
-            title: "Nhận diện lỗi suy nghĩ",
-            description: "Học cách nhận diện các lỗi suy nghĩ phổ biến như suy nghĩ nhị nguyên, đọc suy nghĩ",
-            duration: "10 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Nhận thức", "Tư duy phản biện"],
-          },
-          {
-            id: "3-3",
-            title: "Thực hành tái cấu trúc nhận thức",
-            description: "Thách thức và thay đổi suy nghĩ tiêu cực thành cân bằng hơn",
-            duration: "20 phút",
-            completed: false,
-            required: false,
-            moodTags: ["Thay đổi suy nghĩ", "Tích cực hóa"],
-          },
-        ],
-        canSkip: false,
-        requireConfirmation: false,
-        nextPhaseId: "4"
-      },
-      "4": {
-        id: "4",
-        roadmapId: props.roadmapId,
-        title: "Đối mặt với vấn đề",
-        description: "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-        themeColor: "blue",
-        introduction: "Đối mặt với vấn đề là một bước quan trọng trong việc vượt qua lo âu. Trong phase này, bạn sẽ học cách phát triển các chiến lược để đối mặt với các tình huống gây lo âu và xây dựng sự tự tin.",
-        videoUrl: "/videos/phase4.mp4",
-        tips: [
-          {
-            title: "Tiếp cận từng bước",
-            content: "Chia nhỏ các tình huống khó khăn thành các bước nhỏ hơn, dễ quản lý hơn",
-            icon: "mdi-stairs"
-          },
-          {
-            title: "Thực hành thường xuyên",
-            content: "Đối mặt thường xuyên với các tình huống gây lo âu sẽ giúp giảm phản ứng lo âu theo thời gian",
-            icon: "mdi-repeat"
-          }
-        ],
-        actions: [
-          {
-            id: "4-1",
-            title: "Xây dựng thang đo lo âu",
-            description: "Tạo danh sách các tình huống gây lo âu từ nhẹ đến nặng",
-            duration: "15 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Lập kế hoạch", "Tự nhận thức"],
-          },
-          {
-            id: "4-2",
-            title: "Thực hành đối mặt",
-            description: "Đối mặt với một tình huống gây lo âu nhẹ từ thang đo của bạn",
-            duration: "30 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Đối mặt", "Xây dựng sự tự tin"],
-          },
-          {
-            id: "4-3",
-            title: "Phản ánh và điều chỉnh",
-            description: "Đánh giá trải nghiệm đối mặt và điều chỉnh chiến lược nếu cần",
-            duration: "10 phút",
-            completed: false,
-            required: false,
-            moodTags: ["Phản ánh", "Học hỏi"],
-          },
-        ],
-        canSkip: false,
-        requireConfirmation: false,
-        nextPhaseId: "5"
-      },
-      "5": {
-        id: "5",
-        roadmapId: props.roadmapId,
-        title: "Đánh giá & Duy trì",
-        description: "Đánh giá tiến độ và xây dựng kế hoạch duy trì lâu dài",
-        themeColor: "green",
-        introduction: "Phase cuối cùng tập trung vào việc đánh giá tiến độ của bạn và xây dựng kế hoạch duy trì lâu dài. Bạn sẽ xem xét những gì đã học được, đánh giá sự tiến bộ và phát triển chiến lược để duy trì những kỹ năng mới.",
-        videoUrl: "/videos/phase5.mp4",
-        tips: [
-          {
-            title: "Ghi nhận tiến bộ",
-            content: "Dành thời gian để ghi nhận và ăn mừng những tiến bộ bạn đã đạt được",
-            icon: "mdi-trophy"
-          },
-          {
-            title: "Xây dựng thói quen",
-            content: "Tích hợp các kỹ thuật bạn đã học vào thói quen hàng ngày",
-            icon: "mdi-calendar-check"
-          }
-        ],
-        actions: [
-          {
-            id: "5-1",
-            title: "Đánh giá tiến độ",
-            description: "Xem lại nhật ký và đánh giá sự tiến bộ của bạn",
-            duration: "20 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Đánh giá", "Phản ánh"],
-          },
-          {
-            id: "5-2",
-            title: "Xây dựng kế hoạch duy trì",
-            description: "Phát triển kế hoạch để duy trì và tiếp tục cải thiện",
-            duration: "30 phút",
-            completed: false,
-            required: true,
-            moodTags: ["Lập kế hoạch", "Duy trì"],
-          },
-          {
-            id: "5-3",
-            title: "Xác định nguồn hỗ trợ",
-            description: "Xác định các nguồn hỗ trợ để giúp bạn duy trì tiến độ",
-            duration: "15 phút",
-            completed: false,
-            required: false,
-            moodTags: ["Hỗ trợ", "Kết nối"],
-          },
-        ],
-        canSkip: false,
-        requireConfirmation: false,
-        nextPhaseId: null
-      }
-    };
-
     // Computed properties
     const completedActionsCount = computed(() => {
       if (!phase.value) return 0;
@@ -568,135 +275,45 @@ export default {
         // Xác định phase hiện tại dựa trên phaseId
         currentPhase.value = parseInt(props.phaseId);
         currentPhaseId.value = "phase" + currentPhase.value;
-        currentPhaseTitle.value = phaseData[props.phaseId].title;
-
+        
+        var roadmapId = props.roadmapId;
+        roadmapId = 1;
+        
         // Lấy dữ liệu phase
-        phase.value = JSON.parse(JSON.stringify(phaseData[props.phaseId]));
-
-        // Xác định phase tiếp theo
-        if (phase.value.nextPhaseId) {
-          nextPhase.value = parseInt(phase.value.nextPhaseId);
+        if (phaseDetails[roadmapId] && phaseDetails[roadmapId][props.phaseId]) {
+          phase.value = JSON.parse(JSON.stringify(phaseDetails[roadmapId][props.phaseId]));
+          currentPhaseTitle.value = phase.value.title;
+          
+          // Xác định phase tiếp theo
+          if (phase.value.nextPhaseId) {
+            nextPhase.value = parseInt(phase.value.nextPhaseId);
+          }
+          
+          // Cập nhật dữ liệu cho dialog đánh giá phase
+          if (phase.value.completionCriteria) {
+            phaseCriteria.value = phase.value.completionCriteria;
+          }
+          
+          if (phase.value.resources) {
+            phaseDocuments.value = phase.value.resources;
+          }
+        } else {
+          phase.value = {
+            id: props.phaseId,
+            roadmapId: props.roadmapId,
+            title: "Phase không tồn tại",
+            description: "Không tìm thấy thông tin về phase này",
+            themeColor: "grey",
+            introduction: "Không có thông tin về phase này.",
+            actions: []
+          };
         }
-
-        // Cập nhật dữ liệu cho dialog đánh giá phase
-        updatePhaseCompletionData();
 
         // Cập nhật trạng thái hoàn thành từ localStorage
         loadCompletedPhases();
 
         loading.value = false;
       }, 500);
-    };
-
-    const updatePhaseCompletionData = () => {
-      // Cập nhật dữ liệu cho dialog đánh giá phase dựa trên phase hiện tại
-      switch (currentPhase.value) {
-        case 1:
-          phaseDocuments.value = [
-            { title: "Hiểu về lo âu và các triệu chứng", url: "/docs/anxiety-symptoms" },
-            { title: "Kỹ thuật thở để giảm lo âu", url: "/docs/breathing-techniques" },
-            { title: "Nhận diện và thách thức suy nghĩ tiêu cực", url: "/docs/negative-thoughts" }
-          ];
-          phaseCriteria.value = [
-            {
-              title: "Nhận diện triệu chứng",
-              description: "Bạn có thể nhận diện được các triệu chứng lo âu của mình"
-            },
-            {
-              title: "Hiểu nguồn gốc",
-              description: "Bạn hiểu được nguồn gốc của lo âu và các yếu tố kích hoạt"
-            },
-            {
-              title: "Áp dụng kỹ thuật",
-              description: "Bạn đã thử và áp dụng được ít nhất một kỹ thuật giảm lo âu"
-            }
-          ];
-          break;
-        case 2:
-          phaseDocuments.value = [
-            { title: "Hướng dẫn thiền định cho người mới bắt đầu", url: "/docs/meditation-guide" },
-            { title: "Xây dựng thói quen tích cực", url: "/docs/positive-habits" },
-            { title: "Kỹ thuật đối phó với lo âu", url: "/docs/coping-techniques" }
-          ];
-          phaseCriteria.value = [
-            {
-              title: "Thực hành thiền định",
-              description: "Bạn đã thực hành thiền định ít nhất 3 lần một tuần"
-            },
-            {
-              title: "Xây dựng thói quen",
-              description: "Bạn đã bắt đầu xây dựng ít nhất một thói quen tích cực mới"
-            },
-            {
-              title: "Áp dụng kỹ thuật",
-              description: "Bạn đã áp dụng các kỹ thuật đối phó khi gặp tình huống lo âu"
-            }
-          ];
-          break;
-        case 3:
-          phaseDocuments.value = [
-            { title: "Hướng dẫn thực hành chánh niệm", url: "/docs/mindfulness-guide" },
-            { title: "Kỹ thuật thiền cho người mới bắt đầu", url: "/docs/meditation-beginners" },
-            { title: "Ổn định tâm trí trong cuộc sống hàng ngày", url: "/docs/daily-mindfulness" }
-          ];
-          phaseCriteria.value = [
-            {
-              title: "Thực hành chánh niệm",
-              description: "Bạn đã thực hành chánh niệm ít nhất 5 phút mỗi ngày"
-            },
-            {
-              title: "Nhận biết suy nghĩ",
-              description: "Bạn có thể nhận biết suy nghĩ tiêu cực khi chúng xuất hiện"
-            },
-            {
-              title: "Ổn định tâm trí",
-              description: "Bạn có thể ổn định tâm trí khi cảm thấy lo âu"
-            }
-          ];
-          break;
-        case 4:
-          phaseDocuments.value = [
-            { title: "Kỹ thuật đối mặt với lo âu", url: "/docs/facing-anxiety" },
-            { title: "Xây dựng sự tự tin", url: "/docs/building-confidence" },
-            { title: "Chiến lược đối phó với tình huống khó khăn", url: "/docs/coping-strategies" }
-          ];
-          phaseCriteria.value = [
-            {
-              title: "Xây dựng thang đo",
-              description: "Bạn đã xây dựng thang đo các tình huống gây lo âu"
-            },
-            {
-              title: "Đối mặt với tình huống",
-              description: "Bạn đã đối mặt với ít nhất một tình huống gây lo âu"
-            },
-            {
-              title: "Áp dụng kỹ thuật",
-              description: "Bạn đã áp dụng các kỹ thuật đã học để đối phó với tình huống"
-            }
-          ];
-          break;
-        case 5:
-          phaseDocuments.value = [
-            { title: "Duy trì tiến bộ dài hạn", url: "/docs/maintaining-progress" },
-            { title: "Phòng ngừa tái phát", url: "/docs/relapse-prevention" },
-            { title: "Xây dựng lối sống cân bằng", url: "/docs/balanced-lifestyle" }
-          ];
-          phaseCriteria.value = [
-            {
-              title: "Đánh giá tiến độ",
-              description: "Bạn đã đánh giá tiến độ của mình trong toàn bộ lộ trình"
-            },
-            {
-              title: "Xây dựng kế hoạch",
-              description: "Bạn đã xây dựng kế hoạch duy trì lâu dài"
-            },
-            {
-              title: "Xác định nguồn hỗ trợ",
-              description: "Bạn đã xác định các nguồn hỗ trợ để giúp duy trì tiến độ"
-            }
-          ];
-          break;
-      }
     };
 
     const viewActionDetails = (action) => {

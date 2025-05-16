@@ -82,7 +82,7 @@
 
 <script>
 import RoadmapCard from "@/components/Roadmap/RoadmapCard.vue";
-import { roadmapSteps } from "@/scripts/data/roadmapData.js";
+import { roadmapSteps, mentalHealthRoadmaps } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapOverview",
@@ -93,84 +93,8 @@ export default {
     return {
       activeTab: "suggested",
       roadmapSteps,
-      suggestedRoadmaps: [
-        {
-          id: "1",
-          title: "Vượt qua lo âu",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          steps: 5,
-          category: "anxiety",
-          featured: true,
-          completionRate: 78,
-          image: "/images/anxiety.jpg",
-        },
-        {
-          id: "2",
-          title: "Xây dựng sự tự tin",
-          description:
-            "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
-          steps: 4,
-          category: "confidence",
-          featured: true,
-          completionRate: 85,
-          image: "/images/confidence.jpg",
-        },
-      ],
-      allRoadmaps: [
-        {
-          id: "1",
-          title: "Vượt qua lo âu",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          steps: 5,
-          category: "anxiety",
-          featured: true,
-          completionRate: 78,
-          image: "/images/anxiety.jpg",
-        },
-        {
-          id: "2",
-          title: "Xây dựng sự tự tin",
-          description:
-            "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
-          steps: 4,
-          category: "confidence",
-          featured: true,
-          completionRate: 85,
-          image: "/images/confidence.jpg",
-        },
-        {
-          id: "3",
-          title: "Kiểm soát cảm xúc",
-          description: "Học cách nhận biết và điều chỉnh cảm xúc tiêu cực",
-          steps: 3,
-          category: "emotions",
-          featured: false,
-          completionRate: 62,
-          image: "/images/emotions.jpg",
-        },
-        {
-          id: "4",
-          title: "Cân bằng công việc - cuộc sống",
-          description: "Tạo sự cân bằng giữa công việc và cuộc sống cá nhân",
-          steps: 4,
-          category: "work-life",
-          featured: false,
-          completionRate: 70,
-          image: "/images/balance.jpg",
-        },
-        {
-          id: "5",
-          title: "Giấc ngủ chất lượng",
-          description: "Phương pháp giúp ngủ ngon và sâu giấc",
-          steps: 3,
-          category: "sleep",
-          featured: false,
-          completionRate: 90,
-          image: "/images/sleep.jpg",
-        },
-      ],
+      suggestedRoadmaps: mentalHealthRoadmaps.filter(roadmap => roadmap.featured),
+      allRoadmaps: mentalHealthRoadmaps
     };
   },
   methods: {

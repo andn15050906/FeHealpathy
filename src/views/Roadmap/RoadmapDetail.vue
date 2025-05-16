@@ -150,6 +150,7 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "@/scripts/logic/eventBus";
 import { useRoute, useRouter } from "vue-router";
 import advisorImg from "@/img/advisor.jpg";
+import { roadmapDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapDetail",
@@ -233,76 +234,13 @@ export default {
     const fetchRoadmap = () => {
       // In a real app, this would be an API call
       setTimeout(() => {
-        roadmap.value = {
+        roadmap.value = roadmapDetails[props.id === "1" ? 1 : 2] || {
           id: props.id,
-          title: props.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
+          title: "Lộ trình không tồn tại",
+          description: "Không tìm thấy lộ trình này",
           progress: 0,
-          introText: [
-            "Lộ trình này được thiết kế dựa trên các phương pháp đã được chứng minh hiệu quả trong việc hỗ trợ sức khỏe tinh thần.",
-            "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-            "Mỗi bước trong lộ trình sẽ cung cấp cho bạn các công cụ và kỹ thuật thực tế để cải thiện sức khỏe tinh thần.",
-          ],
-          phases: [
-            {
-              id: "1",
-              title: "Nhận diện vấn đề",
-              description:
-                "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
-              videoUrl: "/videos/phase1.mp4",
-              exerciseCount: 2,
-              completed: false,
-              current: true,
-              themeColor: "indigo",
-            },
-            {
-              id: "2",
-              title: "Giảm nhẹ tức thì",
-              description:
-                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-              videoUrl: "/videos/phase2.mp4",
-              audioUrl: "/audio/relaxation.mp3",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "teal",
-            },
-            {
-              id: "3",
-              title: "Ổn định tâm trí",
-              description:
-                "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-              videoUrl: "/videos/phase3.mp4",
-              audioUrl: "/audio/meditation.mp3",
-              exerciseCount: 4,
-              completed: false,
-              current: false,
-              themeColor: "purple",
-            },
-            {
-              id: "4",
-              title: "Đối mặt với vấn đề",
-              description:
-                "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-              videoUrl: "/videos/phase4.mp4",
-              exerciseCount: 5,
-              completed: false,
-              current: false,
-              themeColor: "blue",
-            },
-            {
-              id: "5",
-              title: "Duy trì và phát triển",
-              description:
-                "Xây dựng kế hoạch duy trì lâu dài và tiếp tục phát triển",
-              videoUrl: "/videos/phase5.mp4",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "green",
-            },
-          ],
+          introText: ["Không có thông tin về lộ trình này."],
+          phases: []
         };
 
         // Cập nhật trạng thái phase dựa trên completedPhases
