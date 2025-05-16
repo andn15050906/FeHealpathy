@@ -1028,6 +1028,7 @@ export default {
   display: flex;
   min-height: 100vh;
   max-width: 1300px;
+  margin-bottom: 25px;
 }
 
 .roadmap-content {

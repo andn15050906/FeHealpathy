@@ -26,7 +26,7 @@
         <v-tab value="all">Tất cả lộ trình</v-tab>
       </v-tabs>
 
-      <v-window v-model="activeTab">
+      <v-window style="margin-top: -35px;" v-model="activeTab">
         <v-window-item value="suggested">
           <div class="roadmap-grid">
             <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
