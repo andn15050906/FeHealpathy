@@ -678,7 +678,6 @@ export default {
     generatePersonalizedRoadmaps(stressLevel, depressionRisk) {
       const roadmaps = [];
       
-      // Get roadmaps based on user type and issue
       if (this.answers.userType && this.answers.issue && this.suggestionData) {
         const userTypeRoadmaps = this.suggestionData.suggestedRoadmaps[this.answers.userType];
         if (userTypeRoadmaps && userTypeRoadmaps[this.answers.issue]) {
@@ -686,14 +685,12 @@ export default {
         }
       }
       
-      // Always add default roadmaps
-      if (this.suggestionData && this.suggestionData.suggestedRoadmaps.default) {
-        roadmaps.push(...this.suggestionData.suggestedRoadmaps.default);
+      if (this.suggestionData && this.suggestionData.suggestedRoadmaps["default"]) {
+        roadmaps.push(...this.suggestionData.suggestedRoadmaps["default"]["default"]);
       }
 
-      // Nếu tâm lý bình thường, thêm lộ trình duy trì sức khỏe tinh thần
-      if (this.isNormalMentalHealth) {
-        roadmaps.push(suggestionData.suggestedRoadmaps.normal);
+      if (this.isNormalMentalHealth && this.suggestionData.suggestedRoadmaps["normal"]) {
+        roadmaps.push(suggestionData.suggestedRoadmap["normal"]["normal"]);
       }
       
       // Sắp xếp theo độ phù hợp

@@ -1,3 +1,5 @@
+import { get } from "@/scripts/api/apiClients";
+
 const defaultRoadmaps = [
   {
     id: "1",
@@ -873,37 +875,41 @@ const suggestionData = {
         },
       ],
     },
-    default: [
-      {
-        id: "7",
-        title: "Thư giãn với âm nhạc",
-        description: "Bộ sưu tập nhạc thư giãn và thiền định giúp giảm căng thẳng",
-        match: 85,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      },
-      {
-        id: "8",
-        title: "Yoga cơ bản",
-        description: "Các bài tập yoga đơn giản giúp thư giãn cơ thể và tâm trí",
-        match: 80,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      },
-    ],
-    normal: [
-      {
-        id: "9",
-        title: "Duy trì sức khỏe tinh thần",
-        description: "Các hoạt động và thói quen giúp duy trì trạng thái tâm lý tích cực",
-        match: 98,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      },
-    ],
+    default: {
+      default: [
+        {
+          id: "7",
+          title: "Thư giãn với âm nhạc",
+          description: "Bộ sưu tập nhạc thư giãn và thiền định giúp giảm căng thẳng",
+          match: 85,
+          steps: 5,
+          isPaid: false,
+          price: 0,
+        },
+        {
+          id: "8",
+          title: "Yoga cơ bản",
+          description: "Các bài tập yoga đơn giản giúp thư giãn cơ thể và tâm trí",
+          match: 80,
+          steps: 5,
+          isPaid: false,
+          price: 0,
+        },
+      ],
+    },
+    normal: {
+      normal: [
+        {
+          id: "9",
+          title: "Duy trì sức khỏe tinh thần",
+          description: "Các hoạt động và thói quen giúp duy trì trạng thái tâm lý tích cực",
+          match: 98,
+          steps: 5,
+          isPaid: false,
+          price: 0,
+        },
+      ],
+    }
   },
   roadmapIcons: {
     1: "mdi-school",
@@ -1046,64 +1052,77 @@ const completionViewData = {
   ],
 }
 
-const simulateApiDelay = async () => {
-  return null
+export const getMentalProfileData = async (userId) => {
+  const result = await get(`/roadmaps/mental-profile`, {
+    userId: userId
+  })
+  return result || mentalProfileData
 }
 
-export const getRoadmapSteps = async () => {
-  const result = await simulateApiDelay()
-  return result || defaultRoadmaps[0].phases
+export const getRecommendationData = async (userId) => {
+  const result = await get(`/roadmaps/recommendations`, {
+    userId: userId
+  })
+  return result || recommendationData
+}
+
+export const getSuggestionData = async (userId) => {
+  const result = await get(`/roadmaps/suggestions`, {
+    userId: userId
+  })
+  return result || suggestionData
 }
 
 export const getMentalHealthRoadmaps = async () => {
-  const result = await simulateApiDelay()
+  const result = await get('/roadmaps')
   return result || defaultRoadmaps
 }
 
-export const getRoadmapDetails = async (id) => {
-  const result = await simulateApiDelay()
+export const getRoadmapDetails = async (roadmapId) => {
+  const result = await get(`/roadmaps/details/${roadmapId}`)
   if (result) return result
 
-  if (!id || !defaultRoadmaps.find((_) => _.id == id))
+  if (!roadmapId || !defaultRoadmaps.find((_) => _.id == roadmapId))
     return defaultRoadmaps[0]
-  return defaultRoadmaps.find((_) => _.id == id)
+  return defaultRoadmaps.find((_) => _.id == roadmapId)
+}
+
+export const getRoadmapSteps = async (roadmapId) => {
+  const result = await get('/roadmaps/roadmap-steps', {
+    roadmapId: roadmapId
+  })
+  return result || defaultRoadmaps[0].phases
 }
 
 export const getPhaseDetails = async (roadmapId, phaseId) => {
-  const result = await simulateApiDelay()
+  const result = await get('/roadmaps/phase', {
+    roadmapId: roadmapId,
+    phaseId: phaseId
+  });
   if (result) return result
 
   return roadmapId && phaseId ? allPhases[roadmapId][phaseId] : allPhases
 }
 
-export const getMentalProfileData = async () => {
-  const result = await simulateApiDelay()
-  return result || mentalProfileData
-}
-
-export const getRecommendationData = async () => {
-  const result = await simulateApiDelay()
-  return result || recommendationData
-}
-
-export const getSuggestionData = async () => {
-  const result = await simulateApiDelay()
-  return result || suggestionData
-}
-
-export const getCompletionData = async () => {
-  const result = await simulateApiDelay()
-  return result || completionData
-}
-
 export const getDetailedStep = async (stepId) => {
-  const result = await simulateApiDelay()
+  const result = await get(`/roadmaps/phase/${stepId}`, {
+    userId: userId
+  })
   if (result) return result
 
   return stepId ? detailedSteps[stepId] : detailedSteps
 }
 
-export const getCompletionViewData = async () => {
-  const result = await simulateApiDelay()
+export const getCompletionData = async (userId) => {
+  const result = await get(`/roadmaps/completion`, {
+    userId: userId
+  })
+  return result || completionData
+}
+
+export const getCompletionViewData = async (userId) => {
+  const result = await get(`/roadmaps/completion-view`, {
+    userId: userId
+  })
   return result || completionViewData
 }
