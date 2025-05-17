@@ -2,30 +2,59 @@
   <div class="roadmap-container">
     <div class="roadmap-content">
       <v-container fluid class="pt-16" style="margin-top: 15px;">
-        <div
-          class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6"
-        >
+        <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h1 class="text-h4 font-weight-bold text-gray-900">
               Các lộ trình sức khỏe tinh thần
             </h1>
             <p class="text-subtitle-1 text-gray-600 mt-2">
-              Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng biệt – an toàn, bảo mật và dành riêng cho bạn.
+              Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng
+              biệt - an toàn, bảo mật và dành riêng cho bạn.
             </p>
           </div>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-leaf"
-            size="large"
-            style="font-weight:600; border-radius: 24px; min-width: 220px;"
-                        @click="goToSuggestion"
-          >
-          Khám phá lộ trình phù hợp cho bạn          </v-btn>
+          <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
+            style="font-weight:600; border-radius: 24px; width: 50%" @click="goToSuggestion">
+            Khám phá lộ trình phù hợp cho bạn </v-btn>
         </div>
 
-        <div style="margin-top:8px; color:#43a047; font-style:italic; font-size: 0.98rem;">
-          Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt đối cho bạn!
+      <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-h4 font-weight-bold text-gray-900">
+            Các lộ trình sức khỏe tinh thần
+          </h1>
+          <p class="text-subtitle-1 text-gray-600 mt-2">
+            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng biệt
+            – an toàn, bảo mật và dành riêng cho bạn.
+          </p>
         </div>
+        <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
+          style="font-weight:600; border-radius: 24px; min-width: 220px;" @click="goToSuggestion">
+          Khám phá lộ trình phù hợp cho bạn </v-btn>
+      </div>
+
+      <div style="margin-top:8px; color:#43a047; font-style:italic; font-size: 0.98rem;">
+        Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt đối cho bạn!
+      </div>
+
+      <v-tabs v-model="activeTab" class="mb-6">
+        <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
+        <v-tab value="all">Tất cả lộ trình</v-tab>
+      </v-tabs>
+
+      <v-window style="margin-top: -35px;" v-model="activeTab">
+        <v-window-item value="suggested">
+          <div class="roadmap-grid">
+            <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
+              @view="viewRoadmap" />
+          </div>
+        </v-window-item>
+
+        <v-window-item value="all">
+          <div class="roadmap-grid">
+            <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
+          </div>
+        </v-window-item>
+      </v-window>
 
         <v-tabs v-model="activeTab" class="mb-6">
           <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
@@ -35,23 +64,14 @@
         <v-window v-model="activeTab">
           <v-window-item value="suggested">
             <div class="roadmap-grid">
-              <RoadmapCard
-                v-for="roadmap in suggestedRoadmaps"
-                :key="roadmap.id"
-                :roadmap="roadmap"
-                @view="viewRoadmap"
-              />
+              <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
+                @view="viewRoadmap" />
             </div>
           </v-window-item>
 
           <v-window-item value="all">
             <div class="roadmap-grid">
-              <RoadmapCard
-                v-for="roadmap in allRoadmaps"
-                :key="roadmap.id"
-                :roadmap="roadmap"
-                @view="viewRoadmap"
-              />
+              <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
             </div>
           </v-window-item>
         </v-window>
@@ -190,7 +210,8 @@ export default {
   justify-items: stretch;
 }
 
-.roadmap-content, .roadmap-grid {
+.roadmap-content,
+.roadmap-grid {
   max-width: 1500px;
   margin: 0 auto;
   justify-items: stretch;
@@ -202,11 +223,15 @@ export default {
     align-items: flex-start !important;
     gap: 12px !important;
   }
-  .roadmap-title, .text-subtitle-1 {
+
+  .roadmap-title,
+  .text-subtitle-1 {
     font-size: 1.1rem !important;
     text-align: left !important;
   }
-  .healing-btn, .v-btn {
+
+  .healing-btn,
+  .v-btn {
     min-width: 90vw !important;
     width: 100% !important;
     font-size: 1rem !important;
@@ -214,33 +239,43 @@ export default {
     margin-right: 0 !important;
     display: block !important;
   }
+
   .roadmap-content {
     padding: 0 8px !important;
   }
+
   .roadmap-grid {
     grid-template-columns: 1fr !important;
     gap: 18px !important;
     padding: 16px 0 24px 0 !important;
     justify-items: center !important;
   }
+
   .roadmap-card {
     width: 95vw !important;
     min-width: unset !important;
     max-width: 400px !important;
     margin: 0 auto !important;
   }
-  .v-tabs, .v-window {
+
+  .v-tabs,
+  .v-window {
     border-radius: 10px !important;
     padding: 0 2px !important;
   }
+
   .text-subtitle-1 {
     font-size: 1rem !important;
     margin-bottom: 8px !important;
   }
-  .roadmap-header-box, .mb-6 {
+
+  .roadmap-header-box,
+  .mb-6 {
     text-align: left !important;
   }
-  .healing-note, .roadmap-note {
+
+  .healing-note,
+  .roadmap-note {
     font-size: 0.95rem !important;
     text-align: left !important;
     margin-top: 8px !important;
