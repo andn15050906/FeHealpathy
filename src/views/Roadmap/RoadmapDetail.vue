@@ -1,9 +1,13 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-
-      <v-btn variant="text" color="primary" class="mb-4" prepend-icon="mdi-arrow-left"
-        @click="$router.push('/roadmaps/recommended')">
+      <v-btn
+        variant="text"
+        color="primary"
+        class="mb-4"
+        prepend-icon="mdi-arrow-left"
+        @click="$router.push('/roadmaps/recommended')"
+      >
         Quay lại danh sách lộ trình
       </v-btn>
 
@@ -13,35 +17,59 @@
           Chào mừng bạn đến với hành trình {{ roadmap.title }}
         </h2>
         <div class="text-body-1" style="color: #444">
-          Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ.
-          Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu
-          hành trình này.
+          Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ. Hãy
+          tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu hành
+          trình này.
         </div>
       </div>
 
       <!-- Card advisor -->
-      <v-card class="advisor-card mb-6 d-flex align-center" style="max-width: 420px">
+      <v-card
+        class="advisor-card mb-6 d-flex align-center"
+        style="max-width: 420px"
+      >
         <v-avatar size="56" class="mr-3">
           <img :src="advisorImg" alt="Advisor" />
         </v-avatar>
         <div>
           <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
           <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
-          <div class="text-body-2 mt-1" style="font-style: italic; color: #6a39ca">
+          <div
+            class="text-body-2 mt-1"
+            style="font-style: italic; color: #6a39ca"
+          >
             "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
           </div>
         </div>
         <v-spacer></v-spacer>
-        <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
+        <v-btn
+          icon
+          color="primary"
+          class="ml-2"
+          title="Nhắn tin cho chuyên gia (sắp ra mắt)"
+        >
           <v-icon>mdi-message-text-outline</v-icon>
         </v-btn>
-        <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
+        <v-btn
+          icon
+          color="success"
+          class="ml-1"
+          title="Tham gia group chat hỗ trợ (sắp ra mắt)"
+        >
           <v-icon>mdi-account-group-outline</v-icon>
         </v-btn>
       </v-card>
 
-      <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      <div
+        v-if="loading"
+        class="d-flex justify-center align-center"
+        style="height: 400px"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        ></v-progress-circular>
       </div>
 
       <div v-else-if="roadmap">
@@ -52,7 +80,9 @@
         <!-- Giới thiệu lộ trình -->
         <v-card class="mb-6">
           <v-card-title class="d-flex align-center">
-            <v-icon color="primary" class="mr-2">mdi-information-outline</v-icon>
+            <v-icon color="primary" class="mr-2"
+              >mdi-information-outline</v-icon
+            >
             Giới thiệu lộ trình
           </v-card-title>
           <v-card-text>
@@ -63,15 +93,26 @@
             </div>
             <v-alert color="warning" variant="tonal" class="mt-4">
               <div class="d-flex align-center mb-2">
-                <v-icon color="warning" class="mr-2">mdi-information-outline</v-icon>
-                <span class="font-weight-bold" style="color: #ff9800; font-size: large">Lưu ý quan trọng</span>
+                <v-icon color="warning" class="mr-2"
+                  >mdi-information-outline</v-icon
+                >
+                <span
+                  class="font-weight-bold"
+                  style="color: #ff9800; font-size: large"
+                  >Lưu ý quan trọng</span
+                >
               </div>
               <p>
                 📌 Lộ trình này được thiết kế bởi các chuyên gia tâm lý với
-                nhiều năm kinh nghiệm. Tuy nhiên, đây không phải là sự thay
-                thế cho việc tư vấn y tế chuyên nghiệp.
-                <a href="#" target="_blank" class="text-primary text-decoration-none">
-                  Tìm hiểu thêm </a>.
+                nhiều năm kinh nghiệm. Tuy nhiên, đây không phải là sự thay thế
+                cho việc tư vấn y tế chuyên nghiệp.
+                <a
+                  href="#"
+                  target="_blank"
+                  class="text-primary text-decoration-none"
+                >
+                  Tìm hiểu thêm </a
+                >.
               </p>
             </v-alert>
           </v-card-text>
@@ -80,52 +121,88 @@
         <h2 class="text-h5 mb-4">Các bước trong lộ trình</h2>
         <div class="mb-6">
           <v-timeline align="start">
-            <v-timeline-item v-for="(phase, index) in roadmap.phases" :key="phase.id" :dot-color="getPhaseColor(phase)"
-              size="small">
+            <v-timeline-item
+              v-for="(phase, index) in roadmap.phases"
+              :key="phase.id"
+              :dot-color="getPhaseColor(phase)"
+              size="small"
+            >
               <template v-slot:opposite>
                 <div class="text-caption">Bước {{ index + 1 }}</div>
               </template>
-              <v-card :class="{
-                'border-primary': phase.current,
-                'bg-success-subtle': phase.completed,
-              }">
+              <v-card
+                :class="{
+                  'border-primary': phase.current,
+                  'bg-success-subtle': phase.completed,
+                }"
+              >
                 <v-card-title class="d-flex align-center">
                   {{ phase.title }}
-                  <v-chip v-if="phase.current" color="primary" size="small" class="ml-2">
+                  <v-chip
+                    v-if="phase.current"
+                    color="primary"
+                    size="small"
+                    class="ml-2"
+                  >
                     Hiện tại
                   </v-chip>
-                  <v-chip v-if="phase.completed" color="success" size="small" class="ml-2">
+                  <v-chip
+                    v-if="phase.completed"
+                    color="success"
+                    size="small"
+                    class="ml-2"
+                  >
                     Hoàn thành
                   </v-chip>
                 </v-card-title>
                 <v-card-text>
                   <p>{{ phase.description }}</p>
                   <div class="d-flex flex-wrap gap-2 mt-3">
-                    <v-chip v-if="phase.videoUrl" size="small" color="primary" variant="outlined" class="mr-2">
+                    <v-chip
+                      v-if="phase.videoUrl"
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      class="mr-2"
+                    >
                       <v-icon size="small" start>mdi-video</v-icon>
                       Video hướng dẫn
                     </v-chip>
-                    <v-chip v-if="phase.audioUrl" size="small" color="primary" variant="outlined" class="mr-2">
+                    <v-chip
+                      v-if="phase.audioUrl"
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      class="mr-2"
+                    >
                       <v-icon size="small" start>mdi-music</v-icon>
                       Âm thanh
                     </v-chip>
-                    <v-chip v-if="phase.exerciseCount" size="small" color="primary" variant="outlined">
+                    <v-chip
+                      v-if="phase.exerciseCount"
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    >
                       <v-icon size="small" start>mdi-dumbbell</v-icon>
                       {{ phase.exerciseCount }} bài tập
                     </v-chip>
                   </div>
                 </v-card-text>
                 <v-card-actions>
-                  <v-btn :color="phase.current ? 'success' : undefined"
-                    :variant="phase.current ? 'elevated' : 'outlined'" :disabled="!phase.current && !phase.completed"
-                    @click="goToPhase(phase.id)">
+                  <v-btn
+                    :color="phase.current ? 'success' : undefined"
+                    :variant="phase.current ? 'elevated' : 'outlined'"
+                    :disabled="!phase.current && !phase.completed"
+                    @click="goToPhase(phase.id)"
+                  >
                     <v-icon v-if="phase.current" start>mdi-play</v-icon>
                     {{
                       phase.current
                         ? "Bắt đầu bước này"
                         : phase.completed
-                          ? "Xem lại"
-                          : "Đã khóa"
+                        ? "Xem lại"
+                        : "Đã khóa"
                     }}
                   </v-btn>
                 </v-card-actions>
@@ -135,12 +212,16 @@
         </div>
 
         <div class="text-center mb-8">
-          <v-btn size="large" color="primary" prepend-icon="mdi-play" @click="startRoadmap">
+          <v-btn
+            size="large"
+            color="primary"
+            prepend-icon="mdi-play"
+            @click="startRoadmap"
+          >
             Bắt đầu lộ trình
           </v-btn>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -149,6 +230,7 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "@/scripts/logic/eventBus";
 import { useRoute, useRouter } from "vue-router";
+import { getRoadmapById } from "@/scripts/api/services/roadmapService";
 import advisorImg from "@/img/advisor.jpg";
 
 export default {
@@ -230,86 +312,22 @@ export default {
       }
     };
 
-    const fetchRoadmap = () => {
-      // In a real app, this would be an API call
-      setTimeout(() => {
-        roadmap.value = {
-          id: props.id,
-          title: props.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          progress: 0,
-          introText: [
-            "Lộ trình này được thiết kế dựa trên các phương pháp đã được chứng minh hiệu quả trong việc hỗ trợ sức khỏe tinh thần.",
-            "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-            "Mỗi bước trong lộ trình sẽ cung cấp cho bạn các công cụ và kỹ thuật thực tế để cải thiện sức khỏe tinh thần.",
-          ],
-          phases: [
-            {
-              id: "1",
-              title: "Nhận diện vấn đề",
-              description:
-                "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
-              videoUrl: "/videos/phase1.mp4",
-              exerciseCount: 2,
-              completed: false,
-              current: true,
-              themeColor: "indigo",
-            },
-            {
-              id: "2",
-              title: "Giảm nhẹ tức thì",
-              description:
-                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-              videoUrl: "/videos/phase2.mp4",
-              audioUrl: "/audio/relaxation.mp3",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "teal",
-            },
-            {
-              id: "3",
-              title: "Ổn định tâm trí",
-              description:
-                "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-              videoUrl: "/videos/phase3.mp4",
-              audioUrl: "/audio/meditation.mp3",
-              exerciseCount: 4,
-              completed: false,
-              current: false,
-              themeColor: "purple",
-            },
-            {
-              id: "4",
-              title: "Đối mặt với vấn đề",
-              description:
-                "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-              videoUrl: "/videos/phase4.mp4",
-              exerciseCount: 5,
-              completed: false,
-              current: false,
-              themeColor: "blue",
-            },
-            {
-              id: "5",
-              title: "Duy trì và phát triển",
-              description:
-                "Xây dựng kế hoạch duy trì lâu dài và tiếp tục phát triển",
-              videoUrl: "/videos/phase5.mp4",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "green",
-            },
-          ],
-        };
+    const fetchRoadmap = async () => {
+      try {
+        loading.value = true;
+        const response = await getRoadmapById(props.id);
 
-        // Cập nhật trạng thái phase dựa trên completedPhases
-        updatePhaseStatus();
+        if (response) {
+          roadmap.value = response;
 
+          // Cập nhật trạng thái phase dựa trên completedPhases
+          updatePhaseStatus();
+        }
+      } catch (error) {
+        console.error("Error fetching roadmap:", error);
+      } finally {
         loading.value = false;
-      }, 1000);
+      }
     };
 
     const getPhaseColor = (phase) => {
@@ -418,9 +436,11 @@ export default {
 
 /* Healing header styling */
 .healing-header {
-  background: linear-gradient(to right,
-      rgba(106, 57, 202, 0.05),
-      rgba(106, 57, 202, 0.01));
+  background: linear-gradient(
+    to right,
+    rgba(106, 57, 202, 0.05),
+    rgba(106, 57, 202, 0.01)
+  );
   padding: 16px 20px;
   border-radius: 12px;
   border-left: 4px solid #6a39ca;

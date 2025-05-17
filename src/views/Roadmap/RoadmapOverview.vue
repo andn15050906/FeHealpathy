@@ -1,24 +1,40 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-
-      <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div
+        class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6"
+      >
         <div>
           <h1 class="text-h4 font-weight-bold text-gray-900">
             Các lộ trình sức khỏe tinh thần
           </h1>
           <p class="text-subtitle-1 text-gray-600 mt-2">
-            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng biệt
-            – an toàn, bảo mật và dành riêng cho bạn.
+            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành
+            cùng bạn tạo nên một hành trình riêng biệt – an toàn, bảo mật và
+            dành riêng cho bạn.
           </p>
         </div>
-        <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
-          style="font-weight:600; border-radius: 24px; min-width: 220px;" @click="goToSuggestion">
-          Khám phá lộ trình phù hợp cho bạn </v-btn>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-leaf"
+          size="large"
+          style="font-weight: 600; border-radius: 24px; min-width: 220px"
+          @click="goToSuggestion"
+        >
+          Khám phá lộ trình phù hợp cho bạn
+        </v-btn>
       </div>
 
-      <div style="margin-top:8px; color:#43a047; font-style:italic; font-size: 0.98rem;">
-        Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt đối cho bạn!
+      <div
+        style="
+          margin-top: 8px;
+          color: #43a047;
+          font-style: italic;
+          font-size: 0.98rem;
+        "
+      >
+        Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt
+        đối cho bạn!
       </div>
 
       <v-tabs v-model="activeTab" class="mb-6">
@@ -26,28 +42,36 @@
         <v-tab value="all">Tất cả lộ trình</v-tab>
       </v-tabs>
 
-      <v-window style="margin-top: -35px;" v-model="activeTab">
+      <v-window style="margin-top: -35px" v-model="activeTab">
         <v-window-item value="suggested">
           <div class="roadmap-grid">
-            <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
-              @view="viewRoadmap" />
+            <RoadmapCard
+              v-for="roadmap in suggestedRoadmaps"
+              :key="roadmap.id"
+              :roadmap="roadmap"
+              @view="viewRoadmap"
+            />
           </div>
         </v-window-item>
 
         <v-window-item value="all">
           <div class="roadmap-grid">
-            <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
+            <RoadmapCard
+              v-for="roadmap in allRoadmaps"
+              :key="roadmap.id"
+              :roadmap="roadmap"
+              @view="viewRoadmap"
+            />
           </div>
         </v-window-item>
       </v-window>
-
     </div>
   </div>
 </template>
 
 <script>
 import RoadmapCard from "@/components/Roadmap/RoadmapCard.vue";
-import { roadmapSteps } from "@/scripts/data/roadmapData.js";
+import { getRoadmaps } from "@/scripts/api/services/roadmapService.js";
 
 export default {
   name: "RoadmapOverview",
@@ -57,88 +81,38 @@ export default {
   data() {
     return {
       activeTab: "suggested",
-      roadmapSteps,
-      suggestedRoadmaps: [
-        {
-          id: "1",
-          title: "Vượt qua lo âu",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          steps: 5,
-          category: "anxiety",
-          featured: true,
-          completionRate: 78,
-          image: "/images/anxiety.jpg",
-        },
-        {
-          id: "2",
-          title: "Xây dựng sự tự tin",
-          description:
-            "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
-          steps: 4,
-          category: "confidence",
-          featured: true,
-          completionRate: 85,
-          image: "/images/confidence.jpg",
-        },
-      ],
-      allRoadmaps: [
-        {
-          id: "1",
-          title: "Vượt qua lo âu",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          steps: 5,
-          category: "anxiety",
-          featured: true,
-          completionRate: 78,
-          image: "/images/anxiety.jpg",
-        },
-        {
-          id: "2",
-          title: "Xây dựng sự tự tin",
-          description:
-            "Phát triển sự tự tin và khả năng đối mặt với thử thách mới",
-          steps: 4,
-          category: "confidence",
-          featured: true,
-          completionRate: 85,
-          image: "/images/confidence.jpg",
-        },
-        {
-          id: "3",
-          title: "Kiểm soát cảm xúc",
-          description: "Học cách nhận biết và điều chỉnh cảm xúc tiêu cực",
-          steps: 3,
-          category: "emotions",
-          featured: false,
-          completionRate: 62,
-          image: "/images/emotions.jpg",
-        },
-        {
-          id: "4",
-          title: "Cân bằng công việc - cuộc sống",
-          description: "Tạo sự cân bằng giữa công việc và cuộc sống cá nhân",
-          steps: 4,
-          category: "work-life",
-          featured: false,
-          completionRate: 70,
-          image: "/images/balance.jpg",
-        },
-        {
-          id: "5",
-          title: "Giấc ngủ chất lượng",
-          description: "Phương pháp giúp ngủ ngon và sâu giấc",
-          steps: 3,
-          category: "sleep",
-          featured: false,
-          completionRate: 90,
-          image: "/images/sleep.jpg",
-        },
-      ],
+      suggestedRoadmaps: [],
+      allRoadmaps: [],
+      loading: true,
     };
   },
+  async created() {
+    await this.fetchRoadmaps();
+  },
   methods: {
+    async fetchRoadmaps() {
+      try {
+        this.loading = true;
+        const response = await getRoadmaps();
+
+        if (Array.isArray(response)) {
+          this.allRoadmaps = response;
+
+          // Giả sử mỗi roadmap có field `featured` để xác định được đề xuất
+          this.suggestedRoadmaps = response.filter(
+            (roadmap) => roadmap.featured
+          );
+
+          if (this.suggestedRoadmaps.length === 0 && response.length > 0) {
+            this.suggestedRoadmaps = response.slice(0, 2);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching roadmaps:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
     goToSuggestion() {
       this.$router.push("/suggest");
     },
