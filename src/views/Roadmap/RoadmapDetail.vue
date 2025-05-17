@@ -235,6 +235,7 @@ import {
   getRoadmapSteps,
 } from "@/scripts/api/services/roadmapService";
 import advisorImg from "@/img/advisor.jpg";
+import { getRoadmapDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapDetail",
@@ -245,10 +246,14 @@ export default {
     },
   },
   setup(props) {
-    const route = useRoute();
     const router = useRouter();
-    const loading = ref(true);
-    const roadmap = ref(null);
+    const roadmap = ref({
+      id: "",
+      title: "",
+      description: "",
+      introText: [],
+      phases: [],
+    });
     const completedPhases = ref({
       1: false,
       2: false,
@@ -390,7 +395,6 @@ export default {
     });
 
     return {
-      loading,
       roadmap,
       completedPhases,
       getPhaseColor,

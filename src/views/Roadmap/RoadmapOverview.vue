@@ -37,10 +37,10 @@
         đối cho bạn!
       </div>
 
-      <v-tabs v-model="activeTab" class="mb-6">
-        <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
-        <v-tab value="all">Tất cả lộ trình</v-tab>
-      </v-tabs>
+        <v-tabs v-model="activeTab" class="mb-6">
+          <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
+          <v-tab value="all">Tất cả lộ trình</v-tab>
+        </v-tabs>
 
       <v-window style="margin-top: -35px" v-model="activeTab">
         <v-window-item value="suggested">
@@ -123,7 +123,22 @@ export default {
       // In a real app, this would update the user's status
       alert("Status updated!");
     },
+    async fetchData() {
+      try {
+        this.roadmapSteps = await getRoadmapSteps();
+        
+        const roadmaps = await getMentalHealthRoadmaps();
+        this.allRoadmaps = roadmaps;
+        
+        this.suggestedRoadmaps = roadmaps.filter(roadmap => roadmap.featured);
+      } catch (error) {
+        console.error("Error fetching roadmap data:", error);
+      }
+    }
   },
+  mounted() {
+    this.fetchData();
+  }
 };
 </script>
 

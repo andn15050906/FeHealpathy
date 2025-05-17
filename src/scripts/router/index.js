@@ -88,6 +88,7 @@ import UpdateRoadmap from "@/views/Profile/Advisor/Manage/UpdateRoadmap.vue";
 import RoadmapProgress from "@/components/RoadmapComponents/RoadmapProgress.vue";
 import CreateRoadmap from "@/views/Profile/Advisor/Manage/CreateRoadmap.vue";
 
+import MentalProfile from '@/components/Roadmap/MentalProfile.vue';
 import RoadmapOverview from "@/views/Roadmap/RoadmapOverview.vue";
 import RoadmapSuggestion from "@/views/Roadmap/RoadmapSuggestion.vue";
 import RoadmapDetail from "@/views/Roadmap/RoadmapDetail.vue";
@@ -447,38 +448,6 @@ const router = createRouter({
       meta: { isAppMode: true, requiresAuth: true },
     },
 
-    // Assignment - Old
-    /*{
-      path: '/assignments/create',
-      name: 'CreateAssignment',
-      component: CreateAssignment,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/assignments/:courseId/manage',
-      name: 'ManageAssignments',
-      component: ManageAssignments,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/assignments/:id/overview',
-      name: 'OverviewAssignment',
-      component: OverviewAssignment,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/assignments/:assignmentId/review/:submissionId',
-      name: 'ReviewAssignment',
-      component: ReviewAssignment,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/assignments/:id/attempt',
-      name: 'AttemptAssignment',
-      component: AttemptAssignment,
-      meta: { requiresAuth: true }
-    },*/
-
     // Others
     {
       path: "/payments",
@@ -588,6 +557,11 @@ const router = createRouter({
     },
 
     // Roadmap v0
+    {
+      path: "/mental-profile",
+      name: "mental-profile",
+      component: MentalProfile
+    },
     {
       path: "/roadmaps/recommended",
       name: "overview",
