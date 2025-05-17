@@ -1,267 +1,316 @@
 <template>
-  <div class="container-fluid">
-    <div class="row mb-4 p-2">
-      <div class="col-12">
-        <div class="d-flex align-items-center">
-          <button class="btn btn-outline-secondary me-3" @click="goBack">
-            <ArrowLeftIcon class="icon" />
-            Quay lại
-          </button>
-          <h1 class="h3 mb-0">Cập nhật khóa học</h1>
+  <div class="create-course-container">
+    <LoadingSpinner ref="loadingSpinner" />
+    <div class="header-section py-2">
+      <div class="container-fluid">
+        <div class="row p-2">
+          <div class="col-12">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-outline-secondary me-3 d-flex align-items-center" @click="goBack">
+                <ArrowLeftIcon class="icon me-1" /> Quay lại
+              </button>
+              <h1 class="h3 mb-0">Cập nhật khóa học</h1>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-lg-8">
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-white py-3">
-            <h5 class="mb-0">Thông tin khóa học</h5>
-          </div>
-          <div class="card-body">
-            <form @submit.prevent="updateCourse">
-              <div class="mb-3">
-                <label for="courseName" class="form-label">Tên khóa học</label>
-                <input type="text" class="form-control" id="courseName" v-model="course.name"
-                  placeholder="Nhập tên khóa học" required />
+    <div class="main-content">
+      <div class="container-fluid">
+        <div class="row g-4 mb-2">
+          <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">Thông tin khóa học</h5>
               </div>
-
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="courseCategory" class="form-label">Danh mục</label>
-                  <select class="form-select" id="courseCategory" v-model="course.category" required>
-                    <option value="" disabled>Chọn danh mục</option>
-                    <option v-for="category in categories" :key="category" :value="category">
-                      {{ category }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="coursePrice" class="form-label">Giá ($)</label>
-                  <input type="number" class="form-control" id="coursePrice" v-model="course.price" min="0" step="0.01"
-                    placeholder="0.00" required />
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="courseDescription" class="form-label">Mô tả</label>
-                <textarea class="form-control" id="courseDescription" v-model="course.description" rows="4"
-                  placeholder="Mô tả khóa học" required></textarea>
-              </div>
-
-              <div class="mb-3">
-                <label for="courseImage" class="form-label">Hình ảnh khóa học</label>
-                <div class="d-flex align-items-center mb-2">
-                  <img :src="course.image" alt="Hình thu nhỏ khóa học" class="img-thumbnail me-3"
-                    style="max-height: 100px" />
-                  <div>Hình hiện tại</div>
-                </div>
-                <div class="input-group">
-                  <input type="file" class="form-control" id="courseImage" @change="handleImageUpload"
-                    accept="image/*" />
-                  <label class="input-group-text" for="courseImage">
-                    <UploadIcon class="icon me-1" /> Tải lên mới
-                  </label>
-                </div>
-                <small class="text-muted">Kích thước khuyến nghị: 1280x720px (16:9)</small>
-
-                <div v-if="course.imagePreview" class="mt-3">
-                  <img :src="course.imagePreview" alt="Xem trước hình ảnh" class="img-thumbnail"
-                    style="max-height: 200px" />
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label d-block">Trạng thái</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="courseStatus" id="statusDraft" value="Draft"
-                    v-model="course.status" />
-                  <label class="form-check-label" for="statusDraft">Nháp</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="courseStatus" id="statusActive" value="Active"
-                    v-model="course.status" />
-                  <label class="form-check-label" for="statusActive">Đang hoạt động</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="courseStatus" id="statusInactive" value="Inactive"
-                    v-model="course.status" />
-                  <label class="form-check-label" for="statusInactive">Ngừng hoạt động</label>
-                </div>
-              </div>
-
-              <hr class="my-4" />
-
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Bài giảng</h5>
-                <div class="d-flex">
-                  <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="reorderLectures">
-                    <ListOrderedIcon class="icon me-1" /> Sắp xếp lại
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline-primary" @click="addLecture">
-                    <PlusIcon class="icon me-1" /> Thêm bài giảng
-                  </button>
-                </div>
-              </div>
-
-              <div v-for="(lecture, index) in course.lectures" :key="index" class="card mb-3">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0">Bài giảng {{ index + 1 }}</h6>
-                    <div>
-                      <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center"
-                        @click="removeLecture(index)">
-                        <TrashIcon class="icon me-1" /> Xóa
-                      </button>
-                    </div>
+              <div class="card-body">
+                <form @submit.prevent="updateCourse">
+                  <div class="mb-4">
+                    <label for="title" class="form-label fw-medium">Tên khóa học</label>
+                    <input type="text" class="form-control form-control-lg" id="courseTitle" v-model="course.title"
+                      placeholder="Nhập tên khóa học" required />
                   </div>
 
-                  <div class="mb-3">
-                    <label :for="`lectureTitle${index}`" class="form-label">Tiêu đề</label>
-                    <input type="text" class="form-control" :id="`lectureTitle${index}`" v-model="lecture.title"
-                      placeholder="Tiêu đề bài giảng" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label :for="`lectureDescription${index}`" class="form-label">Mô tả</label>
-                    <textarea class="form-control" :id="`lectureDescription${index}`" v-model="lecture.description"
-                      rows="2" placeholder="Mô tả bài giảng"></textarea>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label :for="`lectureDuration${index}`" class="form-label">Thời lượng (phút)</label>
-                      <input type="number" class="form-control" :id="`lectureDuration${index}`"
-                        v-model="lecture.duration" min="1" placeholder="Thời lượng" />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label :for="`lectureType${index}`" class="form-label">Loại</label>
-                      <select class="form-select" :id="`lectureType${index}`" v-model="lecture.type">
-                        <option value="Video">Video</option>
-                        <option value="Text">Văn bản</option>
-                        <option value="Assignment">Bài tập</option>
+                  <div class="row mb-4">
+                    <div class="col-md-4">
+                      <label for="courseCategory" class="form-label fw-medium">Danh mục</label>
+                      <select class="form-select" id="courseCategory" v-model="course.category" required>
+                        <option value="" disabled>Chọn danh mục</option>
+                        <option value="Student">Học sinh</option>
+                        <option value="College">Sinh viên</option>
+                        <option value="Working">Người đi làm</option>
                       </select>
                     </div>
-
-                    <div v-if="lecture.type === 'Video'" class="mb-3">
-                      <label class="form-label">Tải lên video</label>
-                      <div
-                        class="dropzone d-flex justify-content-center align-items-center border border-dashed rounded p-3"
-                        @dragover.prevent @dragenter.prevent @dragleave.prevent @drop.prevent="onDrop($event, index)">
-                        <input ref="fileInputs" type="file" accept="video/*" class="d-none"
-                          @change="(e) => onVideoSelected(e, index)" />
-                        <div class="text-center">
-                          <UploadIcon class="icon-large mb-2" />
-                          <p>
-                            Kéo & thả video vào đây, hoặc
-                            <span class="text-primary" @click="$refs.fileInputs[index].click()"
-                              style="cursor: pointer">duyệt</span>
-                          </p>
-                          <small class="text-muted">MP4 hoặc MOV, tối đa 500MB</small>
+                    <div class="col-md-4">
+                      <label class="form-label fw-medium">Giá khóa học</label>
+                      <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="form-check form-check-inline mb-0">
+                          <input class="form-check-input" type="radio" name="priceType" id="freeCourse" value="free"
+                            v-model="course.priceType" />
+                          <label class="form-check-label" for="freeCourse">Miễn phí</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-0">
+                          <input class="form-check-input" type="radio" name="priceType" id="paidCourse" value="paid"
+                            v-model="course.priceType" />
+                          <label class="form-check-label" for="paidCourse">Trả phí</label>
                         </div>
                       </div>
-                      <div v-if="lecture.videoFile" class="mt-3">
-                        <video :src="lecture.preview" controls class="w-100 rounded" style="max-height: 240px"></video>
+                    </div>
+                  </div>
+
+                  <div v-if="course.priceType === 'paid'" class="row mb-4">
+                    <div class="col-md-4">
+                      <label for="coursePrice" class="form-label fw-medium">Giá tiền (VND)</label>
+                      <input type="number" class="form-control" id="coursePrice" v-model="course.price" min="10000"
+                        step="1000" placeholder="Nhập giá khóa học" required />
+                      <small class="text-muted">Giá tối thiểu: 10,000 VND</small>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="courseDiscount" class="form-label fw-medium">Giảm giá (%)</label>
+                      <input type="number" class="form-control" id="courseDiscount" v-model="course.discount" min="0"
+                        max="100" step="1" placeholder="0-100%" />
+                    </div>
+                    <div class="col-md-4">
+                      <label for="discountExpiry" class="form-label fw-medium">Ngày hết hạn giảm giá</label>
+                      <input type="date" class="form-control" id="discountExpiry" v-model="course.discountExpiry" 
+                        :min="minDiscountDate" required />
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="courseDescription" class="form-label fw-medium">Mô tả</label>
+                    <textarea class="form-control" id="courseDescription" v-model="course.description" rows="4"
+                      placeholder="Mô tả khóa học" required></textarea>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="courseImage" class="form-label fw-medium">Ảnh khóa học</label>
+                    <div class="input-group mb-2">
+                      <input type="file" class="form-control" id="courseImage" @change="handleImageUpload"
+                        accept="image/*" />
+                      <label class="input-group-text d-flex align-items-center" for="courseImage">
+                        <UploadIcon class="icon me-1" /> Tải lên
+                      </label>
+                    </div>
+                    <small class="text-muted">Kích thước khuyến nghị: 1280x720px (16:9)</small>
+
+                    <div v-if="course.imagePreview || course.thumb.url" class="mt-3 border p-2 rounded">
+                      <img :src="course.imagePreview || course.thumb.url" alt="Xem trước ảnh" class="img-thumbnail"
+                        style="max-height: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label fw-medium d-block">Trạng thái</label>
+                    <div class="d-flex flex-wrap gap-3">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="courseStatus" id="statusDraft" :value="0"
+                          v-model="course.status" />
+                        <label class="form-check-label" for="statusDraft">Bản nháp</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="courseStatus" id="statusPublished"
+                          :value="1" v-model="course.status" />
+                        <label class="form-check-label" for="statusPublished">Đã xuất bản</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="courseStatus" id="statusOngoing"
+                          :value="2" v-model="course.status" />
+                        <label class="form-check-label" for="statusOngoing">Đang diễn ra</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="courseStatus" id="statusPostponed"
+                          :value="3" v-model="course.status" />
+                        <label class="form-check-label" for="statusPostponed">Tạm hoãn</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="courseStatus" id="statusCompleted"
+                          :value="4" v-model="course.status" />
+                        <label class="form-check-label" for="statusCompleted">Đã hoàn thành</label>
                       </div>
                     </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
 
-                    <div v-else class="mb-3">
-                      <label :for="`lectureContent${index}`" class="form-label">Nội dung</label>
-                      <textarea class="form-control" :id="`lectureContent${index}`" v-model="lecture.content" rows="4"
-                        placeholder="Nhập nội dung văn bản hoặc bài tập"></textarea>
+          <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold">Cài đặt khóa học</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-4">
+                  <label for="courseDifficulty" class="form-label fw-medium">Trình độ</label>
+                  <select class="form-select" id="courseDifficulty" v-model="course.level">
+                    <option :value="0">Sơ cấp</option>
+                    <option :value="1">Trung cấp</option>
+                    <option :value="2">Cao cấp</option>
+                  </select>
+                </div>
+
+                <div class="mb-4">
+                  <label for="courseAdvisorExpectedOutcome" class="form-label fw-medium">Sau khóa học, học viên nhận được gì?</label>
+                  <textarea class="form-control" id="courseAdvisorExpectedOutcome" v-model="course.advisorExpectedOutcome" rows="3"
+                    placeholder=""></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label for="courseOutcomes" class="form-label fw-medium">Mục tiêu khóa học</label>
+                  <textarea class="form-control" id="courseOutcomes" v-model="course.outcomes" rows="3"
+                    placeholder=""></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label for="coursePrerequisites" class="form-label fw-medium">Yêu cầu trước khi học</label>
+                  <textarea class="form-control" id="coursePrerequisites" v-model="course.requirements" rows="3"
+                    placeholder="Học viên cần biết gì trước khi tham gia khóa học?"></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label for="courseCompletionTime" class="form-label fw-medium">Thời gian hoàn thành</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="courseCompletionTime" v-model="course.completionTime" 
+                      min="1" placeholder="Nhập số giờ" />
+                    <span class="input-group-text">giờ</span>
+                  </div>
+                  <small class="text-muted">Thời gian ước tính để học viên hoàn thành khóa học</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-header bg-white py-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0 fw-bold">Nội dung khóa học</h5>
+                  <button class="btn btn-primary d-flex align-items-center" @click="addLecture">
+                    <PlusIcon class="icon me-2" /> Thêm bài giảng
+                  </button>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="lecture-tabs">
+                  <ul class="nav nav-tabs px-3 pt-3" role="tablist">
+                    <li class="nav-item" v-for="(lecture, index) in course.lectures" :key="index">
+                      <button class="nav-link" :class="{ active: activeTab === index }" @click="activeTab = index"
+                        role="tab">
+                        <span class="lecture-number">Bài {{ index + 1 }}</span>
+                        <button type="button" class="btn-close ms-2" style="font-size: 0.5rem;"
+                          @click.stop="removeLecture(index)" v-if="course.lectures.length > 1"></button>
+                      </button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content p-4 border border-top-0 rounded-bottom">
+                    <div v-for="(lecture, index) in course.lectures" :key="index" class="tab-pane"
+                      :class="{ active: activeTab === index }" role="tabpanel">
+                      <div class="lecture-form">
+                        <div class="row g-4">
+                          <div class="col-md-8">
+                            <div class="mb-4">
+                              <label :for="`lectureTitle${index}`" class="form-label fw-medium">Tiêu đề bài
+                                giảng</label>
+                              <input type="text" class="form-control form-control-lg" :id="`lectureTitle${index}`"
+                                v-model="lecture.title" placeholder="Nhập tiêu đề bài giảng" required />
+                            </div>
+
+                            <div class="mb-4">
+                              <label :for="`lectureContentSummary${index}`" class="form-label fw-medium">Tóm tắt nội
+                                dung</label>
+                              <textarea class="form-control" :id="`lectureContentSummary${index}`"
+                                v-model="lecture.contentSummary" rows="3"
+                                placeholder="Tóm tắt ngắn gọn nội dung bài giảng" required></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                              <label :for="`lectureContent${index}`" class="form-label fw-medium">Nội
+                                dung</label>
+                              <textarea class="form-control" :id="`lectureContent${index}`"
+                                v-model="lecture.content" rows="3"
+                                placeholder="Nội dung bài giảng" required></textarea>
+                            </div>
+
+                            <div class="lecture-type-content mt-4">
+                              <div v-if="lecture.type === 'Video'" class="resource-upload">
+                                <h6 class="mb-3 fw-medium">Tài nguyên</h6>
+                                <div class="upload-area p-4 border rounded border-dashed mb-3 text-center">
+                                  <div class="mb-3">
+                                    <i class="bi bi-cloud-upload fs-1 text-primary"></i>
+                                  </div>
+                                  <p class="mb-3">Kéo thả file hoặc nhấn để tải lên</p>
+                                  <input type="file" class="form-control"
+                                    @change="handleLectureMediaUpload($event, index)"
+                                    accept="video/*,image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple />
+                                  <small class="text-muted d-block mt-2">Hỗ trợ: Video, Hình ảnh, PDF, Word, PowerPoint,
+                                    Excel</small>
+                                </div>
+                                <div v-if="lecture.medias && lecture.medias.length > 0" class="uploaded-files">
+                                  <h6 class="mb-3 fw-medium">Tài nguyên đã tải lên</h6>
+                                  <div v-for="(media, mediaIndex) in lecture.medias" :key="mediaIndex"
+                                    class="uploaded-file-item d-flex align-items-center p-3 border rounded mb-2 bg-light">
+                                    <i class="bi bi-file-earmark me-2 fs-5"></i>
+                                    <span class="me-2">{{ media.title }}</span>
+                                    <button type="button" class="btn-close ms-auto"
+                                      @click="removeLectureMedia(index, mediaIndex)"></button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div v-if="lecture.type === 'Text'" class="text-content">
+                                <h6 class="mb-3 fw-medium">Nội dung chi tiết</h6>
+                                <textarea class="form-control" v-model="lecture.content" rows="12"
+                                  placeholder="Nhập nội dung chi tiết của bài giảng"></textarea>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-4">
+                            <div class="lecture-settings p-3 border rounded h-100">
+                              <h6 class="mb-4 fw-medium border-bottom pb-2">Cài đặt bài giảng</h6>
+
+                              <div class="mb-3">
+                                <label :for="`lectureType${index}`" class="form-label fw-medium">Loại bài giảng</label>
+                                <select class="form-select" :id="`lectureType${index}`" v-model="lecture.type">
+                                  <option value="Video">Tài nguyên (Video/Hình Ảnh/Tài Liệu)</option>
+                                  <option value="Text">Văn bản</option>
+                                </select>
+                              </div>
+
+                              <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" :id="`lecturePreview${index}`"
+                                  v-model="lecture.isPreviewable">
+                                <label class="form-check-label" :for="`lecturePreview${index}`">
+                                  Xem trước miễn phí
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-outline-danger me-2" @click="goBack">
-                  Hủy
-                </button>
-                <button type="submit" class="btn btn-outline-primary">
-                  <SaveIcon class="icon me-1" /> Cập nhật khóa học
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4">
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-white py-3">
-            <h5 class="mb-0">Cài đặt khóa học</h5>
-          </div>
-          <div class="card-body">
-            <div class="mb-3">
-              <label for="courseLanguage" class="form-label">Ngôn ngữ</label>
-              <select class="form-select" id="courseLanguage" v-model="course.language">
-                <option value="English">Tiếng Anh</option>
-                <option value="Spanish">Tiếng Tây Ban Nha</option>
-                <option value="French">Tiếng Pháp</option>
-                <option value="German">Tiếng Đức</option>
-                <option value="Chinese">Tiếng Trung</option>
-                <option value="Japanese">Tiếng Nhật</option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="courseDifficulty" class="form-label">Trình độ</label>
-              <select class="form-select" id="courseDifficulty" v-model="course.difficulty">
-                <option value="Beginner">Người mới</option>
-                <option value="Intermediate">Trung cấp</option>
-                <option value="Advanced">Nâng cao</option>
-                <option value="All Levels">Mọi trình độ</option>
-              </select>
-            </div>
-
-            <hr class="my-4" />
-
-            <div class="mb-3">
-              <label for="coursePrerequisites" class="form-label">Yêu cầu đầu vào</label>
-              <textarea class="form-control" id="coursePrerequisites" v-model="course.prerequisites" rows="3"
-                placeholder="Học viên cần biết gì trước khi tham gia khóa học?"></textarea>
-            </div>
-
-            <div class="mb-3">
-              <label for="courseTargetAudience" class="form-label">Đối tượng học viên</label>
-              <textarea class="form-control" id="courseTargetAudience" v-model="course.targetAudience" rows="3"
-                placeholder="Khóa học này dành cho ai?"></textarea>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="modal fade" id="reorderModal" tabindex="-1" aria-labelledby="reorderModalLabel" aria-hidden="true"
-      ref="reorderModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="reorderModalLabel">Sắp xếp bài giảng</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-          </div>
-          <div class="modal-body">
-            <p class="text-muted mb-3">
-              Kéo thả bài giảng để thay đổi thứ tự.
-            </p>
-            <div class="list-group">
-              <div v-for="(lecture, index) in course.lectures" :key="index"
-                class="list-group-item list-group-item-action d-flex align-items-center">
-                <div class="me-3 text-muted">
-                  <GripVerticalIcon class="icon" />
-                </div>
-                <div>{{ lecture.title }}</div>
-              </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-end gap-3 py-4">
+              <button class="btn btn-danger d-flex align-items-center px-4" @click="goBack">
+                <i class="bi bi-x-circle me-2"></i> Hủy
+              </button>
+              <button class="btn btn-primary d-flex align-items-center px-4" @click="updateCourse">
+                <i class="bi bi-save me-2"></i> Cập nhật khóa học
+              </button>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Hủy
-            </button>
-            <button type="button" class="btn btn-primary" @click="saveLectureOrder">
-              Lưu thứ tự
-            </button>
           </div>
         </div>
       </div>
@@ -301,6 +350,13 @@ export default {
     LoadingSpinner,
     SaveConfirmPopUp,
     DeleteConfirmPopUp,
+    ArrowLeftIcon,
+    PlusIcon,
+    TrashIcon,
+    SaveIcon,
+    UploadIcon,
+    ListOrderedIcon,
+    GripVerticalIcon,
   },
   data() {
     return {
@@ -313,17 +369,21 @@ export default {
         leafCategoryId: "",
         status: 0,
         price: 0,
-        level: "",
+        priceType: "free",
+        level: 0,
         outcomes: "",
         requirements: "",
         discount: 0,
         discountExpiry: "",
+        advisorExpectedOutcome: "",
+        completionTime: "",
         lectures: [],
       },
       previewImage: null,
       showSavePopup: false,
       showDeletePopup: false,
       lectureToDeleteIndex: null,
+      activeTab: 0,
       errors: {
         title: "",
         intro: "",
@@ -337,6 +397,11 @@ export default {
       lectureErrors: [],
       originalLectures: [],
       deletedLectureIds: [],
+      minDiscountDate: (() => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString().split('T')[0];
+      })()
     };
   },
   methods: {
@@ -345,11 +410,19 @@ export default {
       try {
         this.$refs.loadingSpinner.showSpinner();
         const courseData = await getCourseById(courseId);
-        courseData.discount *= 100;
+        
+        // Convert discount from decimal to percentage
+        courseData.discount = courseData.discount * 100;
+        
+        // Format discount expiry date
         if (courseData.discountExpiry) {
           const expiryDate = new Date(courseData.discountExpiry);
           courseData.discountExpiry = expiryDate.toISOString().split("T")[0];
         }
+
+        // Set price type based on price
+        courseData.priceType = courseData.price === 0 ? "free" : "paid";
+
         this.course = {
           ...courseData,
           thumb: {
@@ -359,15 +432,20 @@ export default {
           },
           lectures: [],
         };
+
         this.previewImage = courseData.thumbUrl || "";
+
+        // Fetch lectures
         const lectureResponse = await getLectures(courseId);
         const lectureList = lectureResponse?.items || [];
+        
         this.course.lectures = lectureList.map((l) => ({
           id: l.id,
           title: l.title,
           content: l.content,
           contentSummary: l.contentSummary,
           isPreviewable: l.isPreviewable,
+          type: l.type || "Video",
           medias: (l.materials || l.medias || []).map((m) => ({
             id: m.id,
             type: m.type,
@@ -382,16 +460,16 @@ export default {
           isNew: false,
         }));
 
-        this.originalLectures = JSON.parse(
-          JSON.stringify(this.course.lectures)
-        );
+        this.originalLectures = JSON.parse(JSON.stringify(this.course.lectures));
         this.initializeLectureErrors();
       } catch (error) {
+        console.error('Error fetching course:', error);
         toast.error("Không thể tải dữ liệu khóa học.");
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
       }
     },
+
     initializeLectureErrors() {
       this.lectureErrors = Array(this.course.lectures.length)
         .fill()
@@ -401,12 +479,14 @@ export default {
           contentSummary: "",
         }));
     },
+
     addLecture() {
       this.course.lectures.push({
         title: "",
         content: "",
         contentSummary: "",
         isPreviewable: false,
+        type: "Video",
         medias: [],
         addedMedias: [],
         removedMedias: [],
@@ -417,7 +497,9 @@ export default {
         content: "",
         contentSummary: "",
       });
+      this.activeTab = this.course.lectures.length - 1;
     },
+
     removeLecture(index) {
       const lecture = this.course.lectures[index];
       if (lecture.id && !lecture.isNew) {
@@ -425,52 +507,39 @@ export default {
       }
       this.course.lectures.splice(index, 1);
       this.lectureErrors.splice(index, 1);
-    },
-    removeLectureMedia(lectureIndex, mediaIndex) {
-      const media = this.course.lectures[lectureIndex].medias[mediaIndex];
-
-      if (media.id) {
-        this.course.lectures[lectureIndex].removedMedias.push(media.id);
+      
+      if (this.course.lectures.length === 0) {
+        this.activeTab = 0;
+        return;
       }
-
-      this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
-
-      if (this.course.lectures[lectureIndex].medias.length === 0) {
-        this.$nextTick(() => {
-          if (this.$refs["fileInput" + lectureIndex]) {
-            if (Array.isArray(this.$refs["fileInput" + lectureIndex])) {
-              this.$refs["fileInput" + lectureIndex][0].value = "";
-            } else {
-              this.$refs["fileInput" + lectureIndex].value = "";
-            }
-          }
-        });
+      
+      if (index === this.activeTab) {
+        if (index > 0) {
+          this.activeTab = index - 1;
+        } else {
+          this.activeTab = 0;
+        }
+      } else if (index < this.activeTab) {
+        this.activeTab--;
       }
     },
+
     handleImageUpload(event) {
       const file = event.target.files[0];
-      this.processThumbFile(file);
-    },
-    processThumbFile(file) {
-      if (!file) return;
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        this.errors.thumb = "Kích thước file phải nhỏ hơn 5MB";
-        return;
+      if (file) {
+        this.course.thumb.file = file;
+        this.course.thumb.title = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.previewImage = e.target.result;
+        };
+        reader.readAsDataURL(file);
       }
-      if (!file.type.startsWith("image/")) {
-        this.errors.thumb = "Chỉ cho phép tải lên file hình ảnh";
-        return;
-      }
-      this.errors.thumb = "";
-      this.course.thumb.file = file;
-      this.course.thumb.title = file.name;
-      const reader = new FileReader();
-      reader.onload = (e) => (this.previewImage = e.target.result);
-      reader.readAsDataURL(file);
     },
+
     handleLectureMediaUpload(event, lectureIndex) {
-      Array.from(event.target.files).forEach((file) => {
+      const files = Array.from(event.target.files);
+      files.forEach((file) => {
         const type = file.type.startsWith("image")
           ? 1
           : file.type.startsWith("video")
@@ -486,106 +555,138 @@ export default {
             title: file.name,
           };
 
+          if (!this.course.lectures[lectureIndex].medias) {
+            this.course.lectures[lectureIndex].medias = [];
+          }
+          
           this.course.lectures[lectureIndex].medias.push(newMedia);
           this.course.lectures[lectureIndex].addedMedias.push(newMedia);
         };
         reader.readAsDataURL(file);
       });
     },
-    openSavePopup() {
-      if (this.validateForm()) {
-        this.showSavePopup = true;
+
+    removeLectureMedia(lectureIndex, mediaIndex) {
+      const media = this.course.lectures[lectureIndex].medias[mediaIndex];
+      if (media.id) {
+        this.course.lectures[lectureIndex].removedMedias.push(media.id);
       }
+      this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
     },
-    openDeletePopup(index) {
-      this.lectureToDeleteIndex = index;
-      this.showDeletePopup = true;
-    },
-    async handleSave(confirm) {
-      if (!confirm) return;
 
-      this.$refs.loadingSpinner.showSpinner();
+    goBack() {
+      this.$router.back();
+    },
+
+    async updateCourse() {
+      if (!this.validateForm()) {
+        return;
+      }
+
       try {
-        const courseFormData = new FormData();
-        courseFormData.append("Id", this.course.id);
-        courseFormData.append("Title", this.course.title);
-        courseFormData.append("Intro", this.course.intro);
-        courseFormData.append("Description", this.course.description);
-        courseFormData.append("Status", this.course.status);
-        courseFormData.append("Price", this.course.price);
-        courseFormData.append("Discount", this.course.discount / 100);
-        courseFormData.append("DiscountExpiry", this.course.discountExpiry);
-        courseFormData.append("Level", this.course.level);
-        courseFormData.append("Outcomes", this.course.outcomes);
-        courseFormData.append("Requirements", this.course.requirements);
-        courseFormData.append("LeafCategoryId", this.course.leafCategoryId);
+        this.$refs.loadingSpinner.showSpinner();
+        const formData = new FormData();
+        
+        // Basic course information
+        formData.append("Id", this.course.id);
+        formData.append("Title", this.course.title);
+        formData.append("Intro", this.course.intro);
+        formData.append("Description", this.course.description);
+        formData.append("Status", this.course.status);
+        formData.append("Price", this.course.priceType === "free" ? 0 : this.course.price);
+        formData.append("Discount", this.course.discount / 100);
+        
+        if (this.course.discount > 0) {
+          formData.append("DiscountExpiry", this.course.discountExpiry);
+        }
+        
+        formData.append("Level", this.course.level);
+        formData.append("Outcomes", this.course.outcomes);
+        formData.append("Requirements", this.course.requirements);
+        formData.append("AdvisorExpectedOutcome", this.course.advisorExpectedOutcome);
+        formData.append("ExpectedCompletion", this.course.completionTime);
+        formData.append("LeafCategoryId", this.course.leafCategoryId);
 
+        // Handle thumbnail
         if (this.course.thumb.file) {
-          courseFormData.append("Thumb.File", this.course.thumb.file);
-          courseFormData.append("Thumb.Title", this.course.thumb.title);
+          formData.append("Thumb.File", this.course.thumb.file);
+          formData.append("Thumb.Title", this.course.thumb.title);
         } else if (this.course.thumb.url) {
-          courseFormData.append("Thumb.Title", this.course.title);
-          courseFormData.append("Thumb.Url", this.course.thumb.url);
+          formData.append("Thumb.Url", this.course.thumb.url);
+          formData.append("Thumb.Title", this.course.thumb.title);
         }
 
-        await updateCourse(courseFormData);
+        // Update course
+        await updateCourse(formData);
 
+        // Handle deleted lectures
         for (const lectureId of this.deletedLectureIds) {
           await deleteLecture(lectureId);
         }
+
+        // Update existing lectures
         const existingLectures = this.course.lectures.filter(
           (lecture) => !lecture.isNew
         );
-        const newLectures = this.course.lectures.filter(
-          (lecture) => lecture.isNew
-        );
-
         for (const lecture of existingLectures) {
-          const formData = new FormData();
-          formData.append("Id", lecture.id);
-          formData.append("CourseId", this.course.id);
-          formData.append("Title", lecture.title);
-          formData.append("Content", lecture.content);
-          formData.append("ContentSummary", lecture.contentSummary);
-          formData.append("IsPreviewable", lecture.isPreviewable);
+          const lectureFormData = new FormData();
+          lectureFormData.append("Id", lecture.id);
+          lectureFormData.append("CourseId", this.course.id);
+          lectureFormData.append("Title", lecture.title);
+          lectureFormData.append("Content", lecture.content);
+          lectureFormData.append("ContentSummary", lecture.contentSummary);
+          lectureFormData.append("IsPreviewable", lecture.isPreviewable);
+          lectureFormData.append("Type", lecture.type);
 
+          // Handle removed media
           lecture.removedMedias.forEach((id, index) => {
-            formData.append(`RemovedMedias[${index}]`, id);
+            lectureFormData.append(`RemovedMedias[${index}]`, id);
           });
 
+          // Handle added media
           if (lecture.addedMedias.length > 0) {
             lecture.addedMedias.forEach((media, index) => {
               if (media.file) {
-                formData.append(`AddedMedias[${index}].File`, media.file);
-                formData.append(`AddedMedias[${index}].Title`, media.title);
-                formData.append(`AddedMedias[${index}].Type`, media.type);
+                lectureFormData.append(`AddedMedias[${index}].File`, media.file);
+                lectureFormData.append(`AddedMedias[${index}].Title`, media.title);
+                lectureFormData.append(`AddedMedias[${index}].Type`, media.type);
               }
             });
           }
 
-          await updateLecture(formData);
+          await updateLecture(lectureFormData);
         }
 
+        // Create new lectures
+        const newLectures = this.course.lectures.filter(
+          (lecture) => lecture.isNew
+        );
         for (const lecture of newLectures) {
-          const formData = new FormData();
-          formData.append("CourseId", this.course.id);
-          formData.append("Title", lecture.title);
-          formData.append("Content", lecture.content);
-          formData.append("ContentSummary", lecture.contentSummary);
-          formData.append("IsPreviewable", lecture.isPreviewable);
+          const lectureFormData = new FormData();
+          lectureFormData.append("CourseId", this.course.id);
+          lectureFormData.append("Title", lecture.title);
+          lectureFormData.append("Content", lecture.content);
+          lectureFormData.append("ContentSummary", lecture.contentSummary);
+          lectureFormData.append("IsPreviewable", lecture.isPreviewable);
+          lectureFormData.append("Type", lecture.type);
 
+          // Handle media for new lecture
           lecture.addedMedias.forEach((media, index) => {
             if (media.file) {
-              formData.append(`AddedMedias[${index}].File`, media.file);
-              formData.append(`AddedMedias[${index}].Title`, media.title);
-              formData.append(`AddedMedias[${index}].Type`, media.type);
+              lectureFormData.append(`AddedMedias[${index}].File`, media.file);
+              lectureFormData.append(`AddedMedias[${index}].Title`, media.title);
+              lectureFormData.append(`AddedMedias[${index}].Type`, media.type);
             }
           });
 
-          await createLecture(formData);
+          await createLecture(lectureFormData);
         }
 
-        toast.success("Course updated successfully!", { autoClose: 3000 });
+        toast.success("Cập nhật khóa học thành công!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+
         this.$router.push({
           path: "/advisor/content",
           query: {
@@ -594,181 +695,65 @@ export default {
           },
         });
       } catch (error) {
-        toast.error("Đã xảy ra lỗi khi cập nhật khóa học.");
+        console.error('Error updating course:', error);
+        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi cập nhật khóa học. Vui lòng thử lại!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
       } finally {
         this.$refs.loadingSpinner.hideSpinner();
       }
     },
-    handleDelete(confirm) {
-      if (confirm && this.lectureToDeleteIndex !== null) {
-        this.removeLecture(this.lectureToDeleteIndex);
-      }
-      this.lectureToDeleteIndex = null;
-    },
-    validateTitle() {
-      if (!this.course.title.trim()) {
-        this.errors.title = "Vui lòng nhập tiêu đề khóa học";
-      } else if (this.course.title.trim().length < 5) {
-        this.errors.title = "Tiêu đề khóa học phải có ít nhất 5 ký tự";
-      } else if (this.course.title.trim().length > 255) {
-        this.errors.title = "Tiêu đề khóa học phải nhỏ hơn 255 ký tự";
-      } else {
-        this.errors.title = "";
-      }
-    },
-    validateIntro() {
-      if (!this.course.intro.trim()) {
-        this.errors.intro = "Vui lòng nhập giới thiệu khóa học";
-      } else {
-        this.errors.intro = "";
-      }
-    },
-    validateDescription() {
-      if (!this.course.description.trim()) {
-        this.errors.description = "Vui lòng nhập mô tả khóa học";
-      } else {
-        this.errors.description = "";
-      }
-    },
-    validatePrice() {
-      if (!this.course.price || this.course.price < 10000) {
-        this.errors.price = "Giá khóa học phải tối thiểu 10,000 VNĐ";
-      } else {
-        this.errors.price = "";
-      }
-    },
-    validateLevel() {
-      if (this.course.level === "" || this.course.level === null) {
-        this.errors.level = "Vui lòng chọn cấp độ khóa học";
-      } else {
-        this.errors.level = "";
-      }
-    },
-    validateOutcomes() {
-      if (!this.course.outcomes.trim()) {
-        this.errors.outcomes = "Vui lòng nhập kết quả học tập";
-      } else {
-        this.errors.outcomes = "";
-      }
-    },
-    validateRequirements() {
-      if (!this.course.requirements.trim()) {
-        this.errors.requirements = "Vui lòng nhập điều kiện tiên quyết";
-      } else {
-        this.errors.requirements = "";
-      }
-    },
-    validateThumb() {
-      if (!this.course.thumb.file && !this.course.thumb.url) {
-        this.errors.thumb = "Vui lòng chọn hình ảnh bìa";
-      } else {
-        this.errors.thumb = "";
-      }
-    },
-    validateLecture(index) {
-      if (!this.lectureErrors[index]) {
-        while (this.lectureErrors.length <= index) {
-          this.lectureErrors.push({
-            title: "",
-            content: "",
-            contentSummary: "",
-          });
-        }
-      }
 
-      const lec = this.course.lectures[index];
-      const errors = {
-        title: "",
-        content: "",
-        contentSummary: "",
-      };
-
-      if (!lec.title || !lec.title.trim()) {
-        errors.title = `Bài giảng ${index + 1
-          }: vui lòng nhập tiêu đề hoặc xóa bài giảng`;
-      } else if (lec.title.trim().length < 5) {
-        errors.title = `Bài giảng ${index + 1
-          }: tiêu đề phải có ít nhất 5 ký tự`;
-      } else if (lec.title.trim().length > 255) {
-        errors.title = `Bài giảng ${index + 1}: tiêu đề phải nhỏ hơn 255 ký tự`;
-      }
-
-      if (!lec.content || !lec.content.trim()) {
-        errors.content = `Bài giảng ${index + 1
-          }: vui lòng nhập nội dung hoặc xóa bài giảng`;
-      } else if (lec.content.trim().length < 10) {
-        errors.content = `Bài giảng ${index + 1
-          }: nội dung phải có ít nhất 10 ký tự`;
-      } else if (lec.content.trim().length > 1000) {
-        errors.content = `Bài giảng ${index + 1
-          }: nội dung phải nhỏ hơn 1000 ký tự`;
-      }
-
-      if (!lec.contentSummary || !lec.contentSummary.trim()) {
-        errors.contentSummary = `Bài giảng ${index + 1
-          }: vui lòng nhập tóm tắt hoặc xóa bài giảng`;
-      } else if (lec.contentSummary.trim().length < 5) {
-        errors.contentSummary = `Bài giảng ${index + 1
-          }: tóm tắt phải có ít nhất 5 ký tự`;
-      } else if (lec.contentSummary.trim().length > 100) {
-        errors.contentSummary = `Bài giảng ${index + 1
-          }: tóm tắt phải nhỏ hơn 100 ký tự`;
-      }
-
-      this.lectureErrors[index] = errors;
-      return (
-        errors.title === "" &&
-        errors.content === "" &&
-        errors.contentSummary === ""
-      );
-    },
-    validateAllLectures() {
-      this.initializeLectureErrors();
-
-      let allValid = true;
-      for (let i = 0; i < this.course.lectures.length; i++) {
-        const isValid = this.validateLecture(i);
-        if (!isValid) {
-          allValid = false;
-        }
-      }
-      return allValid;
-    },
     validateForm() {
-      this.validateTitle();
-      this.validateIntro();
-      this.validateDescription();
-      this.validatePrice();
-      this.validateLevel();
-      this.validateOutcomes();
-      this.validateRequirements();
-      this.validateThumb();
-
-      const lecturesValid = this.validateAllLectures();
-
-      if (Object.values(this.errors).some((err) => err !== "")) {
-        const firstError = Object.keys(this.errors).find(
-          (key) => this.errors[key] !== ""
-        );
-        toast.error(`Vui lòng sửa lỗi: ${this.errors[firstError]}`);
+      // Validate required fields
+      if (!this.course.title) {
+        toast.error("Vui lòng nhập tên khóa học!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
         return false;
       }
 
-      if (!lecturesValid) {
-        for (let i = 0; i < this.lectureErrors.length; i++) {
-          const err = this.lectureErrors[i];
-          if (err.title) {
-            return false;
-          } else if (err.content) {
-            return false;
-          } else if (err.contentSummary) {
-            return false;
-          }
+      // Validate lectures
+      if (this.course.lectures.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một bài giảng!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+
+      // Validate each lecture
+      for (let i = 0; i < this.course.lectures.length; i++) {
+        const lecture = this.course.lectures[i];
+        if (!lecture.title) {
+          toast.error(`Vui lòng nhập tiêu đề cho bài giảng ${i + 1}!`, {
+            autoClose: 3000,
+            position: toast.POSITION.TOP_RIGHT
+          });
+          return false;
+        }
+        if (!lecture.content) {
+          toast.error(`Vui lòng nhập nội dung cho bài giảng ${i + 1}!`, {
+            autoClose: 3000,
+            position: toast.POSITION.TOP_RIGHT
+          });
+          return false;
         }
       }
 
+      // Validate discount expiry
+      if (this.course.discount > 0 && !this.course.discountExpiry) {
+        toast.error("Vui lòng chọn ngày hết hạn giảm giá!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+
       return true;
-    },
+    }
   },
   mounted() {
     this.fetchCourse();
@@ -777,8 +762,339 @@ export default {
 </script>
 
 <style scoped>
+.create-course-container {
+  display: flex;
+  flex-direction: column;
+  width: 72vw;
+  margin: 0 auto;
+}
+
+.header-section {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.card {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+  padding: 1rem;
+}
+
+.card-header h5 {
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-outline-secondary {
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+
+.btn-outline-secondary:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.btn-outline-primary {
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+
+.btn-outline-primary:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.btn-outline-danger {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.input-group-text {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.form-check-input {
+  width: 1em;
+  height: 1em;
+  margin-top: 0.15em;
+  border: 1px solid #ddd;
+}
+
+.form-check-input:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.img-thumbnail {
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: #e8e8e8;
+  margin: 1.5rem 0;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #e8e8e8;
+  padding: 0.5rem 0.5rem 0;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 4px 4px 0 0;
+  margin-right: 0.25rem;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #f5f5f5;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.tab-content {
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid #e8e8e8;
+  border-top: none;
+}
+
+.lecture-settings {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.upload-area {
+  border: 1px dashed #3b82f6;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.uploaded-file-item {
+  background: #f5f5f5;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.question-item {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.answer-item {
+  background: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.assignment-type-item {
+  cursor: pointer;
+  padding: 1rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.assignment-type-item:hover {
+  background: #f5f5f5;
+}
+
+.assignment-type-item.selected {
+  background: #f0f7ff;
+  border-color: #3b82f6;
+}
+
 .icon {
   width: 16px;
   height: 16px;
+}
+
+.lecture-tabs {
+  position: relative;
+}
+
+.lecture-tabs .nav-tabs {
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.lecture-tabs .nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.lecture-tabs .nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-right: 0.25rem;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  color: #333;
+  background: #f5f5f5;
+  transition: all 0.2s;
+}
+
+.lecture-tabs .nav-link:hover {
+  background: #e8e8e8;
+}
+
+.lecture-tabs .nav-link.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.lecture-tabs .btn-close {
+  margin-left: 0.5rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.lecture-tabs .btn-close:hover {
+  opacity: 1;
+}
+
+.lecture-number {
+  font-weight: 500;
+}
+
+.tab-content {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+}
+
+.upload-area {
+  border: 2px dashed #3b82f6;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  background: #f8fafc;
+  transition: all 0.2s;
+}
+
+.upload-area:hover {
+  background: #f0f7ff;
+}
+
+.uploaded-files {
+  margin-top: 1rem;
+}
+
+.uploaded-file-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.uploaded-file-item i {
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+.uploaded-file-item .btn-close {
+  margin-left: auto;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.uploaded-file-item .btn-close:hover {
+  opacity: 1;
+}
+
+.form-check-switch {
+  padding-left: 2.5rem;
+}
+
+.form-check-switch .form-check-input {
+  width: 2.5rem;
+  height: 1.25rem;
+  margin-left: -2.5rem;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+  background-position: left center;
+  border-radius: 2rem;
+  transition: background-position .15s ease-in-out;
+}
+
+.form-check-switch .form-check-input:checked {
+  background-position: right center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.form-check-switch .form-check-label {
+  padding-top: 0.125rem;
 }
 </style>
