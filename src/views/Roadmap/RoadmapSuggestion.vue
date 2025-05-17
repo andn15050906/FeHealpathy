@@ -1,8 +1,6 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-
-
       <v-card v-if="!showResults" class="mb-6 suggestion-card">
         <v-card-title class="d-flex align-center">
           <v-icon color="primary" class="mr-2">mdi-lightbulb-outline</v-icon>
@@ -43,10 +41,7 @@
                   </div>
                   <h3 class="text-h6 mb-4">Công việc hiện tại của bạn là gì?</h3>
                   <v-radio-group v-model="answers.userType">
-                    <v-radio label="Học sinh" value="student"></v-radio>
-                    <v-radio label="Sinh viên" value="university"></v-radio>
-                    <v-radio label="Người đi làm" value="worker"></v-radio>
-                    <v-radio label="Người cao tuổi" value="elderly"></v-radio>
+                    <v-radio v-for="option in userTypeOptions" :key="option.value" :label="option.text" :value="option.value"></v-radio>
                     <v-radio label="Khác" value="other"></v-radio>
                   </v-radio-group>
                   <v-text-field v-if="answers.userType === 'other'" v-model="answers.userTypeOther"
@@ -89,10 +84,7 @@
                     </div>
                     <h3 class="text-h6 mb-4">Vấn đề đó thường xảy ra ở đâu?</h3>
                     <v-radio-group v-model="answers.where">
-                      <v-radio label="Ở nhà" value="home"></v-radio>
-                      <v-radio label="Ở trường/lớp học" value="school"></v-radio>
-                      <v-radio label="Nơi làm việc" value="work"></v-radio>
-                      <v-radio label="Trên mạng xã hội" value="social"></v-radio>
+                      <v-radio v-for="option in whereOptions" :key="option.value" :label="option.text" :value="option.value"></v-radio>
                       <v-radio label="Khác" value="other"></v-radio>
                     </v-radio-group>
                     <v-text-field v-if="answers.where === 'other'" v-model="answers.whereOther"
@@ -111,11 +103,7 @@
                       Thường xảy ra vào thời gian nào?
                     </div>
                     <v-radio-group v-model="answers.when">
-                      <v-radio label="Buổi sáng" value="morning"></v-radio>
-                      <v-radio label="Trước khi ngủ" value="before_sleep"></v-radio>
-                      <v-radio label="Buổi tối" value="evening"></v-radio>
-                      <v-radio label="Khi đi học/làm" value="at_work"></v-radio>
-                      <v-radio label="Luôn luôn" value="always"></v-radio>
+                      <v-radio v-for="option in whenOptions" :key="option.value" :label="option.text" :value="option.value"></v-radio>
                       <v-radio label="Khác" value="other"></v-radio>
                     </v-radio-group>
                     <v-text-field v-if="answers.when === 'other'" v-model="answers.whenOther"
@@ -134,12 +122,7 @@
                       Ai thường liên quan đến vấn đề này?
                     </div>
                     <v-radio-group v-model="answers.related">
-                      <v-radio label="Bố mẹ" value="parent"></v-radio>
-                      <v-radio label="Giáo viên / giảng viên" value="teacher"></v-radio>
-                      <v-radio label="Bạn bè / người yêu" value="friend"></v-radio>
-                      <v-radio label="Sếp / đồng nghiệp" value="boss"></v-radio>
-                      <v-radio label="Chính bản thân mình" value="myself"></v-radio>
-                      <v-radio label="Không rõ" value="unknown"></v-radio>
+                      <v-radio v-for="option in relatedOptions" :key="option.value" :label="option.text" :value="option.value"></v-radio>
                       <v-radio label="Khác" value="other"></v-radio>
                     </v-radio-group>
                     <v-text-field v-if="answers.related === 'other'" v-model="answers.relatedOther"
@@ -434,7 +417,7 @@
 </template>
 
 <script>
-import { roadmapSteps } from "@/scripts/data/roadmapData.js";
+import { getRoadmapSteps, getSuggestionData } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapSuggestion",
@@ -442,7 +425,7 @@ export default {
     return {
       currentStep: 1,
       showResults: false,
-      roadmapSteps,
+      roadmapSteps: [],
       answers: {
         userType: "",
         userTypeOther: "",
@@ -455,13 +438,11 @@ export default {
         related: "",
         relatedOther: "",
       },
-      userTypeOptions: [
-        { text: "Học sinh", value: "student" },
-        { text: "Sinh viên", value: "university" },
-        { text: "Người đi làm", value: "worker" },
-        { text: "Người cao tuổi", value: "elderly" },
-        { text: "Khác", value: "other" },
-      ],
+      userTypeOptions: [],
+      whereOptions: [],
+      whenOptions: [],
+      relatedOptions: [],
+      /*
       stressSourceOptions: [
         { text: "Gia đình", value: "family" },
         { text: "Việc học", value: "study" },
@@ -476,6 +457,7 @@ export default {
         { text: "Giấc ngủ tốt hơn", value: "sleep" },
         { text: "Tập trung tốt hơn", value: "focus" },
       ],
+      */
       suggestedRoadmaps: [],
       skippedIssue: false,
       isNormalMentalHealth: false,
@@ -483,12 +465,7 @@ export default {
       audioVolume: 50,
       isPlaying: false,
       currentTrack: "Relaxing Nature Sounds",
-      audioTracks: [
-        "Relaxing Nature Sounds",
-        "Meditation Music",
-        "Deep Sleep Music",
-        "Stress Relief Melody",
-      ],
+      audioTracks: [],
       currentTrackIndex: 0,
       showPaymentDialog: false,
       showPaymentSuccess: false,
@@ -501,6 +478,8 @@ export default {
       },
       stressLevel: 0,
       depressionRisk: 0,
+      suggestionData: null,
+      roadmapIcons: {}
     };
   },
   computed: {
@@ -520,6 +499,26 @@ export default {
     },
   },
   methods: {
+    async fetchData() {
+      try {
+        // Fetch roadmap steps
+        this.roadmapSteps = await getRoadmapSteps();
+        
+        // Fetch suggestion data
+        const data = await getSuggestionData();
+        this.suggestionData = data;
+        
+        // Set up form options from suggestion data
+        this.userTypeOptions = data.userTypeOptions;
+        this.whereOptions = data.whereOptions;
+        this.whenOptions = data.whenOptions;
+        this.relatedOptions = data.relatedOptions;
+        this.audioTracks = data.audioTracks;
+        this.roadmapIcons = data.roadmapIcons;
+      } catch (error) {
+        console.error("Error fetching suggestion data:", error);
+      }
+    },
     handleNext() {
       if (this.currentStep < 5) {
         this.currentStep++;
@@ -529,7 +528,7 @@ export default {
         this.showResults = true;
       }
     },
-    generateResults() {
+        generateResults() {
       // Đánh giá mức độ vấn đề tâm lý
       this.stressLevel = 20;
       this.depressionRisk = 10;
@@ -678,164 +677,25 @@ export default {
 
     generatePersonalizedRoadmaps(stressLevel, depressionRisk) {
       const roadmaps = [];
-
-      // Dựa vào userType và issue để tạo roadmap phù hợp
-      if (this.answers.userType === "student") {
-        if (["study_pressure", "future_worry"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "1",
-            title: "Vượt qua áp lực học tập",
-            description:
-              "Phương pháp giảm căng thẳng và cải thiện hiệu suất học tập",
-            match: 95,
-            steps: 5,
-            isPaid: true,
-            price: 500000,
-            features: [
-              "5 bài tập thư giãn chuyên sâu",
-              "Hướng dẫn quản lý thời gian hiệu quả",
-              "Kỹ thuật học tập tối ưu",
-              "Tư vấn 1-1 với chuyên gia",
-              "Theo dõi tiến độ cá nhân",
-            ],
-          });
-        }
-
-        if (["bullying", "no_close_friend"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "2",
-            title: "Xây dựng kỹ năng xã hội",
-            description: "Phát triển sự tự tin và kỹ năng giao tiếp hiệu quả",
-            match: 90,
-            steps: 5,
-            isPaid: true,
-            price: 450000,
-            features: [
-              "Bài tập rèn luyện sự tự tin",
-              "Kỹ thuật giao tiếp hiệu quả",
-              "Xử lý tình huống khó khăn",
-              "Hỗ trợ từ cộng đồng",
-              "Tài liệu chuyên sâu về kỹ năng xã hội",
-            ],
-          });
+      
+      if (this.answers.userType && this.answers.issue && this.suggestionData) {
+        const userTypeRoadmaps = this.suggestionData.suggestedRoadmaps[this.answers.userType];
+        if (userTypeRoadmaps && userTypeRoadmaps[this.answers.issue]) {
+          roadmaps.push(...userTypeRoadmaps[this.answers.issue]);
         }
       }
-
-      if (this.answers.userType === "university") {
-        if (["career_confusion", "future_worry"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "3",
-            title: "Định hướng nghề nghiệp",
-            description:
-              "Khám phá đam mê v�� xây dựng lộ trình sự nghiệp rõ ràng",
-            match: 93,
-            steps: 5,
-            isPaid: true,
-            price: 550000,
-            features: [
-              "Bài kiểm tra định hướng nghề nghiệp",
-              "Tư vấn 1-1 với chuyên gia hướng nghiệp",
-              "Kế hoạch phát triển cá nhân",
-              "Kỹ năng phỏng vấn và tìm việc",
-              "Mạng lưới kết nối chuyên nghiệp",
-            ],
-          });
-        }
-
-        if (["loneliness", "boredom"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "4",
-            title: "Sống trọn vẹn đời sinh viên",
-            description:
-              "Tận hưởng và phát triển bản thân trong thời gian đại học",
-            match: 88,
-            steps: 5,
-            isPaid: false,
-            price: 0,
-          });
-        }
+      
+      if (this.suggestionData && this.suggestionData.suggestedRoadmaps["default"]) {
+        roadmaps.push(...this.suggestionData.suggestedRoadmaps["default"]["default"]);
       }
 
-      if (this.answers.userType === "worker") {
-        if (["work_stress", "work_life_balance"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "5",
-            title: "Cân bằng công việc - cuộc sống",
-            description: "Phương pháp quản lý stress và tạo sự cân bằng",
-            match: 96,
-            steps: 5,
-            isPaid: true,
-            price: 600000,
-            features: [
-              "5 kỹ thuật quản lý thời gian",
-              "Phương pháp thiền mindfulness",
-              "Kỹ năng đặt ranh giới lành mạnh",
-              "Tư vấn 1-1 với chuyên gia",
-              "Theo dõi mức độ stress hàng ngày",
-            ],
-          });
-        }
-
-        if (["no_passion", "not_recognized"].includes(this.answers.issue)) {
-          roadmaps.push({
-            id: "6",
-            title: "Tìm lại đam mê trong công việc",
-            description: "Khám phá lại ý nghĩa và niềm vui trong sự nghiệp",
-            match: 92,
-            steps: 5,
-            isPaid: true,
-            price: 500000,
-            features: [
-              "Bài tập khám phá giá trị cốt lõi",
-              "Kỹ thuật đặt mục tiêu SMART",
-              "Phương pháp tạo động lực nội tại",
-              "Tư vấn phát triển sự nghiệp",
-              "Công cụ đánh giá sự hài lòng",
-            ],
-          });
-        }
+      if (this.isNormalMentalHealth && this.suggestionData.suggestedRoadmaps["normal"]) {
+        roadmaps.push(suggestionData.suggestedRoadmap["normal"]["normal"]);
       }
-
-      // Luôn thêm ít nhất một lộ trình miễn phí
-      roadmaps.push({
-        id: "7",
-        title: "Thư giãn với âm nhạc",
-        description:
-          "Bộ sưu tập nhạc thư giãn và thiền định giúp giảm căng thẳng",
-        match: 85,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      });
-
-      roadmaps.push({
-        id: "8",
-        title: "Yoga cơ bản",
-        description:
-          "Các bài tập yoga đơn giản giúp thư giãn cơ thể và tâm trí",
-        match: 80,
-        steps: 5,
-        isPaid: false,
-        price: 0,
-      });
-
-      // Nếu tâm lý bình thường, thêm lộ trình duy trì sức khỏe tinh thần
-      if (this.isNormalMentalHealth) {
-        roadmaps.push({
-          id: "9",
-          title: "Duy trì sức khỏe tinh thần",
-          description:
-            "Các hoạt động và thói quen giúp duy trì trạng thái tâm lý tích cực",
-          match: 98,
-          steps: 5,
-          isPaid: false,
-          price: 0,
-        });
-      }
-
+      
       // Sắp xếp theo độ phù hợp
       roadmaps.sort((a, b) => b.match - a.match);
-
+      
       // Giới hạn số lượng roadmap
       return roadmaps.slice(0, 4);
     },
@@ -886,38 +746,7 @@ export default {
     },
 
     getIssueOptions(userType) {
-      if (userType === "student") {
-        return [
-          { text: "Áp lực học tập, thi cử", value: "study_pressure" },
-          { text: "Bị bắt nạt hoặc cô lập ở trường", value: "bullying" },
-          { text: "Không có bạn thân", value: "no_close_friend" },
-          { text: "Mâu thuẫn với cha mẹ", value: "parent_conflict" },
-          { text: "Mất động lực", value: "no_motivation" },
-        ];
-      } else if (userType === "university") {
-        return [
-          { text: "Lo lắng về tương lai", value: "future_worry" },
-          { text: "Mất định hướng nghề nghiệp", value: "career_confusion" },
-          { text: "Cô đơn", value: "loneliness" },
-          { text: "Chán học", value: "boredom" },
-          { text: "Stress vì thực tập/thi cử", value: "intern_stress" },
-        ];
-      } else if (userType === "worker") {
-        return [
-          { text: "Căng thẳng công việc", value: "work_stress" },
-          { text: "Mâu thuẫn đồng nghiệp", value: "colleague_conflict" },
-          { text: "Cảm giác không được công nhận", value: "not_recognized" },
-          { text: "Không còn đam mê", value: "no_passion" },
-          {
-            text: "Mất cân bằng cuộc sống – công việc",
-            value: "work_life_balance",
-          },
-        ];
-      } else if (userType === "other") {
-        // Nếu chọn khác, chỉ hiện ô input
-        return [];
-      }
-      return [];
+      return this.suggestionData?.issueOptions[userType] || [];
     },
 
     getEvaluationText(userType, issue) {
@@ -990,36 +819,22 @@ export default {
       // Trường hợp khác
       return "Cảm ơn bạn đã chia sẻ những trải nghiệm cá nhân. Dựa trên thông tin bạn cung cấp, chúng tôi đã xây dựng lộ trình được cá nhân hóa để hỗ trợ bạn hiệu quả nhất. Mỗi thử thách bạn đang đối mặt đều là cơ hội để phát triển, và chúng tôi tin rằng với những công cụ phù hợp, bạn sẽ không chỉ vượt qua khó khăn mà còn phát triển mạnh mẽ hơn.";
     },
-
+    
     getRoadmapIcon(id) {
-      const icons = {
-        1: "mdi-school",
-        2: "mdi-account-group",
-        3: "mdi-briefcase",
-        4: "mdi-school",
-        5: "mdi-briefcase-check",
-        6: "mdi-heart-pulse",
-        7: "mdi-music",
-        8: "mdi-yoga",
-        9: "mdi-meditation",
-        "default-paid": "mdi-star-circle",
-      };
-
-      return icons[id] || "mdi-lightbulb-outline";
+      return this.roadmapIcons[id] || "mdi-lightbulb-outline";
     },
 
     togglePlay() {
       this.isPlaying = !this.isPlaying;
-      // Trong ứng dụng thực tế, bạn sẽ phát/dừng âm nhạc ở đây
     },
-
     nextTrack() {
-      this.currentTrackIndex =
-        (this.currentTrackIndex + 1) % this.audioTracks.length;
+      this.currentTrackIndex = (this.currentTrackIndex + 1) % this.audioTracks.length;
       this.currentTrack = this.audioTracks[this.currentTrackIndex];
-      // Trong ứng dụng thực tế, bạn sẽ chuyển bài ở đây
-    },
+    }
   },
+  mounted() {
+    this.fetchData();
+  }
 };
 </script>
 
