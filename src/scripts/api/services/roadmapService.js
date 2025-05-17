@@ -20,6 +20,18 @@ export const getRoadmaps = async (queryParams = {}) => {
   }
 }
 
+export const getRoadmapSteps = async () => {
+  try {
+    const response = await get(`${API_BASE_URL}/roadmap-steps`)
+    if (!Array.isArray(response)) {
+      return []
+    }
+    return response
+  } catch (error) {
+    return []
+  }
+}
+
 export const createRoadmap = async (data) => post(API_BASE_URL, data)
 export const updateRoadmap = async (data) => patch(API_BASE_URL, data)
 export const deleteRoadmap = async (id) => del(`${API_BASE_URL}/${id}`)

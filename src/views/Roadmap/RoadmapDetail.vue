@@ -230,7 +230,10 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "@/scripts/logic/eventBus";
 import { useRoute, useRouter } from "vue-router";
-import { getRoadmapById } from "@/scripts/api/services/roadmapService";
+import {
+  getRoadmapById,
+  getRoadmapSteps,
+} from "@/scripts/api/services/roadmapService";
 import advisorImg from "@/img/advisor.jpg";
 
 export default {
@@ -254,10 +257,8 @@ export default {
       5: false,
     });
 
-    // Tạo key lưu trữ dựa trên ID lộ trình
     const getStorageKey = () => `completedPhases_roadmap_${props.id}`;
 
-    // Lưu trạng thái hoàn thành của các phase vào localStorage
     const saveCompletedPhases = () => {
       localStorage.setItem(
         getStorageKey(),
@@ -265,18 +266,15 @@ export default {
       );
     };
 
-    // Khôi phục trạng thái hoàn thành của các phase từ localStorage
     const loadCompletedPhases = () => {
       const savedPhases = localStorage.getItem(getStorageKey());
       if (savedPhases) {
         completedPhases.value = JSON.parse(savedPhases);
       } else {
-        // Reset về trạng thái mặc định nếu không có dữ liệu
         resetCompletedPhases();
       }
     };
 
-    // Reset trạng thái hoàn thành về mặc định
     const resetCompletedPhases = () => {
       completedPhases.value = {
         1: false,
@@ -287,25 +285,27 @@ export default {
       };
     };
 
-    // Cập nhật trạng thái của các phase trong roadmap
     const updatePhaseStatus = () => {
-      if (!roadmap.value || !roadmap.value.phases) return;
+      if (!roadmap.value?.phases) return;
+
+      const hasBEStatus = roadmap.value.phases.some(
+        (p) => p.current || p.completed
+      );
+
+      if (hasBEStatus) {
+        return;
+      }
 
       let foundCurrent = false;
-
       for (const phase of roadmap.value.phases) {
         const phaseId = parseInt(phase.id);
-
-        // Nếu phase đã hoàn thành, đánh dấu phase là đã hoàn thành
         if (completedPhases.value[phaseId]) {
           phase.completed = true;
           phase.current = false;
         } else if (!foundCurrent) {
-          // Đánh dấu phase đầu tiên chưa hoàn thành là current
           phase.current = true;
           foundCurrent = true;
         } else {
-          // Các phase còn lại không phải current và chưa hoàn thành
           phase.current = false;
           phase.completed = false;
         }
@@ -315,12 +315,19 @@ export default {
     const fetchRoadmap = async () => {
       try {
         loading.value = true;
-        const response = await getRoadmapById(props.id);
 
-        if (response) {
-          roadmap.value = response;
+        const [roadmapResponse, stepsResponse] = await Promise.all([
+          getRoadmapById(props.id),
+          getRoadmapSteps(),
+        ]);
 
-          // Cập nhật trạng thái phase dựa trên completedPhases
+        if (roadmapResponse) {
+          roadmap.value = roadmapResponse;
+
+          if (!roadmap.value.phases || roadmap.value.phases.length === 0) {
+            roadmap.value.phases = stepsResponse;
+          }
+
           updatePhaseStatus();
         }
       } catch (error) {
@@ -351,12 +358,9 @@ export default {
       router.push(`/roadmap/${roadmap.value.id}/phase/${phaseId}`);
     };
 
-    // Sử dụng event bus
     const eventBus = useEventBus();
 
-    // Lắng nghe sự kiện cập nhật từ StepDetail
     const handleUpdateRoadmapPhases = (data) => {
-      // Chỉ cập nhật nếu sự kiện thuộc về lộ trình hiện tại
       if (data.roadmapId === props.id) {
         console.log(
           `Received update for roadmap ${data.roadmapId}:`,
@@ -372,7 +376,6 @@ export default {
       loadCompletedPhases();
       fetchRoadmap();
 
-      // Đăng ký lắng nghe sự kiện
       eventBus.on("update-roadmap-phases", handleUpdateRoadmapPhases);
       console.log(
         `RoadmapDetail mounted for roadmap ${props.id}, eventBus listener registered`
@@ -380,7 +383,6 @@ export default {
     });
 
     onBeforeUnmount(() => {
-      // Hủy đăng ký sự kiện
       eventBus.off("update-roadmap-phases", handleUpdateRoadmapPhases);
       console.log(
         `RoadmapDetail unmounted for roadmap ${props.id}, eventBus listener removed`
@@ -426,7 +428,6 @@ export default {
   margin-bottom: 0 !important;
 }
 
-/* Advisor card styling */
 .advisor-card {
   border-radius: 12px;
   padding: 12px 16px;
@@ -434,7 +435,6 @@ export default {
   border-left: 4px solid #6a39ca;
 }
 
-/* Healing header styling */
 .healing-header {
   background: linear-gradient(
     to right,
