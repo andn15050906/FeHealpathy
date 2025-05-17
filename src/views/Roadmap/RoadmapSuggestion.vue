@@ -51,7 +51,6 @@
                   </v-radio-group>
                   <v-text-field v-if="answers.userType === 'other'" v-model="answers.userTypeOther"
                     label="Vui lòng mô tả công việc của bạn" outlined dense></v-text-field>
-                  <v-btn text @click="skipStep(1)">Bỏ qua</v-btn>
                 </v-card-text>
               </v-stepper-window-item>
 
@@ -74,7 +73,6 @@
                     </v-radio-group>
                     <v-text-field v-if="answers.issue === 'other'" v-model="answers.issueOther"
                       label="Vui lòng mô tả vấn đề của bạn" outlined dense></v-text-field>
-                    <v-btn text @click="skipStep(2)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
 
@@ -97,7 +95,6 @@
                     </v-radio-group>
                     <v-text-field v-if="answers.where === 'other'" v-model="answers.whereOther"
                       label="Vui lòng mô tả nơi vấn đề xảy ra" outlined dense></v-text-field>
-                    <v-btn text @click="skipStep(3)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
 
@@ -120,7 +117,6 @@
                     </v-radio-group>
                     <v-text-field v-if="answers.when === 'other'" v-model="answers.whenOther"
                       label="Vui lòng mô tả thời gian vấn đề xảy ra" outlined dense></v-text-field>
-                    <v-btn text @click="skipStep(4)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
 
@@ -144,7 +140,6 @@
                     </v-radio-group>
                     <v-text-field v-if="answers.related === 'other'" v-model="answers.relatedOther"
                       label="Vui lòng mô tả người liên quan" outlined dense></v-text-field>
-                    <v-btn text @click="skipStep(5)">Bỏ qua</v-btn>
                   </v-card-text>
                 </v-stepper-window-item>
               </template>
@@ -505,24 +500,29 @@ export default {
   },
   computed: {
     canProceed() {
-      if (this.currentStep === 1) {
-        return !!this.answers.userType;
-      } else if (this.currentStep === 2) {
-        return !!this.answers.issue;
-      } else if (this.currentStep === 3) {
-        return !!this.answers.where;
-      } else if (this.currentStep === 4) {
-        return !!this.answers.when;
-      } else if (this.currentStep === 5) {
-        return !!this.answers.related;
-      }
-      return false;
+      // Luôn cho phép nhấn nút tiếp theo để có thể bỏ qua
+      return true;
     },
   },
   methods: {
     handleNext() {
       if (this.currentStep < 5) {
-        this.currentStep++;
+        // Nếu chưa chọn câu trả lời, coi như bỏ qua bước đó
+        if (this.currentStep === 1 && !this.answers.userType) {
+          this.currentStep++;
+        } else if (this.currentStep === 2 && !this.answers.issue) {
+          this.skippedIssue = true;
+          this.currentStep = 2;
+        } else if (this.currentStep === 3 && !this.answers.where) {
+          this.currentStep++;
+        } else if (this.currentStep === 4 && !this.answers.when) {
+          this.currentStep++;
+        } else if (this.currentStep === 5 && !this.answers.related) {
+          this.generateResults();
+          this.showResults = true;
+        } else {
+          this.currentStep++;
+        }
       } else {
         console.log("Generating results...");
         this.generateResults();
@@ -727,7 +727,7 @@ export default {
             id: "3",
             title: "Định hướng nghề nghiệp",
             description:
-              "Khám phá đam mê v�� xây dựng lộ trình sự nghiệp rõ ràng",
+              "Khám phá đam mê và xây dựng lộ trình sự nghiệp rõ ràng",
             match: 93,
             steps: 5,
             isPaid: true,
@@ -865,18 +865,6 @@ export default {
       this.showPaymentSuccess = false;
       if (this.selectedRoadmap) {
         this.$router.push(`/roadmap/${this.selectedRoadmap.id}`);
-      }
-    },
-
-    skipStep(step) {
-      if (step === 2) {
-        this.skippedIssue = true;
-        this.currentStep = 2;
-      } else if (step < 5) {
-        this.currentStep++;
-      } else {
-        this.generateResults();
-        this.showResults = true;
       }
     },
 
