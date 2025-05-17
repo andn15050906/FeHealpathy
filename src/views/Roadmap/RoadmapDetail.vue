@@ -261,6 +261,7 @@ export default {
       4: false,
       5: false,
     });
+    const loading = ref(true);
 
     const getStorageKey = () => `completedPhases_roadmap_${props.id}`;
 
