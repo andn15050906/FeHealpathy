@@ -65,10 +65,15 @@
                         step="1000" placeholder="Nhập giá khóa học" required />
                       <small class="text-muted">Giá tối thiểu: 10,000 VND</small>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                       <label for="courseDiscount" class="form-label fw-medium">Giảm giá (%)</label>
                       <input type="number" class="form-control" id="courseDiscount" v-model="course.discount" min="0"
                         max="100" step="1" placeholder="0-100%" />
+                    </div>
+                    <div class="col-md-4">
+                      <label for="discountExpiry" class="form-label fw-medium">Ngày hết hạn giảm giá</label>
+                      <input type="date" class="form-control" id="discountExpiry" v-model="course.discountExpiry" 
+                        :min="minDiscountDate" required />
                     </div>
                   </div>
 
@@ -136,37 +141,9 @@
                 </div>
 
                 <div class="mb-4">
-                  <label class="form-label fw-medium">Tính năng khóa học</label>
-                  <div class="feature-list p-3 border rounded">
-                    <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="hasCertificate"
-                        v-model="course.hasCertificate" />
-                      <label class="form-check-label" for="hasCertificate">
-                        Chứng chỉ hoàn thành
-                      </label>
-                    </div>
-                    <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="hasDownloadable"
-                        v-model="course.hasDownloadable" />
-                      <label class="form-check-label" for="hasDownloadable">
-                        Hỗ trợ trực tiếp với cố vấn
-                      </label>
-                    </div>
-                    <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" id="hasAssignments"
-                        v-model="course.hasAssignments" />
-                      <label class="form-check-label" for="hasAssignments">
-                        Cộng đồng cùng phát triển
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="hasForumSupport"
-                        v-model="course.hasForumSupport" />
-                      <label class="form-check-label" for="hasForumSupport">
-                        Hỗ trợ chuyên sâu
-                      </label>
-                    </div>
-                  </div>
+                  <label for="courseAdvisorExpectedOutcome" class="form-label fw-medium">Sau khóa học, học viên nhận được gì?</label>
+                  <textarea class="form-control" id="coursePrerequisites" v-model="course.prerequisites" rows="3"
+                    placeholder=""></textarea>
                 </div>
 
                 <div class="mb-4">
@@ -178,7 +155,17 @@
                 <div class="mb-4">
                   <label for="courseTargetAudience" class="form-label fw-medium">Mục tiêu khóa học</label>
                   <textarea class="form-control" id="courseTargetAudience" v-model="course.targetAudience" rows="3"
-                    placeholder="Khóa học này dành cho ai?"></textarea>
+                    placeholder=""></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label for="courseCompletionTime" class="form-label fw-medium">Thời gian hoàn thành</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="courseCompletionTime" v-model="course.completionTime" 
+                      min="1" placeholder="Nhập số giờ" />
+                    <span class="input-group-text">giờ</span>
+                  </div>
+                  <small class="text-muted">Thời gian ước tính để học viên hoàn thành khóa học</small>
                 </div>
               </div>
             </div>
@@ -262,64 +249,6 @@
                                   placeholder="Nhập nội dung chi tiết của bài giảng"></textarea>
                               </div>
 
-                              <div v-if="lecture.type === 'Quiz'" class="quiz-content">
-                                <h6 class="mb-3 fw-medium">Câu hỏi trắc nghiệm</h6>
-                                <div v-for="(question, qIndex) in lecture.questions" :key="qIndex"
-                                  class="question-item p-4 border rounded mb-4 bg-light">
-                                  <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="mb-0 fw-medium">Câu hỏi {{ qIndex + 1 }}</h6>
-                                    <button type="button" class="btn btn-sm btn-outline-danger"
-                                      @click="removeQuestion(index, qIndex)">
-                                      <i class="bi bi-trash me-1"></i> Xóa
-                                    </button>
-                                  </div>
-                                  <input type="text" class="form-control mb-3" v-model="question.text"
-                                    placeholder="Nhập câu hỏi" />
-
-                                  <div class="answers">
-                                    <p class="fw-medium mb-2">Các câu trả lời:</p>
-                                    <div v-for="(answer, aIndex) in question.answers" :key="aIndex"
-                                      class="answer-item d-flex align-items-center mb-3">
-                                      <input type="radio" class="form-check-input me-2" :name="`question${qIndex}`"
-                                        :checked="answer.isCorrect" @change="setCorrectAnswer(index, qIndex, aIndex)" />
-                                      <input type="text" class="form-control" v-model="answer.text"
-                                        placeholder="Nhập câu trả lời" />
-                                      <button type="button" class="btn-close ms-2"
-                                        @click="removeAnswer(index, qIndex, aIndex)"></button>
-                                    </div>
-                                  </div>
-
-                                  <button type="button" class="btn btn-outline-primary btn-sm mt-2"
-                                    @click="addAnswer(index, qIndex)">
-                                    <i class="bi bi-plus me-1"></i> Thêm câu trả lời
-                                  </button>
-                                </div>
-
-                                <button type="button" class="btn btn-outline-primary" @click="addQuestion(index)">
-                                  <i class="bi bi-plus-circle me-2"></i> Thêm câu hỏi
-                                </button>
-                              </div>
-
-                              <div v-if="lecture.type === 'Assignment'" class="assignment-content">
-                                <h6 class="mb-3 fw-medium">Chọn loại bài tập</h6>
-                                <p class="text-muted fst-italic mb-3">Các công cụ này hoàn toàn miễn phí trong hệ thống,
-                                  hãy khuyến khích học viên sử dụng nhé!</p>
-                                <div class="assignment-types">
-                                  <div class="row g-3">
-                                    <div class="col-md-6" v-for="(type, typeIndex) in assignmentTypes" :key="typeIndex">
-                                      <div class="assignment-type-item p-3 border rounded h-100"
-                                        :class="{ 'selected border-primary bg-light': lecture.assignmentType === type.value }"
-                                        @click="selectAssignmentType(index, type.value)">
-                                        <div class="d-flex align-items-center mb-2">
-                                          <i :class="type.icon + ' me-2 fs-4 text-primary'"></i>
-                                          <h6 class="mb-0 fw-medium">{{ type.label }}</h6>
-                                        </div>
-                                        <p class="text-muted small mb-0">{{ type.description }}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
                             </div>
                           </div>
 
@@ -332,8 +261,6 @@
                                 <select class="form-select" :id="`lectureType${index}`" v-model="lecture.type">
                                   <option value="Video">Tài nguyên (Video/Hình Ảnh/Tài Liệu)</option>
                                   <option value="Text">Văn bản</option>
-                                  <option value="Quiz">Trắc nghiệm</option>
-                                  <option value="Assignment">Bài tập</option>
                                 </select>
                               </div>
 
@@ -413,9 +340,12 @@ export default {
         description: "",
         price: 0,
         priceType: "free",
+        discount: 0,
+        discountExpiry: "",
         level: "",
         outcomes: "",
         requirements: "",
+        completionTime: "",
         thumb: { url: "", file: null, title: "" },
         leafCategoryId: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
         lectures: []
@@ -464,13 +394,25 @@ export default {
           label: 'Nhắn tin cộng đồng',
           description: 'Kết nối và chia sẻ với cộng đồng'
         }
-      ]
+      ],
+      minDiscountDate: (() => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString().split('T')[0];
+      })()
     };
   },
   watch: {
     'course.priceType': function (newValue) {
       if (newValue === 'free') {
         this.course.price = 0;
+        this.course.discount = 0;
+        this.course.discountExpiry = "";
+      }
+    },
+    'course.discount': function (newValue) {
+      if (newValue === 0) {
+        this.course.discountExpiry = "";
       }
     }
   },
@@ -518,9 +460,7 @@ export default {
         contentSummary: "",
         isPreviewable: false,
         type: "Video",
-        medias: [],
-        questions: [],
-        assignmentType: null
+        medias: []
       });
 
       this.$nextTick(() => {
@@ -568,7 +508,22 @@ export default {
     },
 
     validateForm() {
-      //TODO: Implement form validation logic later
+      if (this.course.discount > 0 && !this.course.discountExpiry) {
+        toast.error("Vui lòng chọn ngày hết hạn giảm giá!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+
+      if (this.course.discount > 0 && new Date(this.course.discountExpiry) <= new Date()) {
+        toast.error("Ngày hết hạn giảm giá phải sau ngày hiện tại!", {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT
+        });
+        return false;
+      }
+
       return true;
     },
 
@@ -648,9 +603,12 @@ export default {
         description: "",
         price: 0,
         priceType: "free",
+        discount: 0,
+        discountExpiry: "",
         level: "",
         outcomes: "",
         requirements: "",
+        completionTime: "",
         thumb: { url: "", file: null, title: "" },
         leafCategoryId: "",
         lectures: []
