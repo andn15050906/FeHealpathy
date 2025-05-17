@@ -62,10 +62,16 @@
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
             <PremiumBlocker></PremiumBlocker>
           </div>
+          <div v-else-if="isLoading">
+            <v-container class="d-flex justify-center align-center" style="height: 400px;">
+              <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+            </v-container>
+          </div>
           <RouterView v-else :key="$route.fullPath" @authenticated="handleAuthenticated"
             @addNotification="addNotification" @removeNotification="removeNotification" />
-
-          <!--<v-main :class="mainBackground">
+          
+          <!--DO NOT REMOVE THIS
+          <v-main :class="mainBackground">
             <v-container>
               <div v-if="currentPath">
                 <RoadmapContent :current-path="currentPath" @phase-completed="handlePhaseCompleted"
@@ -110,7 +116,7 @@ import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
 import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
-import { appData } from '@/scripts/data/roadmapData.js';
+import { getRoadmapSteps } from '@/scripts/data/roadmapData.js';
 import { getCourseById, getLectures, getEnrollments } from '@/scripts/api/services/courseService';
 
 const loadingSpinner = ref(null);
@@ -119,6 +125,14 @@ const router = useRouter();
 const isAuthenticated = ref(false);
 const roadmapProgress = ref(null);
 const isPremiumUser = ref(isPremium());
+const isLoading = ref(true);
+
+// App data
+const roadmapSteps = ref([]);
+const appData = ref({
+  moodThemeMap: {},
+  completionAssessmentResult: {}
+});
 
 provide('loadingSpinner', {
   showSpinner: () => loadingSpinner.value.showSpinner(),
@@ -154,6 +168,20 @@ provide('lectureManager', {
   getCurrentLectureIndex: () => currentLectureIndex.value
 });
 
+const fetchAppData = async () => {
+  try {
+    roadmapSteps.value = await getRoadmapSteps();
+    
+    // Set initial theme
+    setTheme(appData.value.moodThemeMap[selectedMood.value] || 'refreshing');
+    
+    isLoading.value = false;
+  } catch (error) {
+    console.error('Error fetching app data:', error);
+    isLoading.value = false;
+  }
+};
+
 onMounted(async () => {
   router.beforeEach((to, from, next) => {
     loadingSpinner.value?.showSpinner();
@@ -169,7 +197,7 @@ onMounted(async () => {
   if (await getUserProfile())
     isAuthenticated.value = true;
 
-  setTheme(appData.moodThemeMap[selectedMood.value] || 'refreshing');
+  await fetchAppData();
 });
 
 const isAuthAndShown = computed(() => {
@@ -240,9 +268,11 @@ const toggleSidebar = () => {
 // Status popup state
 const selectedMood = ref('neutral')
 
+// Theme update based on mood
+const moodThemeMap = computed(() => appData.value.moodThemeMap || {});
 
 watch(selectedMood, (newMood) => {
-  setTheme(appData.moodThemeMap[newMood] || 'refreshing');
+  setTheme(moodThemeMap.value[newMood] || 'refreshing');
 });
 
 const showRouteCompletion = ref(false)
@@ -257,7 +287,7 @@ const totalRequiredActions = ref(0)
 const actionHistory = ref([])
 
 // Completion assessment result
-const completionAssessmentResult = ref(appData.completionAssessmentResult)
+const completionAssessmentResult = computed(() => appData.value.completionAssessmentResult || {})
 
 const handlePathSelected = (path) => {
   currentPath.value = path
@@ -508,7 +538,7 @@ main {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  /*align-items: center; DO NOT CHANGE THIS LINE - will break login screen*/
+  /*DO NOT CHANGE THIS LINE - will break login screen align-items: center;  */
   background-repeat: no-repeat;
   background-size: 100% 100vh;
   background-position: center top;

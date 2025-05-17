@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { roadmapSteps, completionData } from "@/scripts/data/roadmapData.js";
+import { getRoadmapSteps, getCompletionData } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapCompletion",
@@ -130,16 +130,32 @@ export default {
   },
   data() {
     return {
-      roadmapSteps: roadmapSteps.map((step) => ({
-        ...step,
-        completed: true,
-      })),
+      roadmapSteps: [],
       improvement: null,
       showCoupon: false,
-      completionStats: completionData.statistics,
-      couponData: completionData,
-      advancedRoadmaps: completionData.advancedRoadmaps
+      completionStats: {},
+      couponData: {},
+      advancedRoadmaps: []
     };
+  },
+  async created() {
+    try {
+      const [stepsData, completionDataResult] = await Promise.all([
+        getRoadmapSteps(),
+        getCompletionData()
+      ]);
+      
+      this.roadmapSteps = stepsData.map(step => ({
+        ...step,
+        completed: true,
+      }));
+      
+      this.completionStats = completionDataResult.statistics;
+      this.couponData = completionDataResult;
+      this.advancedRoadmaps = completionDataResult.advancedRoadmaps;
+    } catch (error) {
+      console.error("Error fetching completion data:", error);
+    }
   },
   methods: {
     submitSurvey() {

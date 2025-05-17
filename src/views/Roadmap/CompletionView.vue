@@ -159,7 +159,7 @@
 <script>
 import RoadmapSidebar from "@/components/RoadmapSidebar.vue";
 import RoadmapHeader from "@/components/RoadmapHeader.vue";
-import { completionViewData } from "@/scripts/data/roadmapData.js";
+import { getCompletionViewData } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "CompletionView",
@@ -171,12 +171,31 @@ export default {
     return {
       improvement: null,
       showCoupon: false,
-      roadmapSteps: completionViewData.roadmapSteps,
-      improvementOptions: completionViewData.improvementOptions,
-      statistics: completionViewData.statistics,
-      coupon: completionViewData.coupon,
-      advancedRoadmaps: completionViewData.advancedRoadmaps
+      roadmapSteps: [],
+      improvementOptions: [],
+      statistics: {
+        daysActive: 0,
+        actionsCompleted: 0,
+        emotionalImprovement: 0
+      },
+      coupon: {
+        code: "",
+        description: ""
+      },
+      advancedRoadmaps: []
     };
+  },
+  async created() {
+    try {
+      const data = await getCompletionViewData();
+      this.roadmapSteps = data.roadmapSteps;
+      this.improvementOptions = data.improvementOptions;
+      this.statistics = data.statistics;
+      this.coupon = data.coupon;
+      this.advancedRoadmaps = data.advancedRoadmaps;
+    } catch (error) {
+      console.error('Error fetching completion view data:', error);
+    }
   },
   methods: {
     submitSurvey() {

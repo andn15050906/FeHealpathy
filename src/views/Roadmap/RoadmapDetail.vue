@@ -7,44 +7,39 @@
         Quay lại danh sách lộ trình
       </v-btn>
 
-      <!-- Lời chào và động viên -->
-      <div v-if="roadmap" class="healing-header mb-4">
-        <h2 class="text-h5 font-weight-bold mb-1" style="color: #6a39ca">
-          Chào mừng bạn đến với hành trình {{ roadmap.title }}
-        </h2>
-        <div class="text-body-1" style="color: #444">
-          Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ.
-          Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu
-          hành trình này.
-        </div>
-      </div>
-
-      <!-- Card advisor -->
-      <v-card class="advisor-card mb-6 d-flex align-center" style="max-width: 420px">
-        <v-avatar size="56" class="mr-3">
-          <img :src="advisorImg" alt="Advisor" />
-        </v-avatar>
-        <div>
-          <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
-          <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
-          <div class="text-body-2 mt-1" style="font-style: italic; color: #6a39ca">
-            "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+        <!-- Lời chào và động viên -->
+        <div v-if="roadmap" class="healing-header mb-4">
+          <h2 class="text-h5 font-weight-bold mb-1" style="color: #6a39ca">
+            Chào mừng bạn đến với hành trình {{ roadmap.title }}
+          </h2>
+          <div class="text-body-1" style="color: #444">
+            Bạn không đơn độc – chúng tôi sẽ đồng hành cùng bạn từng bước nhỏ.
+            Hãy tiến triển theo nhịp độ của riêng bạn và tự hào vì đã bắt đầu
+            hành trình này.
           </div>
         </div>
-        <v-spacer></v-spacer>
-        <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
-          <v-icon>mdi-message-text-outline</v-icon>
-        </v-btn>
-        <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
-          <v-icon>mdi-account-group-outline</v-icon>
-        </v-btn>
-      </v-card>
 
-      <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      </div>
+        <!-- Card advisor -->
+        <v-card class="advisor-card mb-6 d-flex align-center" style="max-width: 420px">
+          <v-avatar size="56" class="mr-3">
+            <img :src="advisorImg" alt="Advisor" />
+          </v-avatar>
+          <div>
+            <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
+            <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
+            <div class="text-body-2 mt-1" style="font-style: italic; color: #6a39ca">
+              "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+            </div>
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
+            <v-icon>mdi-message-text-outline</v-icon>
+          </v-btn>
+          <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
+            <v-icon>mdi-account-group-outline</v-icon>
+          </v-btn>
+        </v-card>
 
-      <div v-else-if="roadmap">
         <div class="d-flex align-center mb-6">
           <h1 class="text-h4 font-weight-bold">{{ roadmap.title }}</h1>
         </div>
@@ -139,8 +134,6 @@
             Bắt đầu lộ trình
           </v-btn>
         </div>
-      </div>
-
     </div>
   </div>
 </template>
@@ -148,9 +141,9 @@
 <script>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "@/scripts/logic/eventBus";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import advisorImg from "@/img/advisor.jpg";
-import { roadmapDetails } from "@/scripts/data/roadmapData.js";
+import { getRoadmapDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapDetail",
@@ -161,10 +154,15 @@ export default {
     },
   },
   setup(props) {
-    const route = useRoute();
     const router = useRouter();
-    const loading = ref(true);
-    const roadmap = ref(null);
+    const roadmap = ref({
+      id: "",
+      title: "",
+      description: "",
+      progress: 0,
+      introText: [],
+      phases: [],
+    });
     const completedPhases = ref({
       1: false,
       2: false,
@@ -231,23 +229,36 @@ export default {
       }
     };
 
-    const fetchRoadmap = () => {
-      // In a real app, this would be an API call
-      setTimeout(() => {
-        roadmap.value = roadmapDetails[props.id === "1" ? 1 : 2] || {
-          id: props.id,
-          title: "Lộ trình không tồn tại",
-          description: "Không tìm thấy lộ trình này",
-          progress: 0,
-          introText: ["Không có thông tin về lộ trình này."],
-          phases: []
-        };
+    const fetchRoadmap = async () => {
+      try {
+        const roadmapData = await getRoadmapDetails(props.id);
+        if (roadmapData) {
+          roadmap.value = roadmapData;
+        } else {
+          // Fallback if roadmap not found
+          roadmap.value = {
+            id: props.id,
+            title: "Lộ trình không tồn tại",
+            description: "Không tìm thấy lộ trình này",
+            progress: 0,
+            introText: ["Không có thông tin về lộ trình này."],
+            phases: []
+          };
+        }
 
         // Cập nhật trạng thái phase dựa trên completedPhases
         updatePhaseStatus();
-
-        loading.value = false;
-      }, 1000);
+      } catch (error) {
+        console.error("Error fetching roadmap details:", error);
+        roadmap.value = {
+          id: props.id,
+          title: "Đã xảy ra lỗi",
+          description: "Không thể tải thông tin lộ trình",
+          progress: 0,
+          introText: ["Đã xảy ra lỗi khi tải thông tin lộ trình."],
+          phases: []
+        };
+      }
     };
 
     const getPhaseColor = (phase) => {
@@ -308,7 +319,6 @@ export default {
     });
 
     return {
-      loading,
       roadmap,
       completedPhases,
       getPhaseColor,

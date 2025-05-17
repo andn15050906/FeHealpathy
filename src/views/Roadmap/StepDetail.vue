@@ -7,11 +7,7 @@
         Quay lại lộ trình
       </v-btn>
 
-      <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      </div>
-
-      <div v-else-if="phase">
+      <div if="phase">
         <div class="d-flex flex-column md:flex-row justify-space-between align-start mb-6">
           <div>
             <h1 class="text-h4 font-weight-bold">{{ phase.title }}</h1>
@@ -170,10 +166,10 @@
 
 <script>
 import PhaseCompletionDialog from "@/components/Roadmap/PhaseCompletionDialog.vue";
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEventBus } from '@/scripts/logic/eventBus';
-import { phaseDetails } from "@/scripts/data/roadmapData.js";
+import { getPhaseDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "StepDetail",
@@ -194,8 +190,22 @@ export default {
     const router = useRouter();
     const eventBus = useEventBus();
 
-    const loading = ref(true);
-    const phase = ref(null);
+    const phase = ref({
+        id: "",
+        roadmapId: "",
+        title: "",
+        description: "",
+        themeColor: "",
+        introduction: "",
+        videoUrl: "",
+        tips: [],
+        actions: [],
+        canSkip: false,
+        requireConfirmation: false,
+        nextPhaseId: "",
+        completionCriteria: [],
+        resources: [],
+      });
     const activeTab = ref("overview");
     const mood = ref(null);
     const skipReason = ref(null);
@@ -268,34 +278,36 @@ export default {
     const isLastPhase = computed(() => {
       return currentPhase.value === 5;
     });
-
-    const fetchPhaseDetails = () => {
-      // In a real app, this would be an API call
-      setTimeout(() => {
+    
+    const fetchPhaseDetails = async () => {
+      try {        
         // Xác định phase hiện tại dựa trên phaseId
         currentPhase.value = parseInt(props.phaseId);
         currentPhaseId.value = "phase" + currentPhase.value;
         
         var roadmapId = props.roadmapId;
+        // DO NOT CHANGE THIS - ADDED FOR TEST
         roadmapId = 1;
         
         // Lấy dữ liệu phase
-        if (phaseDetails[roadmapId] && phaseDetails[roadmapId][props.phaseId]) {
-          phase.value = JSON.parse(JSON.stringify(phaseDetails[roadmapId][props.phaseId]));
-          currentPhaseTitle.value = phase.value.title;
+        const phaseData = await getPhaseDetails(props.roadmapId, props.phaseId);
+        
+        if (phaseData) {
+          phase.value = phaseData;
+          currentPhaseTitle.value = phaseData.title;
           
           // Xác định phase tiếp theo
-          if (phase.value.nextPhaseId) {
-            nextPhase.value = parseInt(phase.value.nextPhaseId);
+          if (phaseData.nextPhaseId) {
+            nextPhase.value = parseInt(phaseData.nextPhaseId);
           }
           
           // Cập nhật dữ liệu cho dialog đánh giá phase
-          if (phase.value.completionCriteria) {
-            phaseCriteria.value = phase.value.completionCriteria;
+          if (phaseData.completionCriteria) {
+            phaseCriteria.value = phaseData.completionCriteria;
           }
           
-          if (phase.value.resources) {
-            phaseDocuments.value = phase.value.resources;
+          if (phaseData.resources) {
+            phaseDocuments.value = phaseData.resources;
           }
         } else {
           phase.value = {
@@ -311,9 +323,9 @@ export default {
 
         // Cập nhật trạng thái hoàn thành từ localStorage
         loadCompletedPhases();
-
-        loading.value = false;
-      }, 500);
+      } catch (error) {
+        console.error("Error fetching phase details:", error);
+      }
     };
 
     const viewActionDetails = (action) => {
@@ -387,7 +399,6 @@ export default {
 
     // Watch for changes in phaseId
     watch(() => props.phaseId, () => {
-      loading.value = true;
       fetchPhaseDetails();
       // Reset các giá trị khi chuyển phase
       mood.value = null;
@@ -411,7 +422,6 @@ export default {
     });
 
     return {
-      loading,
       phase,
       activeTab,
       mood,
