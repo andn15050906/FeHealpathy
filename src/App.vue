@@ -110,6 +110,8 @@ import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
 import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
+import { appData } from '@/scripts/data/roadmapData.js';
+import { getCourseById, getLectures, getEnrollments } from '@/scripts/api/services/courseService';
 
 const loadingSpinner = ref(null);
 const sweetAlert = ref(null);
@@ -167,7 +169,7 @@ onMounted(async () => {
   if (await getUserProfile())
     isAuthenticated.value = true;
 
-  setTheme(moodThemeMap[selectedMood.value] || 'refreshing');
+  setTheme(appData.moodThemeMap[selectedMood.value] || 'refreshing');
 });
 
 const isAuthAndShown = computed(() => {
@@ -202,13 +204,6 @@ const theme = useTheme()
 
 // Theme state
 const currentTheme = ref('refreshing')
-const availableThemes = [
-  { name: 'Calm', value: 'calm' },
-  { name: 'Refreshing', value: 'refreshing' },
-  { name: 'Energetic', value: 'energetic' },
-  { name: 'Focused', value: 'focused' },
-  { name: 'Peaceful', value: 'peaceful' }
-]
 
 const setTheme = (themeName) => {
   currentTheme.value = themeName
@@ -242,219 +237,12 @@ const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-// Roadmap steps data with highlighted activities
-const roadmapSteps = [
-  {
-    title: 'Self-Awareness',
-    mdiIcon: 'mdi-eye-outline',
-    description: 'The first step in your mental health journey is developing self-awareness. This involves recognizing your emotions, thoughts, and behaviors, and understanding how they affect your overall wellbeing.',
-    focusPoints: [
-      'Pay attention to your thoughts and feelings without judgment',
-      'Identify patterns in your emotional responses',
-      'Recognize your personal triggers and stressors',
-      'Understand how your mental state affects your daily life'
-    ],
-    activities: [
-      {
-        title: 'Daily Mood Journal',
-        description: 'Take 5 minutes each day to record your mood, energy levels, and any significant events.',
-        highlighted: true
-      },
-      {
-        title: 'Body Scan Meditation',
-        description: 'Practice a 10-minute body scan to increase awareness of physical sensations.',
-        highlighted: true
-      },
-      {
-        title: 'Thought Tracking',
-        description: 'Note recurring thoughts and identify any cognitive distortions.',
-        highlighted: false
-      },
-      {
-        title: 'Emotion Wheel Exercise',
-        description: 'Use an emotion wheel to expand your emotional vocabulary and awareness.',
-        highlighted: false
-      }
-    ]
-  },
-  {
-    title: 'Seeking Support',
-    mdiIcon: 'mdi-account-group-outline',
-    description: 'Reaching out for support is a sign of strength, not weakness. Building a support network can provide perspective, encouragement, and practical help during challenging times.',
-    focusPoints: [
-      'Identify trusted people in your life who can provide support',
-      'Learn about professional mental health resources available to you',
-      'Practice communicating your needs clearly',
-      'Understand the different types of support (emotional, practical, informational)'
-    ],
-    activities: [
-      {
-        title: 'Support Network Map',
-        description: 'Create a visual map of your support network, including friends, family, and professionals.',
-        highlighted: true
-      },
-      {
-        title: 'Resource Research',
-        description: 'Compile a list of local mental health resources, including crisis lines and counseling services.',
-        highlighted: false
-      },
-      {
-        title: 'Vulnerability Practice',
-        description: 'Start short conversations sharing your feelings with trusted individuals.',
-        highlighted: true
-      },
-      {
-        title: 'Support Group Exploration',
-        description: 'Research in-person or online support groups relevant to your specific challenges.',
-        highlighted: false
-      }
-    ]
-  },
-  {
-    title: 'Building Healthy Habits',
-    mdiIcon: 'mdi-heart-outline',
-    description: 'Developing consistent healthy habits creates a foundation for good mental health. Small, sustainable changes to your daily routine can have a significant positive impact over time.',
-    focusPoints: [
-      'Establish regular sleep patterns',
-      'Incorporate physical activity into your routine',
-      'Develop healthy eating habits',
-      'Create boundaries between work and personal time'
-    ],
-    activities: [
-      {
-        title: 'Sleep Hygiene Checklist',
-        description: 'Create and implement a bedtime routine to improve sleep quality.',
-        highlighted: true
-      },
-      {
-        title: 'Movement Calendar',
-        description: "Schedule regular physical activity that you enjoy, even if it's just a short daily walk.",
-        highlighted: true
-      },
-      {
-        title: 'Meal Planning',
-        description: 'Plan balanced meals that include mood-supporting foods like omega-3s and complex carbohydrates.',
-        highlighted: false
-      },
-      {
-        title: 'Digital Boundaries',
-        description: 'Set specific times to disconnect from work emails and notifications.',
-        highlighted: false
-      }
-    ]
-  },
-  {
-    title: 'Developing Coping Strategies',
-    mdiIcon: 'mdi-brain',
-    description: 'Effective coping strategies help you manage stress, regulate emotions, and navigate life\'s challenges. Building a diverse toolkit of healthy coping mechanisms is essential for resilience.',
-    focusPoints: [
-      'Identify your current coping mechanisms and assess if they\'re helpful or harmful',
-      'Learn and practice stress reduction techniques',
-      'Develop strategies for managing difficult emotions',
-      'Build problem-solving skills for addressing life challenges'
-    ],
-    activities: [
-      {
-        title: 'Coping Skills Inventory',
-        description: 'Create a list of healthy coping strategies to use in different situations.',
-        highlighted: false
-      },
-      {
-        title: 'Breathing Techniques',
-        description: 'Practice different breathing exercises for immediate stress relief.',
-        highlighted: true
-      },
-      {
-        title: 'Emotional Regulation Plan',
-        description: 'Develop a step-by-step plan for managing overwhelming emotions.',
-        highlighted: true
-      },
-      {
-        title: 'Cognitive Reframing',
-        description: 'Practice identifying negative thought patterns and reframing them more constructively.',
-        highlighted: false
-      }
-    ]
-  },
-  {
-    title: 'Maintaining Mental Wellness',
-    mdiIcon: 'mdi-white-balance-sunny',
-    description: 'Maintaining mental wellness is an ongoing process that requires attention and care. This stage focuses on integrating all you\'ve learned into a sustainable lifestyle that supports your mental health.',
-    focusPoints: [
-      'Regularly assess your mental health and adjust your self-care accordingly',
-      'Continue to strengthen your support network',
-      'Practice self-compassion and celebrate progress',
-      'Develop a long-term wellness plan that evolves with your needs'
-    ],
-    activities: [
-      {
-        title: 'Monthly Wellness Review',
-        description: 'Set aside time each month to reflect on your mental health and adjust your practices as needed.',
-        highlighted: true
-      },
-      {
-        title: 'Gratitude Practice',
-        description: 'Maintain a regular gratitude practice to foster positive emotions.',
-        highlighted: true
-      },
-      {
-        title: 'Values Alignment Check',
-        description: 'Periodically review whether your daily activities align with your core values.',
-        highlighted: false
-      },
-      {
-        title: 'Community Engagement',
-        description: 'Find ways to connect with and contribute to your community for a sense of purpose and belonging.',
-        highlighted: false
-      }
-    ]
-  }
-]
-
-// Current step state
-const currentStepIndex = ref(0)
-const currentStep = computed(() => roadmapSteps[currentStepIndex.value])
-const progressPercentage = computed(() => {
-  return Math.round(((currentStepIndex.value) / (roadmapSteps.length - 1)) * 100)
-})
-
-const selectStep = (index) => {
-  currentStepIndex.value = index
-}
-
 // Status popup state
 const selectedMood = ref('neutral')
 
-const moods = [
-  { label: 'Struggling', value: 'struggling' },
-  { label: 'Okay', value: 'okay' },
-  { label: 'Neutral', value: 'neutral' },
-  { label: 'Good', value: 'good' },
-  { label: 'Great', value: 'great' }
-]
-
-const challenges = [
-  'Anxiety or worry',
-  'Low mood or sadness',
-  'Sleep difficulties',
-  'Concentration problems',
-  'Work/study stress',
-  'Relationship challenges',
-  'Loneliness or isolation',
-  'Physical health concerns'
-]
-
-// Theme update based on mood
-const moodThemeMap = {
-  'struggling': 'calm',
-  'okay': 'peaceful',
-  'neutral': 'refreshing',
-  'good': 'focused',
-  'great': 'energetic'
-};
 
 watch(selectedMood, (newMood) => {
-  setTheme(moodThemeMap[newMood] || 'refreshing');
+  setTheme(appData.moodThemeMap[newMood] || 'refreshing');
 });
 
 const showRouteCompletion = ref(false)
@@ -469,26 +257,7 @@ const totalRequiredActions = ref(0)
 const actionHistory = ref([])
 
 // Completion assessment result
-const completionAssessmentResult = ref({
-  sentiment: 'Positive',
-  summary: 'You have made significant progress in your mental health journey.',
-  stats: {
-    daysActive: 24,
-    actionsCompleted: 42,
-    consistency: 85
-  },
-  achievements: [
-    'Established a regular mindfulness practice',
-    'Improved sleep quality',
-    'Developed effective stress management techniques',
-    'Built a stronger support network'
-  ],
-  improvementAreas: [
-    'Consistency in daily practice',
-    'Managing stress during high-pressure situations',
-    'Building more social connections'
-  ]
-})
+const completionAssessmentResult = ref(appData.completionAssessmentResult)
 
 const handlePathSelected = (path) => {
   currentPath.value = path
@@ -739,7 +508,7 @@ main {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  /*align-items: center; will break login screen*/
+  /*align-items: center; DO NOT CHANGE THIS LINE - will break login screen*/
   background-repeat: no-repeat;
   background-size: 100% 100vh;
   background-position: center top;

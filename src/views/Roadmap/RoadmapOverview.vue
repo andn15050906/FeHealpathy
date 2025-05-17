@@ -2,33 +2,18 @@
   <div class="roadmap-container">
     <div class="roadmap-content">
       <v-container fluid class="pt-16" style="margin-top: 15px;">
-        <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div>
-            <h1 class="text-h4 font-weight-bold text-gray-900">
-              Các lộ trình sức khỏe tinh thần
-            </h1>
-            <p class="text-subtitle-1 text-gray-600 mt-2">
-              Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng
-              biệt - an toàn, bảo mật và dành riêng cho bạn.
-            </p>
-          </div>
-          <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
-            style="font-weight:600; border-radius: 24px; width: 50%" @click="goToSuggestion">
-            Khám phá lộ trình phù hợp cho bạn </v-btn>
-        </div>
-
       <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h1 class="text-h4 font-weight-bold text-gray-900">
             Các lộ trình sức khỏe tinh thần
           </h1>
           <p class="text-subtitle-1 text-gray-600 mt-2">
-            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng biệt
-            – an toàn, bảo mật và dành riêng cho bạn.
+              Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng
+              biệt - an toàn, bảo mật và dành riêng cho bạn.
           </p>
         </div>
         <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
-          style="font-weight:600; border-radius: 24px; min-width: 220px;" @click="goToSuggestion">
+          style="font-weight:600; border-radius: 24px; width: 50%" @click="goToSuggestion">
           Khám phá lộ trình phù hợp cho bạn </v-btn>
       </div>
 
@@ -56,25 +41,6 @@
         </v-window-item>
       </v-window>
 
-        <v-tabs v-model="activeTab" class="mb-6">
-          <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
-          <v-tab value="all">Tất cả lộ trình</v-tab>
-        </v-tabs>
-
-        <v-window v-model="activeTab">
-          <v-window-item value="suggested">
-            <div class="roadmap-grid">
-              <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
-                @view="viewRoadmap" />
-            </div>
-          </v-window-item>
-
-          <v-window-item value="all">
-            <div class="roadmap-grid">
-              <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
-            </div>
-          </v-window-item>
-        </v-window>
       </v-container>
     </div>
   </div>

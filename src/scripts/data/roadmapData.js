@@ -1,4 +1,3 @@
-// Roadmap steps (used in multiple components)
 export const roadmapSteps = [
   {
     id: 1,
@@ -948,6 +947,121 @@ export const completionData = {
   },
   couponCode: "MENTAL25",
   couponDescription: 'Sử dụng mã này để được giảm 25% cho khóa học "Tâm lý học ứng dụng" của chúng tôi',
+  advancedRoadmaps: [
+    {
+      title: "Lộ trình nâng cao: Vượt qua lo âu",
+      description: "Các kỹ thuật nâng cao để đối phó với lo âu mãn tính",
+    },
+    {
+      title: "Thiền định hàng ngày",
+      description: "Xây dựng thói quen thiền định để cải thiện sức khỏe tinh thần",
+    },
+  ],
+}
+
+// App.vue data
+export const appData = {
+  moods: [
+    { label: "Struggling", value: "struggling" },
+    { label: "Okay", value: "okay" },
+    { label: "Neutral", value: "neutral" },
+    { label: "Good", value: "good" },
+    { label: "Great", value: "great" },
+  ],
+  challenges: [
+    "Anxiety or worry",
+    "Low mood or sadness",
+    "Sleep difficulties",
+    "Concentration problems",
+    "Work/study stress",
+    "Relationship challenges",
+    "Loneliness or isolation",
+    "Physical health concerns",
+  ],
+  moodThemeMap: {
+    struggling: "calm",
+    okay: "peaceful",
+    neutral: "refreshing",
+    good: "focused",
+    great: "energetic",
+  },
+  availableThemes: [
+    { name: "Calm", value: "calm" },
+    { name: "Refreshing", value: "refreshing" },
+    { name: "Energetic", value: "energetic" },
+    { name: "Focused", value: "focused" },
+    { name: "Peaceful", value: "peaceful" },
+  ],
+  completionAssessmentResult: {
+    sentiment: "Positive",
+    summary: "You have made significant progress in your mental health journey.",
+    stats: {
+      daysActive: 24,
+      actionsCompleted: 42,
+      consistency: 85,
+    },
+    achievements: [
+      "Established a regular mindfulness practice",
+      "Improved sleep quality",
+      "Developed effective stress management techniques",
+      "Built a stronger support network",
+    ],
+    improvementAreas: [
+      "Consistency in daily practice",
+      "Managing stress during high-pressure situations",
+      "Building more social connections",
+    ],
+  },
+}
+
+// CompletionView.vue data
+export const completionViewData = {
+  roadmapSteps: [
+    {
+      id: 1,
+      title: "Self-Awareness",
+      completed: true,
+      icon: "mdi-eye-outline",
+    },
+    {
+      id: 2,
+      title: "Seeking Support",
+      completed: true,
+      icon: "mdi-hand-heart-outline",
+    },
+    {
+      id: 3,
+      title: "Building Healthy Habits",
+      completed: true,
+      icon: "mdi-sprout-outline",
+    },
+    {
+      id: 4,
+      title: "Developing Coping Strategies",
+      completed: true,
+      icon: "mdi-brain",
+    },
+    {
+      id: 5,
+      title: "Maintaining Mental Wellness",
+      completed: true,
+      icon: "mdi-heart-pulse",
+    },
+  ],
+  improvementOptions: [
+    { label: "Tôi đã cải thiện một chút", value: "little" },
+    { label: "Tôi đã cải thiện kha khá", value: "moderate" },
+    { label: "Tôi đã cải thiện rất nhiều", value: "significant" },
+  ],
+  statistics: {
+    daysActive: 14,
+    actionsCompleted: 23,
+    emotionalImprovement: 68,
+  },
+  coupon: {
+    code: "MENTAL25",
+    description: 'Sử dụng mã này để được giảm 25% cho khóa học "Tâm lý học ứng dụng" của chúng tôi',
+  },
   advancedRoadmaps: [
     {
       title: "Lộ trình nâng cao: Vượt qua lo âu",
