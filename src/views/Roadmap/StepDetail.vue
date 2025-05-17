@@ -290,7 +290,7 @@ export default {
         roadmapId = 1;
         
         // Lấy dữ liệu phase
-        const phaseData = await getPhaseDetails(props.roadmapId, props.phaseId);
+        const phaseData = await getPhaseDetails(roadmapId, props.phaseId);
         
         if (phaseData) {
           phase.value = phaseData;

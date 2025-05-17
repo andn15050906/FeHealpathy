@@ -159,7 +159,6 @@ export default {
       id: "",
       title: "",
       description: "",
-      progress: 0,
       introText: [],
       phases: [],
     });
@@ -240,7 +239,6 @@ export default {
             id: props.id,
             title: "Lộ trình không tồn tại",
             description: "Không tìm thấy lộ trình này",
-            progress: 0,
             introText: ["Không có thông tin về lộ trình này."],
             phases: []
           };
@@ -254,7 +252,6 @@ export default {
           id: props.id,
           title: "Đã xảy ra lỗi",
           description: "Không thể tải thông tin lộ trình",
-          progress: 0,
           introText: ["Đã xảy ra lỗi khi tải thông tin lộ trình."],
           phases: []
         };
