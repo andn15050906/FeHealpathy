@@ -1,38 +1,52 @@
-import { get, post, patch, del } from '@/scripts/api/apiClients';
 import { getUserProfile } from "@/scripts/api/services/authService";
 import { getProgress } from '@/scripts/api/services/statisticsService';
+import { get, post, patch, del } from "@/scripts/api/apiClients"
 
-const API_BASE_URL = '/Roadmaps';
+const API_BASE_URL = "/Roadmaps"
 
 export const getRoadmaps = async (queryParams = {}) => {
-    return await get(`${API_BASE_URL}`, queryParams);    
-};
-
-export const createRoadmap = async (roadmapData) => {
-    return await post(`${API_BASE_URL}`, roadmapData);
-};
-
-export const updateRoadmap = async (roadmapData) => {
-    return await patch(`${API_BASE_URL}`, roadmapData);
-};
-
-export const deleteRoadmap = async (roadmapId) => {
-    return await del(`${API_BASE_URL}/${roadmapId}`);
-};
-
-
-export const getRoadmapById = async (id) => {
   try {
-    const response = await get(`${API_BASE_URL}/${id}`);
-    return response;
+    const response = await get(API_BASE_URL, queryParams)
+
+    if (!Array.isArray(response)) {
+      console.warn("Unexpected roadmap response format", response)
+      return []
+    }
+
+    return response
   } catch (error) {
-    console.error('Error fetching roadmap:', error);
-    throw error;
+    console.error("Error fetching roadmaps:", error)
+    return []
   }
-};
+}
 
+export const getRoadmapSteps = async () => {
+  try {
+    const response = await get(`${API_BASE_URL}/roadmap-steps`)
+    if (!Array.isArray(response)) {
+      return []
+    }
+    return response
+  } catch (error) {
+    return []
+  }
+}
 
+export const createRoadmap = async (data) => post(API_BASE_URL, data)
+export const updateRoadmap = async (data) => patch(API_BASE_URL, data)
+export const deleteRoadmap = async (id) => del(`${API_BASE_URL}/${id}`)
+export const getRoadmapById = async (id) => get(`${API_BASE_URL}/details/${id}`)
+export const getPhaseDetails = async (roadmapId, phaseId) =>
+  get(`${API_BASE_URL}/phase`, { roadmapId, phaseId })
+export const getStepDetails = async (stepId) =>
+  get(`${API_BASE_URL}/phase/${stepId}`)
+export const getCompletionData = async () => get(`${API_BASE_URL}/completion`)
+export const getCompletionViewData = async () =>
+  get(`${API_BASE_URL}/completion-view`)
+export const getSuggestionData = async () =>
+  get(`${API_BASE_URL}/suggestions`)
 
+// old code
 export const getCurrentRoadmapWithProgress = async () => {
   let roadmapPromise = getRoadmaps();
   let progressPromise = getProgress();
