@@ -90,3 +90,10 @@ export const getRecommendationCourses = async (queryParams) => {
   return await getML(`${API_COURSE_RECOMMENDATION}`, queryParams);
 };
 
+export const getEnrollments = () => {
+  return [];
+}
+
+export const getLectures = () => {
+  return [];
+}

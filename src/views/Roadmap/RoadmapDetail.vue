@@ -19,32 +19,27 @@
         </div>
       </div>
 
-      <!-- Card advisor -->
-      <v-card class="advisor-card mb-6 d-flex align-center" style="max-width: 420px">
-        <v-avatar size="56" class="mr-3">
-          <img :src="advisorImg" alt="Advisor" />
-        </v-avatar>
-        <div>
-          <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
-          <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
-          <div class="text-body-2 mt-1" style="font-style: italic; color: #6a39ca">
-            "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+        <!-- Card advisor -->
+        <v-card class="advisor-card mb-6 d-flex align-center" style="max-width: 420px">
+          <v-avatar size="56" class="mr-3">
+            <img :src="advisorImg" alt="Advisor" />
+          </v-avatar>
+          <div>
+            <div class="font-weight-bold">TS. Nguyễn An Tâm</div>
+            <div class="text-caption">Chuyên gia tâm lý trị liệu</div>
+            <div class="text-body-2 mt-1" style="font-style: italic; color: #6a39ca">
+              "Bạn xứng đáng được sống bình an. Hãy kiên nhẫn với chính mình."
+            </div>
           </div>
-        </div>
-        <v-spacer></v-spacer>
-        <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
-          <v-icon>mdi-message-text-outline</v-icon>
-        </v-btn>
-        <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
-          <v-icon>mdi-account-group-outline</v-icon>
-        </v-btn>
-      </v-card>
+          <v-spacer></v-spacer>
+          <v-btn icon color="primary" class="ml-2" title="Nhắn tin cho chuyên gia (sắp ra mắt)">
+            <v-icon>mdi-message-text-outline</v-icon>
+          </v-btn>
+          <v-btn icon color="success" class="ml-1" title="Tham gia group chat hỗ trợ (sắp ra mắt)">
+            <v-icon>mdi-account-group-outline</v-icon>
+          </v-btn>
+        </v-card>
 
-      <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      </div>
-
-      <div v-else-if="roadmap">
         <div class="d-flex align-center mb-6">
           <h1 class="text-h4 font-weight-bold">{{ roadmap.title }}</h1>
         </div>
@@ -139,8 +134,6 @@
             Bắt đầu lộ trình
           </v-btn>
         </div>
-      </div>
-
     </div>
   </div>
 </template>
@@ -148,8 +141,9 @@
 <script>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useEventBus } from "@/scripts/logic/eventBus";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import advisorImg from "@/img/advisor.jpg";
+import { getRoadmapDetails } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "RoadmapDetail",
@@ -160,10 +154,14 @@ export default {
     },
   },
   setup(props) {
-    const route = useRoute();
     const router = useRouter();
-    const loading = ref(true);
-    const roadmap = ref(null);
+    const roadmap = ref({
+      id: "",
+      title: "",
+      description: "",
+      introText: [],
+      phases: [],
+    });
     const completedPhases = ref({
       1: false,
       2: false,
@@ -230,86 +228,34 @@ export default {
       }
     };
 
-    const fetchRoadmap = () => {
-      // In a real app, this would be an API call
-      setTimeout(() => {
-        roadmap.value = {
-          id: props.id,
-          title: props.id === "1" ? "Vượt qua lo âu" : "Xây dựng sự tự tin",
-          description:
-            "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
-          progress: 0,
-          introText: [
-            "Lộ trình này được thiết kế dựa trên các phương pháp đã được chứng minh hiệu quả trong việc hỗ trợ sức khỏe tinh thần.",
-            "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-            "Mỗi bước trong lộ trình sẽ cung cấp cho bạn các công cụ và kỹ thuật thực tế để cải thiện sức khỏe tinh thần.",
-          ],
-          phases: [
-            {
-              id: "1",
-              title: "Nhận diện vấn đề",
-              description:
-                "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
-              videoUrl: "/videos/phase1.mp4",
-              exerciseCount: 2,
-              completed: false,
-              current: true,
-              themeColor: "indigo",
-            },
-            {
-              id: "2",
-              title: "Giảm nhẹ tức thì",
-              description:
-                "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-              videoUrl: "/videos/phase2.mp4",
-              audioUrl: "/audio/relaxation.mp3",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "teal",
-            },
-            {
-              id: "3",
-              title: "Ổn định tâm trí",
-              description:
-                "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-              videoUrl: "/videos/phase3.mp4",
-              audioUrl: "/audio/meditation.mp3",
-              exerciseCount: 4,
-              completed: false,
-              current: false,
-              themeColor: "purple",
-            },
-            {
-              id: "4",
-              title: "Đối mặt với vấn đề",
-              description:
-                "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-              videoUrl: "/videos/phase4.mp4",
-              exerciseCount: 5,
-              completed: false,
-              current: false,
-              themeColor: "blue",
-            },
-            {
-              id: "5",
-              title: "Duy trì và phát triển",
-              description:
-                "Xây dựng kế hoạch duy trì lâu dài và tiếp tục phát triển",
-              videoUrl: "/videos/phase5.mp4",
-              exerciseCount: 3,
-              completed: false,
-              current: false,
-              themeColor: "green",
-            },
-          ],
-        };
+    const fetchRoadmap = async () => {
+      try {
+        const roadmapData = await getRoadmapDetails(props.id);
+        if (roadmapData) {
+          roadmap.value = roadmapData;
+        } else {
+          // Fallback if roadmap not found
+          roadmap.value = {
+            id: props.id,
+            title: "Lộ trình không tồn tại",
+            description: "Không tìm thấy lộ trình này",
+            introText: ["Không có thông tin về lộ trình này."],
+            phases: []
+          };
+        }
 
         // Cập nhật trạng thái phase dựa trên completedPhases
         updatePhaseStatus();
-
-        loading.value = false;
-      }, 1000);
+      } catch (error) {
+        console.error("Error fetching roadmap details:", error);
+        roadmap.value = {
+          id: props.id,
+          title: "Đã xảy ra lỗi",
+          description: "Không thể tải thông tin lộ trình",
+          introText: ["Đã xảy ra lỗi khi tải thông tin lộ trình."],
+          phases: []
+        };
+      }
     };
 
     const getPhaseColor = (phase) => {
@@ -370,7 +316,6 @@ export default {
     });
 
     return {
-      loading,
       roadmap,
       completedPhases,
       getPhaseColor,

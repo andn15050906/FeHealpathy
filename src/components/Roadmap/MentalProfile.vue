@@ -87,7 +87,7 @@
                   v-for="(day, i) in (profile.emotionalIndex && profile.emotionalIndex.length > 1 ? profile.emotionalIndex : [profile.emotionalIndex[0]])"
                   :key="i"
                   class="emotion-bar mx-1"
-                  :style="`height: ${day.value}%; width: 20%`"
+                  :style="`height: ${day ? day.value: 0}%; width: 20%`"
                 ></div>
               </v-sheet>
               <div class="d-flex justify-space-between mt-1">
@@ -96,7 +96,7 @@
                   :key="i"
                   class="text-caption"
                 >
-                  {{ formatDate(day.date) }}
+                  {{ day ? formatDate(day.date) : "" }}
                 </span>
               </div>
               <div v-if="!profile.emotionalIndex || profile.emotionalIndex.length <= 1" class="text-caption mt-2" style="color:#888;">
@@ -111,34 +111,57 @@
 </template>
 
 <script>
+import { getMentalProfileData } from "@/scripts/data/roadmapData.js";
+
 export default {
   name: "MentalProfile",
-  props: {
-    profile: {
-      type: Object,
-      required: true,
-    },
+  data() {
+    return {
+      profile: {
+        userType: "",
+        stressSource: "",
+        improvementGoal: "",
+        stressLevel: 0,
+        depressionRisk: 0,
+        emotionalIndex: []
+      }
+    };
   },
   computed: {
     personalAdvice() {
+      // Use either the prop profile or the locally fetched profile
+      const profileData = this.profile;
+      
+      // Return empty if no profile data is available yet
+      if (!profileData) return '';
+      
       // Đánh giá cá nhân hóa dựa trên profile
-      if (!this.profile) return '';
-      if (this.profile.stressLevel >= 70) {
+      if (profileData.stressLevel >= 70) {
         return "Bạn đang có mức độ căng thẳng cao. Hãy thử các bài tập thở sâu, nghỉ ngơi hợp lý và đừng ngần ngại chia sẻ với người thân hoặc chuyên gia.";
       }
-      if (this.profile.depressionRisk >= 70) {
+      if (profileData.depressionRisk >= 70) {
         return "Nguy cơ trầm cảm của bạn khá cao. Đừng tự chịu đựng một mình, hãy tìm kiếm sự hỗ trợ từ bạn bè, gia đình hoặc chuyên gia tâm lý.";
       }
-      if (this.profile.stressLevel < 30 && this.profile.depressionRisk < 30) {
+      if (profileData.stressLevel < 30 && profileData.depressionRisk < 30) {
         return "Tình trạng tâm lý của bạn khá ổn định. Hãy tiếp tục duy trì lối sống lành mạnh và quan tâm đến cảm xúc của mình nhé!";
       }
-      if (this.profile.userType === "Người đi làm" && this.profile.stressSource === "Công việc") {
+      if (profileData.userType === "Người đi làm" && profileData.stressSource === "Công việc") {
         return "Công việc có thể mang lại nhiều áp lực. Hãy cân bằng giữa công việc và cuộc sống, đừng quên dành thời gian cho bản thân.";
       }
-      if (this.profile.userType === "Học sinh/Sinh viên" && this.profile.stressSource === "Việc học") {
+      if (profileData.userType === "Học sinh/Sinh viên" && profileData.stressSource === "Việc học") {
         return "Áp lực học tập là điều ai cũng trải qua. Hãy chia nhỏ mục tiêu, nghỉ ngơi hợp lý và đừng ngại nhờ sự giúp đỡ từ thầy cô, bạn bè hoặc gia đình.";
       }
       return "Hãy lắng nghe cảm xúc của mình và đừng ngần ngại tìm kiếm sự hỗ trợ khi cần thiết. Chúng tôi luôn đồng hành cùng bạn!";
+    }
+  },
+  async created() {
+    // Only fetch data if no profile is provided via props
+    if (!this.profile || !this.profile.userType) {
+      try {
+        this.profile = await getMentalProfileData();
+      } catch (error) {
+        console.error("Error fetching mental profile data:", error);
+      }
     }
   },
   methods: {
@@ -165,22 +188,6 @@ export default {
       if (level < 30) return 'Nguy cơ thấp';
       if (level < 70) return 'Nguy cơ trung bình';
       return 'Nguy cơ cao';
-    },
-    calculateStressLevel() {
-      let level = 20;
-      if (this.answers.issue === 'study_pressure' || this.answers.issue === 'work_stress') level += 40;
-      if (this.answers.issue === 'bullying' || this.answers.issue === 'intern_stress') level += 30;
-      if (this.answers.issue === 'parent_conflict' || this.answers.issue === 'colleague_conflict') level += 20;
-      // ... các trường hợp khác
-      return Math.min(level, 100);
-    },
-    calculateDepressionRisk() {
-      let risk = 10;
-      if (this.answers.issue === 'loneliness' || this.answers.issue === 'no_close_friend') risk += 40;
-      if (this.answers.issue === 'no_motivation' || this.answers.issue === 'no_passion') risk += 30;
-      if (this.answers.related === 'myself') risk += 20;
-      // ... các trường hợp khác
-      return Math.min(risk, 100);
     }
   },
 };
