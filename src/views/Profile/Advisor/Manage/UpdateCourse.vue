@@ -102,7 +102,8 @@
                     </div>
                     <small class="text-muted">Kích thước khuyến nghị: 1280x720px (16:9)</small>
                     <div v-if="course.imagePreview || course.thumb.url" class="mt-3 border p-2 rounded">
-                      <img :src="course.imagePreview || course.thumb.url" class="img-thumbnail" style="max-height:200px" />
+                      <img :src="course.imagePreview || course.thumb.url" class="img-thumbnail"
+                        style="max-height:200px" />
                     </div>
                   </div>
 
@@ -234,7 +235,7 @@
                                   <small class="text-muted d-block mt-2">Hỗ trợ: Video, Hình ảnh, PDF, Word, PowerPoint,
                                     Excel</small>
                                 </div>
-                                
+
                                 <div v-if="lecture.medias && lecture.medias.length > 0" class="uploaded-files">
                                   <h6 class="mb-3 fw-medium">
                                     Tài nguyên hiện tại
@@ -243,10 +244,12 @@
                                     class="uploaded-file-item d-flex align-items-center p-3 border rounded mb-3 bg-light">
                                     <div class="d-flex align-items-center flex-grow-1">
                                       <div v-if="media.type === 1" class="me-3">
-                                        <img :src="media.url" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                                        <img :src="media.url" class="img-thumbnail"
+                                          style="width: 60px; height: 60px; object-fit: cover;" />
                                       </div>
                                       <div v-else-if="media.type === 2" class="me-3">
-                                        <video :src="media.url" class="border rounded" style="width: 60px; height: 60px; object-fit: cover;" controls></video>
+                                        <video :src="media.url" class="border rounded"
+                                          style="width: 60px; height: 60px; object-fit: cover;" controls></video>
                                       </div>
                                       <div v-else class="me-3">
                                         <i class="bi bi-file-earmark fs-1 text-secondary"></i>
@@ -265,7 +268,8 @@
                                   </div>
                                 </div>
 
-                                <div v-if="lecture.addedMedias && lecture.addedMedias.length > 0" class="uploaded-files mt-3">
+                                <div v-if="lecture.addedMedias && lecture.addedMedias.length > 0"
+                                  class="uploaded-files mt-3">
                                   <h6 class="mb-3 fw-medium">
                                     Tài nguyên mới thêm
                                   </h6>
@@ -273,10 +277,12 @@
                                     class="uploaded-file-item d-flex align-items-center p-3 border rounded mb-3 bg-success bg-opacity-10">
                                     <div class="d-flex align-items-center flex-grow-1">
                                       <div v-if="media.type === 1" class="me-3">
-                                        <img :src="media.preview" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                                        <img :src="media.preview" class="img-thumbnail"
+                                          style="width: 60px; height: 60px; object-fit: cover;" />
                                       </div>
                                       <div v-else-if="media.type === 2" class="me-3">
-                                        <video :src="media.preview" class="border rounded" style="width: 60px; height: 60px; object-fit: cover;" controls></video>
+                                        <video :src="media.preview" class="border rounded"
+                                          style="width: 60px; height: 60px; object-fit: cover;" controls></video>
                                       </div>
                                       <div v-else class="me-3">
                                         <i class="bi bi-file-earmark fs-1 text-secondary"></i>
@@ -427,6 +433,8 @@ export default {
         status: "Draft",
         leafCategoryId: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
         lectures: [],
+        imagePreview: null,
+        category: ""
       },
       categories: [
         { id: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac", name: "Student" },
@@ -522,6 +530,8 @@ export default {
           priceType: courseData.priceType || "paid",
           status: courseData.status || "Draft",
           leafCategoryId: courseData.leafCategoryId || "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
+          category: courseData.category || "",
+          imagePreview: courseData.thumbUrl || "",
           lectures: []
         };
 
@@ -536,6 +546,7 @@ export default {
           contentSummary: lecture.contentSummary || "",
           isPreviewable: lecture.isPreviewable || false,
           lectureType: lecture.lectureType || this.determineLectureType(lecture),
+          metaData: lecture.metaData || "",
           medias: (lecture.materials || lecture.medias || []).map((media) => ({
             id: media.id,
             type: media.type,
@@ -568,7 +579,7 @@ export default {
       } else if (lecture.content && lecture.content.trim().length > 0) {
         return "text";
       } else {
-        return "assignment";
+        return "video";
       }
     },
 
@@ -590,6 +601,7 @@ export default {
         contentSummary: "",
         isPreviewable: false,
         lectureType: "video",
+        metaData: "",
         medias: [],
         addedMedias: [],
         removedMedias: []
@@ -627,6 +639,7 @@ export default {
 
     performRemoveLecture(index) {
       const lecture = this.course.lectures[index];
+      const currentActive = this.activeTab;
 
       if (lecture.id) {
         this.deletedLectureIds.push(lecture.id);
@@ -638,10 +651,14 @@ export default {
       if (this.course.lectures.length === 0) {
         this.addLecture();
         this.activeTab = 0;
-      } else if (index === this.activeTab) {
-        this.activeTab = Math.max(0, index - 1);
-      } else if (index < this.activeTab) {
-        this.activeTab--;
+      } else if (index === currentActive) {
+        if (index === this.course.lectures.length) {
+          this.activeTab = Math.max(0, index - 1);
+        } else {
+          this.activeTab = Math.min(index, this.course.lectures.length - 1);
+        }
+      } else if (index < currentActive) {
+        this.activeTab = currentActive - 1;
       }
 
       toast.success(`Đã xóa bài giảng ${index + 1}`, {
@@ -656,6 +673,16 @@ export default {
         this.course.lectures[lectureIndex].removedMedias.push(media.id);
       }
       this.course.lectures[lectureIndex].medias.splice(mediaIndex, 1);
+
+      if (this.course.lectures[lectureIndex].medias.length === 0) {
+        toast.warning(
+          `Bài giảng ${lectureIndex + 1}: Vui lòng tải lên ít nhất một tài liệu`,
+          {
+            autoClose: 1000,
+            position: toast.POSITION.TOP_RIGHT,
+          }
+        );
+      }
     },
 
     handleImageUpload(event) {
@@ -677,13 +704,21 @@ export default {
       this.course.thumb.title = file.name;
 
       const reader = new FileReader();
-      reader.onload = (e) => (this.course.imagePreview = e.target.result);
+      reader.onload = (e) => {
+        this.course.imagePreview = e.target.result;
+      };
       reader.readAsDataURL(file);
     },
 
     handleLectureMediaUpload(event, lectureIndex) {
       const files = Array.from(event.target.files);
       files.forEach((file) => {
+        const fileType = file.type.startsWith("image")
+          ? "image"
+          : file.type.startsWith("video")
+            ? "video"
+            : "document";
+
         let mediaType;
         if (file.type.startsWith("image/")) {
           mediaType = 1;
@@ -695,16 +730,30 @@ export default {
 
         const reader = new FileReader();
         reader.onload = (e) => {
+          if (!this.course.lectures[lectureIndex].medias) {
+            this.course.lectures[lectureIndex].medias = [];
+          }
           if (!this.course.lectures[lectureIndex].addedMedias) {
             this.course.lectures[lectureIndex].addedMedias = [];
           }
-          this.course.lectures[lectureIndex].addedMedias.push({
+
+          const mediaItem = {
             type: mediaType,
             file: file,
             preview: e.target.result,
             url: "",
             title: file.name,
+          };
+
+          this.course.lectures[lectureIndex].medias.push({
+            type: fileType,
+            file: file,
+            preview: e.target.result,
+            url: "",
+            title: file.name,
           });
+
+          this.course.lectures[lectureIndex].addedMedias.push(mediaItem);
         };
         reader.readAsDataURL(file);
       });
@@ -714,38 +763,12 @@ export default {
       event.preventDefault();
       const files = event.dataTransfer.files;
       if (files.length > 0) {
-        this.onVideoSelected({ target: { files } }, index);
+        this.handleLectureMediaUpload({ target: { files } }, index);
       }
-    },
-
-    onVideoSelected(event, index) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (!file.type.startsWith("video/")) {
-        toast.error("Vui lòng chọn file video.");
-        return;
-      }
-
-      const lecture = this.course.lectures[index];
-      lecture.videoFile = file;
-      const newMedia = {
-        type: 2,
-        file: file,
-        title: file.name,
-        url: ""
-      };
-
-      lecture.addedMedias.push(newMedia);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        lecture.preview = e.target.result;
-      };
-      reader.readAsDataURL(file);
     },
 
     validateForm() {
-      return true;
+      return isValid;
     },
 
     saveCourse() {
@@ -763,9 +786,9 @@ export default {
     },
 
     async processSaveCourse() {
-      this.$refs.loadingSpinner.showSpinner();
-
       try {
+        this.$refs.loadingSpinner.showSpinner();
+
         const courseFormData = new FormData();
         courseFormData.append("Id", this.course.id);
         courseFormData.append("Title", this.course.title);
@@ -804,10 +827,15 @@ export default {
           formData.append("Id", lecture.id);
           formData.append("CourseId", this.course.id);
           formData.append("Title", lecture.title);
-          formData.append("Content", lecture.content);
           formData.append("ContentSummary", lecture.contentSummary);
           formData.append("IsPreviewable", lecture.isPreviewable);
           formData.append("LectureType", lecture.lectureType);
+
+          if (lecture.lectureType === 'text') {
+            formData.append("MetaData", lecture.content);
+          } else {
+            formData.append("MetaData", lecture.metaData || "");
+          }
 
           lecture.removedMedias.forEach((id, index) => {
             formData.append(`RemovedMedias[${index}]`, id);
@@ -829,10 +857,16 @@ export default {
           const formData = new FormData();
           formData.append("CourseId", this.course.id);
           formData.append("Title", lecture.title);
-          formData.append("Content", lecture.content);
           formData.append("ContentSummary", lecture.contentSummary);
           formData.append("IsPreviewable", lecture.isPreviewable);
           formData.append("LectureType", lecture.lectureType);
+          formData.append("Index", this.course.lectures.indexOf(lecture) + 1);
+
+          if (lecture.lectureType === 'text') {
+            formData.append("MetaData", lecture.content);
+          } else {
+            formData.append("MetaData", lecture.metaData || "");
+          }
 
           lecture.addedMedias.forEach((media, index) => {
             if (media.file) {
@@ -846,17 +880,19 @@ export default {
         }
 
         toast.success("Khóa học đã được cập nhật thành công!", {
-          autoClose: 3000,
+          autoClose: 1000,
           position: toast.POSITION.TOP_RIGHT,
         });
 
-        this.$router.push({
-          path: "/advisor/content",
-          query: {
-            updateSuccess: true,
-            message: "Khóa học đã được cập nhật thành công!", 
-          },
-        });
+        setTimeout(() => {
+          this.$router.push({
+            path: "/course-management",
+            query: {
+              updateSuccess: true,
+              message: "Khóa học đã được cập nhật thành công!",
+            },
+          });
+        }, 1500);
       } catch (error) {
         console.error("Error updating course:", error);
         toast.error("Đã xảy ra lỗi khi cập nhật khóa học.");
