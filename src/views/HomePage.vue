@@ -1,6 +1,6 @@
 <template>
-    <div class="home-container">
-        <main v-if="!isLoggedIn" class="main-content">
+    <div :class="{ 'home-container': true, 'home-background': isLoggedIn }">
+        <div v-if="!isLoggedIn" class="main-content">
             <!-- Phần landing page cho người chưa đăng nhập -->
             <section class="hero-section">
                 <h1 class="hero-title">{{ HomePage.Title }}</h1>
@@ -61,18 +61,10 @@
             </section>
             
             <AccountUpgrade></AccountUpgrade>
-        </main>
-        
-        <main v-if="isLoggedIn" class="main-content home-background">
+        </div>
+        <div v-else class="main-content">
             <!-- Dashboard cho người đã đăng nhập -->
             <v-container>
-                <v-row>
-                    <v-col cols="12">
-                        <h1 class="text-h4 mb-4">Xin chào, {{ user.fullName }}</h1>
-                    </v-col>
-                </v-row>
-                
-                <!-- Phần lời động viên và lời khuyên -->
                 <v-row>
                     <v-col cols="12" md="6">
                         <RecommendationCard
@@ -96,13 +88,31 @@
                 </v-row>
                 
                 <!-- Phần lộ trình cá nhân -->
-                <v-row>
+                <!--<v-row>
                     <v-col cols="12">
                         <PersonalRoadmap></PersonalRoadmap>
                     </v-col>
-                </v-row>
+                </v-row>-->
+                
+                <!-- Should be shown if the user does not have a roadmap-->
+                <v-container fluid class="pt-16" style="margin-top: 15px;">
+                    <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6" style="">
+                        <div>
+                            <h1 class="text-h4 font-weight-bold text-gray-900">
+                            Các lộ trình sức khỏe tinh thần
+                            </h1>
+                            <p class="text-subtitle-1 text-gray-600 mt-2">
+                            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng
+                            biệt - an toàn, bảo mật và dành riêng cho bạn.
+                            </p>
+                        </div>
+                        <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
+                            style="font-weight:600; border-radius: 24px; width: 50%" @click="goToSuggestion">
+                            Khám phá lộ trình phù hợp cho bạn </v-btn>
+                    </div>
+                </v-container>
             </v-container>
-        </main>
+        </div>
     </div>
 </template>
 
@@ -148,7 +158,7 @@ export default {
             setTimeout(() => {
                 this.dailyMotivation = {
                     content: "Mỗi bước nhỏ bạn thực hiện hôm nay đều đưa bạn gần hơn đến mục tiêu sức khỏe tinh thần tốt hơn.",
-                    source: "FeHealpathy"
+                    source: "Healpathy"
                 };
             }, 500);
         },
@@ -161,6 +171,9 @@ export default {
                     actionUrl: "/practice/breathing"
                 };
             }, 500);
+        },
+        goToSuggestion() {
+            this.$router.push("/suggest");
         }
     },
     data() {
@@ -236,12 +249,14 @@ export default {
 
 <style scoped>
 .home-container {
+    min-height: 100vh;
     background: #fff;
 }
 
 .home-background {
     background-image: radial-gradient(circle 369px at -2.9% 12.9%, rgba(247, 234, 163, 1) 0%, rgba(236, 180, 238, 0.56) 46.4%, rgba(163, 203, 247, 1) 100.7%);
     padding: 40px 80px !important;
+    margin-top: -30px;
 }
 
 .logo {
@@ -266,7 +281,7 @@ export default {
 .main-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 80px 20px;
 }
 
 .hero-section {
