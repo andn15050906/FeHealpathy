@@ -1,10 +1,11 @@
 <template>
   <div class="create-course-container">
-
     <SaveConfirmPopUp :message="saveMessage" :isVisible="showSaveConfirm" @confirmSave="onConfirmSave"
       @update:isVisible="showSaveConfirm = $event" />
     <DeleteConfirmPopup :message="deleteMessage" :isVisible="showDeleteConfirm" @confirmDelete="onConfirmDelete"
       @update:isVisible="showDeleteConfirm = $event" />
+    <CancelConfirmPopup :message="cancelMessage" :isVisible="showCancelConfirm" @confirmCancel="onConfirmCancel"
+      @update:isVisible="showCancelConfirm = $event" />
 
     <div class="header-section py-2">
       <div class="container-fluid">
@@ -35,18 +36,45 @@
                     <label for="courseName" class="form-label fw-medium">Tên khóa học <span
                         class="text-danger">*</span></label>
                     <input type="text" class="form-control form-control-lg" id="courseName" v-model="course.title"
-                      placeholder="Nhập tên khóa học" required />
+                      placeholder="Nhập tên khóa học" required
+                      :class="{ 'is-invalid': validationErrors.course.title }" />
+                    <div class="invalid-feedback" v-if="validationErrors.course.title">
+                      {{ validationErrors.course.title }}
+                    </div>
                   </div>
 
                   <div class="row mb-4">
-                    <div class="col-md-4">
-                      <label for="courseCategory" class="form-label fw-medium">Danh mục</label>
-                      <select class="form-select" id="courseCategory" v-model="course.category" required>
-                        <option value="" disabled>Chọn danh mục</option>
-                        <option value="Student">Học sinh</option>
-                        <option value="College">Sinh viên</option>
-                        <option value="Working">Người đi làm</option>
-                      </select>
+                    <div class="col-md-8">
+                      <label for="courseCategory" class="form-label fw-medium">Danh mục <span
+                          class="text-danger">*</span></label>
+                      <div class="position-relative" :class="{ 'is-invalid': validationErrors.course.category }">
+                        <div class="form-control d-flex flex-wrap gap-1 min-height-auto"
+                          @click="toggleCategoryDropdown">
+                          <div v-if="course.selectedCategories.length === 0" class="text-muted">Chọn danh mục</div>
+                          <div v-for="category in course.selectedCategories" :key="category.id"
+                            class="badge bg-primary d-flex align-items-center me-1 mb-1">
+                            {{ category.value }}
+                            <button type="button" class="btn-close btn-close-white ms-2"
+                              @click.stop="removeCategory(category)" style="font-size: 0.5rem"></button>
+                          </div>
+                        </div>
+                        <div v-show="showCategoryDropdown" class="dropdown-menu position-absolute w-100 show"
+                          style="max-height: 200px; overflow-y: auto;">
+                          <div class="p-2">
+                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Tìm kiếm danh mục"
+                              v-model="categorySearchTerm" @input="filterCategories">
+                          </div>
+                          <div v-if="filteredCategories.length === 0" class="dropdown-item disabled">Không tìm thấy danh
+                            mục</div>
+                          <button v-for="category in filteredCategories" :key="category.id" class="dropdown-item"
+                            type="button" @click.stop="selectCategory(category)">
+                            {{ category.value }}
+                          </button>
+                        </div>
+                      </div>
+                      <div class="invalid-feedback" v-if="validationErrors.course.category">
+                        {{ validationErrors.course.category }}
+                      </div>
                     </div>
                     <div class="col-md-4">
                       <label class="form-label fw-medium">Giá khóa học <span class="text-danger">*</span></label>
@@ -67,21 +95,33 @@
 
                   <div v-if="course.priceType === 'paid'" class="row mb-4">
                     <div class="col-md-4">
-                      <label for="coursePrice" class="form-label fw-medium">Giá tiền (VND) <span
-                          class="text-danger">*</span></label>
+                      <label for="coursePrice" class="form-label fw-medium">Giá tiền (VND)
+                        <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="coursePrice" v-model="course.price" min="10000"
-                        step="1000" placeholder="Nhập giá khóa học" required />
+                        step="1000" placeholder="Nhập giá khóa học" required
+                        :class="{ 'is-invalid': validationErrors.course.price }" />
+                      <div class="invalid-feedback" v-if="validationErrors.course.price">
+                        {{ validationErrors.course.price }}
+                      </div>
                       <small class="text-muted">Giá tối thiểu: 10,000 VND</small>
                     </div>
                     <div class="col-md-4">
                       <label for="courseDiscount" class="form-label fw-medium">Giảm giá (%)</label>
                       <input type="number" class="form-control" id="courseDiscount" v-model="course.discount" min="0"
-                        max="100" step="1" placeholder="0-100%" />
+                        max="100" step="1" placeholder="0-100%"
+                        :class="{ 'is-invalid': validationErrors.course.discount }" />
+                      <div class="invalid-feedback" v-if="validationErrors.course.discount">
+                        {{ validationErrors.course.discount }}
+                      </div>
                     </div>
                     <div class="col-md-4">
                       <label for="discountExpiry" class="form-label fw-medium">Ngày hết hạn giảm giá</label>
                       <input type="date" class="form-control" id="discountExpiry" v-model="course.discountExpiry"
-                        :min="minDiscountDate" :required="course.discount > 0" />
+                        :min="minDiscountDate" :required="course.discount > 0"
+                        :class="{ 'is-invalid': validationErrors.course.discountExpiry }" />
+                      <div class="invalid-feedback" v-if="validationErrors.course.discountExpiry">
+                        {{ validationErrors.course.discountExpiry }}
+                      </div>
                     </div>
                   </div>
 
@@ -89,7 +129,11 @@
                     <label for="courseDescription" class="form-label fw-medium">Mô tả <span
                         class="text-danger">*</span></label>
                     <textarea class="form-control" id="courseDescription" v-model="course.description" rows="4"
-                      placeholder="Mô tả khóa học" required></textarea>
+                      placeholder="Mô tả khóa học" required
+                      :class="{ 'is-invalid': validationErrors.course.description }"></textarea>
+                    <div class="invalid-feedback" v-if="validationErrors.course.description">
+                      {{ validationErrors.course.description }}
+                    </div>
                   </div>
 
                   <div class="mb-4">
@@ -97,10 +141,13 @@
                         class="text-danger">*</span></label>
                     <div class="input-group mb-2">
                       <input type="file" class="form-control" id="courseImage" @change="handleImageUpload"
-                        accept="image/*" required />
+                        accept="image/*" required :class="{ 'is-invalid': validationErrors.course.thumb }" />
                       <label class="input-group-text d-flex align-items-center" for="courseImage">
                         <UploadIcon class="icon me-1" /> Tải lên
                       </label>
+                    </div>
+                    <div class="invalid-feedback" v-if="validationErrors.course.thumb">
+                      {{ validationErrors.course.thumb }}
                     </div>
                     <small class="text-muted">Kích thước khuyến nghị: 1280x720px (16:9)</small>
 
@@ -143,21 +190,30 @@
               <div class="card-body">
                 <div class="mb-4">
                   <label for="courseDifficulty" class="form-label fw-medium">Trình độ</label>
-                  <select class="form-select" id="courseDifficulty" v-model="course.level" required>
+                  <select class="form-select" id="courseDifficulty" v-model="course.level" required
+                    :class="{ 'is-invalid': validationErrors.course.level }">
                     <option value="" disabled>Chọn trình độ</option>
                     <option value="1">Mới bắt đầu</option>
                     <option value="2">Trung bình</option>
                     <option value="3">Nâng cao</option>
                   </select>
+                  <div class="invalid-feedback" v-if="validationErrors.course.level">
+                    {{ validationErrors.course.level }}
+                  </div>
                 </div>
 
                 <div class="mb-4">
                   <label for="courseAdvisorExpectedOutcome" class="form-label fw-medium">
-                    Sau khóa học, học viên nhận được gì? <span class="text-danger">*</span>
+                    Sau khóa học, học viên nhận được gì?
+                    <span class="text-danger">*</span>
                   </label>
                   <textarea class="form-control" id="courseAdvisorExpectedOutcome"
                     v-model="course.advisorExpectedOutcome" rows="3"
-                    placeholder="Mô tả những gì học viên sẽ đạt được sau khi hoàn thành" required></textarea>
+                    placeholder="Mô tả những gì học viên sẽ đạt được sau khi hoàn thành" required
+                    :class="{ 'is-invalid': validationErrors.course.advisorExpectedOutcome }"></textarea>
+                  <div class="invalid-feedback" v-if="validationErrors.course.advisorExpectedOutcome">
+                    {{ validationErrors.course.advisorExpectedOutcome }}
+                  </div>
                 </div>
 
                 <div class="mb-4">
@@ -165,7 +221,11 @@
                     Kết quả mong đợi <span class="text-danger">*</span>
                   </label>
                   <textarea class="form-control" id="courseExpectedOutcome" v-model="course.expectedOutcome" rows="3"
-                    placeholder="Mô tả kết quả và kỹ năng học viên nhận được" required></textarea>
+                    placeholder="Mô tả kết quả và kỹ năng học viên nhận được" required
+                    :class="{ 'is-invalid': validationErrors.course.expectedOutcome }"></textarea>
+                  <div class="invalid-feedback" v-if="validationErrors.course.expectedOutcome">
+                    {{ validationErrors.course.expectedOutcome }}
+                  </div>
                 </div>
 
                 <div class="mb-4">
@@ -173,7 +233,11 @@
                     Yêu cầu trước khi học <span class="text-danger">*</span>
                   </label>
                   <textarea class="form-control" id="courseRequirements" v-model="course.requirements" rows="3"
-                    placeholder="Nhập các yêu cầu/học vấn cần có trước khi tham gia" required></textarea>
+                    placeholder="Nhập các yêu cầu/học vấn cần có trước khi tham gia" required
+                    :class="{ 'is-invalid': validationErrors.course.requirements }"></textarea>
+                  <div class="invalid-feedback" v-if="validationErrors.course.requirements">
+                    {{ validationErrors.course.requirements }}
+                  </div>
                 </div>
 
                 <div class="mb-4">
@@ -181,7 +245,11 @@
                     Mục tiêu khóa học <span class="text-danger">*</span>
                   </label>
                   <textarea class="form-control" id="courseOutcomes" v-model="course.outcomes" rows="3"
-                    placeholder="Liệt kê các mục tiêu chính của khóa học" required></textarea>
+                    placeholder="Liệt kê các mục tiêu chính của khóa học" required
+                    :class="{ 'is-invalid': validationErrors.course.outcomes }"></textarea>
+                  <div class="invalid-feedback" v-if="validationErrors.course.outcomes">
+                    {{ validationErrors.course.outcomes }}
+                  </div>
                 </div>
 
                 <div class="mb-4">
@@ -190,15 +258,18 @@
                   </label>
                   <div class="input-group">
                     <input type="number" class="form-control" id="courseCompletionTime"
-                      v-model="course.expectedCompletion" min="1" placeholder="Số giờ dự kiến" required />
+                      v-model="course.expectedCompletion" min="1" placeholder="Số giờ dự kiến" required
+                      :class="{ 'is-invalid': validationErrors.course.expectedCompletion }" />
                     <span class="input-group-text">Phút</span>
+                  </div>
+                  <div class="invalid-feedback" v-if="validationErrors.course.expectedCompletion">
+                    {{ validationErrors.course.expectedCompletion }}
                   </div>
                   <small class="text-muted">Thời gian ước tính để học viên hoàn thành</small>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
 
         <div class="row mb-4">
@@ -214,13 +285,15 @@
               </div>
               <div class="card-body p-0">
                 <div class="lecture-tabs">
-                  <ul class="nav nav-tabs px-3 pt-3" role="tablist">
+                  <ul class="nav nav-tabs lecture-tabs-nav px-3 pt-3" role="tablist">
                     <li class="nav-item" v-for="(lecture, index) in course.lectures" :key="index">
-                      <button class="nav-link" :class="{ active: activeTab === index }" @click="activeTab = index"
-                        role="tab">
+                      <button class="nav-link lecture-tab" :class="{ active: activeTab === index }"
+                        @click="activeTab = index" role="tab">
                         <span class="lecture-number">Bài {{ index + 1 }}</span>
-                        <button type="button" class="btn-close ms-2" style="font-size: 0.5rem"
-                          @click.stop="removeLecture(index)" v-if="course.lectures.length > 1"></button>
+                        <button type="button" class="lecture-close-btn" @click.stop="removeLecture(index)"
+                          v-if="course.lectures.length > 1">
+                          <i class="bi bi-x-circle-fill"></i>
+                        </button>
                       </button>
                     </li>
                   </ul>
@@ -235,7 +308,11 @@
                               <label :for="`lectureTitle${index}`" class="form-label fw-medium">Tiêu đề bài giảng <span
                                   class="text-danger">*</span></label>
                               <input type="text" class="form-control form-control-lg" :id="`lectureTitle${index}`"
-                                v-model="lecture.title" placeholder="Nhập tiêu đề bài giảng" required />
+                                v-model="lecture.title" placeholder="Nhập tiêu đề bài giảng" required
+                                :class="{ 'is-invalid': validationErrors.lectures[index]?.title }" />
+                              <div class="invalid-feedback" v-if="validationErrors.lectures[index]?.title">
+                                {{ validationErrors.lectures[index].title }}
+                              </div>
                             </div>
 
                             <div class="mb-4">
@@ -243,13 +320,18 @@
                                 dung <span class="text-danger">*</span></label>
                               <textarea class="form-control" :id="`lectureContentSummary${index}`"
                                 v-model="lecture.contentSummary" rows="3"
-                                placeholder="Tóm tắt ngắn gọn nội dung bài giảng" required></textarea>
+                                placeholder="Tóm tắt ngắn gọn nội dung bài giảng" required
+                                :class="{ 'is-invalid': validationErrors.lectures[index]?.contentSummary }"></textarea>
+                              <div class="invalid-feedback" v-if="validationErrors.lectures[index]?.contentSummary">
+                                {{ validationErrors.lectures[index].contentSummary }}
+                              </div>
                             </div>
 
                             <div class="lecture-type-content mt-4">
                               <div v-if="lecture.lectureType === 'video'" class="resource-upload">
                                 <h6 class="mb-3 fw-medium">Tài nguyên <span class="text-danger">*</span></h6>
-                                <div class="upload-area p-4 border rounded border-dashed mb-3 text-center">
+                                <div class="upload-area p-4 border rounded border-dashed mb-3 text-center"
+                                  :class="{ 'border-danger': validationErrors.lectures[index]?.medias }">
                                   <div class="mb-3">
                                     <i class="bi bi-cloud-upload fs-1 text-primary"></i>
                                   </div>
@@ -261,6 +343,9 @@
                                     accept="video/*,image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple />
                                   <small class="text-muted d-block mt-2">Hỗ trợ: Video, Hình ảnh, PDF, Word, PowerPoint,
                                     Excel</small>
+                                </div>
+                                <div class="text-danger small mb-3" v-if="validationErrors.lectures[index]?.medias">
+                                  {{ validationErrors.lectures[index].medias }}
                                 </div>
                                 <div v-if="lecture.medias && lecture.medias.length > 0" class="uploaded-files">
                                   <h6 class="mb-3 fw-medium">
@@ -281,7 +366,11 @@
                                   Nội dung chi tiết <span class="text-danger">*</span>
                                 </h6>
                                 <textarea class="form-control" v-model="lecture.content" rows="12"
-                                  placeholder="Nhập nội dung chi tiết của bài giảng"></textarea>
+                                  placeholder="Nhập nội dung chi tiết của bài giảng"
+                                  :class="{ 'is-invalid': validationErrors.lectures[index]?.content }"></textarea>
+                                <div class="invalid-feedback" v-if="validationErrors.lectures[index]?.content">
+                                  {{ validationErrors.lectures[index].content }}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -344,13 +433,9 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import SaveConfirmPopUp from "../../../../components/Common/Popup/SaveConfirmPopUp.vue";
 import DeleteConfirmPopup from "../../../../components/Common/Popup/DeleteConfirmPopup.vue";
+import CancelConfirmPopup from "../../../../components/Common/Popup/CancelConfirmPopup.vue";
 import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
-import {
-  ArrowLeftIcon,
-  PlusIcon,
-  SaveIcon,
-  UploadIcon,
-} from "lucide-vue-next";
+import { ArrowLeftIcon, PlusIcon, SaveIcon, UploadIcon } from "lucide-vue-next";
 
 export default {
   name: "CreateCourse",
@@ -361,7 +446,8 @@ export default {
     SaveIcon,
     UploadIcon,
     SaveConfirmPopUp,
-    DeleteConfirmPopup
+    DeleteConfirmPopup,
+    CancelConfirmPopup,
   },
   data() {
     return {
@@ -388,68 +474,78 @@ export default {
         status: "Draft",
         leafCategoryId: "4b35a4fc-ab0c-4f7b-874f-d8e60ad33bac",
         lectures: [],
+        selectedCategories: [],
       },
+      categories: [
+        { id: "1", value: "Sức khỏe tinh thần" },
+        { id: "2", value: "Thiền và chánh niệm" },
+        { id: "3", value: "Quản lý stress" },
+        { id: "4", value: "Phát triển bản thân" },
+        { id: "5", value: "Kỹ năng giao tiếp" },
+        { id: "6", value: "Tâm lý học tích cực" },
+        { id: "7", value: "Dinh dưỡng và sức khỏe" },
+        { id: "8", value: "Yoga và thể dục" },
+        { id: "9", value: "Giấc ngủ và nghỉ ngơi" },
+        { id: "10", value: "Cân bằng cuộc sống" },
+        { id: "11", value: "Phát triển sự nghiệp" },
+        { id: "12", value: "Quản lý thời gian" },
+        { id: "13", value: "Tài chính cá nhân" },
+        { id: "14", value: "Mối quan hệ và tình yêu" },
+        { id: "15", value: "Nuôi dạy con cái" },
+        { id: "16", value: "Vượt qua nghịch cảnh" },
+        { id: "17", value: "Tư duy tích cực" },
+        { id: "18", value: "Kỹ năng lãnh đạo" },
+        { id: "19", value: "Sáng tạo và đổi mới" },
+        { id: "20", value: "Phòng chống kiệt sức" },
+      ],
+      showCategoryDropdown: false,
+      categorySearchTerm: '',
+      filteredCategories: [],
       previewImage: null,
       activeTab: 0,
       showSaveConfirm: false,
       showDeleteConfirm: false,
+      showCancelConfirm: false,
       deleteIndex: null,
       saveMessage: "Bạn có chắc muốn lưu khóa học?",
       deleteMessage: "Bạn có chắc muốn xóa bài giảng này?",
       cancelMessage: "Bạn có chắc muốn hủy và bỏ các thay đổi?",
       isBackAction: false,
-      assignmentTypes: [
-        {
-          value: 'yoga',
-          label: 'Yoga',
-          description: 'Bài tập yoga với hướng dẫn chi tiết'
-        },
-        {
-          value: 'self-assessment',
-          label: 'Tự đánh giá bản thân',
-          description: 'Khám phá và đánh giá bản thân'
-        },
-        {
-          value: 'media',
-          label: 'Media',
-          description: 'Xem và tương tác với nội dung đa phương tiện'
-        },
-        {
-          value: 'journal',
-          label: 'Viết nhật ký',
-          description: 'Ghi lại suy nghĩ và cảm xúc của bạn'
-        },
-        {
-          value: 'mood-tracker',
-          label: 'Cập nhật trạng thái cảm xúc',
-          description: 'Theo dõi và phân tích tâm trạng'
-        },
-        {
-          value: 'habit-tracker',
-          label: 'Thiết lập và theo dõi thói quen',
-          description: 'Xây dựng và duy trì thói quen tốt'
-        },
-        {
-          value: 'reading',
-          label: 'Đọc bài viết',
-          description: 'Đọc và tương tác với nội dung bài viết'
-        },
-        {
-          value: 'community',
-          label: 'Nhắn tin cộng đồng',
-          description: 'Kết nối và chia sẻ với cộng đồng'
-        }
-      ],
       minDiscountDate: (() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow.toISOString().split("T")[0];
       })(),
+      validationErrors: {
+        course: {
+          title: '',
+          category: '',
+          price: '',
+          discount: '',
+          discountExpiry: '',
+          description: '',
+          thumb: '',
+          level: '',
+          advisorExpectedOutcome: '',
+          expectedOutcome: '',
+          requirements: '',
+          outcomes: '',
+          expectedCompletion: ''
+        },
+        lectures: []
+      }
     };
   },
   created() {
+  },
+  mounted() {
+    this.filterCategories();
     if (this.course.lectures.length === 0) {
       this.addLecture();
+    } else {
+      this.course.lectures.forEach((_, index) => {
+        this.ensureLectureValidationExists(index);
+      });
     }
   },
   watch: {
@@ -475,6 +571,52 @@ export default {
     }
   },
   methods: {
+    toggleCategoryDropdown() {
+      this.showCategoryDropdown = !this.showCategoryDropdown;
+      if (this.showCategoryDropdown) {
+        this.filterCategories();
+        setTimeout(() => {
+          document.addEventListener('click', this.closeCategoryDropdown);
+        }, 0);
+      }
+    },
+
+    closeCategoryDropdown(event) {
+      const dropdown = document.querySelector('.dropdown-menu');
+      const trigger = document.querySelector('.form-control.d-flex');
+      if (dropdown && trigger && !dropdown.contains(event.target) && !trigger.contains(event.target)) {
+        this.showCategoryDropdown = false;
+        document.removeEventListener('click', this.closeCategoryDropdown);
+      }
+    },
+
+    filterCategories() {
+      if (!this.categorySearchTerm) {
+        this.filteredCategories = this.categories.filter(
+          category => !this.course.selectedCategories.some(selected => selected.id === category.id)
+        );
+      } else {
+        const searchTerm = this.categorySearchTerm.toLowerCase();
+        this.filteredCategories = this.categories.filter(
+          category =>
+            category.value.toLowerCase().includes(searchTerm) &&
+            !this.course.selectedCategories.some(selected => selected.id === category.id)
+        );
+      }
+    },
+
+    selectCategory(category) {
+      this.course.selectedCategories.push(category);
+      this.filterCategories();
+      this.validationErrors.course.category = '';
+    },
+
+    removeCategory(category) {
+      this.course.selectedCategories = this.course.selectedCategories.filter(
+        selected => selected.id !== category.id
+      );
+      this.filterCategories();
+    },
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -511,6 +653,16 @@ export default {
         reader.readAsDataURL(file);
       });
     },
+    ensureLectureValidationExists(index) {
+      if (!this.validationErrors.lectures[index]) {
+        this.validationErrors.lectures[index] = {
+          title: '',
+          contentSummary: '',
+          content: '',
+          medias: ''
+        };
+      }
+    },
     addLecture() {
       this.course.lectures.push({
         id: "",
@@ -522,8 +674,12 @@ export default {
         metaData: "",
         medias: [],
       });
+
+      const newIndex = this.course.lectures.length - 1;
+      this.ensureLectureValidationExists(newIndex);
+
       this.$nextTick(() => {
-        this.activeTab = this.course.lectures.length - 1;
+        this.activeTab = newIndex;
       });
     },
     removeLecture(index) {
@@ -545,8 +701,8 @@ export default {
     },
     performRemoveLecture(index) {
       const currentActive = this.activeTab;
-
       this.course.lectures.splice(index, 1);
+      this.validationErrors.lectures.splice(index, 1);
 
       if (this.course.lectures.length === 0) {
         this.addLecture();
@@ -582,18 +738,190 @@ export default {
       }
     },
     goBack() {
-      this.deleteMessage = this.cancelMessage;
-      this.isBackAction = true;
-      this.showDeleteConfirm = true;
+      this.showCancelConfirm = true;
+    },
+    onConfirmCancel(confirmed) {
+      if (confirmed) {
+        this.$router.back();
+      }
+      this.showCancelConfirm = false;
     },
     validateForm() {
-      return true;
+      let isValid = true;
+      let firstInvalidField = null;
+
+      Object.keys(this.validationErrors.course).forEach(key => {
+        this.validationErrors.course[key] = '';
+      });
+
+      this.validationErrors.lectures.forEach((lecture, index) => {
+        Object.keys(lecture).forEach(key => {
+          this.validationErrors.lectures[index][key] = '';
+        });
+      });
+
+      if (!this.course.title) {
+        isValid = false;
+        this.validationErrors.course.title = "Tên khóa học không được để trống";
+        firstInvalidField = firstInvalidField || document.getElementById("courseName");
+      } else if (this.course.title.length > 100) {
+        isValid = false;
+        this.validationErrors.course.title = "Tên khóa học không được vượt quá 100 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseName");
+      }
+
+      if (this.course.selectedCategories.length === 0) {
+        isValid = false;
+        this.validationErrors.course.category = "Vui lòng chọn ít nhất một danh mục";
+        firstInvalidField = firstInvalidField || document.querySelector(".form-control.d-flex");
+      }
+
+      if (this.course.priceType === 'paid') {
+        if (!this.course.price || this.course.price < 10000) {
+          isValid = false;
+          this.validationErrors.course.price = "Giá khóa học không được thấp hơn 10,000 VND";
+          firstInvalidField = firstInvalidField || document.getElementById("coursePrice");
+        }
+
+        if (this.course.discount > 0 && !this.course.discountExpiry) {
+          isValid = false;
+          this.validationErrors.course.discountExpiry = "Vui lòng chọn ngày hết hạn giảm giá";
+          firstInvalidField = firstInvalidField || document.getElementById("discountExpiry");
+        }
+      }
+
+      if (!this.course.description) {
+        isValid = false;
+        this.validationErrors.course.description = "Mô tả khóa học không được để trống";
+        firstInvalidField = firstInvalidField || document.getElementById("courseDescription");
+      } else if (this.course.description.length > 500) {
+        isValid = false;
+        this.validationErrors.course.description = "Mô tả khóa học không được vượt quá 500 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseDescription");
+      }
+
+      if (!this.course.thumb.file && !this.course.thumb.url) {
+        isValid = false;
+        this.validationErrors.course.thumb = "Vui lòng tải lên ảnh khóa học";
+        firstInvalidField = firstInvalidField || document.getElementById("courseImage");
+      }
+
+      if (!this.course.level) {
+        isValid = false;
+        this.validationErrors.course.level = "Vui lòng chọn trình độ khóa học";
+        firstInvalidField = firstInvalidField || document.getElementById("courseDifficulty");
+      }
+
+      if (!this.course.advisorExpectedOutcome) {
+        isValid = false;
+        this.validationErrors.course.advisorExpectedOutcome = "Vui lòng nhập thông tin học viên nhận được sau khóa học";
+        firstInvalidField = firstInvalidField || document.getElementById("courseAdvisorExpectedOutcome");
+      } else if (this.course.advisorExpectedOutcome.length > 255) {
+        isValid = false;
+        this.validationErrors.course.advisorExpectedOutcome = "Thông tin học viên nhận được không được vượt quá 255 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseAdvisorExpectedOutcome");
+      }
+
+      if (!this.course.expectedOutcome) {
+        isValid = false;
+        this.validationErrors.course.expectedOutcome = "Vui lòng nhập kết quả mong đợi";
+        firstInvalidField = firstInvalidField || document.getElementById("courseExpectedOutcome");
+      } else if (this.course.expectedOutcome.length > 255) {
+        isValid = false;
+        this.validationErrors.course.expectedOutcome = "Kết quả mong đợi không được vượt quá 255 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseExpectedOutcome");
+      }
+
+      if (!this.course.requirements) {
+        isValid = false;
+        this.validationErrors.course.requirements = "Vui lòng nhập yêu cầu trước khi học";
+        firstInvalidField = firstInvalidField || document.getElementById("courseRequirements");
+      } else if (this.course.requirements.length > 255) {
+        isValid = false;
+        this.validationErrors.course.requirements = "Yêu cầu trước khi học không được vượt quá 255 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseRequirements");
+      }
+
+      if (!this.course.outcomes) {
+        isValid = false;
+        this.validationErrors.course.outcomes = "Vui lòng nhập mục tiêu khóa học";
+        firstInvalidField = firstInvalidField || document.getElementById("courseOutcomes");
+      } else if (this.course.outcomes.length > 255) {
+        isValid = false;
+        this.validationErrors.course.outcomes = "Mục tiêu khóa học không được vượt quá 255 ký tự";
+        firstInvalidField = firstInvalidField || document.getElementById("courseOutcomes");
+      }
+
+      if (!this.course.expectedCompletion) {
+        isValid = false;
+        this.validationErrors.course.expectedCompletion = "Vui lòng nhập thời gian hoàn thành";
+        firstInvalidField = firstInvalidField || document.getElementById("courseCompletionTime");
+      }
+
+      this.course.lectures.forEach((lecture, index) => {
+        this.ensureLectureValidationExists(index);
+
+        if (!lecture.title) {
+          isValid = false;
+          this.validationErrors.lectures[index].title = "Tiêu đề không được để trống";
+          firstInvalidField = firstInvalidField || document.getElementById(`lectureTitle${index}`);
+        } else if (lecture.title.length > 100) {
+          isValid = false;
+          this.validationErrors.lectures[index].title = "Tiêu đề không được vượt quá 100 ký tự";
+          firstInvalidField = firstInvalidField || document.getElementById(`lectureTitle${index}`);
+        }
+
+        if (!lecture.contentSummary) {
+          isValid = false;
+          this.validationErrors.lectures[index].contentSummary = "Tóm tắt nội dung không được để trống";
+          firstInvalidField = firstInvalidField || document.getElementById(`lectureContentSummary${index}`);
+        } else if (lecture.contentSummary.length > 500) {
+          isValid = false;
+          this.validationErrors.lectures[index].contentSummary = "Tóm tắt nội dung không được vượt quá 500 ký tự";
+          firstInvalidField = firstInvalidField || document.getElementById(`lectureContentSummary${index}`);
+        }
+
+        if (lecture.lectureType === 'text') {
+          if (!lecture.content) {
+            isValid = false;
+            this.validationErrors.lectures[index].content = "Nội dung chi tiết không được để trống";
+          } else if (lecture.content.length > 500) {
+            isValid = false;
+            this.validationErrors.lectures[index].content = "Nội dung chi tiết không được vượt quá 500 ký tự";
+          }
+        } else if (lecture.lectureType === 'video') {
+          if (!lecture.medias || lecture.medias.length === 0) {
+            isValid = false;
+            this.validationErrors.lectures[index].medias = "Vui lòng tải lên ít nhất một tài liệu";
+          }
+        }
+      });
+
+      if (!isValid && firstInvalidField) {
+        if (firstInvalidField.id.includes('lecture')) {
+          const lectureIndex = parseInt(firstInvalidField.id.match(/\d+/)[0]);
+          if (this.activeTab !== lectureIndex) {
+            this.activeTab = lectureIndex;
+            this.$nextTick(() => {
+              firstInvalidField.focus();
+              firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+          } else {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } else {
+          firstInvalidField.focus();
+          firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      return isValid;
     },
     saveCourse() {
-      if (!this.validateForm()) {
-        return;
+      if (this.validateForm()) {
+        this.showSaveConfirm = true;
       }
-      this.showSaveConfirm = true;
     },
     onConfirmSave(confirmed) {
       if (confirmed) {
@@ -619,6 +947,10 @@ export default {
         courseFormData.append("ExpectedCompletion", this.course.expectedCompletion);
         courseFormData.append("AdvisorExpectedOutcome", this.course.advisorExpectedOutcome);
         courseFormData.append("ExpectedOutcome", this.course.expectedOutcome);
+
+        const categoriesJson = JSON.stringify(this.course.selectedCategories.map(cat => ({ id: cat.id, value: cat.value })));
+        courseFormData.append("Categories", categoriesJson);
+
         courseFormData.append("LeafCategoryId", this.course.leafCategoryId);
         if (this.course.thumb.file) {
           courseFormData.append("Thumb.File", this.course.thumb.file);
@@ -666,7 +998,6 @@ export default {
         setTimeout(() => {
           this.$router.push("/course-management");
         }, 1500);
-
       } catch (error) {
         toast.error(
           error.response?.data?.message ||
@@ -685,6 +1016,37 @@ export default {
 </script>
 
 <style scoped>
+.min-height-auto {
+  min-height: 38px;
+  height: auto;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  z-index: 1000;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.badge {
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+
+.btn-close-white {
+  filter: brightness(0) invert(1);
+}
+
 .create-course-container {
   display: flex;
   flex-direction: column;
@@ -813,33 +1175,84 @@ hr {
   margin: 1.5rem 0;
 }
 
-.nav-tabs {
+.lecture-tabs-nav {
   border-bottom: 1px solid #e8e8e8;
   padding: 0.5rem 0.5rem 0;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.nav-tabs .nav-link {
-  border: none;
+.lecture-tabs-nav::-webkit-scrollbar {
+  height: 5px;
+}
+
+.lecture-tabs-nav::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+.lecture-tab {
+  border: 1px solid #e8e8e8;
+  border-bottom: none;
   color: #333;
-  padding: 0.5rem 1rem;
-  border-radius: 4px 4px 0 0;
+  padding: 0.6rem 1rem;
+  border-radius: 6px 6px 0 0;
   margin-right: 0.25rem;
+  display: flex;
+  align-items: center;
+  min-width: 100px;
+  justify-content: space-between;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s;
+  height: 40px;
+  overflow: hidden;
 }
 
-.nav-tabs .nav-link:hover {
-  background-color: #f5f5f5;
+.lecture-tab:hover {
+  background-color: #e9ecef;
 }
 
-.nav-tabs .nav-link.active {
+.lecture-tab.active {
   background-color: #3b82f6;
   color: white;
+  border-color: #3b82f6;
+  font-weight: 500;
+}
+
+.lecture-number {
+  white-space: nowrap;
+}
+
+.lecture-close-btn {
+  background: transparent;
+  border: none;
+  color: #dc3545;
+  font-size: 1rem;
+  padding: 0;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.lecture-tab.active .lecture-close-btn {
+  color: white;
+}
+
+.lecture-close-btn:hover {
+  color: #bb2d3b;
+  transform: scale(1.1);
 }
 
 .tab-content {
   background: #fff;
-  padding: 1rem;
+  padding: 1.5rem;
   border: 1px solid #e8e8e8;
   border-top: none;
+  border-radius: 0 0 8px 8px;
 }
 
 .lecture-settings {
@@ -890,5 +1303,21 @@ hr {
 .assignment-type-item.selected {
   background: #f0f7ff;
   border-color: #3b82f6;
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.border-danger {
+  border-color: #dc3545 !important;
 }
 </style>
