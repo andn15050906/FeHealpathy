@@ -215,6 +215,9 @@ h2 {
   letter-spacing: 0.01em;
 }
 
+/* Add font imports */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+
 @media (max-width: 768px) {
   .container {
     width: 100%;

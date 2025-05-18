@@ -34,7 +34,7 @@
                   >mdi-calendar-check</v-icon
                 >
                 <h3 class="text-h5 mb-1">Số ngày hoạt động</h3>
-                <p class="text-h3 text-primary font-weight-bold">{{ statistics.daysActive }}</p>
+                <p class="text-h3 text-primary font-weight-bold">14</p>
                 <p class="text-body-2 text-grey">ngày</p>
               </v-card-text>
             </v-card>
@@ -47,7 +47,7 @@
                   >mdi-check-circle</v-icon
                 >
                 <h3 class="text-h5 mb-1">Hành động đã thực hiện</h3>
-                <p class="text-h3 text-success font-weight-bold">{{ statistics.actionsCompleted }}</p>
+                <p class="text-h3 text-success font-weight-bold">23</p>
                 <p class="text-body-2 text-grey">hành động</p>
               </v-card-text>
             </v-card>
@@ -62,12 +62,12 @@
                 <h3 class="text-h5 mb-1">Tiến bộ cảm xúc</h3>
                 <div class="d-flex justify-center align-center my-2">
                   <v-progress-linear
-                    :model-value="statistics.emotionalImprovement"
+                    model-value="68"
                     color="success"
                     height="8"
                     class="w-50"
                   ></v-progress-linear>
-                  <span class="ml-2 font-weight-medium">{{ statistics.emotionalImprovement }}%</span>
+                  <span class="ml-2 font-weight-medium">68%</span>
                 </div>
                 <p class="text-body-2 text-grey">cải thiện</p>
               </v-card-text>
@@ -84,10 +84,16 @@
           <v-card-text>
             <v-radio-group v-model="improvement">
               <v-radio
-                v-for="option in improvementOptions"
-                :key="option.value"
-                :label="option.label"
-                :value="option.value"
+                label="Tôi đã cải thiện một chút"
+                value="little"
+              ></v-radio>
+              <v-radio
+                label="Tôi đã cải thiện kha khá"
+                value="moderate"
+              ></v-radio>
+              <v-radio
+                label="Tôi đã cải thiện rất nhiều"
+                value="significant"
               ></v-radio>
             </v-radio-group>
           </v-card-text>
@@ -112,10 +118,13 @@
           >
           <v-card-text class="text-center">
             <div class="coupon-code mb-4">
-              <p class="text-h4 font-weight-bold text-amber-darken-2">{{ coupon.code }}</p>
+              <p class="text-h4 font-weight-bold text-amber-darken-2"
+                >MENTAL25</p
+              >
             </div>
             <p class="text-body-2 text-amber-darken-1">
-              {{ coupon.description }}
+              Sử dụng mã này để được giảm 25% cho khóa học "Tâm lý học ứng dụng"
+              của chúng tôi
             </p>
           </v-card-text>
         </v-card>
@@ -127,12 +136,31 @@
           </v-card-subtitle>
           <v-card-text>
             <v-list bg-color="transparent">
-              <v-list-item v-for="(roadmap, index) in advancedRoadmaps" :key="index">
+              <v-list-item>
                 <template v-slot:prepend>
                   <v-icon color="amber-darken-2">mdi-star</v-icon>
                 </template>
-                <v-list-item-title>{{ roadmap.title }}</v-list-item-title>
-                <v-list-item-subtitle>{{ roadmap.description }}</v-list-item-subtitle>
+                <v-list-item-title
+                  >Lộ trình nâng cao: Vượt qua lo âu</v-list-item-title
+                >
+                <v-list-item-subtitle
+                  >Các kỹ thuật nâng cao để đối phó với lo âu mãn
+                  tính</v-list-item-subtitle
+                >
+                <template v-slot:append>
+                  <v-btn variant="outlined" size="small">Xem chi tiết</v-btn>
+                </template>
+              </v-list-item>
+
+              <v-list-item>
+                <template v-slot:prepend>
+                  <v-icon color="amber-darken-2">mdi-star</v-icon>
+                </template>
+                <v-list-item-title>Thiền định hàng ngày</v-list-item-title>
+                <v-list-item-subtitle
+                  >Xây dựng thói quen thiền định để cải thiện sức khỏe tinh
+                  thần</v-list-item-subtitle
+                >
                 <template v-slot:append>
                   <v-btn variant="outlined" size="small">Xem chi tiết</v-btn>
                 </template>
@@ -159,7 +187,6 @@
 <script>
 import RoadmapSidebar from "@/components/RoadmapSidebar.vue";
 import RoadmapHeader from "@/components/RoadmapHeader.vue";
-import { getCompletionViewData } from "@/scripts/data/roadmapData.js";
 
 export default {
   name: "CompletionView",
@@ -171,31 +198,39 @@ export default {
     return {
       improvement: null,
       showCoupon: false,
-      roadmapSteps: [],
-      improvementOptions: [],
-      statistics: {
-        daysActive: 0,
-        actionsCompleted: 0,
-        emotionalImprovement: 0
-      },
-      coupon: {
-        code: "",
-        description: ""
-      },
-      advancedRoadmaps: []
+      roadmapSteps: [
+        {
+          id: 1,
+          title: "Self-Awareness",
+          completed: true,
+          icon: "mdi-eye-outline",
+        },
+        {
+          id: 2,
+          title: "Seeking Support",
+          completed: true,
+          icon: "mdi-hand-heart-outline",
+        },
+        {
+          id: 3,
+          title: "Building Healthy Habits",
+          completed: true,
+          icon: "mdi-sprout-outline",
+        },
+        {
+          id: 4,
+          title: "Developing Coping Strategies",
+          completed: true,
+          icon: "mdi-brain",
+        },
+        {
+          id: 5,
+          title: "Maintaining Mental Wellness",
+          completed: true,
+          icon: "mdi-heart-pulse",
+        },
+      ],
     };
-  },
-  async created() {
-    try {
-      const data = await getCompletionViewData();
-      this.roadmapSteps = data.roadmapSteps;
-      this.improvementOptions = data.improvementOptions;
-      this.statistics = data.statistics;
-      this.coupon = data.coupon;
-      this.advancedRoadmaps = data.advancedRoadmaps;
-    } catch (error) {
-      console.error('Error fetching completion view data:', error);
-    }
   },
   methods: {
     submitSurvey() {

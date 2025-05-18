@@ -1,29 +1,25 @@
 <template>
   <footer class="footer bg-white pt-2">
     <div class="container text-center p-0">
-      <!--hovered-link instead of text-secondary-->
       <ul class="nav justify-content-center mb-3">
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="#"><strong>Trang Chủ</strong></a>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="#"><strong>Trang Chủ</strong></a>
         </li>
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="/practice"><strong>Công cụ</strong></a>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="/blogs"><strong>Blog</strong></a>
         </li>
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="/blogs"><strong>Bài viết</strong></a>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Về Chúng Tôi</strong></a>
         </li>
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="/courses"><strong>Khoá học</strong></a>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Liên Hệ</strong></a>
         </li>
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="/chat"><strong>Cộng đồng</strong></a>
-        </li>
-        <li class="nav-item hovered-link">
-          <a class="nav-link px-2" href="/faq"><strong>Câu hỏi thường gặp</strong></a>
+        <li class="nav-item">
+          <a class="nav-link text-secondary px-2" href="/faq"><strong>Đội Nhóm</strong></a>
         </li>
       </ul>
 
-      <div class="hovered-link py-3">
+      <div class="text-secondary py-3">
         © 2025 Healpathy. Tất cả quyền được bảo lưu.
       </div>
     </div>
@@ -31,15 +27,6 @@
 </template>
 
 <style scoped>
-.hovered-link {
-  color: #000;
-}
-
-.hovered-link:hover {
-  opacity: 1;
-  color: #3db83b;
-}
-
 .nav-link {
   font-weight: 400;
   transition: color 0.3s;
