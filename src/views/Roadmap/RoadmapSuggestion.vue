@@ -1513,7 +1513,7 @@ export default {
 }
 
 .roadmap-card .v-card-title {
-  padding-top: 16px;
+  padding-top: 40px !important; /* hoặc lớn hơn nếu cần */
   padding-right: 16px;
   position: relative;
 }
@@ -1593,6 +1593,7 @@ export default {
   min-height: 40px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

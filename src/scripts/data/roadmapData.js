@@ -4,11 +4,11 @@ const defaultRoadmaps = [
   {
     id: "1",
     title: "Vượt qua lo âu",
-    description: "Học cách nhận biết và vượt qua các triệu chứng lo âu phổ biến",
+    description: "Hành trình giúp bạn hiểu và kiểm soát cảm xúc lo âu một cách tự nhiên",
     introText: [
-      "Lộ trình này được thiết kế dựa trên các phương pháp đã được chứng minh hiệu quả trong việc hỗ trợ sức khỏe tinh thần.",
-      "Trong quá trình này, bạn sẽ học cách nhận diện những suy nghĩ tiêu cực, thách thức chúng và thay thế bằng những suy nghĩ tích cực hơn.",
-      "Mỗi bước trong lộ trình sẽ cung cấp cho bạn các công cụ và kỹ thuật thực tế để cải thiện sức khỏe tinh thần.",
+      "Lo âu là một phản ứng tự nhiên của cơ thể khi đối mặt với những tình huống căng thẳng. Tuy nhiên, khi lo âu trở nên quá mức, nó có thể ảnh hưởng đến cuộc sống hàng ngày của bạn.",
+      "Lộ trình này sẽ giúp bạn từng bước hiểu rõ về lo âu, học cách nhận diện các dấu hiệu, và áp dụng các kỹ thuật thực tế để kiểm soát nó.",
+      "Hãy nhớ rằng mỗi người có một hành trình riêng. Điều quan trọng là bạn đang bước đi trên con đường của mình."
     ],
     steps: 5,
     category: "anxiety",
@@ -18,62 +18,220 @@ const defaultRoadmaps = [
     phases: [
       {
         id: "1",
-        title: "Nhận diện vấn đề",
-        description: "Nhận biết các triệu chứng lo âu và hiểu nguồn gốc của chúng",
-        videoUrl: "/videos/phase1.mp4",
-        exerciseCount: 2,
-        completed: false,
-        current: true,
+        title: "Hiểu về lo âu",
+        description: "Tìm hiểu về lo âu và cách nó ảnh hưởng đến bạn",
         themeColor: "indigo",
-        icon: "mdi-eye-outline",
+        icon: "mdi-brain",
+        introduction: "Trong phase đầu tiên này, chúng ta sẽ cùng tìm hiểu về lo âu - một cảm xúc tự nhiên của con người. Bạn sẽ học cách nhận diện các dấu hiệu lo âu và hiểu rõ hơn về cơ chế hoạt động của nó trong cơ thể.",
+        tips: [
+          {
+            icon: "mdi-lightbulb-outline",
+            title: "Lo âu là gì?",
+            content: "Lo âu là phản ứng tự nhiên của cơ thể khi đối mặt với tình huống căng thẳng. Nó giúp chúng ta cảnh giác và chuẩn bị cho các thách thức."
+          },
+          {
+            icon: "mdi-heart-pulse",
+            title: "Dấu hiệu cơ thể",
+            content: "Tim đập nhanh, đổ mồ hôi, thở gấp là những dấu hiệu cơ thể thường gặp khi lo âu."
+          }
+        ],
+        actions: [
+          {
+            id: "1.1",
+            title: "Bài tập nhận diện lo âu",
+            description: "Dành 10 phút để viết ra những tình huống khiến bạn cảm thấy lo âu gần đây",
+            duration: "10 phút",
+            required: true,
+            moodTags: ["Tập trung", "Tự nhận thức"]
+          },
+          {
+            id: "1.2",
+            title: "Hít thở có ý thức",
+            description: "Thực hành kỹ thuật hít thở 4-7-8 để giúp cơ thể thư giãn",
+            duration: "5 phút",
+            required: true,
+            moodTags: ["Thư giãn", "Tập trung"]
+          }
+        ],
+        canSkip: false,
+        completionCriteria: [
+          "Hoàn thành bài tập nhận diện lo âu",
+          "Thực hành kỹ thuật hít thở ít nhất 1 lần"
+        ]
       },
       {
         id: "2",
-        title: "Giảm nhẹ tức thì",
-        description: "Học các kỹ thuật thư giãn nhanh để giảm lo âu trong tình huống khẩn cấp",
-        videoUrl: "/videos/phase2.mp4",
-        audioUrl: "/audio/relaxation.mp3",
-        exerciseCount: 3,
-        completed: false,
-        current: false,
+        title: "Kỹ thuật thở và thư giãn",
+        description: "Học các kỹ thuật thở và thư giãn cơ bản",
         themeColor: "teal",
-        icon: "mdi-hand-heart-outline",
+        icon: "mdi-meditation",
+        introduction: "Phase này sẽ giúp bạn làm chủ các kỹ thuật thở và thư giãn cơ bản. Đây là những công cụ mạnh mẽ để kiểm soát lo âu ngay tại thời điểm nó xuất hiện.",
+        tips: [
+          {
+            icon: "mdi-lungs",
+            title: "Thở bụng",
+            content: "Thở bụng giúp kích hoạt hệ thần kinh phó giao cảm, giúp cơ thể thư giãn tự nhiên."
+          },
+          {
+            icon: "mdi-meditation",
+            title: "Thư giãn cơ",
+            content: "Thư giãn cơ theo nhóm giúp giảm căng thẳng và lo âu hiệu quả."
+          }
+        ],
+        actions: [
+          {
+            id: "2.1",
+            title: "Thực hành thở bụng",
+            description: "Học và thực hành kỹ thuật thở bụng trong 5 phút",
+            duration: "5 phút",
+            required: true,
+            moodTags: ["Thư giãn", "Tập trung"]
+          },
+          {
+            id: "2.2",
+            title: "Thư giãn cơ theo nhóm",
+            description: "Thực hành thư giãn cơ từng nhóm trong 10 phút",
+            duration: "10 phút",
+            required: true,
+            moodTags: ["Thư giãn", "Tự nhận thức"]
+          }
+        ],
+        canSkip: false,
+        completionCriteria: [
+          "Thực hành thở bụng thành thạo",
+          "Hoàn thành bài tập thư giãn cơ"
+        ]
       },
       {
         id: "3",
-        title: "Ổn định tâm trí",
-        description: "Thực hành chánh niệm và các bài tập thiền để ổn định tâm trí",
-        videoUrl: "/videos/phase3.mp4",
-        audioUrl: "/audio/meditation.mp3",
-        exerciseCount: 4,
-        completed: false,
-        current: false,
-        themeColor: "purple",
-        icon: "mdi-sprout-outline",
+        title: "Thay đổi suy nghĩ",
+        description: "Học cách nhận diện và thay đổi những suy nghĩ tiêu cực",
+        themeColor: "blue",
+        icon: "mdi-lightbulb-on",
+        introduction: "Trong phase này, chúng ta sẽ tập trung vào việc nhận diện và thay đổi những suy nghĩ tiêu cực thường gặp khi lo âu. Bạn sẽ học cách đối thoại tích cực với chính mình.",
+        tips: [
+          {
+            icon: "mdi-brain",
+            title: "Suy nghĩ tự động",
+            content: "Những suy nghĩ tiêu cực thường xuất hiện tự động và nhanh chóng."
+          },
+          {
+            icon: "mdi-comment-question",
+            title: "Đặt câu hỏi",
+            content: "Học cách đặt câu hỏi để kiểm tra tính thực tế của những suy nghĩ lo âu."
+          }
+        ],
+        actions: [
+          {
+            id: "3.1",
+            title: "Nhật ký suy nghĩ",
+            description: "Ghi lại những suy nghĩ lo âu và phân tích chúng",
+            duration: "15 phút",
+            required: true,
+            moodTags: ["Tự nhận thức", "Tập trung"]
+          },
+          {
+            id: "3.2",
+            title: "Thực hành đối thoại tích cực",
+            description: "Tập luyện cách đối thoại tích cực với bản thân",
+            duration: "10 phút",
+            required: true,
+            moodTags: ["Tích cực", "Tự nhận thức"]
+          }
+        ],
+        canSkip: true,
+        completionCriteria: [
+          "Hoàn thành nhật ký suy nghĩ",
+          "Thực hành đối thoại tích cực ít nhất 3 lần"
+        ]
       },
       {
         id: "4",
-        title: "Đối mặt với vấn đề",
-        description: "Phát triển chiến lược để đối mặt với các tình huống gây lo âu",
-        videoUrl: "/videos/phase4.mp4",
-        exerciseCount: 5,
-        completed: false,
-        current: false,
-        themeColor: "blue",
-        icon: "mdi-brain",
+        title: "Đối mặt với tình huống",
+        description: "Học cách đối mặt với các tình huống gây lo âu",
+        themeColor: "purple",
+        icon: "mdi-shield-check",
+        introduction: "Phase này sẽ giúp bạn xây dựng sự tự tin trong việc đối mặt với các tình huống gây lo âu. Chúng ta sẽ thực hành từng bước nhỏ để vượt qua nỗi sợ.",
+        tips: [
+          {
+            icon: "mdi-stairs",
+            title: "Tiếp cận từng bước",
+            content: "Chia nhỏ mục tiêu thành các bước dễ thực hiện hơn."
+          },
+          {
+            icon: "mdi-trophy",
+            title: "Kỷ niệm thành công",
+            content: "Ghi nhận và kỷ niệm mỗi bước tiến nhỏ trong hành trình."
+          }
+        ],
+        actions: [
+          {
+            id: "4.1",
+            title: "Lập kế hoạch đối mặt",
+            description: "Xác định và lập kế hoạch cho một tình huống gây lo âu",
+            duration: "20 phút",
+            required: true,
+            moodTags: ["Lập kế hoạch", "Tự tin"]
+          },
+          {
+            id: "4.2",
+            title: "Thực hành đối mặt",
+            description: "Thực hiện kế hoạch đối mặt đã lập",
+            duration: "Tùy tình huống",
+            required: true,
+            moodTags: ["Dũng cảm", "Tự tin"]
+          }
+        ],
+        canSkip: true,
+        completionCriteria: [
+          "Hoàn thành kế hoạch đối mặt",
+          "Thực hiện ít nhất một bước trong kế hoạch"
+        ]
       },
       {
         id: "5",
         title: "Duy trì và phát triển",
-        description: "Xây dựng kế hoạch duy trì lâu dài và tiếp tục phát triển",
-        videoUrl: "/videos/phase5.mp4",
-        exerciseCount: 3,
-        completed: false,
-        current: false,
+        description: "Xây dựng thói quen lành mạnh để duy trì sự bình an",
         themeColor: "green",
         icon: "mdi-heart-pulse",
-      },
-    ],
+        introduction: "Phase cuối cùng này sẽ giúp bạn xây dựng những thói quen lành mạnh để duy trì sự bình an trong cuộc sống. Chúng ta sẽ tập trung vào việc chăm sóc bản thân và phát triển lối sống cân bằng.",
+        tips: [
+          {
+            icon: "mdi-heart",
+            title: "Chăm sóc bản thân",
+            content: "Duy trì thói quen chăm sóc bản thân mỗi ngày."
+          },
+          {
+            icon: "mdi-calendar-check",
+            title: "Lịch trình cân bằng",
+            content: "Tạo lịch trình cân bằng giữa công việc và nghỉ ngơi."
+          }
+        ],
+        actions: [
+          {
+            id: "5.1",
+            title: "Lập kế hoạch chăm sóc bản thân",
+            description: "Tạo kế hoạch chăm sóc bản thân hàng ngày",
+            duration: "15 phút",
+            required: true,
+            moodTags: ["Tự chăm sóc", "Lập kế hoạch"]
+          },
+          {
+            id: "5.2",
+            title: "Thực hành thói quen mới",
+            description: "Bắt đầu thực hiện một thói quen lành mạnh mới",
+            duration: "Tùy thói quen",
+            required: true,
+            moodTags: ["Kiên trì", "Phát triển"]
+          }
+        ],
+        canSkip: false,
+        completionCriteria: [
+          "Hoàn thành kế hoạch chăm sóc bản thân",
+          "Duy trì thói quen mới ít nhất 3 ngày"
+        ]
+      }
+    ]
   },
   {
     id: "2",

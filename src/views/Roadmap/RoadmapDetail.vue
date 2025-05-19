@@ -159,16 +159,6 @@
                   <p>{{ phase.description }}</p>
                   <div class="d-flex flex-wrap gap-2 mt-3">
                     <v-chip
-                      v-if="phase.videoUrl"
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      class="mr-2"
-                    >
-                      <v-icon size="small" start>mdi-video</v-icon>
-                      Video hướng dẫn
-                    </v-chip>
-                    <v-chip
                       v-if="phase.audioUrl"
                       size="small"
                       color="primary"

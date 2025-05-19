@@ -2,97 +2,184 @@
     <div class="roadmap-creation">
       <LoadingSpinner ref="loadingSpinner" />
       <h1 class="title">✨ Cập nhật Roadmap ✨</h1>
-      <form @submit.prevent="submitRoadmap" class="roadmap-form">
-        <div class="form-group">
-          <label for="title">🖋️ Tiêu đề Roadmap</label>
-          <input type="text" id="title" v-model="roadmap.title" placeholder="Nhập tiêu đề Roadmap" required />
-        </div>
-  
-        <div class="form-group">
-          <label for="introText">📝 Giới thiệu</label>
-          <textarea id="introText" v-model="roadmap.introText" placeholder="Nhập giới thiệu cho roadmap" rows="3" required></textarea>
-        </div>
-  
+      <v-container class="py-8" style="max-width: 1300px; margin: 0 auto;">
+        <v-card class="pa-8 mb-8" elevation="3">
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-text-field v-model="roadmap.title" label="Tiêu đề Roadmap" outlined dense required />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-text-field v-model="roadmap.category" label="Danh mục (category)" outlined dense />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-textarea v-model="roadmap.description" label="Mô tả Roadmap" outlined dense required />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-text-field v-model="roadmap.steps" label="Số bước (steps)" type="number" outlined dense />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <div class="mb-2 font-weight-bold">Giới thiệu (Intro Text)</div>
+              <div v-for="(intro, idx) in roadmap.introText" :key="idx" class="d-flex align-center mb-2">
+                <v-text-field v-model="roadmap.introText[idx]" label="Dòng giới thiệu" outlined dense class="flex-grow-1" />
+                <v-btn icon color="error" @click="removeIntro(idx)" class="ml-2"><v-icon>mdi-delete</v-icon></v-btn>
+              </div>
+              <v-btn color="primary" outlined small @click="addIntro"><v-icon left>mdi-plus</v-icon> Thêm dòng</v-btn>
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-text-field v-model="roadmap.image" label="Link ảnh minh họa" outlined dense />
+              <v-img v-if="roadmap.image" :src="roadmap.image" max-width="220" class="mt-2 rounded-lg" />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-checkbox v-model="roadmap.featured" label="Nổi bật (featured)" />
+            </v-col>
+          </v-row>
+          <v-row class="mb-2">
+            <v-col cols="12">
+              <v-slider v-model="roadmap.completionRate" label="Tỉ lệ hoàn thành (%)" min="0" max="100" step="1" thumb-label />
+            </v-col>
+          </v-row>
+        </v-card>
         <div class="phases">
-          <h2>📈 Các Giai Đoạn</h2>
-          <div class="phase" v-for="(phase, index) in roadmap.phases?.sort((a, b) => a.index - b.index)" :key="index">
-            <div class="form-group">
-              <label>🏷️ Tiêu đề Giai Đoạn</label>
-              <input type="text" v-model="phase.title" placeholder="Nhập tiêu đề giai đoạn" required />
-            </div>
-            <div class="form-group">
-              <label>📝 Mô tả Giai Đoạn</label>
-              <textarea v-model="phase.description" placeholder="Mô tả chi tiết giai đoạn" rows="3" required></textarea>
-            </div>
-            <div class="form-group">
-              <label>⏳ Thời Gian Dự Kiến (ngày)</label>
-              <input type="number" v-model="phase.timeSpan" placeholder="Thời gian dự kiến hoàn thành giai đoạn" required />
-            </div>
-  
-            <div class="milestones">
-              <h3>🚩 Các Mốc Quan Trọng</h3>
-              <div class="milestone" v-for="(milestone, msIndex) in phase.milestones" :key="msIndex">
-                <div class="form-group">
-                  <label>🏷️ Tiêu đề Mốc</label>
-                  <input type="text" v-model="milestone.title" placeholder="Nhập tiêu đề mốc" required />
-                </div>
-                <div class="form-group">
-                  <label>📅 Sự Kiện</label>
-                  <select v-model="milestone.eventName" class="form-select">
-                    <option v-for="eventType in TRACKED_EVENTS" :key="eventType.value" :value="eventType.label" @change="updateEventList(index, msIndex, milestone.eventName)">
-                      {{ eventType.displayName.length > 0 ? eventType.displayName : 'General' }}
-                    </option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>🔁 Lần lặp lại yêu cầu</label>
-                  <input type="number" v-model="milestone.repeatTimesRequired" placeholder="Số lần lặp lại sự kiện" required />
-                </div>
-                <div class="form-group">
-                  <label>⏱ Thời gian cần thiết (phút)</label>
-                  <input type="number" v-model="milestone.timeSpentRequired" placeholder="Thời gian cần thiết để hoàn thành mốc" required />
-                </div>
-                <div class="recommendations" v-if="isRecommendationAvailable(milestone.eventName) && milestone.recommendations">
-                <h4>📘 Khuyến Nghị</h4>
-                <div class="recommendation" v-for="(recommendation, recIndex) in milestone.recommendations" :key="recIndex">
-                  <select v-model="recommendation.entityType" class="hidden">
-                    <option :key="milestone.eventName" :value="milestone.eventName"></option>
-                  </select>
-                  <div class="form-group">
-                    <label>🆔 Nội dung khuyến nghị</label>
-                    <select v-model="recommendation.targetEntityId" class="form-select">
-                      <option v-for="content in getAvailableContents(index, msIndex, recIndex, milestone.eventName)" :key="content.id" :value="content.id">
-                        {{ content.name ?? content.title }}
-                      </option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                      <label>🏷️ Đặc Tính</label>
-                      <input type="text" v-model="recommendation.trait" placeholder="Nhập đặc tính" required />
-                    </div>
-                    <div class="form-group">
-                      <label>📝 Mô Tả Đặc Tính</label>
-                      <textarea v-model="recommendation.traitDescription" placeholder="Mô tả đặc tính" rows="2" required></textarea>
-                    </div>
-                    <button type="button" class="btn remove" @click="removeRecommendation(index, msIndex, recIndex)" style="margin-top: 5px;">❌ Xóa Khuyến Nghị</button>
-                </div>
-                <button type="button" class="btn add" @click="addRecommendation(index, msIndex)">➕ Thêm Khuyến Nghị</button>
-              </div>
-                <button type="button" class="btn remove" @click="removeMilestone(index, msIndex)" style="margin-top: 5px;">❌ Xóa Mốc</button>
-              </div>
-              <button type="button" class="btn add" @click="addMilestone(index)">➕ Thêm Mốc</button>
-            </div>
-  
-            <button type="button" class="btn remove" @click="removePhase(index)" style="margin-top: 5px;">❌ Xóa Giai Đoạn</button>
-            <div class="divider"></div>
+          <div class="d-flex align-center mb-4">
+            <v-icon color="primary" class="mr-2">mdi-timeline</v-icon>
+            <span class="text-h5 font-weight-bold">Các Giai Đoạn (Phases)</span>
+            <v-spacer />
+            <v-btn color="success" @click="addPhase"><v-icon left>mdi-plus</v-icon> Thêm giai đoạn</v-btn>
           </div>
-          <button type="button" class="btn add" @click="addPhase">➕ Thêm Giai Đoạn</button>
+          <v-card v-for="(phase, pIdx) in roadmap.phases" :key="pIdx" class="mb-6 pa-6" elevation="2">
+            <v-row align="center" class="mb-2">
+              <v-icon color="primary" class="mr-2">mdi-flag</v-icon>
+              <span class="text-h6 font-weight-bold">Giai đoạn {{ pIdx + 1 }}: {{ phase.title }}</span>
+              <v-spacer />
+              <v-btn icon color="error" @click="removePhase(pIdx)"><v-icon>mdi-delete</v-icon></v-btn>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12">
+                <v-text-field v-model="phase.title" label="Tiêu đề giai đoạn" outlined dense />
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12" md="6">
+                <v-text-field v-model="phase.themeColor" label="Màu chủ đề" outlined dense readonly @click:append="() => showColorPicker(pIdx)" append-icon="mdi-chevron-down" />
+                <v-menu v-model="phase._showColorPicker" :close-on-content-click="false" offset-y>
+                  <v-color-picker v-model="phase.themeColor" hide-inputs mode="hexa" />
+                </v-menu>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-autocomplete
+                  v-model="phase.icon"
+                  :items="iconOptions"
+                  label="Icon (mdi-xxx)"
+                  outlined
+                  dense
+                  clearable
+                  item-text="name"
+                  item-value="value"
+                  :menu-props="{ maxHeight: '300px' }"
+                  prepend-inner-icon="mdi-magnify"
+                >
+                  <template v-slot:item="{ item }">
+                    <v-icon left>{{ item.value }}</v-icon>
+                    <span>{{ item.name }}</span>
+                  </template>
+                  <template v-slot:selection="{ item }">
+                    <v-icon left>{{ item.value }}</v-icon>
+                    <span>{{ item.name }}</span>
+                  </template>
+                </v-autocomplete>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12">
+                <v-checkbox v-model="phase.canSkip" label="Có thể bỏ qua" />
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12">
+                <v-textarea v-model="phase.description" label="Mô tả giai đoạn" outlined dense />
+              </v-col>
+            </v-row>
+            <v-row class="mb-4">
+              <v-col cols="12">
+                <v-textarea v-model="phase.introduction" label="Giới thiệu giai đoạn (introduction)" outlined dense />
+              </v-col>
+            </v-row>
+            <v-divider class="my-4" />
+            <div class="mb-2 font-weight-bold">Tips (Mẹo)</div>
+            <v-row v-for="(tip, tIdx) in phase.tips" :key="tIdx" class="align-center mb-2">
+              <v-col cols="12" md="4">
+                <v-text-field v-model="tip.title" label="Tiêu đề mẹo" outlined dense />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model="tip.content" label="Nội dung mẹo" outlined dense />
+              </v-col>
+              <v-col cols="12" md="1">
+                <v-text-field v-model="tip.icon" label="Icon" outlined dense />
+              </v-col>
+              <v-col cols="12" md="1" class="d-flex align-center">
+                <v-btn icon color="error" @click="removeTip(pIdx, tIdx)"><v-icon>mdi-delete</v-icon></v-btn>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12" class="d-flex justify-end">
+                <v-btn color="primary" outlined small @click="addTip(pIdx)"><v-icon left>mdi-plus</v-icon> Thêm mẹo</v-btn>
+              </v-col>
+            </v-row>
+            <v-divider class="my-4" />
+            <div class="mb-2 font-weight-bold">Actions (Hành động)</div>
+            <v-row v-for="(action, aIdx) in phase.actions" :key="aIdx" class="align-center mb-2">
+              <v-col cols="12" md="4">
+                <v-text-field v-model="action.title" label="Tiêu đề hành động" outlined dense />
+              </v-col>
+              <v-col cols="12" md="5">
+                <v-text-field v-model="action.description" label="Mô tả hành động" outlined dense />
+              </v-col>
+              <v-col cols="12" md="2">
+                <v-text-field v-model="action.duration" label="Thời lượng" outlined dense />
+              </v-col>
+              <v-col cols="12" md="1" class="d-flex align-center">
+                <v-btn icon color="error" @click="removeAction(pIdx, aIdx)"><v-icon>mdi-delete</v-icon></v-btn>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12" class="d-flex justify-end">
+                <v-btn color="primary" outlined small @click="addAction(pIdx)"><v-icon left>mdi-plus</v-icon> Thêm hành động</v-btn>
+              </v-col>
+            </v-row>
+            <v-divider class="my-4" />
+            <div class="mb-2 font-weight-bold">Tiêu chí hoàn thành (Completion Criteria)</div>
+            <v-row v-for="(cri, cIdx) in phase.completionCriteria" :key="cIdx" class="align-center mb-2">
+              <v-col cols="12" md="5">
+                <v-text-field v-model="cri.title" label="Tiêu đề tiêu chí" outlined dense />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model="cri.description" label="Mô tả tiêu chí" outlined dense />
+              </v-col>
+              <v-col cols="12" md="1" class="d-flex align-center">
+                <v-btn icon color="error" @click="removeCriteria(pIdx, cIdx)"><v-icon>mdi-delete</v-icon></v-btn>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col cols="12" class="d-flex justify-end">
+                <v-btn color="primary" outlined small @click="addCriteria(pIdx)"><v-icon left>mdi-plus</v-icon> Thêm tiêu chí</v-btn>
+              </v-col>
+            </v-row>
+          </v-card>
         </div>
-  
-        <div class="form-actions">
-          <button type="submit" class="btn submit" :disabled="!isFormValid">✅ Cập nhật Roadmap</button>
-        </div>
-      </form>
+      </v-container>
+      <v-btn color="primary" block large type="submit" @click="submitRoadmap">Cập nhật Roadmap</v-btn>
     </div>
   </template>
   
@@ -122,7 +209,13 @@
   const roadmap = ref({
     id: "",
     title: "",
-    introText: "",
+    introText: [],
+    category: "",
+    description: "",
+    steps: 0,
+    image: "",
+    featured: false,
+    completionRate: 0,
     phases: [],
   });
   
@@ -139,9 +232,32 @@
 
   const isFormValid = computed(() => {
     return roadmap.value.title.trim() !== '' && 
-           roadmap.value.introText.trim() !== '' && 
+           roadmap.value.introText.length > 0 && 
            roadmap.value.phases.length > 0;
   });
+
+  const iconOptions = [
+    { name: 'Flag', value: 'mdi-flag' },
+    { name: 'Star', value: 'mdi-star' },
+    { name: 'Check', value: 'mdi-check' },
+    { name: 'Trophy', value: 'mdi-trophy' },
+    { name: 'Lightbulb', value: 'mdi-lightbulb' },
+    { name: 'Heart', value: 'mdi-heart' },
+    { name: 'Fire', value: 'mdi-fire' },
+    { name: 'Rocket', value: 'mdi-rocket' },
+    { name: 'Book', value: 'mdi-book' },
+    { name: 'Account', value: 'mdi-account' },
+    { name: 'Calendar', value: 'mdi-calendar' },
+    { name: 'Clock', value: 'mdi-clock' },
+    { name: 'School', value: 'mdi-school' },
+    { name: 'Brain', value: 'mdi-brain' },
+    { name: 'Leaf', value: 'mdi-leaf' },
+    { name: 'Run', value: 'mdi-run' },
+    { name: 'Meditation', value: 'mdi-meditation' },
+    { name: 'Music', value: 'mdi-music' },
+    { name: 'Sleep', value: 'mdi-sleep' },
+    { name: 'Smile', value: 'mdi-emoticon-happy' },
+  ];
 
   async function fetchRoadmapData() {
     try {
@@ -151,6 +267,12 @@
         id: response.id,
         title: response.title,
         introText: response.introText,
+        category: response.category,
+        description: response.description,
+        steps: response.steps,
+        image: response.image,
+        featured: response.featured,
+        completionRate: response.completionRate,
         phases: response.phases || [],
       };
       console.log("Dữ liệu roadmap:", roadmap.value);
@@ -246,12 +368,12 @@
         toast.error("Tiêu đề roadmap không được vượt quá 200 ký tự!", toastConfig);
         return false;
     }
-    if (!roadmap.value.introText.trim()) {
+    if (!roadmap.value.introText.length > 0) {
         toast.error("Vui lòng nhập giới thiệu roadmap!", toastConfig);
         return false;
     }
-    if (roadmap.value.introText.length > 1000) {
-        toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!", toastConfig);
+    if (roadmap.value.description.length > 1000) {
+        toast.error("Mô tả roadmap không được vượt quá 1000 ký tự!", toastConfig);
         return false;
     }
     return true;
@@ -380,6 +502,14 @@
   
   function getAvailableContents(phaseIndex, milestoneIndex, recIndex, eventLabel) {
     return getPreloadedEntities(getEntityTypeByEventLabel(eventLabel));
+  }
+  
+  function showColorPicker(pIdx) {
+    if (!roadmap.value.phases[pIdx]._showColorPicker) {
+      roadmap.value.phases[pIdx]._showColorPicker = true;
+    } else {
+      roadmap.value.phases[pIdx]._showColorPicker = !roadmap.value.phases[pIdx]._showColorPicker;
+    }
   }
   
   onMounted(async () => {
