@@ -436,6 +436,7 @@ import DeleteConfirmPopup from "../../../../components/Common/Popup/DeleteConfir
 import CancelConfirmPopup from "../../../../components/Common/Popup/CancelConfirmPopup.vue";
 import LoadingSpinner from "@/components/Common/Popup/LoadingSpinner.vue";
 import { ArrowLeftIcon, PlusIcon, SaveIcon, UploadIcon } from "lucide-vue-next";
+import { getPagedTags } from "@/scripts/api/services/tagService";
 
 export default {
   name: "CreateCourse",
@@ -476,28 +477,7 @@ export default {
         lectures: [],
         selectedCategories: [],
       },
-      categories: [
-        { id: "1", value: "Sức khỏe tinh thần" },
-        { id: "2", value: "Thiền và chánh niệm" },
-        { id: "3", value: "Quản lý stress" },
-        { id: "4", value: "Phát triển bản thân" },
-        { id: "5", value: "Kỹ năng giao tiếp" },
-        { id: "6", value: "Tâm lý học tích cực" },
-        { id: "7", value: "Dinh dưỡng và sức khỏe" },
-        { id: "8", value: "Yoga và thể dục" },
-        { id: "9", value: "Giấc ngủ và nghỉ ngơi" },
-        { id: "10", value: "Cân bằng cuộc sống" },
-        { id: "11", value: "Phát triển sự nghiệp" },
-        { id: "12", value: "Quản lý thời gian" },
-        { id: "13", value: "Tài chính cá nhân" },
-        { id: "14", value: "Mối quan hệ và tình yêu" },
-        { id: "15", value: "Nuôi dạy con cái" },
-        { id: "16", value: "Vượt qua nghịch cảnh" },
-        { id: "17", value: "Tư duy tích cực" },
-        { id: "18", value: "Kỹ năng lãnh đạo" },
-        { id: "19", value: "Sáng tạo và đổi mới" },
-        { id: "20", value: "Phòng chống kiệt sức" },
-      ],
+      categories: [],
       showCategoryDropdown: false,
       categorySearchTerm: '',
       filteredCategories: [],
@@ -538,7 +518,8 @@ export default {
   },
   created() {
   },
-  mounted() {
+  async mounted() {
+    await this.fetchCategories();
     this.filterCategories();
     if (this.course.lectures.length === 0) {
       this.addLecture();
@@ -571,6 +552,20 @@ export default {
     }
   },
   methods: {
+    async fetchCategories() {
+      try {
+        const response = await getPagedTags();
+        if (response && Array.isArray(response)) {
+          this.categories = response.map(category => ({
+            id: category.id,
+            value: category.title
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Không thể tải danh mục khóa học.");
+      }
+    },
     toggleCategoryDropdown() {
       this.showCategoryDropdown = !this.showCategoryDropdown;
       if (this.showCategoryDropdown) {
@@ -787,6 +782,23 @@ export default {
           isValid = false;
           this.validationErrors.course.discountExpiry = "Vui lòng chọn ngày hết hạn giảm giá";
           firstInvalidField = firstInvalidField || document.getElementById("discountExpiry");
+        }
+
+        if (this.course.discountExpiry && !this.course.discount) {
+          isValid = false;
+          this.validationErrors.course.discount = "Vui lòng nhập giá trị giảm giá";
+          firstInvalidField = firstInvalidField || document.getElementById("courseDiscount");
+        }
+
+        if (this.course.discountExpiry) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiryDate = new Date(this.course.discountExpiry);
+          if (expiryDate <= today) {
+            isValid = false;
+            this.validationErrors.course.discountExpiry = "Ngày hết hạn phải lớn hơn ngày hiện tại";
+            firstInvalidField = firstInvalidField || document.getElementById("discountExpiry");
+          }
         }
       }
 
