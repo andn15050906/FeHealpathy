@@ -24,7 +24,7 @@
           <v-divider></v-divider>
 
           <!-- Course Progress -->
-          <div class="pa-4">
+          <div v-if="currentCourse" class="pa-4">
             <div class="d-flex justify-space-between align-center mb-2">
               <span class="text-subtitle-2">Tiến độ khóa học</span>
               <span class="text-caption">{{ courseProgressData.currentCourse.progress }}%</span>
@@ -371,6 +371,15 @@ const totalLectures = ref(0);
 const isOwner = ref(false);
 const isEnrolled = ref(false);
 
+// Add courseProgressData
+const courseProgressData = computed(() => ({
+  currentCourse: {
+    progress: courseProgressPercentage.value,
+    completedLectures: completedLectures.value,
+    totalLectures: totalLectures.value
+  }
+}));
+
 // Add new methods for course progress
 const fetchCourseData = async (courseId) => {
   try {
@@ -578,7 +587,7 @@ main {
   background-size: 100% 100vh;
   background-position: center top;
   background-attachment: fixed;
-  margin-top: 100px;
+  margin-top: 50px;
 }
 
 /**.page-container {

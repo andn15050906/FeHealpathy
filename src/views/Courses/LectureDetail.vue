@@ -4,59 +4,82 @@
     <button class="btn-back" @click="goBack">⬅️ Quay lại khóa học</button>
     <div v-show="!isLoading" class="lecture-detail-container">
       <div v-if="lecture">
-    <div class="lecture-header">
-      <h1>{{ lecture.title }}</h1>
-      <p class="lecture-meta">
-            🧑‍🏫 {{ authorName || 'Không rõ tác giả' }} • 
-            🕒 Ngày tạo: {{ formatDate(lecture.creationTime) }} • 
-            <span v-if="lecture.lastModificationTime">
-              🖋️ Cập nhật: {{ formatDate(lecture.lastModificationTime) }}
-            </span>
-      </p>
-    </div>
+        <div class="lecture-header">
+          <h1 class="lecture-title">{{ lecture.title }}</h1>
+          <div class="lecture-meta">
+            <div class="lecture-author">
+              <span class="meta-icon"></span>
+              <span class="meta-text">Cố vấn: {{ authorName || 'Không rõ tác giả' }}</span>
+            </div>
+            <div class="lecture-dates">
+              <div class="date-item">
+                <span class="meta-icon"></span>
+                <span class="meta-text">Ngày tạo: {{ formatDate(lecture.creationTime) }}</span>
+              </div>
+              <div class="date-item" v-if="lecture.lastModificationTime">
+                <span class="meta-icon"></span>
+                <span class="meta-text">Cập nhật: {{ formatDate(lecture.lastModificationTime) }}</span>
+              </div>
+            </div>
+            <div class="lecture-info">
+              <span v-if="lecture.isPreviewable" class="info-item">
+                <span class="meta-icon">👁️</span>
+                <span class="meta-text">Có thể xem trước</span>
+              </span>
+            </div>
+          </div>
+        </div>
 
-    <div class="lecture-content">
-          <p>Nội dung bài giảng: {{ lecture.content || lecture.contentSummary }}</p>
-    </div>
+        <div class="lecture-content">
+          <h2 class="content-title">Nội Dung Bài Giảng</h2>
+          <p>{{ lecture.content}}</p>
+          <div v-if="lecture.metaData" class="lecture-metadata">
+            <h3>Thông tin bổ sung</h3>
+            <pre>{{ lecture.metaData }}</pre>
+          </div>
+        </div>
 
         <div v-if="hasMaterials" class="lecture-materials">
           <h2>📎 Tài liệu đính kèm</h2>
-      <div class="material-grid">
-        <div
-          v-for="(material, index) in lecture.materials"
-          :key="index"
-          class="material-card"
-        >
-          <template v-if="isImage(material.url)">
-            <img
-              :src="material.url"
+          <div class="material-grid">
+            <div
+              v-for="(material, index) in lecture.materials"
+              :key="index"
+              class="material-card"
+            >
+              <template v-if="isImage(material.url)">
+                <img
+                  :src="material.url"
                   :alt="material.title || 'Hình ảnh'"
-              class="material-image"
+                  class="material-image"
                   @error="handleImageError"
-            />
-          </template>
-          <template v-else-if="isVideo(material.url)">
-            <video controls :src="material.url" class="material-video"></video>
-          </template>
+                />
+              </template>
+              <template v-else-if="isVideo(material.url)">
+                <video controls :src="material.url" class="material-video"></video>
+              </template>
               <template v-else-if="isAudio(material.url)">
                 <audio controls :src="material.url" class="material-audio"></audio>
-          </template>
-          <template v-else>
+              </template>
+              <template v-else>
                 <div class="document-container">
-            <a :href="material.url" target="_blank" class="material-link">
-                    📄 {{ material.title || 'Tài liệu' }}
-            </a>
-            <button
-              class="btn-download"
-                    @click="downloadFile(material.url, material.title || 'download')"
-            >
-                    ⬇️ Tải xuống
-            </button>
+                  <div class="document-preview" v-if="isPreviewable(material.url)">
+                    <iframe 
+                      :src="getPreviewUrl(material.url)"
+                      class="document-preview-frame"
+                      frameborder="0"
+                    ></iframe>
+                  </div>
+                  <div class="document-actions">
+                    <a :href="material.url" target="_blank" class="material-link">
+                      📄 {{ material.title || 'Tài liệu' }}
+                    </a>
+                  </div>
                 </div>
-          </template>
+              </template>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
         <div class="comments-section">
           <h2>💬 Bình luận</h2>
@@ -410,6 +433,40 @@ export default {
           lecture.value = null;
         }
         
+        // Thêm các tài liệu mẫu vào materials
+        if (lecture.value) {
+          lecture.value.materials = lecture.value.materials || [];
+          // Video mẫu
+          lecture.value.materials.push({
+            title: "Video bài giảng",
+            url: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          });
+          // Audio mẫu
+          lecture.value.materials.push({
+            title: "Audio bài giảng",
+            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          });
+          // PDF mẫu
+          lecture.value.materials.push({
+            title: "Tài liệu PDF mẫu",
+            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf"
+          });
+          // Word mẫu
+          lecture.value.materials.push({
+            title: "Tài liệu Word mẫu",
+            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.docx"
+          });
+          // Excel mẫu
+          lecture.value.materials.push({
+            title: "Bảng tính Excel mẫu",
+            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.xlsx"
+          });
+          // PowerPoint mẫu
+          lecture.value.materials.push({
+            title: "Slide PowerPoint mẫu",
+            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.pptx"
+          });
+        }
         
         if (lecture.value?.creatorId) {
           try {
@@ -502,6 +559,22 @@ export default {
       });
     };
 
+    const showPreview = ref({});
+
+    const isPreviewable = (url) => {
+      if (!url) return false;
+      return /\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/i.test(url);
+    };
+
+    const getPreviewUrl = (url) => {
+      // Sử dụng Google Docs Viewer
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    };
+
+    const togglePreview = (url) => {
+      showPreview.value[url] = !showPreview.value[url];
+    };
+
     onMounted(async () => {
       getCurrentUserInfo();
       await fetchLecture();
@@ -517,6 +590,8 @@ export default {
       isImage,
       isVideo,
       isAudio,
+      isPreviewable,
+      getPreviewUrl,
       handleImageError,
       downloadFile,
       goBack,
@@ -542,7 +617,9 @@ export default {
       showUpdateConfirm,
       handleUpdateConfirm,
       handleUpdateCancel,
-      commentToUpdate
+      commentToUpdate,
+      showPreview,
+      togglePreview
     };
   }
 };
@@ -560,23 +637,75 @@ export default {
 }
 
 .lecture-header {
-  margin-bottom: 30px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 20px;
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #eee;
 }
 
-.lecture-header h1 {
-  font-size: 28px;
-  margin-bottom: 10px;
-  color: #333;
+.lecture-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  line-height: 1.3;
 }
 
 .lecture-meta {
-  font-size: 14px;
-  color: #666;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
   gap: 15px;
+  color: #666;
+  font-size: 15px;
+}
+
+.lecture-author {
+  font-size: 18px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.lecture-dates {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lecture-info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-icon {
+  font-size: 18px;
+}
+
+.meta-text {
+  font-size: 15px;
+}
+
+.content-title {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 .lecture-content {
@@ -585,6 +714,33 @@ export default {
   margin-bottom: 40px;
   color: #444;
   max-width: 900px;
+}
+
+.lecture-metadata {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lecture-metadata h3 {
+  font-size: 18px;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.lecture-metadata pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  padding: 10px;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
 }
 
 .lecture-materials {
@@ -601,8 +757,8 @@ export default {
 }
 
 .material-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 25px;
   width: 100%;
 }
@@ -614,6 +770,7 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
 }
 
 .material-card:hover {
@@ -623,7 +780,7 @@ export default {
 
 .material-image {
   width: 100%;
-  max-height: 220px;
+  max-height: 400px;
   object-fit: contain;
   border-radius: 8px;
   background-color: #f0f0f0;
@@ -642,6 +799,33 @@ export default {
 .document-container {
   display: flex;
   flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.document-preview {
+  width: 100%;
+  min-height: 600px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.document-preview-frame {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+.document-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-buttons {
+  display: flex;
   gap: 10px;
 }
 
@@ -1026,6 +1210,23 @@ export default {
 .pagination {
   margin-top: 20px;
   text-align: center;
+}
+
+.btn-preview {
+  padding: 12px;
+  background: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  flex: 1;
+}
+
+.btn-preview:hover {
+  background: #138496;
 }
 
 @media (max-width: 768px) {
