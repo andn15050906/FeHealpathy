@@ -62,7 +62,7 @@
 
 <script>
 import ActivityCard from "./ActivityCard.vue";
-import { getStepDetails } from "@/scripts/api/services/roadmapService";
+import { getPhaseDetailsById } from "@/scripts/api/services/roadmapService";
 
 export default {
   name: "StepDetail",
@@ -91,7 +91,7 @@ export default {
     async fetchStepDetails(stepId) {
       try {
         this.loading = true;
-        const response = await getStepDetails(stepId);
+        const response = await getPhaseDetailsById(stepId);
 
         if (response) {
           this.detailedStep = response;
