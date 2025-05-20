@@ -48,14 +48,6 @@
                     {{ phase.introduction }}
                   </p>
 
-                  <div v-if="phase.videoUrl" class="mt-6">
-                    <h3 class="text-h6 mb-2">Hướng dẫn video</h3>
-                    <div class="video-placeholder d-flex justify-center align-center"
-                      :style="{ backgroundColor: phase.themeColor + '-lighten-4' }">
-                      <v-btn icon="mdi-play" :color="phase.themeColor" size="x-large" variant="flat"></v-btn>
-                    </div>
-                  </div>
-
                   <div v-if="phase.tips && phase.tips.length > 0" class="mt-6">
                     <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
                     <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
@@ -459,7 +451,6 @@ export default {
   flex: 1;
   width: 100%;
   padding: 0 40px;
-  /* Thêm padding để nội dung không sát cạnh */
 }
 
 .video-placeholder {
@@ -473,8 +464,8 @@ export default {
 }
 
 .step-tab-wrapper {
-  max-width: 1300px;
-  min-width: 1300px;
+  max-width: 1200px;
+  min-width: 1200px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;

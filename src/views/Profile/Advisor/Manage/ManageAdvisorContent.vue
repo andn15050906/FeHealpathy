@@ -192,7 +192,7 @@ import { getCourses, deleteCourse } from '@/scripts/api/services/courseService'
 import { getRoadmaps, deleteRoadmap } from '@/scripts/api/services/roadmapService'
 import Pagination from '@/components/Common/Pagination.vue'
 import UpdateBlog from './UpdateBlog.vue'
-import UpdateRoadmap from './UpdateRoadmap.vue'
+import UpdateRoadmap from '../../Admin/UpdateRoadmap.vue'
 import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue'
 import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue'
 import { toast } from "vue3-toastify";
