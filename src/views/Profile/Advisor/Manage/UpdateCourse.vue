@@ -563,7 +563,7 @@ export default {
       minDiscountDate: (() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow.toISOString().split("T")[0];
+        return tomorrow.toISOString().split('T')[0];
       })(),
     };
   },
@@ -667,7 +667,7 @@ export default {
         }
         if (courseData.discountExpiry) {
           const expiryDate = new Date(courseData.discountExpiry);
-          courseData.discountExpiry = expiryDate.toISOString().split("T")[0];
+          courseData.discountExpiry = expiryDate.toISOString().split('T')[0];
           this.originalDiscountExpiry = courseData.discountExpiry;
         }
 
@@ -1010,7 +1010,6 @@ export default {
 
         if (this.course.discountExpiry && this.course.discountExpiry !== this.originalDiscountExpiry) {
           const today = new Date();
-          today.setHours(0, 0, 0, 0);
           const expiryDate = new Date(this.course.discountExpiry);
           if (expiryDate <= today) {
             isValid = false;
@@ -1164,7 +1163,13 @@ export default {
         courseFormData.append("Status", this.course.status);
         courseFormData.append("Price", this.course.price);
         courseFormData.append("Discount", this.course.discount / 100);
-        courseFormData.append("DiscountExpiry", this.course.discountExpiry);
+        let discountExpiryWithTime = null;
+        if (this.course.discountExpiry) {
+          const dateOnly = new Date(this.course.discountExpiry);
+          dateOnly.setHours(23, 59, 59, 999);
+          discountExpiryWithTime = dateOnly.toISOString();
+        }
+        courseFormData.append("DiscountExpiry", discountExpiryWithTime);
         courseFormData.append("Level", this.course.level);
         courseFormData.append("Outcomes", this.course.outcomes);
         courseFormData.append("Requirements", this.course.requirements);

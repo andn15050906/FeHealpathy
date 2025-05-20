@@ -926,7 +926,15 @@ export default {
         courseFormData.append("Status", this.course.status);
         courseFormData.append("Price", this.course.price);
         courseFormData.append("Discount", this.course.discount / 100);
-        courseFormData.append("DiscountExpiry", this.course.discountExpiry);
+        
+        let discountExpiryWithTime = null;
+        if (this.course.discountExpiry) {
+          const dateOnly = new Date(this.course.discountExpiry);
+          dateOnly.setHours(23, 59, 59, 999);
+          discountExpiryWithTime = dateOnly.toISOString();
+        }
+        courseFormData.append("DiscountExpiry", discountExpiryWithTime);
+        
         courseFormData.append("Level", this.course.level);
         courseFormData.append("Outcomes", this.course.outcomes);
         courseFormData.append("Requirements", this.course.requirements);
