@@ -107,15 +107,15 @@ const router = createRouter({
       path: "/:pathMatch(.*)*",
       redirect: "/NotFound",
     },
-    {
-      path: "/",
-      name: "Home",
-      component: HomePage,
-      /*components: {
-        default: HomePage,
-        roadmapProgress: RoadmapProgress
-      }*/
-    },
+    // {
+    //   path: "/",
+    //   name: "Home",
+    //   component: HomePage,
+    //   /*components: {
+    //     default: HomePage,
+    //     roadmapProgress: RoadmapProgress
+    //   }*/
+    // },
     {
       path: "/faq",
       name: "FAQ",
@@ -563,7 +563,7 @@ const router = createRouter({
       component: MentalProfile
     },
     {
-      path: "/roadmaps/recommended",
+      path: "/",
       name: "overview",
       component: RoadmapOverview,
     },
