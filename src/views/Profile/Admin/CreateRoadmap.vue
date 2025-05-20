@@ -598,7 +598,7 @@ onMounted(async () => {
 .roadmap-fullscreen {
   width: 100%;
   margin-bottom: 35px;
-  min-width: 1300px;
+  min-width: 1200px;
   min-height: 100vh;
   background-color: #f0f7fa;
   display: flex;
