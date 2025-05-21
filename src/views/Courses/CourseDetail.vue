@@ -18,7 +18,7 @@
             </div>
 
             <div class="owner-status" v-if="isOwner">
-              <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
+              <p class="owner-message">Đây là khóa học của bạn.</p>
             </div>
 
             <div
@@ -30,9 +30,7 @@
                 <div class="price-container">
                   <div class="old-price-row" v-if="course.discount > 0">
                     <del>{{ course.price?.toLocaleString("vi-VN") }} VND</del>
-                    <span class="discount-badge"
-                      >{{ Math.floor(course.discount * 100) }}% OFF</span
-                    >
+                    <span class="discount-badge">{{ Math.floor(course.discount * 100) }}% OFF</span>
                   </div>
                   <div class="new-price">
                     <strong>{{
@@ -45,7 +43,7 @@
               </div>
               <div class="buy-button-container">
                 <button class="btn-buy" @click="handlePurchase">
-                  💰 Mua ngay
+                  Mua ngay
                 </button>
               </div>
             </div>
@@ -53,7 +51,7 @@
               class="enrollment-status"
               v-else-if="isEnrolled && !isLoadingEnrollment"
             >
-              <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
+              <p class="enrolled-message">Bạn đã tham gia khóa học này.</p>
             </div>
             <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
               <p>Đang kiểm tra trạng thái...</p>
@@ -63,28 +61,28 @@
           <div class="course-info">
             <h1 class="course-title">{{ course.title }}</h1>
             <p class="course-meta">
-              <span>🧑‍🏫 Giảng viên: {{ instructorName }}</span>
-              <span>🎓 {{ course.learnerCount || 0 }} Học viên</span>
+              <span>Giảng viên: {{ instructorName }}</span>
+              <span>{{ course.learnerCount || 0 }} Học viên</span>
               <span class="rating-meta" @click="scrollToRating">⭐ {{ averageRating }}/5</span>
             </p>
 
             <div class="course-section">
-              <h3 class="section-subtitle">🎯 Giới thiệu</h3>
+              <h3 class="section-subtitle">Giới thiệu</h3>
               <p class="course-intro">{{ course.intro }}</p>
             </div>
 
             <div class="course-section">
-              <h3 class="section-subtitle">💡 Mô tả chi tiết</h3>
+              <h3 class="section-subtitle">Mô tả chi tiết</h3>
               <p class="course-description">{{ course.description }}</p>
             </div>
 
             <div class="course-section">
-              <h3 class="section-subtitle">🎯 Kết quả đạt được</h3>
+              <h3 class="section-subtitle">Kết quả đạt được</h3>
               <p class="course-outcomes">{{ course.outcomes }}</p>
             </div>
 
             <div class="course-section">
-              <h3 class="section-subtitle">💡 Yêu cầu khóa học</h3>
+              <h3 class="section-subtitle">Yêu cầu khóa học</h3>
               <p class="course-requirements">{{ course.requirements }}</p>
             </div>
 
@@ -116,14 +114,12 @@
         <div class="card border-0 shadow-sm mb-4">
           <div class="card-body">
             <div class="section-header">
-              <h4 class="fw-bold text-dark card-title mb-4">📚 Bài giảng</h4>
+              <h4 class="fw-bold text-dark card-title mb-4">Bài giảng</h4>
               <div class="section-stats" v-if="isEnrolled">
                 <span class="stat-badge">
-                  <i class="fas fa-book-open"></i>
                   {{ completedLectures }}/{{ totalLectures }} bài đã học
                 </span>
                 <span class="stat-badge">
-                  <i class="fas fa-chart-line"></i>
                   {{ Math.round(completionRate) }}% hoàn thành
                 </span>
               </div>
@@ -148,12 +144,12 @@
                     "
                   />
                   <div class="lecture-thumb-placeholder" style="display: none">
-                    Không thể tải ảnh
+                    {{ lecture.title }}
                   </div>
                 </template>
                 <template v-else>
                   <div class="lecture-thumb-placeholder">
-                    Không có ảnh xem trước
+                    {{ lecture.title }}
                   </div>
                 </template>
 
@@ -176,7 +172,7 @@
                       : 'Bạn cần mua khóa học để xem bài giảng này'
                   "
                 >
-                  ▶️ Xem bài giảng
+                  Xem bài giảng
                 </button>
               </div>
             </div>
@@ -1079,13 +1075,43 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
-  color: #888;
-  font-size: 14px;
+  background: linear-gradient(135deg, #4b6cb7, #182848);
+  color: white;
+  font-size: 16px;
   text-align: center;
   border-radius: 10px;
-  border: 1px dashed #ddd;
+  border: none;
   margin-bottom: 18px;
+  padding: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(75, 108, 183, 0.2);
+}
+
+.lecture-thumb-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.lecture-thumb-placeholder > * {
+  position: relative;
+  z-index: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .enrollment-status {
