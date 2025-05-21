@@ -140,6 +140,7 @@ import ConversationWindow from './views/Community/ConversationWindow.vue';
 import RoadmapProgress from '@/components/Layouts/RoadmapProgress.vue';
 import PremiumBlocker from '@/components/Layouts/PremiumBlocker.vue';
 import CallWindow from '@/components/CommunityComponents/CallWindow.vue';
+import { courseProgressData } from '@/scripts/data/courseData.js';
 import { getRoadmapSteps } from '@/scripts/data/roadmapData.js';
 import { getCourseById, getLectures, getEnrollments } from '@/scripts/api/services/courseService';
 
