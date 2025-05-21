@@ -284,7 +284,7 @@ const cardAnimation = computed(() => {
 })
 
 // Sidebar state
-const sidebarOpen = ref(true)
+const sidebarOpen = ref(false)
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
 }
@@ -595,7 +595,8 @@ main {
 }
 
 .v-navigation-drawer--rail {
-  width: 64px !important;
+  width: 0 !important;
+  overflow: hidden;
 }
 
 /**.page-container {
