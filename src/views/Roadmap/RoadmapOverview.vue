@@ -1,54 +1,77 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <v-container fluid class="pt-16" style="margin-top: 15px;">
-        <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div>
-            <h1 class="text-h4 font-weight-bold text-gray-900">
-              Các lộ trình sức khỏe tinh thần
-            </h1>
-            <p class="text-subtitle-1 text-gray-600 mt-2">
-              Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành cùng bạn tạo nên một hành trình riêng
-              biệt - an toàn, bảo mật và dành riêng cho bạn.
-            </p>
-          </div>
-          <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
-          style="font-weight:600; border-radius: 24px; width: 50%" @click="goToSuggestion">
-            Khám phá lộ trình phù hợp cho bạn </v-btn>
+      <div
+        class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6"
+      >
+        <div>
+          <h1 class="text-h4 font-weight-bold text-gray-900">
+            Các lộ trình sức khỏe tinh thần
+          </h1>
+          <p class="text-subtitle-1 text-gray-600 mt-2">
+            Bạn có thể tự chọn lộ trình phù hợp, hoặc để chúng tôi đồng hành
+            cùng bạn tạo nên một hành trình riêng biệt – an toàn, bảo mật và
+            dành riêng cho bạn.
+          </p>
         </div>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-leaf"
+          size="large"
+          style="font-weight: 600; border-radius: 24px; min-width: 220px"
+          @click="goToSuggestion"
+        >
+          Khám phá lộ trình phù hợp cho bạn
+        </v-btn>
+      </div>
 
-        <div style="margin-top:8px; color:#43a047; font-style:italic; font-size: 0.98rem;">
-          Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt đối cho bạn!
-        </div>
+      <div
+        style="
+          margin-top: 8px;
+          color: #43a047;
+          font-style: italic;
+          font-size: 0.98rem;
+        "
+      >
+        Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt
+        đối cho bạn!
+      </div>
 
       <v-tabs v-model="activeTab" class="mb-6">
         <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
         <v-tab value="all">Tất cả lộ trình</v-tab>
       </v-tabs>
 
-      <v-window style="margin-top: -35px;" v-model="activeTab">
-          <v-window-item value="suggested">
-            <div class="roadmap-grid">
-              <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
-                @view="viewRoadmap" />
-            </div>
-          </v-window-item>
+      <v-window style="margin-top: -35px" v-model="activeTab">
+        <v-window-item value="suggested">
+          <div class="roadmap-grid">
+            <RoadmapCard
+              v-for="roadmap in suggestedRoadmaps"
+              :key="roadmap.id"
+              :roadmap="roadmap"
+              @view="viewRoadmap"
+            />
+          </div>
+        </v-window-item>
 
-          <v-window-item value="all">
-            <div class="roadmap-grid">
-              <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
-            </div>
-          </v-window-item>
-        </v-window>
-
-      </v-container>
+        <v-window-item value="all">
+          <div class="roadmap-grid">
+            <RoadmapCard
+              v-for="roadmap in allRoadmaps"
+              :key="roadmap.id"
+              :roadmap="roadmap"
+              @view="viewRoadmap"
+            />
+          </div>
+        </v-window-item>
+      </v-window>
     </div>
   </div>
 </template>
 
 <script>
 import RoadmapCard from "@/components/Roadmap/RoadmapCard.vue";
-import { getRoadmapSteps, getMentalHealthRoadmaps } from "@/scripts/data/roadmapData.js";
+import { getRoadmaps } from "@/scripts/api/services/roadmapService.js";
 
 export default {
   name: "RoadmapOverview",
@@ -58,12 +81,38 @@ export default {
   data() {
     return {
       activeTab: "suggested",
-      roadmapSteps: [],
       suggestedRoadmaps: [],
-      allRoadmaps: []
+      allRoadmaps: [],
+      loading: true,
     };
   },
+  async created() {
+    await this.fetchRoadmaps();
+  },
   methods: {
+    async fetchRoadmaps() {
+      try {
+        this.loading = true;
+        const response = await getRoadmaps();
+
+        if (Array.isArray(response)) {
+          this.allRoadmaps = response;
+
+          // Giả sử mỗi roadmap có field `featured` để xác định được đề xuất
+          this.suggestedRoadmaps = response.filter(
+            (roadmap) => roadmap.featured
+          );
+
+          if (this.suggestedRoadmaps.length === 0 && response.length > 0) {
+            this.suggestedRoadmaps = response.slice(0, 2);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching roadmaps:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
     goToSuggestion() {
       this.$router.push("/suggest");
     },
@@ -97,7 +146,7 @@ export default {
 .roadmap-container {
   display: flex;
   min-height: 100vh;
-  margin-left: 100px;
+  max-width: 1200px;
 }
 
 .roadmap-content {

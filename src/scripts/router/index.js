@@ -84,9 +84,9 @@ import ManageCourse from "@/views/Profile/Advisor/Manage/ManageCourse.vue";
 import CreateCourse from "@/views/Profile/Advisor/Manage/CreateCourse.vue";
 import UpdateCourse from "@/views/Profile/Advisor/Manage/UpdateCourse.vue";
 import RoadmapBuilder from "@/views/Profile/Advisor/Manage/RoadmapBuilder.vue";
-import UpdateRoadmap from "@/views/Profile/Advisor/Manage/UpdateRoadmap.vue";
+import UpdateRoadmap from "@/views/Profile/Admin/UpdateRoadmap.vue";
 import RoadmapProgress from "@/components/RoadmapComponents/RoadmapProgress.vue";
-import CreateRoadmap from "@/views/Profile/Advisor/Manage/CreateRoadmap.vue";
+import CreateRoadmap from "@/views/Profile/Admin/CreateRoadmap.vue";
 
 import MentalProfile from '@/components/Roadmap/MentalProfile.vue';
 import RoadmapOverview from "@/views/Roadmap/RoadmapOverview.vue";
@@ -107,15 +107,15 @@ const router = createRouter({
       path: "/:pathMatch(.*)*",
       redirect: "/NotFound",
     },
-    {
-      path: "/",
-      name: "Home",
-      component: HomePage,
-      /*components: {
-        default: HomePage,
-        roadmapProgress: RoadmapProgress
-      }*/
-    },
+    // {
+    //   path: "/",
+    //   name: "Home",
+    //   component: HomePage,
+    //   /*components: {
+    //     default: HomePage,
+    //     roadmapProgress: RoadmapProgress
+    //   }*/
+    // },
     {
       path: "/faq",
       name: "FAQ",
@@ -563,7 +563,7 @@ const router = createRouter({
       component: MentalProfile
     },
     {
-      path: "/roadmaps/recommended",
+      path: "/",
       name: "overview",
       component: RoadmapOverview,
     },

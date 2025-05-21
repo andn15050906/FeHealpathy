@@ -1,77 +1,96 @@
 <template>
-  <v-dialog v-model="dialogVisible" max-width="600px" persistent>
-    <v-card>
-      <v-card-title class="text-h5 bg-primary text-white">
-        <v-icon color="white" class="mr-2">mdi-check-circle</v-icon>
-        Hoàn thành Phase: {{ phaseTitle }}
+  <v-dialog v-model="dialogVisible" max-width="540px" persistent>
+    <v-card class="rounded-xl pa-0">
+      <v-card-title
+        class="d-flex align-center"
+        :style="{ background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)', color: 'white', borderTopLeftRadius: '18px', borderTopRightRadius: '18px' }"
+      >
+        <v-icon size="36" class="mr-3 bounce">mdi-trophy</v-icon>
+        <span class="text-h5 font-weight-bold">Hoàn thành Phase: {{ phaseTitle }}</span>
       </v-card-title>
 
-      <v-card-text class="pt-4">
-        <p class="text-body-1 mb-4">
-          Chúc mừng! Bạn đã hoàn thành phase "{{ phaseTitle }}" trong lộ trình của mình.
-        </p>
+      <v-card-text class="pt-5 pb-0 px-6">
+        <div class="mb-4 text-center">
+          <v-icon color="success" size="40" class="mb-2">mdi-check-circle</v-icon>
+          <div class="text-h6 font-weight-bold" style="color: #43cea2;">
+            Chúc mừng bạn đã hoàn thành phase này! Hãy tự hào về bản thân mình!
+          </div>
+        </div>
 
         <v-divider class="my-4"></v-divider>
 
-        <h3 class="text-h6 mb-3">Đánh giá tiến độ của bạn</h3>
-
-        <v-list>
-          <v-list-item v-for="(criteria, index) in criteriaList" :key="index">
-            <template v-slot:prepend>
-              <v-checkbox v-model="completedCriteria[index]" color="success"></v-checkbox>
-            </template>
-            <v-list-item-title>{{ criteria.title }}</v-list-item-title>
-            <v-list-item-subtitle>{{ criteria.description }}</v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
+        <div class="mb-2 text-subtitle-2 font-weight-bold">Đánh giá tiến độ của bạn</div>
+        <v-row dense>
+          <v-col cols="12" v-for="(criteria, index) in criteriaList" :key="index">
+            <v-sheet
+              class="pa-3 mb-2 d-flex align-center transition"
+              :elevation="completedCriteria[index] ? 3 : 1"
+              :color="completedCriteria[index] ? '#e8f5e9' : '#f5f7fa'"
+              rounded
+            >
+              <v-checkbox
+                v-model="completedCriteria[index]"
+                color="success"
+                hide-details
+                class="mr-2"
+              ></v-checkbox>
+              <div>
+                <div class="font-weight-medium">{{ criteria.title }}</div>
+                <div class="text-caption" style="color: #888;">{{ criteria.description }}</div>
+              </div>
+            </v-sheet>
+          </v-col>
+        </v-row>
 
         <v-divider class="my-4"></v-divider>
 
-        <h3 class="text-h6 mb-3">Tài liệu tham khảo</h3>
-        <v-list>
-          <v-list-item v-for="(doc, index) in documents" :key="index" :href="doc.url" target="_blank">
-            <template v-slot:prepend>
-              <v-icon color="primary">mdi-file-document-outline</v-icon>
-            </template>
-            <v-list-item-title>{{ doc.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
+        <div class="mb-2 text-subtitle-2 font-weight-bold">Tài liệu tham khảo</div>
+        <div>
+          <div
+            v-for="(doc, idx) in documents"
+            :key="idx"
+            :href="doc.url"
+            target="_blank"
+            class="rounded-lg mb-1 doc-link"
+            style="display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer;"
+            @click="() => window.open(doc.url, '_blank')"
+          >
+            <v-icon left color="primary" style="margin-right: 8px;">mdi-file-document-outline</v-icon>
+            <span>{{ doc.title }}</span>
+          </div>
+        </div>
 
         <v-divider class="my-4"></v-divider>
 
-        <h3 class="text-h6 mb-3">Bạn muốn làm gì tiếp theo?</h3>
-        <v-radio-group v-model="nextAction">
-          <v-radio value="yes" color="success">
-            <template v-slot:label>
-              <div>
-                <strong>Tiếp tục lộ trình</strong>
-                <div class="text-caption">Chuyển đến phase tiếp theo ngay lập tức</div>
-              </div>
-            </template>
-          </v-radio>
-          <v-radio value="review" color="primary">
-            <template v-slot:label>
-              <div>
-                <strong>Xem lại lộ trình</strong>
-                <div class="text-caption">Quay lại trang tổng quan lộ trình</div>
-              </div>
-            </template>
-          </v-radio>
-          <v-radio value="pause" color="warning">
-            <template v-slot:label>
-              <div>
-                <strong>Tạm dừng</strong>
-                <div class="text-caption">Tạm dừng lộ trình và quay lại sau</div>
-              </div>
-            </template>
-          </v-radio>
+        <div class="mb-2 text-subtitle-2 font-weight-bold">Bạn muốn làm gì tiếp theo?</div>
+        <v-radio-group v-model="nextAction" class="mb-2">
+          <v-radio
+            label="Tiếp tục lộ trình"
+            value="yes"
+            color="primary"
+            class="mb-1"
+            prepend-icon="mdi-arrow-right-bold-circle"
+          ></v-radio>
+          <v-radio
+            label="Xem lại lộ trình"
+            value="review"
+            color="info"
+            class="mb-1"
+            prepend-icon="mdi-eye-outline"
+          ></v-radio>
+          <v-radio
+            label="Tạm dừng"
+            value="pause"
+            color="grey"
+            prepend-icon="mdi-pause-circle"
+          ></v-radio>
         </v-radio-group>
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions class="px-6 pb-5 pt-2">
         <v-spacer></v-spacer>
-        <v-btn color="primary" variant="elevated" @click="submitEvaluation" :disabled="!isFormValid">
-          Xác nhận
+        <v-btn color="primary" block large class="rounded-lg" @click="submitEvaluation" :disabled="!isFormValid">
+          Xác nhận & Tiếp tục
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -160,7 +179,22 @@ export default {
 </script>
 
 <style scoped>
-.v-list-item {
-  min-height: 64px;
+.bounce {
+  animation: bounce 1.2s infinite alternate;
+}
+@keyframes bounce {
+  0% { transform: translateY(0);}
+  100% { transform: translateY(-6px);}
+}
+.doc-link {
+  display: flex !important;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+  min-height: 48px;
+}
+.doc-link:hover {
+  background: #e3f2fd !important;
+  cursor: pointer;
 }
 </style>
