@@ -590,6 +590,14 @@ main {
   margin-top: 50px;
 }
 
+.v-navigation-drawer {
+  width: 200px !important;
+}
+
+.v-navigation-drawer--rail {
+  width: 64px !important;
+}
+
 /**.page-container {
   min-height: 100vh;
   width: 1200px;

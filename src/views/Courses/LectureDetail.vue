@@ -21,12 +21,6 @@
                 <span class="meta-text">Cập nhật: {{ formatDate(lecture.lastModificationTime) }}</span>
               </div>
             </div>
-            <div class="lecture-info">
-              <span v-if="lecture.isPreviewable" class="info-item">
-                <span class="meta-icon">👁️</span>
-                <span class="meta-text">Có thể xem trước</span>
-              </span>
-            </div>
           </div>
         </div>
 
@@ -433,41 +427,6 @@ export default {
           lecture.value = null;
         }
         
-        // Thêm các tài liệu mẫu vào materials
-        if (lecture.value) {
-          lecture.value.materials = lecture.value.materials || [];
-          // Video mẫu
-          lecture.value.materials.push({
-            title: "Video bài giảng",
-            url: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          });
-          // Audio mẫu
-          lecture.value.materials.push({
-            title: "Audio bài giảng",
-            url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-          });
-          // PDF mẫu
-          lecture.value.materials.push({
-            title: "Tài liệu PDF mẫu",
-            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf"
-          });
-          // Word mẫu
-          lecture.value.materials.push({
-            title: "Tài liệu Word mẫu",
-            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.docx"
-          });
-          // Excel mẫu
-          lecture.value.materials.push({
-            title: "Bảng tính Excel mẫu",
-            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.xlsx"
-          });
-          // PowerPoint mẫu
-          lecture.value.materials.push({
-            title: "Slide PowerPoint mẫu",
-            url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample.pptx"
-          });
-        }
-        
         if (lecture.value?.creatorId) {
           try {
             const userData = await getUserById(lecture.value.creatorId);
@@ -628,18 +587,17 @@ export default {
 <style scoped>
 .lecture-detail-container {
   width: 72vw;
-  margin: 40px auto;
+  margin: 5px auto;
   background: white;
-  padding: 40px;
-  border-radius: 12px;
+  padding: 10px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   min-height: 70vh;
 }
 
 .lecture-header {
   text-align: center;
-  margin-bottom: 40px;
-  padding-bottom: 30px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
   border-bottom: 2px solid #eee;
 }
 
@@ -647,7 +605,7 @@ export default {
   font-size: 36px;
   font-weight: 700;
   color: #2c3e50;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
   line-height: 1.3;
 }
 
@@ -655,7 +613,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  /* gap: 15px; */
   color: #666;
   font-size: 15px;
 }
@@ -703,9 +661,7 @@ export default {
 .content-title {
   font-size: 24px;
   color: #2c3e50;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
 }
 
 .lecture-content {
@@ -744,7 +700,7 @@ export default {
 }
 
 .lecture-materials {
-  margin-top: 40px;
+  margin-top: 20px;
   width: 100%;
 }
 
@@ -864,7 +820,7 @@ export default {
 
 .btn-back {
   display: block;
-  margin-top: 40px;
+  margin-top: 25px;
   padding: 12px 25px;
   background: #6c757d;
   color: white;
@@ -1231,7 +1187,7 @@ export default {
 
 @media (max-width: 768px) {
   .lecture-detail-container {
-    padding: 20px;
+    padding: 10px;
   }
   
   .material-grid {
