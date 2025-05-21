@@ -1,9 +1,7 @@
 <template>
   <div class="roadmap-container">
     <div class="roadmap-content">
-      <div
-        class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6"
-      >
+      <div class="d-flex flex-column md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h1 class="text-h4 font-weight-bold text-gray-900">
             Các lộ trình sức khỏe tinh thần
@@ -14,25 +12,18 @@
             dành riêng cho bạn.
           </p>
         </div>
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-leaf"
-          size="large"
-          style="font-weight: 600; border-radius: 24px; min-width: 220px"
-          @click="goToSuggestion"
-        >
+        <v-btn color="primary" prepend-icon="mdi-leaf" size="large"
+          style="font-weight: 600; border-radius: 24px; min-width: 220px" @click="goToSuggestion">
           Khám phá lộ trình phù hợp cho bạn
         </v-btn>
       </div>
 
-      <div
-        style="
+      <div style="
           margin-top: 8px;
           color: #43a047;
           font-style: italic;
           font-size: 0.98rem;
-        "
-      >
+        ">
         Chỉ mất 1 phút để nhận lộ trình cá nhân hóa, an toàn và bảo mật tuyệt
         đối cho bạn!
       </div>
@@ -45,23 +36,14 @@
       <v-window style="margin-top: -35px" v-model="activeTab">
         <v-window-item value="suggested">
           <div class="roadmap-grid">
-            <RoadmapCard
-              v-for="roadmap in suggestedRoadmaps"
-              :key="roadmap.id"
-              :roadmap="roadmap"
-              @view="viewRoadmap"
-            />
+            <RoadmapCard v-for="roadmap in suggestedRoadmaps" :key="roadmap.id" :roadmap="roadmap"
+              @view="viewRoadmap" />
           </div>
         </v-window-item>
 
         <v-window-item value="all">
           <div class="roadmap-grid">
-            <RoadmapCard
-              v-for="roadmap in allRoadmaps"
-              :key="roadmap.id"
-              :roadmap="roadmap"
-              @view="viewRoadmap"
-            />
+            <RoadmapCard v-for="roadmap in allRoadmaps" :key="roadmap.id" :roadmap="roadmap" @view="viewRoadmap" />
           </div>
         </v-window-item>
       </v-window>
@@ -84,6 +66,7 @@ export default {
       suggestedRoadmaps: [],
       allRoadmaps: [],
       loading: true,
+      roadmapSteps: [],
     };
   },
   async created() {
@@ -98,7 +81,6 @@ export default {
         if (Array.isArray(response)) {
           this.allRoadmaps = response;
 
-          // Giả sử mỗi roadmap có field `featured` để xác định được đề xuất
           this.suggestedRoadmaps = response.filter(
             (roadmap) => roadmap.featured
           );
@@ -120,24 +102,8 @@ export default {
       this.$router.push(`/roadmap/${id}`);
     },
     updateStatus() {
-      // In a real app, this would update the user's status
       alert("Status updated!");
-    },
-    async fetchData() {
-      try {
-        this.roadmapSteps = await getRoadmapSteps();
-        
-        const roadmaps = await getMentalHealthRoadmaps();
-        this.allRoadmaps = roadmaps;
-        
-        this.suggestedRoadmaps = roadmaps.filter(roadmap => roadmap.featured);
-      } catch (error) {
-        console.error("Error fetching roadmap data:", error);
-      }
     }
-  },
-  mounted() {
-    this.fetchData();
   }
 };
 </script>
