@@ -37,10 +37,10 @@
         đối cho bạn!
       </div>
 
-        <v-tabs v-model="activeTab" class="mb-6">
-          <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
-          <v-tab value="all">Tất cả lộ trình</v-tab>
-        </v-tabs>
+      <v-tabs v-model="activeTab" class="mb-6">
+        <v-tab value="suggested">Lộ trình được đề xuất</v-tab>
+        <v-tab value="all">Tất cả lộ trình</v-tab>
+      </v-tabs>
 
       <v-window style="margin-top: -35px" v-model="activeTab">
         <v-window-item value="suggested">

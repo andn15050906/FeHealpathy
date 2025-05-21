@@ -162,4 +162,7 @@ export default {
 body {
   background-color: #f8f9fa;
 }
+.container{
+  width: 72vw;
+}
 </style>

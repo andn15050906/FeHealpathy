@@ -23,6 +23,26 @@
 
           <v-divider></v-divider>
 
+          <!-- Course Progress -->
+          <div class="pa-4">
+            <div class="d-flex justify-space-between align-center mb-2">
+              <span class="text-subtitle-2">Tiến độ khóa học</span>
+              <span class="text-caption">{{ courseProgressData.currentCourse.progress }}%</span>
+            </div>
+            <v-progress-linear
+              :model-value="courseProgressData.currentCourse.progress"
+              color="primary"
+              height="8"
+              rounded
+            ></v-progress-linear>
+            <div class="d-flex justify-space-between mt-1">
+              <span class="text-caption">Đã hoàn thành: {{ courseProgressData.currentCourse.completedLectures }}/{{ courseProgressData.currentCourse.totalLectures }} bài</span>
+            </div>
+          </div>
+
+          <v-divider></v-divider>
+
+          <!-- Lecture List -->
           <v-list density="compact" nav class="pa-2">
             <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
               :active="isActiveLecture(index)" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
@@ -30,26 +50,30 @@
               class="mb-2 transition-all duration-300" :class="[
                 isActiveLecture(index) ? 'elevation-2 bg-primary-lighten-4' : '',
                 'hover:bg-primary-lighten-5'
-              ]">
+              ]"
+            >
               <template v-slot:prepend>
-                <v-avatar :color="isActiveLecture(index) ? 'primary' : 'grey-lighten-1'"
-                  :variant="isActiveLecture(index) ? 'elevated' : 'flat'" size="small" class="text-white">
-                  <span>{{ index + 1 }}</span>
+                <v-avatar
+                  :color="lecture.completed ? 'success' : currentLectureIndex === lecture.id ? 'primary' : 'grey-lighten-1'"
+                  :variant="currentLectureIndex === lecture.id ? 'elevated' : 'flat'"
+                  size="small"
+                  class="text-white"
+                >
+                  <span>{{ lecture.id }}</span>
                 </v-avatar>
               </template>
-              <template v-slot:append v-if="isActiveLecture(index)">
-                <v-icon color="primary">mdi-check-circle</v-icon>
+              <template v-slot:append v-if="lecture.completed">
+                <v-icon color="success">mdi-check-circle</v-icon>
+              </template>
+              <template v-slot:append v-else>
+                <span class="text-caption">{{ lecture.duration }} phút</span>
               </template>
             </v-list-item>
           </v-list>
 
           <v-divider class="mt-2"></v-divider>
-          <div class="pa-4">
-            <div class="d-flex align-center">
-              <v-avatar size="x-small" color="success" class="mr-2"></v-avatar>
-              <span>Tiến độ: {{ courseProgressPercentage || 0 }}%</span>
-            </div>
-          </div>
+
+         
         </v-navigation-drawer>
 
         <!-- Add floating button to open sidebar when collapsed -->
@@ -476,6 +500,17 @@ const currentLecture = computed(() => {
 const isActiveLecture = computed(() => (index) => {
   return currentLectureIndex.value === index;
 });
+
+const getLectureIcon = (type) => {
+  switch (type) {
+    case 'video':
+      return 'mdi-play-circle-outline'
+    case 'practice':
+      return 'mdi-dumbbell'
+    default:
+      return 'mdi-book-outline'
+  }
+}
 </script>
 
 <script>
