@@ -4,139 +4,168 @@
     <!-- <button class="btn-back" @click="goBack">⬅️ Quay lại khóa học</button> -->
     <div v-show="!isLoading" class="lecture-detail-container">
       <div v-if="lecture" class="lecture-main-content">
-        <div class="lecture-header">
-          <h1>{{ lecture.title }}</h1>
-          <p class="lecture-meta">
-            🧑‍🏫 {{ authorName || 'Không rõ tác giả' }} • 
-            🕒 Ngày tạo: {{ formatDate(lecture.creationTime) }} • 
-            <span v-if="lecture.lastModificationTime">
-              🖋️ Cập nhật: {{ formatDate(lecture.lastModificationTime) }}
-            </span>
-          </p>
-        </div>
-
-        <div class="lecture-content">
-          <p>Nội dung bài giảng: {{ lecture.content || lecture.contentSummary }}</p>
-        </div>
-
-        <div v-if="hasMaterials" class="lecture-materials">
-          <h2>📎 Tài liệu đính kèm</h2>
-          <div class="material-grid">
-            <div
-              v-for="(material, index) in lecture.materials"
-              :key="index"
-              class="material-card"
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item" v-for="tab in tabs" :key="tab.id">
+            <button 
+              class="nav-link" 
+              :class="{ active: activeTab === tab.id }" 
+              @click="activeTab = tab.id"
             >
-              <template v-if="isImage(material.url)">
-                <img
-                  :src="material.url"
-                  :alt="material.title || 'Hình ảnh'"
-                  class="material-image"
-                  @error="handleImageError"
-                />
-              </template>
-              <template v-else-if="isVideo(material.url)">
-                <video controls :src="material.url" class="material-video"></video>
-              </template>
-              <template v-else-if="isAudio(material.url)">
-                <audio controls :src="material.url" class="material-audio"></audio>
-              </template>
-              <template v-else>
-                <div class="document-container">
-                  <a :href="material.url" target="_blank" class="material-link">
-                    📄 {{ material.title || 'Tài liệu' }}
-                  </a>
-                  <button
-                    class="btn-download"
-                    @click="downloadFile(material.url, material.title || 'download')"
-                  >
-                    ⬇️ Tải xuống
-                  </button>
-                </div>
-              </template>
-            </div>
-          </div>
-        </div>
+              {{ tab.name }}
+            </button>
+          </li>
+        </ul>
 
-        <div class="comments-section">
-          <h2>💬 Bình luận</h2>
-          
-          <div class="comment-form-container">
-            <div class="form-content">
-              <textarea 
-                v-model="newComment" 
-                class="comment-input" 
-                placeholder="Viết bình luận..."
-                rows="3"
-              ></textarea>
-              <div class="comment-actions">
-                <button 
-                  class="btn-post-comment" 
-                  @click="postComment" 
-                  :disabled="!newComment.trim()"
-                >
-                  <span class="icon">✉️</span> Gửi bình luận
-                </button>
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Tab 1: Thông tin bài giảng -->
+          <div v-show="activeTab === 'info'" class="tab-pane fade show active">
+            <div class="lecture-info">
+              <h1 class="lecture-title text-center">{{ lecture.title }}</h1>
+              <div class="lecture-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Cố vấn:</span>
+                  <span class="meta-value">{{ authorName || 'Không rõ tác giả' }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Ngày tạo:</span>
+                  <span class="meta-value">{{ formatDate(lecture.creationTime) }}</span>
+                </div>
+                <div class="meta-item" v-if="lecture.lastModificationTime">
+                  <span class="meta-label">Cập nhật lần cuối:</span>
+                  <span class="meta-value">{{ formatDate(lecture.lastModificationTime) }}</span>
+                </div>
+              </div>
+              <div class="lecture-content mt-4">
+                <h3 class="content-title">Giới thiệu</h3>
+                <div class="content-body">
+                  {{ lecture.content || lecture.contentSummary }}
+                </div>
               </div>
             </div>
           </div>
-          
-          <div class="comments-container">
-            
-            <div v-if="comments && comments.length > 0" class="comments-list">
-              <div v-for="(comment, index) in comments" :key="comment.id" class="comment-item">
-                <div class="comment-header">
-                  <div class="comment-user">
-                    <img 
-                      class="user-avatar comment-avatar" 
-                      :src="comment.creatorAvatarUrl || '/default-avatar.png'" 
-                      alt="Avatar"
-                    >
-                    <div class="user-info">
-                      <strong>{{ comment.creatorName || 'Người dùng ẩn danh' }}</strong>
-                      <span class="comment-date">{{ formatCommentDate(comment.creationTime) }}</span> 
+
+          <!-- Tab 2: Nội dung bài giảng -->
+          <div v-show="activeTab === 'materials'" class="tab-pane fade show active">
+            <div v-if="hasMaterials" class="lecture-materials">
+              <div class="material-grid">
+                <div
+                  v-for="(material, index) in lecture.materials"
+                  :key="index"
+                  class="material-card"
+                >
+                  <template v-if="isImage(material.url)">
+                    <img
+                      :src="material.url"
+                      :alt="material.title || 'Hình ảnh'"
+                      class="material-image"
+                      @error="handleImageError"
+                    />
+                  </template>
+                  <template v-else-if="isVideo(material.url)">
+                    <video controls :src="material.url" class="material-video"></video>
+                  </template>
+                  <template v-else-if="isAudio(material.url)">
+                    <audio controls :src="material.url" class="material-audio"></audio>
+                  </template>
+                  <template v-else>
+                    <div class="document-container">
+                      <a :href="material.url" target="_blank" class="material-link">
+                        📄 {{ material.title || 'Tài liệu' }}
+                      </a>
+                      <button
+                        class="btn-download"
+                        @click="downloadFile(material.url, material.title || 'download')"
+                      >
+                        ⬇️ Tải xuống
+                      </button>
                     </div>
-                  </div>
-                  <div v-if="isCurrentUserComment(comment)" class="comment-controls">
-                    <button class="btn-icon btn-edit-comment" @click="startEditComment(comment, index)" title="Sửa bình luận">
-                      ✏️
-                    </button>
-                    <button class="btn-icon btn-delete-comment" @click="confirmDeleteComment(comment.id)" title="Xóa bình luận">
-                      🗑️
-                    </button>
-                  </div>
+                  </template>
                 </div>
-                
-                <div v-if="editingCommentIndex !== index" class="comment-body">
-                  <p class="comment-content">{{ comment.content }}</p>
-                </div>
-                <div v-else class="edit-comment-form">
+              </div>
+            </div>
+            <div v-else class="no-materials">
+              <span class="icon">📁</span>
+              <p>Chưa có tài liệu đính kèm nào.</p>
+            </div>
+          </div>
+
+          <!-- Tab 3: Bình luận -->
+          <div v-show="activeTab === 'comments'" class="tab-pane fade show active">
+            <div class="comments-section">
+              <div class="comment-form-container">
+                <div class="form-content">
                   <textarea 
-                    v-model="editCommentContent" 
-                    class="edit-comment-input"
+                    v-model="newComment" 
+                    class="comment-input" 
+                    placeholder="Viết bình luận..."
                     rows="3"
-                    ref="editInput"
                   ></textarea>
-                  <div class="edit-comment-actions">
-                    <button class="btn-save-edit" @click="saveCommentEdit(comment.id)">
-                      Lưu
-                    </button>
-                    <button class="btn-cancel-edit" @click="cancelCommentEdit">
-                      Hủy
+                  <div class="comment-actions">
+                    <button 
+                      class="btn-post-comment" 
+                      @click="postComment" 
+                      :disabled="!newComment.trim()"
+                    >
+                      <span class="icon">✉️</span> Gửi bình luận
                     </button>
                   </div>
                 </div>
               </div>
               
-              <!-- Phân trang nếu cần -->
-              <div v-if="totalComments > pageSize" class="pagination">
-                <!-- Thêm các nút phân trang -->
+              <div class="comments-container">
+                <div v-if="comments && comments.length > 0" class="comments-list">
+                  <div v-for="(comment, index) in comments" :key="comment.id" class="comment-item">
+                    <div class="comment-header">
+                      <div class="comment-user">
+                        <img 
+                          class="user-avatar comment-avatar" 
+                          :src="comment.creatorAvatarUrl || '/default-avatar.png'" 
+                          alt="Avatar"
+                        >
+                        <div class="user-info">
+                          <strong>{{ comment.creatorName || 'Người dùng ẩn danh' }}</strong>
+                          <span class="comment-date">{{ formatCommentDate(comment.creationTime) }}</span> 
+                        </div>
+                      </div>
+                      <div v-if="isCurrentUserComment(comment)" class="comment-controls">
+                        <button class="btn-icon btn-edit-comment" @click="startEditComment(comment, index)" title="Sửa bình luận">
+                          ✏️
+                        </button>
+                        <button class="btn-icon btn-delete-comment" @click="confirmDeleteComment(comment.id)" title="Xóa bình luận">
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div v-if="editingCommentIndex !== index" class="comment-body">
+                      <p class="comment-content">{{ comment.content }}</p>
+                    </div>
+                    <div v-else class="edit-comment-form">
+                      <textarea 
+                        v-model="editCommentContent" 
+                        class="edit-comment-input"
+                        rows="3"
+                        ref="editInput"
+                      ></textarea>
+                      <div class="edit-comment-actions">
+                        <button class="btn-save-edit" @click="saveCommentEdit(comment.id)">
+                          Lưu
+                        </button>
+                        <button class="btn-cancel-edit" @click="cancelCommentEdit">
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-else class="no-comments">
+                  <span class="icon">📝</span>
+                  <p>Chưa có bình luận nào. Hãy là người đầu tiên thảo luận về bài giảng này!</p>
+                </div>
               </div>
-            </div>
-            
-            <div v-else class="no-comments">
-              <span class="icon">📝</span>
-              <p>Chưa có bình luận nào. Hãy là người đầu tiên thảo luận về bài giảng này!</p>
             </div>
           </div>
         </div>
@@ -641,6 +670,14 @@ export default {
       }
     };
 
+    const tabs = [
+      { id: 'info', name: ' Thông tin bài giảng' },
+      { id: 'materials', name: ' Nội dung bài giảng' },
+      { id: 'comments', name: ' Bình luận' }
+    ];
+
+    const activeTab = ref('info');
+
     onMounted(async () => {
       getCurrentUserInfo();
       await Promise.all([
@@ -694,7 +731,9 @@ export default {
       currentLectureId,
       viewLecture,
       isEnrolled,
-      isOwner
+      isOwner,
+      activeTab,
+      tabs
     };
   }
 };
@@ -703,7 +742,7 @@ export default {
 <style scoped>
 .lecture-detail-container {
   margin: 0;
-  background: white;
+  background: #f8f9fa;
   padding: 0;
   border-radius: 0;
   box-shadow: none;
@@ -719,189 +758,15 @@ export default {
   padding: 40px;
   overflow-y: auto;
   height: 100vh;
-}
-
-.lecture-progress-sidebar {
-  width: 20%;
   background: #f8f9fa;
-  padding: 40px;
-  border-left: 1px solid #e9ecef;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-}
-
-.progress-sidebar-header {
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #e9ecef;
-}
-
-.progress-sidebar-header h3 {
-  font-size: 20px;
-  color: #0056b3;
-  margin: 0 0 15px 0;
-}
-
-.progress-overview {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.progress-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.progress-stats {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
-}
-
-.progress-stat-label {
-  color: #666;
-  font-size: 14px;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0056b3;
-  margin-bottom: 5px;
-}
-
-
-.progress-bar-container {
-  height: 6px;
-  background: #e9ecef;
-  border-radius: 3px;
-  margin-top: 15px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #0056b3, #007bff);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.lecture-progress-list {
-  margin-top: 20px;
-}
-
-.lecture-progress-item {
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
-}
-
-.lecture-progress-item:hover {
-  transform: translateX(-5px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.lecture-progress-item.completed {
-  border-left: 4px solid #28a745;
-}
-
-.lecture-progress-item.current {
-  border-left: 4px solid #0056b3;
-}
-
-.lecture-progress-item h4 {
-  font-size: 14px;
-  margin: 0 0 5px 0;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.lecture-progress-item p {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
-}
-
-.progress-status {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.progress-status.completed {
-  color: #28a745;
-}
-
-.progress-status.current {
-  color: #0056b3;
-}
-
-.lecture-number {
-  font-size: 12px;
-  color: #666;
-  background: #f8f9fa;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-@media (max-width: 992px) {
-  .lecture-detail-container {
-    flex-direction: column;
-  }
-  
-  .lecture-main-content {
-    width: 100%;
-    padding: 30px;
-    height: auto;
-  }
-  
-  .lecture-progress-sidebar {
-    width: 100%;
-    position: relative;
-    height: auto;
-    border-left: none;
-    border-top: 1px solid #e9ecef;
-    padding: 25px;
-  }
-
-.progress-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-  .progress-stat-item {
-    flex: 1;
-    min-width: 200px;
-  }
 }
 
 .lecture-header {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
   margin-bottom: 30px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .lecture-header h1 {
@@ -921,13 +786,19 @@ export default {
 .lecture-content {
   font-size: 16px;
   line-height: 1.8;
-  margin-bottom: 40px;
   color: #444;
-  max-width: 900px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.lecture-content p {
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 .lecture-materials {
-  margin-top: 40px;
+  margin-top: 0;
   width: 100%;
 }
 
@@ -939,34 +810,25 @@ export default {
   border-bottom: 1px solid #eee;
 }
 
-.enrollment-sidebar {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: #f8f9fa;
-}
-
-.enrollment-sidebar-content {
-  text-align: center;
-  max-width: 100%;
-}
-
 .material-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: 1fr;
+  gap: 40px;
   width: 100%;
+  margin-top: 20px;
 }
 
 .material-card {
   background: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .material-card:hover {
@@ -976,36 +838,42 @@ export default {
 
 .material-image {
   width: 100%;
-  max-height: 220px;
+  max-height: 600px;
   object-fit: contain;
   border-radius: 8px;
   background-color: #f0f0f0;
 }
 
-.material-video,
-.material-audio {
+.material-video {
   width: 100%;
+  max-height: 600px;
   border-radius: 8px;
 }
 
 .material-audio {
+  width: 100%;
   margin: 20px 0;
+  height: 80px;
 }
 
 .document-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+  padding: 30px;
+  height: 100%;
+  justify-content: center;
 }
 
 .material-link {
   display: inline-block;
-  padding: 12px;
+  padding: 20px;
   background: #007bff;
   color: white;
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-weight: bold;
+  font-size: 18px;
   width: 100%;
   transition: background 0.3s ease;
 }
@@ -1015,13 +883,13 @@ export default {
 }
 
 .btn-download {
-  padding: 12px;
+  padding: 20px;
   background: #28a745;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   transition: background 0.3s ease;
   width: 100%;
@@ -1111,9 +979,11 @@ export default {
 }
 
 .comments-section {
-  margin-top: 50px;
-  border-top: 2px solid #e9ecef;
-  padding-top: 30px;
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .comments-section h2 {
@@ -1124,14 +994,10 @@ export default {
 }
 
 .comment-form-container {
-  background: #fff;
+  background: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  margin-bottom: 35px;
-  display: flex;
-  gap: 15px;
-  align-items: flex-start;
+  margin-bottom: 30px;
 }
 
 .form-avatar {
@@ -1181,6 +1047,20 @@ export default {
 
 .btn-post-comment .icon {
   font-size: 16px;
+}
+
+.enrollment-sidebar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.enrollment-sidebar-content {
+  text-align: center;
+  max-width: 100%;
 }
 
 .enrollment-sidebar h3 {
@@ -1247,7 +1127,7 @@ export default {
 }
 
 .comments-container {
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .comments-loading {
@@ -1437,5 +1317,290 @@ export default {
 .pagination {
   margin-top: 20px;
   text-align: center;
+}
+
+/* Update tab styles */
+.nav-tabs {
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 30px;
+  background: white;
+  padding: 0 20px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: -2px;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  font-weight: 500;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #0056b3;
+  border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0056b3;
+  background: none;
+  border-bottom: 2px solid #0056b3;
+}
+
+.tab-content {
+  background: white;
+  border-radius: 0 0 8px 8px;
+  padding: 30px;
+  min-height: 600px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Update lecture info styles */
+.lecture-info {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.lecture-title {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 30px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.lecture-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 120px;
+}
+
+.meta-value {
+  color: #333;
+}
+
+.content-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.content-body {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #444;
+  white-space: pre-wrap;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Sidebar styles */
+.lecture-progress-sidebar {
+  width: 20%;
+  background: white;
+  padding: 40px;
+  border-left: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.progress-sidebar-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.progress-sidebar-header h3 {
+  font-size: 20px;
+  color: #0056b3;
+  margin: 0 0 15px 0;
+}
+
+.progress-overview {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.progress-stats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-stat-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0056b3;
+  margin-bottom: 5px;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  margin-top: 15px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0056b3, #007bff);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.lecture-progress-list {
+  margin-top: 20px;
+}
+
+.lecture-progress-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.lecture-progress-item:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.lecture-progress-item.completed {
+  border-left: 4px solid #28a745;
+}
+
+.lecture-progress-item.current {
+  border-left: 4px solid #0056b3;
+}
+
+.lecture-progress-item h4 {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lecture-progress-item p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.progress-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.progress-status.completed {
+  color: #28a745;
+}
+
+.progress-status.current {
+  color: #0056b3;
+}
+
+.lecture-number {
+  font-size: 12px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .lecture-detail-container {
+    flex-direction: column;
+  }
+  
+  .lecture-main-content {
+    width: 100%;
+    padding: 20px;
+    height: auto;
+  }
+  
+  .lecture-progress-sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid #e9ecef;
+    padding: 20px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
 }
 </style>
