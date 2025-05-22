@@ -7,13 +7,11 @@
         Quay lại lộ trình
       </v-btn>
 
-      <div if="phase">
+      <div v-if="phase">
         <div class="d-flex flex-column md:flex-row justify-space-between align-start mb-6">
           <div>
-            <h1 class="text-h4 font-weight-bold">{{ phase.title }}</h1>
-            <p class="text-subtitle-1 text-grey-darken-1">{{
-              phase.description
-            }}</p>
+            <h1 class="text-h4 font-weight-bold">{{ parsedTitle }}</h1>
+            <p class="text-subtitle-1 text-grey-darken-1">{{ parsedDescription }}</p>
             <div class="d-flex align-center mt-2">
               <v-chip color="primary">Phase {{ currentPhase }}</v-chip>
             </div>
@@ -34,7 +32,7 @@
         <v-tabs v-model="activeTab" class="mb-6">
           <v-tab value="overview">Tổng quan</v-tab>
           <v-tab value="actions">
-            Hành động ({{ completedActionsCount }}/{{ phase.actions.length }})
+            Hành động ({{ completedActionsCount }}/{{ phase.actions ? phase.actions.length : 0 }})
           </v-tab>
         </v-tabs>
 
@@ -45,13 +43,13 @@
                 <v-card-title>Giới thiệu phase</v-card-title>
                 <v-card-text>
                   <p class="text-body-1 mb-4">
-                    {{ phase.introduction }}
+                    {{ parsedIntroduction }}
                   </p>
 
-                  <div v-if="phase.tips && phase.tips.length > 0" class="mt-6">
+                  <div v-if="parsedTips && parsedTips.length > 0" class="mt-6">
                     <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
                     <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
-                      <v-list-item v-for="(tip, index) in phase.tips" :key="index" :title="tip.title"
+                      <v-list-item v-for="(tip, index) in parsedTips" :key="index" :title="tip.title"
                         :subtitle="tip.content" class="mb-2">
                         <template v-slot:prepend>
                           <v-icon :color="phase.themeColor">{{ tip.icon }}</v-icon>
@@ -67,7 +65,7 @@
           <v-window-item value="actions">
             <div class="step-tab-wrapper">
               <v-row>
-                <v-col v-for="action in phase.actions" :key="action.id" cols="12" md="6">
+                <v-col v-for="action in parsedActions" :key="action.id" cols="12" md="6">
                   <v-card :class="{ 'bg-success-subtle': action.completed }">
                     <v-card-title class="d-flex justify-space-between align-center">
                       {{ action.title }}
@@ -149,7 +147,6 @@
 
     </div>
 
-    <!-- Dialog đánh giá cuối phase -->
     <PhaseCompletionDialog :show="showPhaseCompletion" :phase-id="currentPhaseId" :phase-title="currentPhaseTitle"
       :documents="phaseDocuments" :criteria-list="phaseCriteria" @close="showPhaseCompletion = false"
       @submit="submitPhaseEvaluation" />
@@ -161,7 +158,7 @@ import PhaseCompletionDialog from "@/components/Roadmap/PhaseCompletionDialog.vu
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEventBus } from '@/scripts/logic/eventBus';
-import { getPhaseDetails } from "@/scripts/data/roadmapData.js";
+import { getPhaseDetailsById } from "@/scripts/api/services/roadmapService";
 
 export default {
   name: "StepDetail",
@@ -183,27 +180,26 @@ export default {
     const eventBus = useEventBus();
 
     const phase = ref({
-        id: "",
-        roadmapId: "",
-        title: "",
-        description: "",
-        themeColor: "",
-        introduction: "",
-        videoUrl: "",
-        tips: [],
-        actions: [],
-        canSkip: false,
-        requireConfirmation: false,
-        nextPhaseId: "",
-        completionCriteria: [],
-        resources: [],
-      });
+      id: "",
+      roadmapId: "",
+      title: "",
+      description: "",
+      themeColor: "",
+      introduction: "",
+      videoUrl: "",
+      tips: [],
+      actions: [],
+      canSkip: false,
+      requireConfirmation: false,
+      nextPhaseId: "",
+      completionCriteria: [],
+      resources: [],
+    });
     const activeTab = ref("overview");
     const mood = ref(null);
     const skipReason = ref(null);
     const showSkipConfirm = ref(false);
 
-    // Dữ liệu cho PhaseCompletionDialog
     const showPhaseCompletion = ref(false);
     const currentPhase = ref(1);
     const nextPhase = ref(2);
@@ -212,7 +208,6 @@ export default {
     const phaseDocuments = ref([]);
     const phaseCriteria = ref([]);
 
-    // Trạng thái hoàn thành của các phase
     const completedPhases = ref({
       1: false,
       2: false,
@@ -221,26 +216,21 @@ export default {
       5: false
     });
 
-    // Tạo key lưu trữ dựa trên ID lộ trình
     const getStorageKey = () => `completedPhases_roadmap_${props.roadmapId}`;
 
-    // Lưu trạng thái hoàn thành của các phase vào localStorage
     const saveCompletedPhases = () => {
       localStorage.setItem(getStorageKey(), JSON.stringify(completedPhases.value));
     };
 
-    // Khôi phục trạng thái hoàn thành của các phase từ localStorage
     const loadCompletedPhases = () => {
       const savedPhases = localStorage.getItem(getStorageKey());
       if (savedPhases) {
         completedPhases.value = JSON.parse(savedPhases);
       } else {
-        // Reset về trạng thái mặc định nếu không có dữ liệu
         resetCompletedPhases();
       }
     };
 
-    // Reset trạng thái hoàn thành về mặc định
     const resetCompletedPhases = () => {
       completedPhases.value = {
         1: false,
@@ -251,57 +241,193 @@ export default {
       };
     };
 
-    // Computed properties
+    const parseJsonString = (jsonString) => {
+      if (!jsonString) return null;
+
+      try {
+        if (typeof jsonString === 'object') return jsonString;
+
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.error("Error parsing JSON string:", error);
+        return jsonString; 
+      }
+    };
+
+    const parsedTitle = computed(() => {
+      if (!phase.value) return "";
+
+      if (typeof phase.value.title === 'string' && phase.value.title.startsWith('{') && phase.value.title.includes('Title')) {
+        try {
+          const parsedData = parseJsonString(phase.value.title);
+          return parsedData.Title || "Untitled Phase";
+        } catch (e) {
+          return phase.value.title;
+        }
+      }
+
+      return phase.value.title;
+    });
+
+    const parsedDescription = computed(() => {
+      if (!phase.value) return "";
+
+      if (typeof phase.value.description === 'string' && phase.value.description.startsWith('{') && phase.value.description.includes('Description')) {
+        try {
+          const parsedData = parseJsonString(phase.value.description);
+          return parsedData.Description || "";
+        } catch (e) {
+          return phase.value.description;
+        }
+      }
+
+      return phase.value.description;
+    });
+
+    const parsedIntroduction = computed(() => {
+      if (!phase.value) return "";
+
+      if (typeof phase.value.introduction === 'string' && phase.value.introduction.startsWith('{')) {
+        try {
+          const parsedData = parseJsonString(phase.value.introduction);
+          return parsedData.Introduction || parsedData.Content || "";
+        } catch (e) {
+          return phase.value.introduction;
+        }
+      }
+
+      return phase.value.introduction;
+    });
+
+    const parsedTips = computed(() => {
+      if (!phase.value || !phase.value.tips) return [];
+
+      if (typeof phase.value.tips === 'string' && phase.value.tips.startsWith('[')) {
+        try {
+          return parseJsonString(phase.value.tips);
+        } catch (e) {
+          return [];
+        }
+      }
+
+      return phase.value.tips;
+    });
+
+    const parsedActions = computed(() => {
+      if (!phase.value || !phase.value.actions) return [];
+
+      if (typeof phase.value.actions === 'string' && phase.value.actions.startsWith('[')) {
+        try {
+          return parseJsonString(phase.value.actions);
+        } catch (e) {
+          return [];
+        }
+      }
+
+      return phase.value.actions;
+    });
+
     const completedActionsCount = computed(() => {
-      if (!phase.value) return 0;
-      return phase.value.actions.filter((action) => action.completed).length;
+      if (!parsedActions.value) return 0;
+      return parsedActions.value.filter((action) => action.completed).length;
     });
 
     const canContinue = computed(() => {
-      if (!phase.value) return false;
+      if (!parsedActions.value) return false;
 
-      // Đã bỏ phần kiểm tra confirmation
-      const requiredActions = phase.value.actions.filter(
+      const requiredActions = parsedActions.value.filter(
         (action) => action.required
       );
-      return requiredActions.every((action) => action.completed);
+      return requiredActions.length === 0 || requiredActions.every((action) => action.completed);
     });
 
     const isLastPhase = computed(() => {
       return currentPhase.value === 5;
     });
-    
+
     const fetchPhaseDetails = async () => {
-      try {        
-        // Xác định phase hiện tại dựa trên phaseId
+      try {
         currentPhase.value = parseInt(props.phaseId);
         currentPhaseId.value = "phase" + currentPhase.value;
-        
-        var roadmapId = props.roadmapId;
-        // DO NOT CHANGE THIS - ADDED FOR TEST
-        roadmapId = 1;
-        
-        // Lấy dữ liệu phase
-        const phaseData = await getPhaseDetails(roadmapId, props.phaseId);
-        
+
+        const phaseData = await getPhaseDetailsById(props.phaseId);
+
         if (phaseData) {
-          phase.value = phaseData;
-          currentPhaseTitle.value = phaseData.title;
-          
-          // Xác định phase tiếp theo
-          if (phaseData.nextPhaseId) {
-            nextPhase.value = parseInt(phaseData.nextPhaseId);
+          const processedPhaseData = { ...phaseData };
+
+          if (typeof processedPhaseData.title === 'string' &&
+            (processedPhaseData.title.startsWith('[') || processedPhaseData.title.startsWith('{'))) {
+            try {
+              const parsedTitle = parseJsonString(processedPhaseData.title);
+              if (parsedTitle && typeof parsedTitle === 'object') {
+                processedPhaseData.originalTitle = processedPhaseData.title;
+                processedPhaseData.title = parsedTitle.Title || "Untitled Phase";
+              }
+            } catch (e) {
+              console.error("Error parsing title:", e);
+            }
           }
-          
-          // Cập nhật dữ liệu cho dialog đánh giá phase
-          if (phaseData.completionCriteria) {
-            phaseCriteria.value = phaseData.completionCriteria;
+
+          if (typeof processedPhaseData.description === 'string' &&
+            (processedPhaseData.description.startsWith('[') || processedPhaseData.description.startsWith('{'))) {
+            try {
+              const parsedDescription = parseJsonString(processedPhaseData.description);
+              if (parsedDescription && typeof parsedDescription === 'object') {
+                processedPhaseData.originalDescription = processedPhaseData.description;
+                processedPhaseData.description = parsedDescription.Description || "";
+              }
+            } catch (e) {
+              console.error("Error parsing description:", e);
+            }
           }
-          
-          if (phaseData.resources) {
-            phaseDocuments.value = phaseData.resources;
+
+          if (!processedPhaseData.actions) {
+            processedPhaseData.actions = [];
+          } else if (typeof processedPhaseData.actions === 'string') {
+            try {
+              processedPhaseData.actions = parseJsonString(processedPhaseData.actions) || [];
+            } catch (e) {
+              console.error("Error parsing actions:", e);
+              processedPhaseData.actions = [];
+            }
           }
+
+          phase.value = processedPhaseData;
+          currentPhaseTitle.value = processedPhaseData.title || "Phase " + currentPhase.value;
+
+          if (processedPhaseData.nextPhaseId) {
+            nextPhase.value = parseInt(processedPhaseData.nextPhaseId);
+          }
+
+          if (processedPhaseData.completionCriteria) {
+            if (typeof processedPhaseData.completionCriteria === 'string') {
+              try {
+                phaseCriteria.value = parseJsonString(processedPhaseData.completionCriteria) || [];
+              } catch (e) {
+                console.error("Error parsing completionCriteria:", e);
+                phaseCriteria.value = [];
+              }
+            } else {
+              phaseCriteria.value = processedPhaseData.completionCriteria;
+            }
+          }
+
+          if (processedPhaseData.resources) {
+            if (typeof processedPhaseData.resources === 'string') {
+              try {
+                phaseDocuments.value = parseJsonString(processedPhaseData.resources) || [];
+              } catch (e) {
+                console.error("Error parsing resources:", e);
+                phaseDocuments.value = [];
+              }
+            } else {
+              phaseDocuments.value = processedPhaseData.resources;
+            }
+          }
+
+          console.log("Phase data loaded successfully:", processedPhaseData);
         } else {
+          console.warn(`No phase found with ID: ${props.phaseId}`);
           phase.value = {
             id: props.phaseId,
             roadmapId: props.roadmapId,
@@ -313,22 +439,28 @@ export default {
           };
         }
 
-        // Cập nhật trạng thái hoàn thành từ localStorage
         loadCompletedPhases();
       } catch (error) {
         console.error("Error fetching phase details:", error);
+        phase.value = {
+          id: props.phaseId,
+          roadmapId: props.roadmapId,
+          title: "Lỗi khi tải dữ liệu",
+          description: "Không thể tải thông tin về phase này",
+          themeColor: "grey",
+          introduction: "Đã xảy ra lỗi khi tải dữ liệu phase.",
+          actions: []
+        };
       }
     };
 
     const viewActionDetails = (action) => {
-      // In a real app, this would open a detailed view of the action
       alert(`Chi tiết hành động: ${action.title}\n\n${action.description}`);
     };
 
     const confirmSkip = () => {
       if (!skipReason.value) return;
 
-      // In a real app, this would send the skip reason to the API
       if (phase.value.nextPhaseId) {
         router.push(
           `/roadmap/${props.roadmapId}/phase/${phase.value.nextPhaseId}`
@@ -341,76 +473,53 @@ export default {
     const completePhase = () => {
       if (!canContinue.value) return;
 
-      // Hiển thị dialog đánh giá phase
       console.log("Hiển thị dialog đánh giá phase");
       showPhaseCompletion.value = true;
     };
 
     const submitPhaseEvaluation = (evaluationData) => {
-      // Đóng dialog đánh giá phase
       showPhaseCompletion.value = false;
 
-      // Đánh dấu phase hiện tại là đã hoàn thành
       completedPhases.value[currentPhase.value] = true;
 
-      // Đồng bộ trạng thái với RoadmapDetail
       syncCompletedPhasesWithRoadmapDetail();
 
-      // Chuyển đến phase tiếp theo ngay lập tức nếu người dùng chọn "yes"
       if (evaluationData.moveToNextPhase === "yes") {
         if (phase.value.nextPhaseId) {
-          // Chuyển đến phase tiếp theo
           router.push(`/roadmap/${props.roadmapId}/phase/${phase.value.nextPhaseId}`);
         } else {
-          // Đây là phase cuối cùng, chuyển đến trang hoàn thành
           router.push(`/roadmap/${props.roadmapId}/complete`);
         }
       } else if (evaluationData.moveToNextPhase === "review") {
-        // Quay lại trang roadmap detail
         router.push(`/roadmap/${props.roadmapId}`);
       } else {
-        // Tạm dừng lộ trình, quay về trang chủ
         router.push("/");
       }
     };
 
     const syncCompletedPhasesWithRoadmapDetail = () => {
-      // Gửi sự kiện để thông báo cho RoadmapDetail cập nhật trạng thái
-      // Thêm roadmapId vào dữ liệu để RoadmapDetail biết cập nhật cho lộ trình nào
       eventBus.emit('update-roadmap-phases', {
         roadmapId: props.roadmapId,
         phases: completedPhases.value
       });
 
-      // Lưu trạng thái vào localStorage để đảm bảo nhất quán
       saveCompletedPhases();
-
-      // Log để debug
-      console.log(`Đã cập nhật trạng thái phase cho lộ trình ${props.roadmapId}:`, completedPhases.value);
     };
 
-    // Watch for changes in phaseId
     watch(() => props.phaseId, () => {
       fetchPhaseDetails();
-      // Reset các giá trị khi chuyển phase
       mood.value = null;
       skipReason.value = null;
       showSkipConfirm.value = false;
       activeTab.value = "overview";
     }, { immediate: true });
 
-    // Watch for changes in roadmapId
     watch(() => props.roadmapId, () => {
-      // Khi chuyển lộ trình, cần tải lại trạng thái hoàn thành từ localStorage
       loadCompletedPhases();
     });
 
     onMounted(() => {
-      // Khôi phục trạng thái hoàn thành của các phase từ localStorage
       loadCompletedPhases();
-
-      // Thêm console.log để debug
-      console.log(`StepDetail mounted for roadmap ${props.roadmapId}, phase ${props.phaseId}`);
     });
 
     return {
@@ -434,7 +543,13 @@ export default {
       confirmSkip,
       completePhase,
       submitPhaseEvaluation,
-      syncCompletedPhasesWithRoadmapDetail
+      syncCompletedPhasesWithRoadmapDetail,
+      // Add the parsed computed properties
+      parsedTitle,
+      parsedDescription,
+      parsedIntroduction,
+      parsedTips,
+      parsedActions
     };
   }
 };

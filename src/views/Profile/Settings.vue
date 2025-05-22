@@ -25,7 +25,7 @@ import Notifications from '../../components/SettingsComponents/NotificationSetti
 .settings-page {
   display: flex;
   gap: 24px;
-  max-width: 1200px;
+  width: 72vw;
   margin: 0 auto;
   padding: 20px;
 }
