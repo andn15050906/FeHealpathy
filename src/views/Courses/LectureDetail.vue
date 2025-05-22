@@ -20,8 +20,8 @@
         <!-- Tab Content -->
         <div class="tab-content">
           <!-- Tab 1: Thông tin bài giảng -->
-          <div v-show="activeTab === 'info'" class="tab-pane fade show active">
-            <div class="lecture-info">
+          <div v-show="activeTab === 'info'" class="tab-pane fade show active lecture-info">
+            <div class="">
               <h1 class="lecture-title text-center">{{ lecture.title }}</h1>
               <div class="lecture-meta">
                 <div class="meta-item">
@@ -819,84 +819,97 @@ export default {
 }
 
 .material-card {
-  background: #f9f9f9;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: white;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
   min-height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .material-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 .material-image {
   width: 100%;
   max-height: 600px;
   object-fit: contain;
-  border-radius: 8px;
-  background-color: #f0f0f0;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .material-video {
   width: 100%;
   max-height: 600px;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .material-audio {
   width: 100%;
   margin: 20px 0;
   height: 80px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .document-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 30px;
+  padding: 35px;
   height: 100%;
   justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
 }
 
 .material-link {
   display: inline-block;
   padding: 20px;
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   text-decoration: none;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 12px;
+  font-weight: 600;
   font-size: 18px;
   width: 100%;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.2);
 }
 
 .material-link:hover {
-  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,123,255,0.3);
+  background: linear-gradient(135deg, #0056b3, #004494);
 }
 
 .btn-download {
   padding: 20px;
-  background: #28a745;
+  background: linear-gradient(135deg, #28a745, #1e7e34);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 18px;
-  font-weight: bold;
-  transition: background 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
   width: 100%;
+  box-shadow: 0 4px 12px rgba(40,167,69,0.2);
 }
 
 .btn-download:hover {
-  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(40,167,69,0.3);
+  background: linear-gradient(135deg, #1e7e34, #155d27);
 }
 
 .btn-back {
@@ -1319,102 +1332,139 @@ export default {
   text-align: center;
 }
 
-/* Update tab styles */
+/* Tab Navigation Styles */
 .nav-tabs {
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: none;
   margin-bottom: 30px;
   background: white;
   padding: 0 20px;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .nav-tabs .nav-item {
-  margin-bottom: -2px;
+  margin-bottom: 0;
 }
 
 .nav-tabs .nav-link {
   border: none;
   color: #6c757d;
-  font-weight: 500;
-  padding: 12px 24px;
+  font-weight: 600;
+  padding: 15px 30px;
   transition: all 0.3s ease;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  border-radius: 8px;
+  margin: 10px 0;
+  position: relative;
+  font-size: 16px;
 }
 
 .nav-tabs .nav-link:hover {
   color: #0056b3;
-  border-color: transparent;
+  background: rgba(0, 123, 255, 0.05);
+  transform: translateY(-2px);
 }
 
 .nav-tabs .nav-link.active {
   color: #0056b3;
-  background: none;
-  border-bottom: 2px solid #0056b3;
+  background: rgba(0, 123, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
 }
 
+.nav-tabs .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: #0056b3;
+  border-radius: 3px;
+}
+
+/* Tab Content Styles */
 .tab-content {
   background: white;
-  border-radius: 0 0 8px 8px;
-  padding: 30px;
+  border-radius: 12px;
+  padding: 40px;
   min-height: 600px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-.tab-pane {
-  animation: fadeIn 0.3s ease;
-}
 
-/* Update lecture info styles */
+/* Lecture Info Styles */
 .lecture-info {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
+  padding: 40px;
+  border-radius: 12px;
   margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 .lecture-title {
-  font-size: 32px;
-  color: #333;
+  font-size: 36px;
+  color: #1a1a1a;
   margin-bottom: 30px;
   font-weight: 700;
   line-height: 1.3;
   padding-bottom: 20px;
   border-bottom: 2px solid #e9ecef;
+  text-align: center;
 }
 
 .lecture-meta {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px;
+  gap: 15px;
+  padding: 25px;
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 30px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .meta-label {
-  font-weight: 500;
-  color: #666;
-  min-width: 120px;
+  font-weight: 600;
+  color: #495057;
+  min-width: 140px;
+  font-size: 15px;
 }
 
 .meta-value {
-  color: #333;
+  color: #1a1a1a;
+  font-size: 15px;
 }
 
 .content-title {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 28px;
+  color: #1a1a1a;
+  margin-bottom: 25px;
   font-weight: 600;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.content-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: #0056b3;
+  border-radius: 3px;
 }
 
 .content-body {
@@ -1423,8 +1473,9 @@ export default {
   color: #444;
   white-space: pre-wrap;
   background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 /* Sidebar styles */
@@ -1603,4 +1654,5 @@ export default {
     text-align: center;
   }
 }
+
 </style>
