@@ -4,287 +4,372 @@
 
     <div v-show="!isLoading">
       <div class="course-detail-container" v-if="course">
-        <div class="course-header">
-          <div class="course-media-actions">
-            <div class="course-thumb-container">
-              <img
-                :src="course.thumbUrl"
-                alt="Course Thumbnail"
-                class="course-thumb"
-              />
-              <div class="level-badge" :class="getLevelClass(course.level)">
-                {{ getLevelText(course.level) }}
+        <div class="course-main-content">
+          <div class="course-header">
+            <div class="course-media-actions">
+              <div class="course-thumb-container">
+                <img
+                  :src="course.thumbUrl"
+                  alt="Course Thumbnail"
+                  class="course-thumb"
+                />
+                <div class="level-badge" :class="getLevelClass(course.level)">
+                  {{ getLevelText(course.level) }}
+                </div>
+              </div>
+
+              <div class="owner-status" v-if="isOwner">
+                <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
+              </div>
+
+              <div
+                class="course-actions"
+                v-else-if="!isEnrolled && !isLoadingEnrollment"
+              >
+                <div class="course-pricing">
+                  <span class="price-label">Giá:</span>
+                  <div class="price-container">
+                    <div class="old-price-row" v-if="course.discount > 0">
+                      <del>{{ course.price?.toLocaleString("vi-VN") }} VND</del>
+                      <span class="discount-badge"
+                        >{{ Math.floor(course.discount * 100) }}% OFF</span
+                      >
+                    </div>
+                    <div class="new-price">
+                      <strong>{{
+                        discountedPrice == 0
+                          ? "Miễn phí"
+                          : discountedPrice.toLocaleString("vi-VN") + " VND"
+                      }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="buy-button-container">
+                  <button class="btn-buy" @click="handlePurchase">
+                    💰 Mua ngay
+                  </button>
+                </div>
+              </div>
+              <div
+                class="enrollment-status"
+                v-else-if="isEnrolled && !isLoadingEnrollment"
+              >
+                <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
+              </div>
+              <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
+                <p>Đang kiểm tra trạng thái...</p>
               </div>
             </div>
 
-            <div class="owner-status" v-if="isOwner">
-              <p class="owner-message">🔑 Đây là khóa học của bạn.</p>
-            </div>
+            <div class="course-info">
+              <h1 class="course-title">{{ course.title }}</h1>
+              <div class="course-meta">
+                <span>Giảng viên: {{ instructorName }}</span>
+                <span>{{ course.learnerCount || 0 }} Học viên</span>
+                <span class="rating-meta" @click="scrollToRating">{{ averageRating }}/5</span>
+              </div>
 
-            <div
-              class="course-actions"
-              v-else-if="!isEnrolled && !isLoadingEnrollment"
-            >
-              <div class="course-pricing">
-                <span class="price-label">Giá:</span>
-                <div class="price-container">
-                  <div class="old-price-row" v-if="course.discount > 0">
-                    <del>{{ course.price?.toLocaleString("vi-VN") }} VND</del>
-                    <span class="discount-badge"
-                      >{{ Math.floor(course.discount * 100) }}% OFF</span
+              <div class="course-section">
+                <h3 class="section-subtitle">Giới thiệu</h3>
+                <p class="course-intro">{{ course.intro }}</p>
+              </div>
+
+              <div class="course-section">
+                <h3 class="section-subtitle">Mô tả chi tiết</h3>
+                <p class="course-description">{{ course.description }}</p>
+              </div>
+
+              <div class="course-section">
+                <h3 class="section-subtitle">Kết quả đạt được</h3>
+                <p class="course-outcomes">{{ course.outcomes }}</p>
+              </div>
+
+              <div class="course-section">
+                <h3 class="section-subtitle">Yêu cầu khóa học</h3>
+                <p class="course-requirements">{{ course.requirements }}</p>
+              </div>
+
+              
+            </div>
+          </div>
+          <div class="course-section" v-if="isEnrolled || isOwner">
+            <h3 class="section-subtitle">Tiến độ học tập</h3>
+            <div class="progress-container">
+              <div class="progress-stats">
+                <div class="stat-item">
+                  <div class="stat-value">{{ completedLectures }}/{{ totalLectures }}</div>
+                  <div class="stat-label">Bài giảng đã học</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">{{ Math.round(completionRate) }}%</div>
+                  <div class="stat-label">Hoàn thành</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">{{ lastStudyDate || 'Chưa học' }}</div>
+                  <div class="stat-label">Lần học cuối</div>
+                </div>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar" :style="{ width: `${completionRate}%` }"></div>
+              </div>
+            </div>
+          </div>
+          <div class="course-section" v-else>
+            <div class="enrollment-notice">
+              <div class="notice-content">
+                <i class="fas fa-lock notice-icon"></i>
+                <h3>Đăng ký khóa học để theo dõi tiến độ</h3>
+                <p>Bạn cần đăng ký khóa học này để có thể:</p>
+                <ul>
+                  <li>Theo dõi tiến độ học tập</li>
+                  <li>Xem các bài giảng đã hoàn thành</li>
+                  <li>Tiếp tục học từ bài cuối cùng</li>
+                </ul>
+                <button class="btn-enroll" @click="handlePurchase">
+                  Đăng ký ngay
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <div class="section-header">
+                <h4 class="fw-bold text-dark card-title mb-4">Bài giảng</h4>
+                <div class="section-stats" v-if="isEnrolled">
+                  <span class="stat-badge">
+                    <i class="fas fa-book-open"></i>
+                    {{ completedLectures }}/{{ totalLectures }} bài đã học
+                  </span>
+                  <span class="stat-badge">
+                    <i class="fas fa-chart-line"></i>
+                    {{ Math.round(completionRate) }}% hoàn thành
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="lectures.length > 0" class="lecture-grid">
+                <div
+                  v-for="lecture in lectures"
+                  :key="lecture.id"
+                  class="lecture-card"
+                >
+                  <template v-if="lecture.firstImageUrl">
+                    <img
+                      :src="lecture.firstImageUrl"
+                      alt="Lecture Image"
+                      class="lecture-thumb"
+                      @error="
+                        (e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextElementSibling.style.display = 'block';
+                        }
+                      "
+                    />
+                    <div class="lecture-thumb-placeholder" style="display: none">
+                      Không thể tải ảnh
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="lecture-thumb-placeholder">
+                      Không có ảnh xem trước
+                    </div>
+                  </template>
+
+                  <div class="lecture-content">
+                    <h3>{{ lecture.title }}</h3>
+                    <p class="lecture-summary">{{ lecture.contentSummary }}</p>
+                    <span v-if="lecture.isPreviewable" class="preview-badge"
+                      >Xem trước miễn phí</span
                     >
                   </div>
-                  <div class="new-price">
-                    <strong>{{
-                      discountedPrice == 0
-                        ? "Miễn phí"
-                        : discountedPrice.toLocaleString("vi-VN") + " VND"
-                    }}</strong>
-                  </div>
-                </div>
-              </div>
-              <div class="buy-button-container">
-                <button class="btn-buy" @click="handlePurchase">
-                  💰 Mua ngay
-                </button>
-              </div>
-            </div>
-            <div
-              class="enrollment-status"
-              v-else-if="isEnrolled && !isLoadingEnrollment"
-            >
-              <p class="enrolled-message">✅ Bạn đã tham gia khóa học này.</p>
-            </div>
-            <div v-else-if="isLoadingEnrollment" class="enrollment-loading">
-              <p>Đang kiểm tra trạng thái...</p>
-            </div>
-          </div>
-
-          <div class="course-info">
-            <h1 class="course-title">{{ course.title }}</h1>
-            <p class="course-meta">
-              <span>🧑‍🏫 Giảng viên: {{ instructorName }}</span>
-              <span>🎓 {{ course.learnerCount || 0 }} Học viên</span>
-              <span class="rating-meta" @click="scrollToRating">⭐ {{ averageRating }}/5</span>
-            </p>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">🎯 Giới thiệu</h3>
-              <p class="course-intro">{{ course.intro }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">💡 Mô tả chi tiết</h3>
-              <p class="course-description">{{ course.description }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">🎯 Kết quả đạt được</h3>
-              <p class="course-outcomes">{{ course.outcomes }}</p>
-            </div>
-
-            <div class="course-section">
-              <h3 class="section-subtitle">💡 Yêu cầu khóa học</h3>
-              <p class="course-requirements">{{ course.requirements }}</p>
-            </div>
-
-            
-          </div>
-        </div>
-        <div class="course-section" v-if="isEnrolled">
-              <h3 class="section-subtitle">📊 Tiến độ học tập</h3>
-              <div class="progress-container">
-                <div class="progress-stats">
-                  <div class="stat-item">
-                    <div class="stat-value">{{ completedLectures }}/{{ totalLectures }}</div>
-                    <div class="stat-label">Bài giảng đã học</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">{{ Math.round(completionRate) }}%</div>
-                    <div class="stat-label">Hoàn thành</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-value">{{ lastStudyDate || 'Chưa học' }}</div>
-                    <div class="stat-label">Lần học cuối</div>
-                  </div>
-                </div>
-                <div class="progress-bar-container">
-                  <div class="progress-bar" :style="{ width: `${completionRate}%` }"></div>
-                </div>
-              </div>
-            </div>
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <div class="section-header">
-              <h4 class="fw-bold text-dark card-title mb-4">📚 Bài giảng</h4>
-              <div class="section-stats" v-if="isEnrolled">
-                <span class="stat-badge">
-                  <i class="fas fa-book-open"></i>
-                  {{ completedLectures }}/{{ totalLectures }} bài đã học
-                </span>
-                <span class="stat-badge">
-                  <i class="fas fa-chart-line"></i>
-                  {{ Math.round(completionRate) }}% hoàn thành
-                </span>
-              </div>
-            </div>
-
-            <div v-if="lectures.length > 0" class="lecture-grid">
-              <div
-                v-for="lecture in lectures"
-                :key="lecture.id"
-                class="lecture-card"
-              >
-                <template v-if="lecture.firstImageUrl">
-                  <img
-                    :src="lecture.firstImageUrl"
-                    alt="Lecture Image"
-                    class="lecture-thumb"
-                    @error="
-                      (e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
-                      }
+                  <button
+                    class="btn-view"
+                    @click="viewLecture(lecture.id)"
+                    :disabled="!lecture.isPreviewable && !isOwner && !isEnrolled"
+                    :title="
+                      lecture.isPreviewable
+                        ? 'Xem bài giảng'
+                        : isOwner || isEnrolled
+                        ? 'Xem bài giảng'
+                        : 'Bạn cần mua khóa học để xem bài giảng này'
                     "
-                  />
-                  <div class="lecture-thumb-placeholder" style="display: none">
-                    Không thể tải ảnh
-                  </div>
-                </template>
-                <template v-else>
-                  <div class="lecture-thumb-placeholder">
-                    Không có ảnh xem trước
-                  </div>
-                </template>
-
-                <div class="lecture-content">
-                  <h3>{{ lecture.title }}</h3>
-                  <p class="lecture-summary">{{ lecture.contentSummary }}</p>
-                  <span v-if="lecture.isPreviewable" class="preview-badge"
-                    >🔓 Xem trước miễn phí</span
                   >
+                    ▶️ Xem bài giảng
+                  </button>
                 </div>
-                <button
-                  class="btn-view"
-                  @click="viewLecture(lecture.id)"
-                  :disabled="!lecture.isPreviewable && !isOwner && !isEnrolled"
-                  :title="
-                    lecture.isPreviewable
-                      ? 'Xem bài giảng'
-                      : isOwner || isEnrolled
-                      ? 'Xem bài giảng'
-                      : 'Bạn cần mua khóa học để xem bài giảng này'
-                  "
-                >
-                  ▶️ Xem bài giảng
-                </button>
+              </div>
+              <div v-else-if="!isLoadingLectures && course">
+                <p class="no-lectures">Chưa có bài giảng nào cho khóa học này.</p>
               </div>
             </div>
-            <div v-else-if="!isLoadingLectures && course">
-              <p class="no-lectures">Chưa có bài giảng nào cho khóa học này.</p>
+          </div>
+
+          <div
+            class="card border-0 shadow-sm mb-2 mt-4"
+            v-if="recommendedCourses.length > 0"
+          >
+            <div class="card-body">
+              <h4 class="fw-bold text-dark card-title mb-4">
+                Khóa học bạn có thể thích
+              </h4>
+
+              <div class="position-relative">
+                <swiper
+                  :modules="swiperModules"
+                  :slides-per-view="1"
+                  :space-between="10"
+                  :navigation="true"
+                  :pagination="{ clickable: true }"
+                  :breakpoints="{
+                    576: { slidesPerView: 1 },
+                    768: { slidesPerView: 2, spaceBetween: 10 },
+                    992: { slidesPerView: 3, spaceBetween: 10 },
+                  }"
+                  class="related-courses-swiper"
+                >
+                  <swiper-slide
+                    v-for="recCourse in recommendedCourses"
+                    :key="recCourse.objectID"
+                  >
+                    <a
+                      :href="`/courses/${recCourse.objectID}`"
+                      class="card h-100 shadow-sm article-card text-decoration-none"
+                    >
+                      <div class="image-container">
+                        <img
+                          :src="recCourse.ThumbUrl"
+                          class="card-img-top"
+                          alt="course image"
+                        />
+                      </div>
+                      <div class="card-content">
+                        <h5 class="fw-bold title-truncate">
+                          {{ recCourse.Title }}
+                        </h5>
+                        <p class="text-muted mb-0 date-text">
+                          {{ formatDate(recCourse.CreationTime) }}
+                        </p>
+                      </div>
+                    </a>
+                  </swiper-slide>
+                </swiper>
+              </div>
+            </div>
+          </div>
+
+          <div class="rating-section" v-if="course">
+            <!-- <h2 class="section-title">⭐ Đánh giá khóa học</h2>
+            
+            <div class="rating-summary">
+              <div class="average-rating">
+                <div class="rating-number">{{ averageRating }}</div>
+                <div class="rating-stars">
+                  <span v-for="n in 5" :key="n" class="star" :class="{ 'filled': n <= Math.round(averageRating) }">★</span>
+                </div>
+                <div class="rating-count">{{ course.ratingCount || 0 }} đánh giá</div>
+              </div>
+            </div> -->
+
+            <div class="rating-form" v-if="isEnrolled && !hasRated">
+              <h3>Viết đánh giá của bạn</h3>
+              <div class="rating-input">
+                <span v-for="n in 5" :key="n" 
+                      class="star-input" 
+                      :class="{ 'filled': n <= userRating }"
+                      @click="setUserRating(n)"
+                      @mouseover="hoverRating = n"
+                      @mouseleave="hoverRating = 0">★</span>
+              </div>
+              <textarea 
+                v-model="userReview" 
+                placeholder="Chia sẻ trải nghiệm của bạn về khóa học này..."
+                class="review-input"
+              ></textarea>
+              <button class="btn-submit-review" @click="submitReview" :disabled="!userRating">
+                Gửi đánh giá
+              </button>
+            </div>
+
+            <div class="reviews-list" v-if="course.ratingCount > 0">
+              <div v-for="review in reviews" :key="review.id" class="review-item">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <img :src="review.userAvatar || '/default-avatar.png'" alt="User Avatar" class="reviewer-avatar">
+                    <span class="reviewer-name">{{ review.userName }}</span>
+                  </div>
+                  <div class="review-rating">
+                    <span v-for="n in 5" :key="n" class="star" :class="{ 'filled': n <= review.rating }">★</span>
+                  </div>
+                </div>
+                <p class="review-content">{{ review.content }}</p>
+                <div class="review-date">{{ formatDate(review.createdAt) }}</div>
+              </div>
             </div>
           </div>
         </div>
-
-        <div
-          class="card border-0 shadow-sm mb-2 mt-4"
-          v-if="recommendedCourses.length > 0"
-        >
-          <div class="card-body">
-            <h4 class="fw-bold text-dark card-title mb-4">
-              Khóa học bạn có thể thích
-            </h4>
-
-            <div class="position-relative">
-              <swiper
-                :modules="swiperModules"
-                :slides-per-view="1"
-                :space-between="10"
-                :navigation="true"
-                :pagination="{ clickable: true }"
-                :breakpoints="{
-                  576: { slidesPerView: 1 },
-                  768: { slidesPerView: 2, spaceBetween: 10 },
-                  992: { slidesPerView: 3, spaceBetween: 10 },
-                }"
-                class="related-courses-swiper"
-              >
-                <swiper-slide
-                  v-for="recCourse in recommendedCourses"
-                  :key="recCourse.objectID"
-                >
-                  <a
-                    :href="`/courses/${recCourse.objectID}`"
-                    class="card h-100 shadow-sm article-card text-decoration-none"
-                  >
-                    <div class="image-container">
-                      <img
-                        :src="recCourse.ThumbUrl"
-                        class="card-img-top"
-                        alt="course image"
-                      />
-                    </div>
-                    <div class="card-content">
-                      <h5 class="fw-bold title-truncate">
-                        {{ recCourse.Title }}
-                      </h5>
-                      <p class="text-muted mb-0 date-text">
-                        {{ formatDate(recCourse.CreationTime) }}
-                      </p>
-                    </div>
-                  </a>
-                </swiper-slide>
-              </swiper>
+        <div class="course-progress-sidebar" v-if="isEnrolled || isOwner">
+          <div class="progress-sidebar-header">
+            <h3>Tiến độ học tập</h3>
+            <div class="progress-overview">
+              <div class="progress-stats">
+                <div class="progress-stat-item">
+                  <span class="progress-stat-label">Tổng số bài giảng:</span>
+                  <span class="progress-stat-value">{{ totalLectures }}</span>
+                </div>
+                <div class="progress-stat-item">
+                  <span class="progress-stat-label">Đã hoàn thành:</span>
+                  <span class="progress-stat-value">{{ completedLectures }}</span>
+                </div>
+                <div class="progress-stat-item">
+                  <span class="progress-stat-label">Tiến độ:</span>
+                  <span class="progress-stat-value">{{ Math.round(completionRate) }}%</span>
+                </div>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar" :style="{ width: `${completionRate}%` }"></div>
+              </div>
+            </div>
+          </div>
+          <div class="lecture-progress-list">
+            <div
+              v-for="(lecture, index) in lectures"
+              :key="lecture.id"
+              class="lecture-progress-item"
+              :class="{ 
+                completed: lecture.isCompleted, 
+                current: lecture.isCurrent 
+              }"
+              @click="viewLecture(lecture.id)"
+            >
+              <h4>
+                <span class="lecture-number">Bài {{ index + 1 }}</span>
+                {{ lecture.title }}
+              </h4>
+              <p>{{ lecture.contentSummary }}</p>
+              <div class="progress-status" :class="{ 
+                completed: lecture.isCompleted, 
+                current: lecture.isCurrent 
+              }">
+                <i :class="lecture.isCompleted ? 'fas fa-check-circle' : 'far fa-circle'"></i>
+                {{ lecture.isCompleted ? 'Đã hoàn thành' : 'Chưa hoàn thành' }}
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="rating-section" v-if="course">
-          <!-- <h2 class="section-title">⭐ Đánh giá khóa học</h2>
-          
-          <div class="rating-summary">
-            <div class="average-rating">
-              <div class="rating-number">{{ averageRating }}</div>
-              <div class="rating-stars">
-                <span v-for="n in 5" :key="n" class="star" :class="{ 'filled': n <= Math.round(averageRating) }">★</span>
-              </div>
-              <div class="rating-count">{{ course.ratingCount || 0 }} đánh giá</div>
-            </div>
-          </div> -->
-
-          <div class="rating-form" v-if="isEnrolled && !hasRated">
-            <h3>Viết đánh giá của bạn</h3>
-            <div class="rating-input">
-              <span v-for="n in 5" :key="n" 
-                    class="star-input" 
-                    :class="{ 'filled': n <= userRating }"
-                    @click="setUserRating(n)"
-                    @mouseover="hoverRating = n"
-                    @mouseleave="hoverRating = 0">★</span>
-            </div>
-            <textarea 
-              v-model="userReview" 
-              placeholder="Chia sẻ trải nghiệm của bạn về khóa học này..."
-              class="review-input"
-            ></textarea>
-            <button class="btn-submit-review" @click="submitReview" :disabled="!userRating">
-              Gửi đánh giá
-            </button>
-          </div>
-
-          <div class="reviews-list" v-if="course.ratingCount > 0">
-            <div v-for="review in reviews" :key="review.id" class="review-item">
-              <div class="review-header">
-                <div class="reviewer-info">
-                  <img :src="review.userAvatar || '/default-avatar.png'" alt="User Avatar" class="reviewer-avatar">
-                  <span class="reviewer-name">{{ review.userName }}</span>
-                </div>
-                <div class="review-rating">
-                  <span v-for="n in 5" :key="n" class="star" :class="{ 'filled': n <= review.rating }">★</span>
-                </div>
-              </div>
-              <p class="review-content">{{ review.content }}</p>
-              <div class="review-date">{{ formatDate(review.createdAt) }}</div>
+        <div class="course-progress-sidebar" v-else>
+          <div class="enrollment-sidebar">
+            <div class="enrollment-sidebar-content">
+              <i class="fas fa-lock sidebar-icon"></i>
+              <h3>Đăng ký khóa học</h3>
+              <p>Đăng ký ngay để:</p>
+              <ul>
+                <li>Theo dõi tiến độ học tập</li>
+                <li>Xem các bài giảng đã hoàn thành</li>
+                <li>Tiếp tục học từ bài cuối cùng</li>
+              </ul>
+              <button class="btn-enroll-sidebar" @click="handlePurchase">
+                Đăng ký ngay
+              </button>
             </div>
           </div>
         </div>
@@ -411,16 +496,31 @@ export default {
         const response = await getLectures(courseId);
         const lectureList = response?.items || [];
         lectures.value = lectureList
-          .map((lecture) => {
+          .map((lecture, index) => {
             const firstImageMaterial = lecture.materials?.find(
               (material) => material.type === 1
             );
             return {
               ...lecture,
               firstImageUrl: firstImageMaterial ? firstImageMaterial.url : null,
+              isCompleted: false,
+              isCurrent: false,
+              order: index + 1
             };
           })
           .sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
+          
+        totalLectures.value = lectures.value.length;
+        completedLectures.value = lectures.value.filter(l => l.isCompleted).length;
+        completionRate.value = (completedLectures.value / totalLectures.value) * 100;
+        
+        const date = new Date();
+        date.setDate(date.getDate() - Math.floor(Math.random() * 7));
+        lastStudyDate.value = date.toLocaleDateString('vi-VN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
       } catch (error) {
         lectures.value = [];
       } finally {
@@ -607,19 +707,12 @@ export default {
       }
     };
 
-    const calculateProgress = () => {
-      // Mock data for now
-      totalLectures.value = lectures.value.length;
-      completedLectures.value = Math.floor(Math.random() * totalLectures.value);
-      completionRate.value = (completedLectures.value / totalLectures.value) * 100;
-      
-      // Mock last study date
-      const date = new Date();
-      date.setDate(date.getDate() - Math.floor(Math.random() * 7));
-      lastStudyDate.value = date.toLocaleDateString('vi-VN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("vi-VN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
       });
     };
 
@@ -634,20 +727,7 @@ export default {
 
       await fetchRecommendedCourses();
       await fetchReviews();
-
-      if (isEnrolled.value) {
-        calculateProgress();
-      }
     });
-
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-      });
-    };
 
     return {
       isLoading,
@@ -689,12 +769,164 @@ export default {
 
 <style scoped>
 .course-detail-container {
-  margin: 0px auto;
+  margin: 0;
   background: white;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  width: 100%;
+  display: flex;
+  min-height: 100vh;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.course-main-content {
+  width: 80%;
+  padding: 50px;
+  overflow-y: auto;
+}
+
+.course-progress-sidebar {
+  width: 20%;
+  background: #f8f9fa;
   padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.06);
-  width: 72vw;
+  border-left: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.progress-sidebar-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.progress-sidebar-header h3 {
+  font-size: 20px;
+  color: #0056b3;
+  margin: 0 0 15px 0;
+}
+
+.progress-overview {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.progress-stats {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0056b3;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0056b3, #007bff);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.lecture-progress-list {
+  margin-top: 20px;
+}
+
+.lecture-progress-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.lecture-progress-item:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.lecture-progress-item.completed {
+  border-left: 4px solid #28a745;
+}
+
+.lecture-progress-item.current {
+  border-left: 4px solid #0056b3;
+}
+
+.lecture-progress-item h4 {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lecture-progress-item p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.progress-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.progress-status.completed {
+  color: #28a745;
+}
+
+.progress-status.current {
+  color: #0056b3;
+}
+
+.lecture-number {
+  font-size: 12px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .course-header {
@@ -1020,45 +1252,6 @@ export default {
 .btn-view:disabled:hover {
   background: linear-gradient(135deg, #adb5bd, #868e96);
   transform: none;
-}
-
-@media (max-width: 768px) {
-  .course-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-  }
-
-  .course-media-actions {
-    width: 100%;
-    max-width: 450px;
-    align-items: center;
-  }
-
-  .course-thumb {
-    max-width: 400px;
-    height: auto;
-  }
-
-  .course-info {
-    width: 100%;
-  }
-
-  .course-pricing {
-    justify-content: center;
-  }
-
-  .btn-buy {
-    width: 100%;
-  }
-
-  .lecture-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .course-detail-container {
-    padding: 25px;
-  }
 }
 
 .loading-placeholder {
@@ -1529,21 +1722,247 @@ export default {
   font-size: 16px;
 }
 
-@media (max-width: 768px) {
-  .section-header {
-    flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
+@media (max-width: 1200px) {
+  .course-detail-container {
+    max-width: 100%;
   }
+  
+  .course-main-content {
+    width: 75%;
+    padding: 40px;
+  }
+  
+  .course-progress-sidebar {
+    width: 25%;
+    padding: 30px;
+  }
+}
 
-  .section-stats {
+@media (max-width: 992px) {
+  .course-detail-container {
+    flex-direction: column;
+  }
+  
+  .course-main-content {
     width: 100%;
-    flex-direction: column;
+    padding: 30px;
   }
+  
+  .course-progress-sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid #e9ecef;
+    padding: 25px;
+  }
+  
+  .course-header {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .course-media-actions {
+    width: 100%;
+  }
+  
+  .course-thumb-container {
+    height: 400px;
+  }
+}
 
-  .stat-badge {
+@media (max-width: 576px) {
+  .course-main-content {
+    padding: 20px;
+  }
+  
+  .course-progress-sidebar {
+    padding: 20px;
+  }
+  
+  .course-thumb-container {
+    height: 250px;
+  }
+  
+  .course-title {
+    font-size: 28px;
+  }
+  
+  .course-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .course-meta span {
     width: 100%;
     justify-content: center;
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+}
+
+.enrollment-notice {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  margin: 20px 0;
+  border: 1px solid #e9ecef;
+}
+
+.notice-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.notice-icon {
+  font-size: 48px;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.enrollment-notice h3 {
+  color: #343a40;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.enrollment-notice p {
+  color: #495057;
+  margin-bottom: 15px;
+}
+
+.enrollment-notice ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 25px 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.enrollment-notice li {
+  color: #495057;
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+}
+
+.enrollment-notice li:before {
+  content: "✓";
+  color: #28a745;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.btn-enroll {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+  padding: 12px 30px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+}
+
+.btn-enroll:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+}
+
+.enrollment-sidebar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.enrollment-sidebar-content {
+  text-align: center;
+  max-width: 100%;
+}
+
+.sidebar-icon {
+  font-size: 36px;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.enrollment-sidebar h3 {
+  color: #343a40;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.enrollment-sidebar p {
+  color: #495057;
+  margin-bottom: 12px;
+}
+
+.enrollment-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  text-align: left;
+}
+
+.enrollment-sidebar li {
+  color: #495057;
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+  font-size: 14px;
+}
+
+.enrollment-sidebar li:before {
+  content: "✓";
+  color: #28a745;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.btn-enroll-sidebar {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+  width: 100%;
+  max-width: 200px;
+}
+
+.btn-enroll-sidebar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+}
+
+@media (max-width: 992px) {
+  .enrollment-sidebar {
+    padding: 15px;
+  }
+  
+  .enrollment-sidebar h3 {
+    font-size: 18px;
+  }
+  
+  .enrollment-sidebar li {
+    font-size: 13px;
+  }
+  
+  .btn-enroll-sidebar {
+    padding: 8px 16px;
+    font-size: 13px;
   }
 }
 </style>

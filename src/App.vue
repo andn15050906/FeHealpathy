@@ -5,82 +5,6 @@
     <Header ref="headerRef" @authenticated="handleAuthenticated" :isAuthenticated="isAuthenticated" />
     <main>
       <div v-if="!router.currentRoute.value.meta.isAppMode">
-        <v-navigation-drawer v-model="sidebarOpen" :rail="!sidebarOpen" permanent :color="drawerColor" border
-          class="rounded-tr-xl rounded-br-xl" elevation="4" style="top: 70px; box-shadow: none !important;">
-          <v-list-item class="py-2" :title="sidebarOpen ? currentCourse?.title || 'Course Progress' : ''"
-            color="primary">
-            <template v-slot:prepend>
-              <v-avatar color="primary" variant="tonal" class="mr-2">
-                <v-icon>mdi-book-open-page-variant</v-icon>
-              </v-avatar>
-            </template>
-            <template v-slot:append>
-              <v-btn variant="text" icon @click="toggleSidebar">
-                <v-icon>{{ sidebarOpen ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
-              </v-btn>
-            </template>
-          </v-list-item>
-
-          <v-divider></v-divider>
-
-          <!-- Course Progress -->
-          <div class="pa-4">
-            <div class="d-flex justify-space-between align-center mb-2">
-              <span class="text-subtitle-2">Tiến độ khóa học</span>
-              <span class="text-caption">{{ courseProgressData.currentCourse.progress }}%</span>
-            </div>
-            <v-progress-linear
-              :model-value="courseProgressData.currentCourse.progress"
-              color="primary"
-              height="8"
-              rounded
-            ></v-progress-linear>
-            <div class="d-flex justify-space-between mt-1">
-              <span class="text-caption">Đã hoàn thành: {{ courseProgressData.currentCourse.completedLectures }}/{{ courseProgressData.currentCourse.totalLectures }} bài</span>
-            </div>
-          </div>
-
-          <v-divider></v-divider>
-
-          <!-- Lecture List -->
-          <v-list density="compact" nav class="pa-2">
-            <v-list-item v-for="(lecture, index) in currentCourse?.lectures" :key="index" :value="index"
-              :active="isActiveLecture(index)" @click="selectLecture(index)" :title="sidebarOpen ? lecture.title : ''"
-              :prepend-icon="'mdi-play-circle-outline'" :color="'primary'" rounded="xl"
-              class="mb-2 transition-all duration-300" :class="[
-                isActiveLecture(index) ? 'elevation-2 bg-primary-lighten-4' : '',
-                'hover:bg-primary-lighten-5'
-              ]"
-            >
-              <template v-slot:prepend>
-                <v-avatar
-                  :color="lecture.completed ? 'success' : currentLectureIndex === lecture.id ? 'primary' : 'grey-lighten-1'"
-                  :variant="currentLectureIndex === lecture.id ? 'elevated' : 'flat'"
-                  size="small"
-                  class="text-white"
-                >
-                  <span>{{ lecture.id }}</span>
-                </v-avatar>
-              </template>
-              <template v-slot:append v-if="lecture.completed">
-                <v-icon color="success">mdi-check-circle</v-icon>
-              </template>
-              <template v-slot:append v-else>
-                <span class="text-caption">{{ lecture.duration }} phút</span>
-              </template>
-            </v-list-item>
-          </v-list>
-
-          <v-divider class="mt-2"></v-divider>
-
-         
-        </v-navigation-drawer>
-
-        <!-- Add floating button to open sidebar when collapsed -->
-        <v-btn v-if="!sidebarOpen" icon color="primary" class="sidebar-toggle-btn" @click="toggleSidebar" elevation="2">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-
         <RoadmapProgress v-if="isAuthAndShown" class="left-sidebar" ref="roadmapProgress"></RoadmapProgress>
         <div class="page-container">
           <div v-if="router.currentRoute.value.meta.requiresPremium && !isPremiumUser">
@@ -94,20 +18,6 @@
           <RouterView v-else :key="$route.fullPath" @authenticated="handleAuthenticated"
             @addNotification="addNotification" @removeNotification="removeNotification" />
           
-          <!--DO NOT REMOVE THIS
-          <v-main :class="mainBackground">
-            <v-container>
-              <div v-if="currentPath">
-                <RoadmapContent :current-path="currentPath" @phase-completed="handlePhaseCompleted"
-                  @update-progress="handleProgressUpdate" @path-completed="handlePathCompleted" />
-              </div>
-              <div v-else-if="showProgressTracker">
-                <ProgressTracker :active-days="activeDays" :total-days="totalDays" :completed-actions="completedActions"
-                  :total-required-actions="totalRequiredActions" :action-history="actionHistory"
-                  @suggest-new-route="() => {}/*startSurvey*/" @view-full-history="viewFullHistory" />
-              </div>
-            </v-container>
-          </v-main>-->
           <RouteCompletion v-model="showRouteCompletion" :current-theme="currentTheme"
             :assessment-result="completionAssessmentResult" @close="showRouteCompletion = false"
             @restart-assessment="() => { }/*startSurvey*/" @select-continue-option="handleContinueOptionSelected"
@@ -570,11 +480,10 @@ export default {
 
 <style scoped>
 main {
-  padding: 0 20px;
+  padding: 0;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  /*DO NOT CHANGE THIS LINE - will break login screen align-items: center;  */
   background-repeat: no-repeat;
   background-size: 100% 100vh;
   background-position: center top;
@@ -582,30 +491,11 @@ main {
   margin-top: 100px;
 }
 
-/**.page-container {
-  min-height: 100vh;
-  width: 1200px;
-  background-color: #fff;
-  margin-top: 60px;
-  padding: 40px;
-}**/
-
-@media (max-width: 1150px) {
-  .page-container {
-    width: unset;
-  }
-}
-
-.page-container:has(.home-background) {
-  padding: 0;
-}
-
 .left-sidebar {
   position: fixed;
   top: 80px;
   left: 20px;
   border-radius: 15px;
-  /*width: calc((100vw - 1200px)/2 - 8px);*/
   width: 320px;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
   z-index: 1;
@@ -623,22 +513,6 @@ main {
 
 footer {
   z-index: 100;
-}
-
-.sidebar-toggle-btn {
-  position: fixed;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1000;
-  border-radius: 0 8px 8px 0;
-  background: linear-gradient(135deg, #0d6efd, #0a58ca);
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle-btn:hover {
-  transform: translateY(-50%) translateX(4px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
 }
 </style>
 
