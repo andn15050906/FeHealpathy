@@ -32,6 +32,10 @@
           <i class="fas fa-shield-alt"></i>
           <span>Kiểm duyệt người dùng</span>
         </button>
+        <button class="action-card" @click="navigateTo('/roadmap-builder')">
+          <i class="fas fa-road"></i>
+          <span>Quản lý lộ trình</span>
+        </button>
       </div>
     </div>
 
