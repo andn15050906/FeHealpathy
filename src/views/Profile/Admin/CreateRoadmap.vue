@@ -312,7 +312,6 @@ function addPhase() {
     index: roadmap.value.phases.length,
     tools: [],
     tips: "",
-    milestones: [],
   });
 }
 
@@ -406,11 +405,45 @@ async function submitRoadmap() {
 
   try {
     loadingSpinner.value.showSpinner();
-    console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
     
-    await createRoadmap(roadmap.value);
+    const formData = new FormData();
+    
+    // Thêm các trường cơ bản
+    formData.append('Title', roadmap.value.title);
+    formData.append('IntroText', roadmap.value.introText);
+    formData.append('Description', roadmap.value.introText);
+    formData.append('Category', 'mental-health');
+    formData.append('IsPaid', roadmap.value.isPaid);
+    
+    if (roadmap.value.isPaid) {
+      formData.append('Price', roadmap.value.price);
+    }
+
+    // Thêm features nếu có
+    if (roadmap.value.features && roadmap.value.features.length > 0) {
+      roadmap.value.features.forEach((feature, index) => {
+        formData.append(`Features[${index}]`, feature);
+      });
+    }
+
+    // Thêm phases
+    roadmap.value.phases.forEach((phase, index) => {
+      formData.append(`Phases[${index}].Title`, phase.title);
+      formData.append(`Phases[${index}].Description`, JSON.stringify([{
+        Title: phase.title,
+        Description: phase.description
+      }]));
+      formData.append(`Phases[${index}].Introduction`, phase.tips || '');
+      formData.append(`Phases[${index}].Index`, phase.index);
+      formData.append(`Phases[${index}].TimeSpan`, phase.timeSpan || 7);
+      formData.append(`Phases[${index}].IsRequiredToAdvance`, false);
+    });
+
+    console.log("Dữ liệu roadmap gửi đi: ", Object.fromEntries(formData));
+    
+    await createRoadmap(formData);
     router.push({ 
-      name: 'ManageAdvisorContent',
+      name: 'RoadmapBuilder',
       query: { 
         createSuccess: true,
         message: 'Tạo roadmap thành công!'
@@ -484,47 +517,6 @@ function validatePhases() {
     if (phase.timeSpan <= 0) {
       toast.error(`Thời gian dự kiến của giai đoạn ${i + 1} phải lớn hơn 0!`, toastConfig);
       return false;
-    }
-    
-    if (!validateMilestones(phase.milestones, i)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function validateMilestones(milestones, phaseIndex) {
-  if (!milestones || milestones.length === 0) {
-    toast.error(`Vui lòng thêm ít nhất một mốc cho giai đoạn ${phaseIndex + 1}!`, toastConfig);
-    return false;
-  }
-
-  for (let i = 0; i < milestones.length; i++) {
-    const milestone = milestones[i];
-    
-    if (!milestone.title.trim()) {
-      toast.error(`Vui lòng nhập tiêu đề cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
-      return false;
-    }
-    if (!milestone.eventName) {
-      toast.error(`Vui lòng chọn sự kiện cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
-      return false;
-    }
-    if (milestone.repeatTimesRequired <= 0) {
-      toast.error(`Số lần lặp lại của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
-      return false;
-    }
-    if (milestone.timeSpentRequired <= 0) {
-      toast.error(`Thời gian cần thiết của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
-      return false;
-    }
-
-    if (isRecommendationAvailable(milestone.eventName) && 
-        milestone.recommendations && 
-        milestone.recommendations.length > 0) {
-      if (!validateRecommendations(milestone.recommendations, phaseIndex, i)) {
-        return false;
-      }
     }
   }
   return true;

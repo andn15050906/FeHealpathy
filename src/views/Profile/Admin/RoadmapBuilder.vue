@@ -180,9 +180,11 @@ export default {
 
 <style scoped>
 .roadmap-builder {
+  margin-top: -15px;
+  min-width: 1200px;
+  min-height: 100vh;
   padding: 24px;
   background: #f8f9fa;
-  min-height: 100vh;
 }
 
 .page-header {
