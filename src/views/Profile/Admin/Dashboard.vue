@@ -32,6 +32,10 @@
           <i class="fas fa-shield-alt"></i>
           <span>Kiểm duyệt người dùng</span>
         </button>
+        <button class="action-card" @click="navigateTo('/roadmap-builder')">
+          <i class="fas fa-road"></i>
+          <span>Quản lý lộ trình</span>
+        </button>
       </div>
     </div>
 
@@ -367,12 +371,15 @@ export default {
 
 <style scoped>
 .admin-dashboard {
+  margin-top: -40px;
+  width: 100vw;        
+  min-height: 100vh;
   padding: 24px;
   background: #f8f9fa;
-  min-height: 100vh;
 }
 
 .dashboard-header {
+  min-width: 1200px;
   display: flex;
   justify-content: space-between;
   align-items: center;

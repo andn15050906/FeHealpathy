@@ -1,6 +1,6 @@
 import { getUserProfile } from "@/scripts/api/services/authService";
 import { getProgress } from '@/scripts/api/services/statisticsService';
-import { get, post, patch, del } from "@/scripts/api/apiClients"
+import { get, post, patch, del, postForm } from "@/scripts/api/apiClients"
 
 const API_BASE_URL = "/Roadmaps"
 
@@ -91,7 +91,16 @@ export const getPhaseDetailsById = async (phaseId) => {
   }
 }
 
-export const createRoadmap = async (data) => post(API_BASE_URL, data)
+export const createRoadmap = async (formData) => {
+  try {
+    const response = await postForm(API_BASE_URL, formData);
+    return response;
+  } catch (error) {
+    console.error('Error creating roadmap:', error);
+    throw error;
+  }
+}
+
 export const updateRoadmap = async (data) => patch(API_BASE_URL, data)
 export const deleteRoadmap = async (id) => del(`${API_BASE_URL}/${id}`)
 export const getCompletionData = async () => get(`/recommendations/completion`)
@@ -126,6 +135,6 @@ export const getCurrentRoadmapWithProgress = async () => {
   }
   if (!roadmap.currentPhase)
     roadmap.isCompleted = true;
-  
+
   return roadmap;
 }

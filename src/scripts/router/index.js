@@ -83,7 +83,7 @@ import UpdateBlog from "@/views/Profile/Advisor/Manage/UpdateBlog.vue";
 import ManageCourse from "@/views/Profile/Advisor/Manage/ManageCourse.vue";
 import CreateCourse from "@/views/Profile/Advisor/Manage/CreateCourse.vue";
 import UpdateCourse from "@/views/Profile/Advisor/Manage/UpdateCourse.vue";
-import RoadmapBuilder from "@/views/Profile/Advisor/Manage/RoadmapBuilder.vue";
+import RoadmapBuilder from "@/views/Profile/Admin/RoadmapBuilder.vue";
 import UpdateRoadmap from "@/views/Profile/Admin/UpdateRoadmap.vue";
 import RoadmapProgress from "@/components/RoadmapComponents/RoadmapProgress.vue";
 import CreateRoadmap from "@/views/Profile/Admin/CreateRoadmap.vue";
