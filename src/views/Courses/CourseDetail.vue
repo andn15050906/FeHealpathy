@@ -208,7 +208,7 @@
             class="card border-0 shadow-sm mb-2 mt-4"
             v-if="recommendedCourses.length > 0"
           >
-            <div class="card-body">
+            <!-- <div class="card-body">
               <h4 class="fw-bold text-dark card-title mb-4">
                 Khóa học bạn có thể thích
               </h4>
@@ -254,7 +254,7 @@
                   </swiper-slide>
                 </swiper>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <div class="rating-section" v-if="course">
@@ -307,6 +307,7 @@
             </div>
           </div>
         </div>
+        
         <div class="course-progress-sidebar" v-if="isEnrolled || isOwner">
           <div class="progress-sidebar-header">
             <h3>Tiến độ học tập</h3>
@@ -785,6 +786,7 @@ export default {
   width: 80%;
   padding: 50px;
   overflow-y: auto;
+  height: 100vh;
 }
 
 .course-progress-sidebar {
@@ -1746,6 +1748,7 @@ export default {
   .course-main-content {
     width: 100%;
     padding: 30px;
+    height: auto;
   }
   
   .course-progress-sidebar {
