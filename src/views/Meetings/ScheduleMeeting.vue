@@ -253,17 +253,22 @@ function joinMeeting(id) {
 </script>
 
 <style scoped>
-.schedule-meeting {
+.container {
+  width: 72vw;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 2rem 0;
 }
 
 .page-title {
-  margin-bottom: 30px;
-  font-weight: 600;
-  font-size: 28px;
+  margin-bottom: 40px;
+  font-weight: 700;
+  font-size: 32px;
   position: relative;
-  padding-bottom: 12px;
-  color: #000000;
+  padding-bottom: 15px;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .page-title::after {
@@ -272,69 +277,84 @@ function joinMeeting(id) {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background-color: #000000;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border-radius: 2px;
 }
 
 .section-title {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-weight: 600;
+  font-size: 24px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #000000;
+  gap: 12px;
+  color: #2c3e50;
+  position: relative;
+  padding-left: 15px;
 }
 
-.section-title i {
-  color: #000000;
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(to bottom, #3498db, #2ecc71);
+  border-radius: 2px;
 }
 
 .meeting-form {
-  border: 2px solid #dee2e6;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.meeting-form:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 15px;
   font-weight: 600;
-}
-
-.text-danger {
-  font-size: 12px;
-  margin-top: 2px;
-  display: block;
+  color: #2c3e50;
+  font-size: 1.1rem;
 }
 
 .advisors-grid .advisor-card {
   height: 100%;
-  transition: all 0.3s ease;
-  border-width: 2px;
-  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
 }
 
 .advisors-grid .advisor-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-color: #3498db;
 }
 
 .advisor-avatar-container {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #dee2e6;
+  border: 4px solid #e9ecef;
   transition: all 0.3s ease;
-  margin: 0 auto;
-}
-
-.border-primary .advisor-avatar-container {
-  border-color: #000000;
+  margin: 1.5rem auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .advisor-card .avatar {
@@ -343,45 +363,52 @@ function joinMeeting(id) {
   object-fit: cover;
 }
 
+.border-primary .advisor-avatar-container {
+  border-color: #3498db;
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
 .advisor-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 10px;
-  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #2c3e50;
 }
 
 .advisor-card .bio {
   font-size: 14px;
   color: #6c757d;
-  margin-bottom: 0px;
-  line-height: 1.5;
-  height: 63px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  height: 66px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  text-align: center;
+  padding: 0 15px;
 }
 
 .meeting-card {
-  transition: all 0.25s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
 }
 
 .meeting-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
 }
 
 .meeting-header {
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 1rem;
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
 }
 
 .meeting-details {
-  display: flex;
-  flex-direction: column;
+  padding: 1rem;
 }
 
 .info-row {
@@ -389,45 +416,101 @@ function joinMeeting(id) {
   align-items: center;
   color: #495057;
   font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.info-row i {
+  color: #3498db;
+  width: 20px;
 }
 
 .description-container {
   display: flex;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid #000000;
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  border-radius: 10px;
+  border-left: 4px solid #3498db;
+  margin-top: 15px;
+  padding: 12px;
 }
 
 .description-container p {
   font-size: 0.9rem;
   color: #495057;
-  line-height: 1.5;
-}
-
-.card-footer {
-  padding-top: 0;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .btn-primary {
-  transition: all 0.2s ease;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgba(52, 152, 219, 0.3);
+  background: linear-gradient(to right, #2980b9, #27ae60);
+}
+
+.btn-primary:disabled,
+.btn-primary.btn-secondary {
+  background: linear-gradient(to right, #95a5a6, #7f8c8d) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.btn-outline-primary {
+  border: 2px solid #3498db;
+  color: #3498db;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
 }
 
 .no-meetings {
-  border: 2px dashed #dee2e6;
+  border: 2px dashed #e9ecef;
+  border-radius: 15px;
+  padding: 3rem !important;
+  background: linear-gradient(to bottom, #f8f9fa, #ffffff);
 }
 
 .no-meetings i {
-  font-size: 48px;
-  color: #000000;
-  opacity: 0.5;
+  font-size: 56px;
+  color: #3498db;
+  opacity: 0.7;
+  margin-bottom: 1rem;
 }
 
-.border-primary {
-  border-color: #000000 !important;
+.badge {
+  padding: 8px 12px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.bg-warning {
+  background: linear-gradient(to right, #f1c40f, #f39c12) !important;
+}
+
+.bg-success {
+  background: linear-gradient(to right, #2ecc71, #27ae60) !important;
+}
+
+.bg-danger {
+  background: linear-gradient(to right, #e74c3c, #c0392b) !important;
+}
+
+.bg-secondary {
+  background: linear-gradient(to right, #95a5a6, #7f8c8d) !important;
 }
 </style>

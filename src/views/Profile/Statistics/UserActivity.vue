@@ -243,55 +243,142 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped>
+.container {
+  width: 72vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
 h2 {
-  color: #343a40;
-  font-weight: 600;
+  color: #2c3e50;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+h2.text-center::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border-radius: 2px;
 }
 
 .card {
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
   border: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .card-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  padding: 1.25rem;
+}
+
+.card-header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #2c3e50;
 }
 
 .table-container {
   height: 380px;
   overflow-y: auto;
+  border-radius: 0 0 15px 15px;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .sticky-top {
   position: sticky;
   top: 0;
   z-index: 1;
+  background: #f8f9fa;
+}
+
+.table {
+  margin-bottom: 0;
 }
 
 .table th {
   font-weight: 600;
-  color: #495057;
+  color: #2c3e50;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  text-align: left;
 }
 
 .table td {
   vertical-align: middle;
+  padding: 1rem;
+  color: #495057;
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.04);
+  background-color: rgba(52, 152, 219, 0.04);
+  transition: all 0.2s ease;
 }
 
 .chart-container {
   height: 450px;
   position: relative;
+  padding: 1rem;
 }
 
 a {
-  color: #007bff;
+  color: #3498db;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 a:hover {
-  color: #0056b3;
+  color: #2980b9;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95vw;
+    padding: 1rem;
+  }
+  
+  .chart-container {
+    height: 350px;
+  }
+  
+  .table-container {
+    height: 300px;
+  }
 }
 </style>

@@ -230,48 +230,142 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  width: 72vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
 h2 {
-  color: #343a40;
-  font-weight: 600;
+  color: #2c3e50;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+h2.text-center::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border-radius: 2px;
 }
 
 .card {
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
   border: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .card-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  padding: 1.25rem;
+}
+
+.card-header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #2c3e50;
 }
 
 .table-container {
   height: 300px;
   overflow-y: auto;
+  border-radius: 0 0 15px 15px;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .sticky-top {
   position: sticky;
   top: 0;
   z-index: 1;
+  background: #f8f9fa;
+}
+
+.table {
+  margin-bottom: 0;
 }
 
 .table th {
   font-weight: 600;
-  color: #495057;
+  color: #2c3e50;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.table th:nth-child(3) {
+  text-align: center;
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
+}
+
+.table th:last-child,
+.table td:last-child {
+  text-align: center;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  text-align: center;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  text-align: center;
 }
 
 .table td {
   vertical-align: middle;
+  padding: 1rem;
+  color: #495057;
+}
+
+.table td:nth-child(3) {
+  text-align: center;
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.04);
+  background-color: rgba(52, 152, 219, 0.04);
+  transition: all 0.2s ease;
 }
 
 .chart-container {
   height: 300px;
   position: relative;
+  padding: 1rem;
 }
 
 .good {
@@ -289,13 +383,31 @@ h2 {
   font-weight: bold;
 }
 
-a.btn-outline-primary {
-  color: #007bff;
-  border-color: #007bff;
+.btn-outline-primary {
+  color: #3498db;
+  border: 2px solid #3498db;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-a.btn-outline-primary:hover {
+.btn-outline-primary:hover {
   color: #fff;
-  background-color: #007bff;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95vw;
+    padding: 1rem;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
 }
 </style>
