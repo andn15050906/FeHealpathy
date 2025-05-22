@@ -509,7 +509,7 @@ export default {
               order: index + 1
             };
           })
-          .sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
+          .sort((a, b) => (a.index || 0) - (b.index || 0));
           
         totalLectures.value = lectures.value.length;
         completedLectures.value = lectures.value.filter(l => l.isCompleted).length;
@@ -775,7 +775,7 @@ export default {
   padding: 0;
   border-radius: 0;
   box-shadow: none;
-  width: 100%;
+  width: 100vw;
   display: flex;
   min-height: 100vh;
   max-width: 1800px;
