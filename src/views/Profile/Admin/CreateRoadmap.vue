@@ -77,46 +77,13 @@
             </div>
           </div>
 
-          <div class="form-group" v-if="isPaidLocal">
+          <div class="form-group" v-if="roadmap.isPaid">
             <label for="price">
               <v-icon small>mdi-currency-usd</v-icon>
               Giá (VND)
             </label>
-            <input
-              type="number"
-              id="price"
-              v-model="roadmap.price"
-              placeholder="Nhập giá roadmap"
-              min="0"
-              step="10000"
-            />
-          </div>
-
-          <div class="form-group" v-if="isPaidLocal">
-            <label for="features">
-              <v-icon small>mdi-check-circle-outline</v-icon>
-              Quyền lợi khi mua
-            </label>
-            <div
-              v-for="(feature, index) in roadmap.features"
-              :key="index"
-              class="feature-item"
-            >
-              <div class="feature-input">
-                <input
-                  type="text"
-                  v-model="roadmap.features[index]"
-                  placeholder="Nhập quyền lợi"
-                />
-                <v-btn icon small @click="removeFeature(index)" color="error">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </div>
-            </div>
-            <v-btn text color="primary" @click="addFeature" class="mt-2">
-              <v-icon left>mdi-plus</v-icon>
-              Thêm quyền lợi
-            </v-btn>
+            <input type="number" id="price" v-model="roadmap.price" placeholder="Nhập giá roadmap" min="0"
+              step="10000" />
           </div>
         </div>
 
@@ -337,11 +304,6 @@ const roadmap = ref({
   discount: null,
   discountExpiry: null,
   coupons: null,
-  features: [
-    "5 bước chi tiết với hướng dẫn chuyên sâu",
-    "Bài tập thực hành hàng ngày",
-    "Tài liệu tham khảo chuyên môn",
-  ],
   targetUserTypes: [],
   targetIssues: [],
   phases: [
@@ -411,8 +373,7 @@ const isFormValid = computed(() => {
     roadmap.value.targetIssues.length > 0 &&
     (!isPaidLocal.value ||
       (isPaidLocal.value &&
-        roadmap.value.price > 0 &&
-        roadmap.value.features.length > 0))
+        roadmap.value.price > 0))
   );
 });
 
@@ -554,14 +515,6 @@ function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
   ].recommendations.splice(recommendationIndex, 1);
 }
 
-function addFeature() {
-  roadmap.value.features.push("");
-}
-
-function removeFeature(index) {
-  roadmap.value.features.splice(index, 1);
-}
-
 function handleThumbUpload(event) {
   const file = event.target.files[0];
   if (file) {
@@ -607,12 +560,6 @@ async function submitRoadmap() {
       if (roadmap.value.discount) formData.append("Discount", roadmap.value.discount);
       if (roadmap.value.discountExpiry) formData.append("DiscountExpiry", roadmap.value.discountExpiry.toISOString());
       if (roadmap.value.coupons) formData.append("Coupons", roadmap.value.coupons);
-    }
-
-    if (roadmap.value.features && roadmap.value.features.length > 0) {
-      roadmap.value.features.forEach((feature, index) => {
-        formData.append(`Features[${index}]`, feature);
-      });
     }
 
     roadmap.value.phases.forEach((phase, index) => {
@@ -692,10 +639,7 @@ function validateRoadmapBasicInfo() {
     return false;
   }
   if (roadmap.value.introText.length > 1000) {
-    toast.error(
-      "Giới thiệu roadmap không được vượt quá 1000 ký tự!",
-      toastConfig
-    );
+    toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!", toastConfig);
     return false;
   }
   if (roadmap.value.targetUserTypes.length === 0) {
@@ -703,24 +647,11 @@ function validateRoadmapBasicInfo() {
     return false;
   }
   if (roadmap.value.targetIssues.length === 0) {
-    toast.error(
-      "Vui lòng chọn ít nhất một vấn đề mà roadmap giải quyết!",
-      toastConfig
-    );
+    toast.error("Vui lòng chọn ít nhất một vấn đề mà roadmap giải quyết!", toastConfig);
     return false;
   }
-  if (isPaidLocal.value && roadmap.value.price <= 0) {
+  if (roadmap.value.isPaid && roadmap.value.price <= 0) {
     toast.error("Giá roadmap phải lớn hơn 0!", toastConfig);
-    return false;
-  }
-  if (
-    isPaidLocal.value &&
-    (!roadmap.value.features || roadmap.value.features.length === 0)
-  ) {
-    toast.error(
-      "Vui lòng thêm ít nhất một quyền lợi khi mua roadmap!",
-      toastConfig
-    );
     return false;
   }
   return true;
