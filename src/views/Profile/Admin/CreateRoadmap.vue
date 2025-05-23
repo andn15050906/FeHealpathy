@@ -29,6 +29,28 @@
           </div>
 
           <div class="form-group">
+            <label for="thumb">
+              <v-icon small>mdi-image</v-icon>
+              Ảnh bìa lộ trình
+            </label>
+            <div class="thumb-upload">
+              <input
+                type="file"
+                id="thumb"
+                @change="handleThumbUpload"
+                accept="image/*"
+                class="thumb-input"
+              />
+              <div class="thumb-preview" v-if="thumbPreview">
+                <img :src="thumbPreview" alt="Thumbnail preview" />
+                <v-btn icon small @click="removeThumb" class="remove-thumb">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label for="introText">
               <v-icon small>mdi-text-box-outline</v-icon>
               Giới thiệu
@@ -307,8 +329,14 @@ const allSurveys = ref([]);
 const roadmap = ref({
   title: "",
   introText: "",
+  description: "",
+  category: "mental-health",
+  thumb: null,
   isPaid: false,
   price: 500000,
+  discount: null,
+  discountExpiry: null,
+  coupons: null,
   features: [
     "5 bước chi tiết với hướng dẫn chuyên sâu",
     "Bài tập thực hành hàng ngày",
@@ -430,6 +458,8 @@ const availableTools = ref([
   },
 ]);
 
+const thumbPreview = ref(null);
+
 function addPhase() {
   roadmap.value.phases.push({
     title: "",
@@ -532,6 +562,25 @@ function removeFeature(index) {
   roadmap.value.features.splice(index, 1);
 }
 
+function handleThumbUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    roadmap.value.thumb = {
+      file: file,
+      title: file.name,
+      url: null
+    };
+    thumbPreview.value = URL.createObjectURL(file);
+  }
+}
+
+function removeThumb() {
+  roadmap.value.thumb = null;
+  thumbPreview.value = null;
+  const input = document.getElementById('thumb');
+  if (input) input.value = '';
+}
+
 async function submitRoadmap() {
   if (!validateRoadmapBasicInfo() || !validatePhases()) {
     return;
@@ -548,8 +597,16 @@ async function submitRoadmap() {
     formData.append("Category", "mental-health");
     formData.append("IsPaid", roadmap.value.isPaid);
 
+    if (roadmap.value.thumb) {
+      formData.append("Thumb.File", roadmap.value.thumb.file);
+      formData.append("Thumb.Title", roadmap.value.thumb.title);
+    }
+
     if (roadmap.value.isPaid) {
       formData.append("Price", roadmap.value.price);
+      if (roadmap.value.discount) formData.append("Discount", roadmap.value.discount);
+      if (roadmap.value.discountExpiry) formData.append("DiscountExpiry", roadmap.value.discountExpiry.toISOString());
+      if (roadmap.value.coupons) formData.append("Coupons", roadmap.value.coupons);
     }
 
     if (roadmap.value.features && roadmap.value.features.length > 0) {
@@ -1051,5 +1108,48 @@ onMounted(async () => {
   .submit-btn {
     width: 100%;
   }
+}
+
+.thumb-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thumb-input {
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.thumb-input:hover {
+  border-color: #2196f3;
+}
+
+.thumb-preview {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumb-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-thumb {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.remove-thumb .v-icon {
+  color: white;
 }
 </style>

@@ -6,8 +6,9 @@
   >
     <div class="position-relative">
       <v-img
-        :src="roadmap.image || '/images/placeholder.jpg'"
-        height="160"
+        :src="roadmap.thumbUrl || '/images/default-roadmap.jpg'"
+        @error="handleImageError"
+        height="200"
         cover
       ></v-img>
       <v-chip
@@ -65,6 +66,11 @@ export default {
     },
   },
   emits: ["view"],
+  methods: {
+    handleImageError(e) {
+      e.target.src = '/images/default-roadmap.jpg';
+    }
+  }
 };
 </script>
 
@@ -77,6 +83,7 @@ export default {
   height: auto !important;
   display: flex;
   flex-direction: column;
+  min-height: 420px;
 }
 
 .roadmap-card:hover {
@@ -84,8 +91,30 @@ export default {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
+.v-card-title {
+  padding: 20px 16px 10px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.v-card-subtitle {
+  padding: 0 16px 16px;
+}
+
+.v-card-text {
+  padding: 0 16px 20px;
+  flex-grow: 1;
+}
+
+.v-card-text p {
+  line-height: 1.6;
+  color: #4a5568;
+}
+
 .v-card-actions {
   margin-top: auto;
   padding: 16px;
+  padding-top: 0;
 }
 </style>
