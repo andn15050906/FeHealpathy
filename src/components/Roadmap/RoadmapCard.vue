@@ -104,7 +104,7 @@ export default {
         this.$router.push(`/roadmap/${this.roadmap.id}`);
       } else {
         // Nếu là lộ trình miễn phí hoặc đã mua
-        this.$router.push(`/roadmap/${this.roadmap.id}/detail`);
+        this.$router.push(`/roadmap/${this.roadmap.id}`);
       }
     },
     proceedToPayment() {
