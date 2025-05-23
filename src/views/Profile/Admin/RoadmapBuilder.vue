@@ -195,6 +195,7 @@ export default {
 <style scoped>
 .roadmap-builder {
   margin-top: -15px;
+  margin-bottom: 15px;
   min-width: 1200px;
   min-height: 100vh;
   padding: 24px;
@@ -305,6 +306,7 @@ export default {
 }
 
 .actions {
+  margin-top: 25px;
   display: flex;
   gap: 8px;
 }
@@ -318,6 +320,7 @@ export default {
 }
 
 .btn-action.edit {
+  margin-bottom: 17px;
   background: #ebf8ff;
   color: #3182ce;
 }
@@ -327,6 +330,7 @@ export default {
 }
 
 .btn-action.delete {
+  margin-bottom: 17px;
   background: #fff5f5;
   color: #e53e3e;
 }
