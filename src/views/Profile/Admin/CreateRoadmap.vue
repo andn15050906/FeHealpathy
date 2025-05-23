@@ -65,6 +65,20 @@
           </div>
 
           <div class="form-group">
+            <label for="description">
+              <v-icon small>mdi-text-box-outline</v-icon>
+              Mô tả
+            </label>
+            <textarea
+              id="description"
+              v-model="roadmap.description"
+              placeholder="Nhập mô tả chi tiết cho roadmap"
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
             <label for="isPaid">
               <v-icon small>mdi-cash</v-icon>
               Loại lộ trình
@@ -297,13 +311,8 @@ const roadmap = ref({
   title: "",
   introText: "",
   description: "",
-  category: "mental-health",
-  thumb: null,
   isPaid: false,
   price: 500000,
-  discount: null,
-  discountExpiry: null,
-  coupons: null,
   targetUserTypes: [],
   targetIssues: [],
   phases: [
@@ -312,6 +321,7 @@ const roadmap = ref({
       tips: "",
     },
   ],
+  thumb: null,
 });
 
 const isPaidLocal = ref(roadmap.value.isPaid);
@@ -546,7 +556,7 @@ async function submitRoadmap() {
 
     formData.append("Title", roadmap.value.title);
     formData.append("IntroText", roadmap.value.introText);
-    formData.append("Description", roadmap.value.introText);
+    formData.append("Description", roadmap.value.description);
     formData.append("Category", "mental-health");
     formData.append("IsPaid", roadmap.value.isPaid);
 

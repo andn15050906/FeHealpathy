@@ -54,6 +54,20 @@
           </div>
 
           <div class="form-group">
+            <label for="description">
+              <v-icon small>mdi-text-box-outline</v-icon>
+              Mô tả
+            </label>
+            <textarea 
+              id="description" 
+              v-model="roadmap.description" 
+              placeholder="Nhập mô tả chi tiết cho roadmap" 
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
             <label for="isPaid">
               <v-icon small>mdi-cash</v-icon>
               Loại lộ trình
@@ -230,6 +244,7 @@ const roadmap = ref({
   id: "",
   title: "",
   introText: "",
+  description: "",
   isPaid: false,
   price: 500000,
   targetUserTypes: [],
@@ -342,6 +357,7 @@ async function fetchRoadmapData() {
       id: response.id,
       title: response.title,
       introText: response.introText,
+      description: response.description,
       isPaid: response.price > 0,
       price: response.price || 500000,
       targetUserTypes: response.targetUserTypes || [],
@@ -487,31 +503,25 @@ async function submitRoadmap(event) {
     loadingSpinner.value.showSpinner();
     const formData = new FormData();
 
-    // Thêm các trường cơ bản
     formData.append("Id", roadmap.value.id);
     formData.append("Title", roadmap.value.title);
     formData.append("IntroText", roadmap.value.introText);
-    formData.append("Description", roadmap.value.introText);
+    formData.append("Description", roadmap.value.description);
     formData.append("Category", "mental-health");
     
-    // Xử lý price: nếu là miễn phí thì gửi 0, nếu là trả phí thì giữ giá hiện tại
     const price = roadmap.value.isPaid ? Number(roadmap.value.price) : 0;
     formData.append("Price", price);
 
-    // Xử lý ảnh
     if (roadmap.value.thumb) {
       if (roadmap.value.thumb.isNewUpload && roadmap.value.thumb.file) {
-        // Nếu là ảnh mới upload
         formData.append("Thumb.File", roadmap.value.thumb.file);
         formData.append("Thumb.Title", roadmap.value.thumb.title);
       } else if (roadmap.value.thumb.url) {
-        // Nếu là ảnh cũ
         formData.append("ThumbUrl", roadmap.value.thumb.url);
         formData.append("ThumbTitle", roadmap.value.thumb.title);
       }
     }
 
-    // Thêm target types và issues
     roadmap.value.targetUserTypes.forEach((type, index) => {
       formData.append(`TargetUserTypes[${index}]`, type);
     });
@@ -520,7 +530,6 @@ async function submitRoadmap(event) {
       formData.append(`TargetIssues[${index}]`, issue);
     });
 
-    // Thêm phases
     roadmap.value.phases.forEach((phase, phaseIndex) => {
       formData.append(`Phases[${phaseIndex}].Title`, phase.title);
       formData.append(`Phases[${phaseIndex}].Description`, phase.description);
@@ -529,7 +538,6 @@ async function submitRoadmap(event) {
       formData.append(`Phases[${phaseIndex}].TimeSpan`, Number(phase.timeSpan) || 7);
       formData.append(`Phases[${phaseIndex}].IsRequiredToAdvance`, false);
 
-      // Thêm tools và recommendations
       if (phase.tools && phase.tools.length > 0) {
         phase.tools.forEach((toolValue, toolIndex) => {
           const tool = availableTools.value.find(t => t.value === toolValue);
@@ -698,7 +706,6 @@ function getAvailableContents(phaseIndex, milestoneIndex, recIndex, eventLabel) 
   }
 }
 
-// Thêm computed để xử lý price
 const computedPrice = computed({
   get: () => roadmap.value.price,
   set: (val) => {
