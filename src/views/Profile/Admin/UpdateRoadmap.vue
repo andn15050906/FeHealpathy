@@ -143,7 +143,13 @@
                 <v-icon small>mdi-text-box-outline</v-icon>
                 Mô tả Giai Đoạn
               </label>
-              <textarea v-model="phase.description" placeholder="Mô tả chi tiết giai đoạn" rows="3" required></textarea>
+              <textarea 
+                :value="phase.description"
+                @input="handleDescriptionInput($event, phase)"
+                placeholder="Mô tả chi tiết giai đoạn" 
+                rows="3" 
+                required
+              ></textarea>
             </div>
 
             <div class="form-group">
@@ -296,25 +302,53 @@ const isFormValid = computed(() => {
 
 const isSubmitting = ref(false);
 
+function parseDescription(description) {
+  if (!description) return '';
+  
+  try {
+    if (typeof description === 'string' && description.startsWith('[')) {
+      const parsed = JSON.parse(description);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0].Description || parsed[0].Title || '';
+      }
+    }
+    
+    if (typeof description === 'string' && description.startsWith('{')) {
+      const parsed = JSON.parse(description);
+      return parsed.Description || parsed.Title || '';
+    }
+    
+    if (typeof description === 'object') {
+      if (Array.isArray(description) && description.length > 0) {
+        return description[0].Description || description[0].Title || '';
+      }
+      return description.Description || description.Title || '';
+    }
+    
+    return description;
+  } catch (e) {
+    console.error('Error parsing description:', e);
+    return description;
+  }
+}
+
 async function fetchRoadmapData() {
   try {
     loadingSpinner.value.showSpinner();
     const roadmapId = route.params.id;
     const response = await getRoadmapById(roadmapId);
 
-    console.log("Response from API:", response); // Debug log
-
-    // Khởi tạo roadmap với dữ liệu từ API
     roadmap.value = {
       id: response.id,
       title: response.title,
       introText: response.introText,
       isPaid: response.price > 0,
-      price: response.price || 500000, // Giữ giá từ API nếu có, nếu không thì mặc định 500,000
+      price: response.price || 500000,
       targetUserTypes: response.targetUserTypes || [],
       targetIssues: response.targetIssues || [],
       phases: (response.phases || []).map(phase => ({
         ...phase,
+        description: parseDescription(phase.description),
         tools: phase.tools || [],
         tips: phase.tips || "",
       })),
@@ -324,14 +358,10 @@ async function fetchRoadmapData() {
       } : null
     };
 
-    // Set thumb preview from existing URL
     if (response.thumbUrl) {
       thumbPreview.value = response.thumbUrl;
     }
-
-    console.log("Dữ liệu roadmap đã xử lý:", roadmap.value); // Debug log
   } catch (error) {
-    console.error("Lỗi tải dữ liệu roadmap:", error);
     toast.error("Không thể tải dữ liệu roadmap", toastConfig);
   } finally {
     loadingSpinner.value.hideSpinner();
@@ -517,12 +547,6 @@ async function submitRoadmap(event) {
       }
     });
 
-    // Log để debug
-    console.log("FormData being sent:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-
     await updateRoadmap(formData);
 
     await router.push({
@@ -686,14 +710,20 @@ const computedPrice = computed({
   }
 });
 
+function handleDescriptionInput(event, phase) {
+  const value = event.target.value;
+  const parsedValue = parseDescription(value);
+  phase.description = parsedValue;
+}
+
 onMounted(async () => {
   await fetchRoadmapData();
 
-  allCourses.value = await getCourses({ pageIndex: 0, pageSize: 10 });
-  allMediaResources.value = await getPagedMediaResources({ pageIndex: 0, pageSize: 10 });
-  allArticles.value = await getPagedArticles({ pageIndex: 0, pageSize: 10 });
-  allConversations.value = await getPagedConversations({ pageIndex: 0, pageSize: 10 });
-  allSurveys.value = await getPagedSurveys({ pageIndex: 0, pageSize: 10 });
+  // allCourses.value = await getCourses({ pageIndex: 0, pageSize: 10 });
+  // allMediaResources.value = await getPagedMediaResources({ pageIndex: 0, pageSize: 10 });
+  // allArticles.value = await getPagedArticles({ pageIndex: 0, pageSize: 10 });
+  // allConversations.value = await getPagedConversations({ pageIndex: 0, pageSize: 10 });
+  // allSurveys.value = await getPagedSurveys({ pageIndex: 0, pageSize: 10 });
 });
 </script>
 
