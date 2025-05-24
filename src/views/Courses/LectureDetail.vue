@@ -69,14 +69,31 @@
                     />
                   </template>
                   <template v-else-if="isVideo(material.url)">
-                    <video controls :src="material.url" class="material-video"></video>
+                    <video 
+                      controls 
+                      :src="material.url" 
+                      class="material-video"
+                      @ended="handleVideoEnded"
+                      @timeupdate="handleVideoProgress"
+                      ref="videoPlayer"
+                    ></video>
                   </template>
                   <template v-else-if="isAudio(material.url)">
-                    <audio controls :src="material.url" class="material-audio"></audio>
+                    <audio 
+                      controls 
+                      :src="material.url" 
+                      class="material-audio"
+                      @ended="handleAudioEnded"
+                    ></audio>
                   </template>
                   <template v-else>
                     <div class="document-container">
-                      <a :href="material.url" target="_blank" class="material-link">
+                      <a 
+                        :href="material.url" 
+                        target="_blank" 
+                        class="material-link"
+                        @click="isPdf(material.url) ? handlePdfView() : handleImageView()"
+                      >
                         📄 {{ material.title || 'Tài liệu' }}
                       </a>
                       <button
@@ -264,7 +281,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { getLectureById } from "@/scripts/api/services/lectureService";
 import { getUserById } from "@/scripts/api/services/userService";
@@ -279,7 +296,7 @@ import LoadingSpinner from '@/components/Common/Popup/LoadingSpinner.vue';
 import DeleteConfirmPopup from '@/components/Common/Popup/DeleteConfirmPopup.vue';
 import UpdateConfirmPopup from '@/components/Common/Popup/UpdateConfirmPopup.vue';
 import { getLectures } from "@/scripts/api/services/lectureService";
-import { getEnrollments } from "@/scripts/api/services/enrollmentService";
+import { getEnrollments, updateCourseProgress } from "@/scripts/api/services/enrollmentService";
 import { getCourseById } from "@/scripts/api/services/courseService";
 
 export default {
@@ -683,6 +700,72 @@ export default {
 
     const activeTab = ref('info');
 
+    const handleMediaCompletion = async () => {
+      if (!courseId || !lecture.value?.index) return;
+      
+      try {
+        await updateCourseProgress(courseId, lecture.value.index);
+        // Cập nhật trạng thái hoàn thành trong danh sách bài giảng
+        const lectureIndex = lectures.value.findIndex(l => l.id === lecture.value.id);
+        if (lectureIndex !== -1) {
+          lectures.value[lectureIndex].isCompleted = true;
+          completedLectures.value = lectures.value.filter(l => l.isCompleted).length;
+          completionRate.value = (completedLectures.value / totalLectures.value) * 100;
+        }
+      } catch (error) {
+        console.error('Error updating course progress:', error);
+      }
+    };
+
+    const videoPlayer = ref(null);
+    const videoProgress = ref(0);
+    const videoCompleted = ref(false);
+
+    const handleVideoProgress = (event) => {
+      if (!videoPlayer.value) return;
+      
+      const video = event.target;
+      const progress = (video.currentTime / video.duration) * 100;
+      videoProgress.value = progress;
+      
+      // Mark as completed if watched at least 80% of the video
+      if (progress >= 80 && !videoCompleted.value) {
+        videoCompleted.value = true;
+        handleMediaCompletion();
+      }
+    };
+
+    const handleVideoEnded = () => {
+      videoCompleted.value = true;
+      handleMediaCompletion();
+    };
+
+    const handleAudioEnded = () => {
+      handleMediaCompletion();
+    };
+
+    const handlePdfView = () => {
+      // Giả sử người dùng đã xem PDF khi họ mở nó
+      handleMediaCompletion();
+    };
+
+    const handleImageView = () => {
+      // Giả sử người dùng đã xem ảnh khi họ mở nó
+      handleMediaCompletion();
+    };
+
+    // Watch cho việc chuyển tab
+    watch(activeTab, (newTab) => {
+      if (newTab === 'materials' && lecture.value?.lectureType === 'text') {
+        handleMediaCompletion();
+      }
+    });
+
+    const isPdf = (url) => {
+      if (!url) return false;
+      return /\.(pdf)$/i.test(url);
+    };
+
     onMounted(async () => {
       getCurrentUserInfo();
       await Promise.all([
@@ -738,7 +821,11 @@ export default {
       isEnrolled,
       isOwner,
       activeTab,
-      tabs
+      tabs,
+      videoPlayer,
+      videoProgress,
+      videoCompleted,
+      handleVideoProgress,
     };
   }
 };
