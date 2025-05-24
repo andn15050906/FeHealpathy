@@ -1,56 +1,205 @@
 <template>
-  <div class="diary-container">
-    <header class="header-section">
-      <h1 class="diary-title">📖 Nhật Ký Của Tôi</h1>
-    </header>
+  <div class="diary-app">
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <div class="col-md-4 col-lg-3 sidebar">
+          <div class="sidebar-header">
+            <h2 class="d-flex align-items-center justify-content-center gap-2 mb-0">
+              <BookOpen :size="28" class="text-primary" />
+              Nhật Ký
+            </h2>
+          </div>
 
-    <div class="book">
-      <div class="page cover">
-        <h2 class="cover-title">📕 Nhật Ký Của Tôi</h2>
-        <v-calendar v-model="selectedDate" @dayclick="goToNearestEntry" :attributes="calendarAttributes"
-          class="custom-calendar" />
-        <div class="write-note-container">
-          <div class="arrow-animation">➡️</div>
-          <router-link to="/diary/diary-writing">
-            <button class="new-entry-button">Viết nhật ký hôm nay</button>
-          </router-link>
+          <div class="calendar-section">
+            <h5 class="section-title d-flex align-items-center justify-content-center gap-2">
+              <Calendar :size="20" />
+              Lịch
+            </h5>
+            <div class="calendar-wrapper">
+              <v-calendar v-model="selectedDate" @dayclick="goToNearestEntry" :attributes="calendarAttributes"
+                class="custom-calendar" is-expanded />
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <router-link to="/diary/diary-writing" class="text-decoration-none">
+              <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                <PenTool :size="18" />
+                Viết nhật ký mới
+              </button>
+            </router-link>
+          </div>
+
+          <div class="entries-list">
+            <h5 class="section-title d-flex align-items-center justify-content-center gap-2">
+              <FileText :size="20" />
+              Danh sách nhật ký ({{ orderedEntries.length }})
+            </h5>
+            <div class="entries-container">
+              <div v-for="(entry, index) in orderedEntries" :key="entry.id" class="entry-item"
+                :class="{ active: currentPageIndex === index }" @click="currentPageIndex = index">
+                <div class="entry-preview">
+                  <h6 class="entry-preview-title">
+                    {{ entry.title || "Không có tiêu đề" }}
+                  </h6>
+                  <p class="entry-preview-date">
+                    {{ formatDateShort(entry.creationTime) }}
+                  </p>
+                  <p class="entry-preview-content">
+                    {{ getPreviewContent(entry.content) }}
+                  </p>
+                </div>
+              </div>
+              <div v-if="orderedEntries.length === 0" class="no-entries">
+                <FileX :size="48" class="text-muted mb-2" />
+                <p class="text-muted">Chưa có nhật ký nào</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="page diary-page right" :class="{ flippingright: isFlippingRight }" @click.self="nextPage">
-        <div v-if="currentEntry">
-          <button class="delete-button fixed" @click.stop="confirmDelete(currentEntry.id)">🗑️</button>
-          <input type="text" v-model="currentEntry.title" @input="updateDiary" class="entry-title" />
-          <p class="entry-date">{{ formatDate(currentEntry.creationTime) }}</p>
-          <textarea v-model="currentEntry.content" @input="updateDiary" class="entry-content"></textarea>
+        <div class="col-md-8 col-lg-9 main-content">
+          <div v-if="currentEntry" class="entry-editor">
+            <div class="entry-header">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <input type="text" v-model="currentEntry.title" @input="updateDiary"
+                    class="form-control form-control-lg border-0 entry-title-input" placeholder="Tiêu đề nhật ký..." />
+                </div>
+                <button class="btn btn-outline-danger btn-sm"
+                  @click="showDeleteConfirmation(currentEntry.id, currentEntry.title)">
+                  <Trash2 :size="16" />
+                </button>
+              </div>
+
+              <div class="entry-meta">
+                <span class="badge bg-light text-dark d-flex align-items-center gap-1">
+                  <Calendar :size="14" />
+                  {{ formatDate(currentEntry.creationTime) }}
+                </span>
+                <span class="badge bg-light text-dark d-flex align-items-center gap-1">
+                  <Clock :size="14" />
+                  {{ getWordCount(currentEntry.content) }} từ
+                </span>
+              </div>
+            </div>
+
+            <div class="entry-content-section">
+              <textarea v-model="currentEntry.content" @input="updateDiary" class="form-control entry-content-textarea"
+                placeholder="Viết về ngày hôm nay của bạn..." rows="20"></textarea>
+            </div>
+
+            <div class="entry-footer">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="navigation-buttons">
+                  <button class="btn btn-outline-secondary btn-sm me-2" @click="previousEntry"
+                    :disabled="currentPageIndex === 0">
+                    <ChevronLeft :size="16" />
+                    Trước
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm" @click="nextEntry"
+                    :disabled="currentPageIndex === orderedEntries.length - 1">
+                    Sau
+                    <ChevronRight :size="16" />
+                  </button>
+                </div>
+
+                <div class="entry-info">
+                  <span class="text-muted small">
+                    {{ currentPageIndex + 1 }} / {{ orderedEntries.length }}
+                  </span>
+                </div>
+
+                <div class="save-status">
+                  <span class="badge bg-success d-flex align-items-center gap-1">
+                    <Check :size="12" />
+                    Đã lưu tự động
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="empty-state">
+            <div class="text-center">
+              <BookOpen :size="80" class="text-muted mb-4" />
+              <h3 class="text-muted mb-3">Chào mừng đến với Nhật Ký</h3>
+              <p class="text-muted mb-4">
+                Bắt đầu viết nhật ký đầu tiên của bạn hoặc chọn một nhật ký từ
+                danh sách bên trái.
+              </p>
+              <router-link to="/diary/diary-writing" class="text-decoration-none">
+                <button class="btn btn-primary btn-lg d-flex align-items-center gap-2 mx-auto">
+                  <PenTool :size="20" />
+                  Viết nhật ký đầu tiên
+                </button>
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <DeleteConfirmPopup :message="deleteMessage" :isVisible="showDeleteDialog" @confirmDelete="handleConfirmDelete"
+      @update:isVisible="showDeleteDialog = $event" />
   </div>
 </template>
 
 <script>
-import { getPagedDiaryNotes, deleteDiaryNote, updateDiaryNote } from "@/scripts/api/services/diaryNoteService";
-import { getUserProfile } from '@/scripts/api/services/authService';
-import Swal from "sweetalert2";
+import {
+  getPagedDiaryNotes,
+  deleteDiaryNote,
+  updateDiaryNote,
+} from "@/scripts/api/services/diaryNoteService";
+import { getUserProfile } from "@/scripts/api/services/authService";
+import { toast } from "vue3-toastify";
 import { Calendar } from "v-calendar";
+import {
+  BookOpen,
+  PenTool,
+  Trash2,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  FileX,
+  Clock,
+  Check,
+} from "lucide-vue-next";
+import DeleteConfirmPopup from "../../../components/Common/Popup/DeleteConfirmPopup.vue";
 import "v-calendar/style.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default {
   name: "DiaryList",
-  components: { VCalendar: Calendar },
+  components: {
+    VCalendar: Calendar,
+    BookOpen,
+    PenTool,
+    Trash2,
+    Calendar: CalendarIcon,
+    ChevronLeft,
+    ChevronRight,
+    FileText,
+    FileX,
+    Clock,
+    Check,
+    DeleteConfirmPopup,
+  },
   data() {
     return {
       entries: [],
       currentPageIndex: 0,
       selectedDate: new Date(),
-      isFlippingRight: false,
+      showDeleteDialog: false,
+      deleteMessage: "",
+      entryToDelete: null,
     };
   },
   computed: {
     orderedEntries() {
       return this.entries.sort(
-        (a, b) => new Date(a.creationTime) - new Date(b.creationTime)
+        (a, b) => new Date(b.creationTime) - new Date(a.creationTime)
       );
     },
     currentEntry() {
@@ -59,7 +208,10 @@ export default {
     calendarAttributes() {
       return this.entries.map((entry) => ({
         key: entry.id,
-        highlight: { color: "blue", fillMode: "solid" },
+        highlight: {
+          color: "blue",
+          fillMode: "solid",
+        },
         dates: new Date(entry.creationTime),
       }));
     },
@@ -70,313 +222,305 @@ export default {
         year: "numeric",
         month: "long",
         day: "numeric",
+        weekday: "long",
       });
+    },
+    formatDateShort(date) {
+      return new Date(date).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
+    getPreviewContent(content) {
+      if (!content) return "Không có nội dung...";
+      return content.length > 100 ? content.substring(0, 100) + "..." : content;
+    },
+    getWordCount(content) {
+      if (!content) return 0;
+      return content
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length;
     },
     async fetchDiaryNotes() {
       try {
         var user = await getUserProfile();
         const data = await getPagedDiaryNotes({ CreatorId: user.id });
-        this.entries = (data.items || []).filter(entry => !!entry.title);
+        this.entries = (data.items || []).filter((entry) => !!entry.title);
       } catch (error) {
         if (error.response?.status === 404) {
           this.entries = [];
         } else {
-          Swal.fire("Lỗi", "Không thể tải danh sách nhật ký.", "error");
+          toast.error("Không thể tải danh sách nhật ký.");
         }
       }
     },
-      nextPage() {
-        if (this.currentPageIndex < this.orderedEntries.length - 1) {
-          this.isFlippingRight = true;
-          setTimeout(() => {
-            this.currentPageIndex++;
-            this.isFlippingRight = false;
-          }, 700);
-        }
-      },
-      goToNearestEntry(day) {
-        const selectedDate = new Date(day.id).toISOString().split("T")[0];
-        const index = this.orderedEntries.findIndex((entry) =>
-          entry.creationTime.startsWith(selectedDate)
-        );
-        if (index !== -1) {
-          this.currentPageIndex = index;
-        } else {
-          Swal.fire("Không tìm thấy", "Không có nhật ký nào vào ngày này.", "info");
-        }
-      },
+    nextEntry() {
+      if (this.currentPageIndex < this.orderedEntries.length - 1) {
+        this.currentPageIndex++;
+      }
+    },
+    previousEntry() {
+      if (this.currentPageIndex > 0) {
+        this.currentPageIndex--;
+      }
+    },
+    goToNearestEntry(day) {
+      const selectedDate = new Date(day.id).toISOString().split("T")[0];
+      const index = this.orderedEntries.findIndex((entry) =>
+        entry.creationTime.startsWith(selectedDate)
+      );
+      if (index !== -1) {
+        this.currentPageIndex = index;
+      } else {
+      }
+    },
     async updateDiary() {
-        if (!this.currentEntry) return;
-        const formData = new FormData();
-        formData.append("Id", this.currentEntry.id);
-        formData.append("Title", this.currentEntry.title);
-        formData.append("Content", this.currentEntry.content);
+      if (!this.currentEntry) return;
+      const formData = new FormData();
+      formData.append("Id", this.currentEntry.id);
+      formData.append("Title", this.currentEntry.title);
+      formData.append("Content", this.currentEntry.content);
 
-        try {
-          await updateDiaryNote(formData);
-        } catch (error) {
-          console.error("Error updating diary:", error);
-        }
-      },
-    async confirmDelete(entryId) {
-        const result = await Swal.fire({
-          title: "Bạn có chắc chắn?",
-          text: "Bạn sẽ không thể khôi phục lại nhật ký này!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Có, xóa nó!",
-          cancelButtonText: "Hủy bỏ",
-        });
+      try {
+        await updateDiaryNote(formData);
+      } catch (error) {
+        toast.error("Lỗi khi cập nhật nhật ký.");
+      }
+    },
+    showDeleteConfirmation(entryId, entryTitle) {
+      this.entryToDelete = entryId;
+      this.deleteMessage = `Bạn có chắc chắn muốn xóa nhật ký "${entryTitle || 'Không có tiêu đề'}"? Hành động này không thể hoàn tác.`;
+      this.showDeleteDialog = true;
+    },
+    async handleConfirmDelete(confirmed) {
+      if (!confirmed || !this.entryToDelete) {
+        this.entryToDelete = null;
+        return;
+      }
 
-        if (result.isConfirmed) {
-          await this.deleteDiary(entryId);
+      try {
+        await deleteDiaryNote(this.entryToDelete);
+        this.entries = this.entries.filter((entry) => entry.id !== this.entryToDelete);
+        if (
+          this.currentPageIndex >= this.orderedEntries.length &&
+          this.currentPageIndex > 0
+        ) {
+          this.currentPageIndex--;
         }
-      },
-    async deleteDiary(entryId) {
-        try {
-          await deleteDiaryNote(entryId);
-          this.entries = this.entries.filter((entry) => entry.id !== entryId);
-          Swal.fire("Đã xóa!", "Nhật ký của bạn đã được xóa.", "success");
-        } catch (error) {
-          Swal.fire("Lỗi", "Không thể xóa nhật ký.", "error");
-        }
-      },
+        toast.success("Nhật ký đã được xóa thành công.");
+      } catch (error) {
+        toast.error("Không thể xóa nhật ký.");
+      } finally {
+        this.entryToDelete = null;
+      }
     },
-    mounted() {
-      this.fetchDiaryNotes();
-    },
-  };
+  },
+  mounted() {
+    this.fetchDiaryNotes();
+  },
+};
 </script>
 
 <style scoped>
-.new-entry-button {
-  background: #673ab7;
-  color: white;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
+.diary-app {
+  width: 1380px;
+  background-color: #f8f9fa;
 }
 
-.new-entry-button:hover {
-  background: #512da8;
+.sidebar {
+  background-color: white;
+  border-right: 1px solid #e9ecef;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+.sidebar-header h2 {
+  color: #495057;
+  font-weight: 600;
+}
+
+.calendar-section {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-title {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
 }
 
 .custom-calendar {
+  width: 100%;
   max-width: 280px;
-  margin-top: 10px;
 }
 
-.entry-title {
-  font-size: 20px;
-  font-weight: bold;
-  width: 100%;
-  border: none;
-  background: none;
+.quick-actions {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.entries-list {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.entries-list .section-title {
   text-align: center;
 }
 
-.entry-content {
-  width: 100%;
-  height: 400px;
-  border: none;
-  background: none;
-  font-size: 16px;
-  padding: 10px;
+.entries-container {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-.calendar-and-book {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  width: 100%;
-  margin-top: 50px;
-}
-
-.delete-button {
-  position: absolute;
-  top: 35px;
-  right: 35px;
-  font-size: 16px;
-  background: none;
-  border: none;
+.entry-item {
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
   cursor: pointer;
-  z-index: 10;
+  transition: all 0.2s ease;
 }
 
-.delete-button.fixed {
-  position: absolute;
-  top: 35px;
-  right: 35px;
-  font-size: 16px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
+.entry-item:hover {
+  background-color: #f8f9fa;
+  border-color: #007bff;
 }
 
-.diary-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+.entry-item.active {
+  background-color: #e3f2fd;
+  border-color: #007bff;
 }
 
-.edit-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px;
-  border: none;
-  background: none;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 50%;
+.entry-preview-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #495057;
 }
 
-.edit-button:hover {
-  background: rgba(0, 0, 0, 0.1);
+.entry-preview-date {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
 }
 
-.header-section {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  width: 80%;
-  max-width: 1000px;
+.entry-preview-content {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0;
+  line-height: 1.4;
 }
 
-.diary-title {
-  font: 700 32px Poppins, sans-serif;
-  color: #282828;
-}
-
-.calendar-container {
-  margin-bottom: 20px;
-}
-
-.write-note-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-  margin-left: -50px;
-}
-
-.arrow-animation {
-  font-size: 24px;
-  color: #ff9800;
-  animation: moveArrow 1.2s infinite alternate ease-in-out;
-}
-
-@keyframes moveArrow {
-  0% {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-
-  50% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(10px);
-    opacity: 0;
-  }
-}
-
-.date-picker {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.book {
-  position: relative;
-  width: 800px;
-  height: 600px;
-  display: flex;
-  box-shadow: -15px 0 25px rgba(0, 0, 0, 0.2), 10px 0 15px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(to right, #d4c5a1 20%, #f5f5f5 80%);
-  perspective: 2000px;
-  border-radius: 15px;
-}
-
-.page.cover {
-  flex: 1;
-  background: #a974cf;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  transition: transform 0.6s;
-  padding: 20px;
-}
-
-.cover-title {
-  font-size: 30px;
-  margin-bottom: 20px;
-}
-
-.page {
-  flex: 1;
-  width: 50%;
-  height: 100%;
-  background: #fdfaf6;
-  padding: 40px 50px;
+.no-entries {
   text-align: center;
-  line-height: 1.8;
-  border-radius: 5px;
-  cursor: pointer;
-  transform-origin: left;
-  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), 6px 6px 15px rgba(0, 0, 0, 0.15),
-    8px 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
 }
 
-.page::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 100%;
-  height: 100%;
-  background: #f3f1eb;
-  border-radius: 5px;
-  z-index: -1;
-  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15), 6px 6px 12px rgba(0, 0, 0, 0.1);
+.main-content {
+  padding: 0;
+  overflow-y: auto;
 }
 
-.page::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 100%;
-  height: 100%;
-  background: #eae5dc;
-  border-radius: 5px;
-  z-index: -2;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.12);
+.entry-editor {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.flippingright {
-  transform: rotateY(-90deg);
+.entry-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background-color: white;
 }
 
-.flippingleft {
-  transform: rotateY(90deg);
-  transform-origin: right;
+.entry-title-input {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.entry-title-input:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.entry-meta {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.entry-content-section {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: white;
+}
+
+.entry-content-textarea {
+  border: none;
+  resize: none;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.entry-content-textarea:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.entry-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.empty-state {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 300px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
 }
 </style>

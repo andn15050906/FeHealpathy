@@ -1,47 +1,61 @@
 <template>
-  <form class="memory-entry-container" @submit.prevent="handleSubmit">
-    <SweetAlert ref="sweetAlert" />
+  <form class="memory-entry-container" @submit.prevent="showSaveConfirmation">
     <header class="header-section">
-      <button class="back-button" @click="handleBack">
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/d9b58e3b5db27ef7508f6ec31fd50ca2a91cd5f71d18910c95741bcb028f9bba"
-          alt="Quay lại" class="back-icon" />
+      <button type="button" class="back-button" @click="handleBack">
+        <ArrowLeft :size="24" />
         <span>Quay lại</span>
       </button>
     </header>
 
-    <input type="text" class="memory-title-input" v-model="memoryTitle" aria-label="Tiêu đề nhật ký"
-      placeholder="Nhật ký của tôi #1" />
+    <div class="input-group">
+      <input type="text" class="memory-title-input" :class="{ 'is-invalid': titleError }" v-model="memoryTitle"
+        aria-label="Tiêu đề nhật ký" placeholder="Nhật ký của tôi #1" maxlength="100" />
+      <div v-if="titleError" class="error-message">{{ titleError }}</div>
+      <div class="char-count">{{ memoryTitle.length }}/100</div>
+    </div>
 
-    <input type="date" class="memory-date-input" v-model="memoryDate" aria-label="Ngày viết" />
+    <div class="input-group">
+      <input type="date" class="memory-date-input" v-model="memoryDate" aria-label="Ngày viết" />
+    </div>
 
     <div class="content-section">
       <div class="content-header">
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e44458ef9434dde6ea240cbe1e7b2a82dca59ee4b66564ddcbe76fbf7ddf52c"
-          alt="Tải ảnh lên" class="upload-icon" tabindex="0" @click="triggerFileInput" />
+        <button type="button" class="upload-button" @click="triggerFileInput">
+          <Upload :size="24" />
+        </button>
         <input type="file" ref="fileInput" class="visually-hidden" @change="handleFileChange" multiple
           accept="image/*" />
       </div>
-      <textarea class="memory-content" placeholder="Viết bất cứ điều gì..." v-model="memoryContent"
-        aria-label="Nội dung nhật ký"></textarea>
 
-      <div class="preview-section">
+      <div class="textarea-wrapper">
+        <textarea class="memory-content" :class="{ 'is-invalid': contentError }" placeholder="Viết bất cứ điều gì..."
+          v-model="memoryContent" aria-label="Nội dung nhật ký" maxlength="1000"></textarea>
+        <div v-if="contentError" class="error-message">{{ contentError }}</div>
+        <div class="char-count">{{ memoryContent.length }}/1000</div>
+      </div>
+
+      <div v-if="mediaFiles.length > 0" class="preview-section">
         <div v-for="(file, index) in mediaFiles" :key="index" class="preview-item">
           <img :src="file.preview" alt="Xem trước" class="preview-image" />
           <button type="button" @click="removeFile(file.id)" class="remove-button">
-            <i class="fa fa-trash"></i>
+            <X :size="16" />
           </button>
         </div>
       </div>
     </div>
 
-    <button type="submit" class="save-button">Lưu lại</button>
+    <button type="submit" class="save-button" :disabled="!isFormValid">
+      <Save :size="20" />
+      {{ isEdit ? 'Cập nhật' : 'Lưu lại' }}
+    </button>
+
+    <SaveConfirmPopUp :message="confirmMessage" :isVisible="showConfirmDialog" @confirmSave="handleConfirmSave"
+      @update:isVisible="showConfirmDialog = $event" />
   </form>
 </template>
 
 <script>
-import { inject, ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import {
   createDiaryNote,
   getPagedDiaryNotes,
@@ -50,11 +64,20 @@ import {
 import { ConvertTo_yyyy_mm_dd } from "../../../scripts/logic/common";
 import { useRoute, useRouter } from "vue-router";
 import { getUserProfile } from '@/scripts/api/services/authService';
+import { toast } from "vue3-toastify";
+import { ArrowLeft, Upload, X, Save } from "lucide-vue-next";
+import SaveConfirmPopUp from "../../../components/Common/Popup/SaveConfirmPopUp.vue";
 
 export default {
   name: "DiaryWriting",
+  components: {
+    ArrowLeft,
+    Upload,
+    X,
+    Save,
+    SaveConfirmPopUp
+  },
   setup() {
-    const sweetAlert = inject("sweetAlert");
     const route = useRoute();
     const router = useRouter();
 
@@ -65,6 +88,37 @@ export default {
     const removedFileIds = ref([]);
     const diaryNoteId = ref(null);
     const isEdit = ref(false);
+    const showConfirmDialog = ref(false);
+
+    const titleError = computed(() => {
+      if (!memoryTitle.value.trim()) {
+        return "Tiêu đề không được để trống";
+      }
+      if (memoryTitle.value.length > 100) {
+        return "Tiêu đề không được vượt quá 100 ký tự";
+      }
+      return "";
+    });
+
+    const contentError = computed(() => {
+      if (!memoryContent.value.trim()) {
+        return "Nội dung không được để trống";
+      }
+      if (memoryContent.value.length > 1000) {
+        return "Nội dung không được vượt quá 1000 ký tự";
+      }
+      return "";
+    });
+
+    const isFormValid = computed(() => {
+      return !titleError.value && !contentError.value && memoryTitle.value.trim() && memoryContent.value.trim();
+    });
+
+    const confirmMessage = computed(() => {
+      return isEdit.value
+        ? `Bạn có chắc chắn muốn cập nhật nhật ký này?`
+        : `Bạn có chắc chắn muốn lưu nhật ký này?`;
+    });
 
     onMounted(async () => {
       const title = route.params.title;
@@ -98,18 +152,20 @@ export default {
             url: media.url,
           }));
         } else {
-          sweetAlert.showError("Không tìm thấy nhật ký.");
+          toast.error("Không tìm thấy nhật ký.");
+          router.push({ name: "diaryList" });
         }
       } catch (error) {
-        sweetAlert.showError("Không thể tải nhật ký. Vui lòng thử lại.");
+        toast.error("Không thể tải nhật ký. Vui lòng thử lại.");
+        router.push({ name: "diaryList" });
       }
     }
 
     async function fetchTodayDiary() {
       const today = ConvertTo_yyyy_mm_dd(new Date());
       const now = new Date();
-      now.setHours(now.getHours() - 8); // Trừ 8 tiếng để khớp UTC
-      const startAfter = now.toISOString(); // Định dạng đúng cả ngày + giờ
+      now.setHours(now.getHours() - 8);
+      const startAfter = now.toISOString();
 
       var user = await getUserProfile();
       const queryParams = { StartAfter: startAfter, CreatorId: user.id };
@@ -141,30 +197,37 @@ export default {
       }
     }
 
-    async function handleSubmit() {
-      if (!memoryTitle.value || !memoryDate.value || !memoryContent.value) {
-        sweetAlert.showError("Vui lòng điền đầy đủ thông tin trước khi lưu.");
+    function showSaveConfirmation() {
+      if (!isFormValid.value) {
+        toast.error("Vui lòng kiểm tra lại thông tin đã nhập.");
+        return;
+      }
+      showConfirmDialog.value = true;
+    }
+
+    async function handleConfirmSave(confirmed) {
+      if (!confirmed) {
         return;
       }
 
       const formData = new FormData();
       isEdit.value && formData.append("Id", diaryNoteId.value || "");
-      formData.append("Title", memoryTitle.value);
-      formData.append("Content", memoryContent.value);
+      formData.append("Title", memoryTitle.value.trim());
+      formData.append("Content", memoryContent.value.trim());
 
       try {
         if (isEdit.value && diaryNoteId.value) {
           await updateDiaryNote(formData);
-          sweetAlert.showSuccess("Cập nhật nhật ký thành công!");
+          toast.success("Cập nhật nhật ký thành công!");
         } else {
           const response = await createDiaryNote(formData);
           diaryNoteId.value = response.id;
-          sweetAlert.showSuccess("Tạo nhật ký thành công!");
+          toast.success("Tạo nhật ký thành công!");
         }
         router.push({ name: "diaryList" });
       } catch (error) {
         console.error("Lỗi khi lưu nhật ký:", error);
-        sweetAlert.showError("Không thể lưu nhật ký. Vui lòng thử lại.");
+        toast.error("Không thể lưu nhật ký. Vui lòng thử lại.");
       }
     }
 
@@ -205,7 +268,13 @@ export default {
       removedFileIds,
       diaryNoteId,
       isEdit,
-      handleSubmit,
+      titleError,
+      contentError,
+      isFormValid,
+      showConfirmDialog,
+      confirmMessage,
+      showSaveConfirmation,
+      handleConfirmSave,
       fetchDiaryNote,
       fetchTodayDiary,
       handleBack,
@@ -222,125 +291,205 @@ export default {
   background: #fff;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  align-items: end;
-  padding: 23px 23px 39px 23px;
+  padding: 2rem;
+  width: 1300px;
+  margin: 0 auto;
+  min-height: 100vh;
 }
 
 .header-section {
-  align-self: start;
+  margin-bottom: 2rem;
 }
 
 .back-button {
   display: flex;
-  gap: 5px;
-  color: #000;
-  font: 400 18px Manrope, sans-serif;
+  align-items: center;
+  gap: 0.5rem;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
-  align-items: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-.back-icon {
-  aspect-ratio: 1;
-  width: 26px;
+.back-button:hover {
+  background-color: #f8f9fa;
 }
 
-.memory-title-input {
-  border-radius: 11px;
-  background-color: rgba(220, 210, 247, 0.4);
-  margin-top: 24px;
-  width: 1286px;
-  max-width: 100%;
-  color: #251d1d;
-  padding: 13px;
-  font: 400 18px Manrope, sans-serif;
-  border: none;
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
+.memory-title-input,
 .memory-date-input {
-  border-radius: 11px;
-  background-color: rgba(220, 210, 247, 0.4);
-  margin-top: 16px;
-  width: 1286px;
-  max-width: 100%;
-  color: #161616;
-  padding: 14px;
-  font: 400 18px Manrope, sans-serif;
-  border: none;
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.memory-title-input:focus,
+.memory-date-input:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.memory-title-input.is-invalid,
+.memory-content.is-invalid {
+  border-color: #dc3545;
 }
 
 .content-section {
-  border-radius: 11px;
-  background-color: rgba(220, 210, 247, 0.4);
-  margin-top: 13px;
-  width: 100%;
-  max-width: 1286px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  margin-bottom: 2rem;
+  overflow: hidden;
 }
 
 .content-header {
   display: flex;
   justify-content: flex-end;
-  padding: 16px;
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.upload-icon {
-  width: 24px;
-  height: 24px;
+.upload-button {
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 8px;
+  color: #6c757d;
+  transition: all 0.2s ease;
 }
 
-.upload-icon:hover {
-  transform: scale(1.1);
+.upload-button:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.textarea-wrapper {
+  position: relative;
+  padding: 1rem;
 }
 
 .memory-content {
-  color: #2d2828;
-  font: 400 18px Manrope, sans-serif;
-  margin: 0 44px 20px;
-  background: transparent;
+  width: 100%;
+  min-height: 400px;
   border: none;
-  min-height: 700px;
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #495057;
   resize: vertical;
-  margin-top: -35px;
+  font-family: inherit;
 }
 
 .memory-content:focus {
   outline: none;
 }
 
-.formatting-toolbar {
-  background-color: #fff9f9;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  z-index: 10;
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
   display: flex;
-  justify-content: flex-end;
-  padding: 23px 76px;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.format-icon {
-  aspect-ratio: 1;
-  width: 40px;
+.char-count {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.preview-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.remove-button:hover {
+  background: #dc3545;
 }
 
 .save-button {
   align-self: center;
-  border-radius: 7.72px;
-  background: var(--Black, #282828);
-  margin-top: 32px;
-  width: 383px;
-  max-width: 100%;
-  color: #fff;
-  padding: 15px;
-  font: 700 17px Manrope, sans-serif;
+  background: #007bff;
+  color: white;
   border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.save-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .visually-hidden {
@@ -354,91 +503,22 @@ export default {
   border: 0;
 }
 
-.preview-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  /* Increased gap between items */
-  justify-content: flex-start;
-}
-
-.preview-item {
-  position: relative;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-}
-
-.preview-image {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 5px;
-  display: block;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.remove-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 22px;
-  color: #ff0000;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-}
-
-.remove-button:hover {
-  transform: scale(1.2);
-}
-
-.remove-button i {
-  margin: 0;
-}
-
-.preview-item:hover {
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 991px) {
+@media (max-width: 768px) {
   .memory-entry-container {
-    padding: 0 20px;
+    padding: 1rem;
   }
 
-  .memory-title-input,
-  .memory-date-input {
-    padding-right: 20px;
+  .preview-section {
+    gap: 0.5rem;
   }
 
-  .memory-content {
-    margin-left: 10px;
-  }
-
-  .formatting-toolbar {
-    max-width: 100%;
-    margin: 40px 0 10px;
-    padding: 0 20px;
+  .preview-image {
+    width: 120px;
+    height: 120px;
   }
 
   .save-button {
-    padding: 15px 20px;
-  }
-
-  .content-header {
-    padding: 12px;
-  }
-
-  .memory-content {
-    margin: 0 20px 20px;
+    min-width: 100%;
   }
 }
 </style>
