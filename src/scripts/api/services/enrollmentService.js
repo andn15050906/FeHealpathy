@@ -1,4 +1,4 @@
-import { get } from '@/scripts/api/apiClients';
+import { get, post } from '@/scripts/api/apiClients';
 
 const API_BASE_URL = '/Enrollments';
 
@@ -35,5 +35,16 @@ export const getEnrollments = async (params = { pageIndex: 0, pageSize: 20 }) =>
       pageSize: params.pageSize,
       pageCount: 0
     };
+  }
+};
+
+export const updateCourseProgress = async (courseId, index) => {
+  try {
+    const response = await post(`${API_BASE_URL}/update-progress/${courseId}/${index}`);
+    console.log('Update progress response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error updating course progress:', error);
+    throw error;
   }
 };

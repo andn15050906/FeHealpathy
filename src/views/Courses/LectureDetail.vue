@@ -48,7 +48,12 @@
 
           <!-- Tab 2: Nội dung bài giảng -->
           <div v-show="activeTab === 'materials'" class="tab-pane fade show active">
-            <div v-if="hasMaterials" class="lecture-materials">
+            <div v-if="lecture.lectureType === 'text'" class="lecture-content">
+              <div class="content-body">
+                {{ lecture.content }}
+              </div>
+            </div>
+            <div v-else-if="hasMaterials" class="lecture-materials">
               <div class="material-grid">
                 <div
                   v-for="(material, index) in lecture.materials"
