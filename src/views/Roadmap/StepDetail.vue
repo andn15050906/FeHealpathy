@@ -11,9 +11,8 @@
         <div class="d-flex flex-column md:flex-row justify-space-between align-start mb-6">
           <div>
             <h1 class="text-h4 font-weight-bold">{{ parsedTitle }}</h1>
-            <p class="text-subtitle-1 text-grey-darken-1">{{ parsedDescription }}</p>
             <div class="d-flex align-center mt-2">
-              <v-chip color="primary">Phase {{ currentPhase }}</v-chip>
+              <v-chip color="primary">Phase {{ phase.index + 1 }}</v-chip>
             </div>
           </div>
 
@@ -43,16 +42,16 @@
                 <v-card-title>Giới thiệu phase</v-card-title>
                 <v-card-text>
                   <p class="text-body-1 mb-4">
-                    {{ parsedIntroduction }}
+                    {{ phase.introduction || phase.description }}
                   </p>
 
                   <div v-if="parsedTips && parsedTips.length > 0" class="mt-6">
                     <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
                     <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
-                      <v-list-item v-for="(tip, index) in parsedTips" :key="index" :title="tip.title"
-                        :subtitle="tip.content" class="mb-2">
+                      <v-list-item v-for="(tip, index) in parsedTips" :key="index" :title="tip.Title"
+                        :subtitle="tip.Content" class="mb-2">
                         <template v-slot:prepend>
-                          <v-icon :color="phase.themeColor">{{ tip.icon }}</v-icon>
+                          <v-icon :color="phase.themeColor">{{ tip.Icon || 'mdi-lightbulb' }}</v-icon>
                         </template>
                       </v-list-item>
                     </v-list>
@@ -68,20 +67,32 @@
                 <v-col v-for="action in parsedActions" :key="action.id" cols="12" md="6">
                   <v-card :class="{ 'bg-success-subtle': action.completed }">
                     <v-card-title class="d-flex justify-space-between align-center">
-                      {{ action.title }}
-                      <v-chip :color="action.required ? 'error' : phase.themeColor" size="small">
-                        {{ action.required ? "Bắt buộc" : "Tùy chọn" }}
+                      {{ action.Title || action.title }}
+                      <v-chip :color="action.Required ? 'error' : phase.themeColor" size="small">
+                        {{ action.Required ? "Bắt buộc" : "Tùy chọn" }}
                       </v-chip>
                     </v-card-title>
                     <v-card-subtitle class="d-flex align-center">
                       <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
-                      {{ action.duration }}
+                      {{ action.Duration || action.duration }}
                     </v-card-subtitle>
                     <v-card-text>
-                      <p>{{ action.description }}</p>
+                      <p>{{ action.Description || action.description }}</p>
 
-                      <div v-if="action.moodTags && action.moodTags.length > 0" class="mt-2">
-                        <v-chip v-for="tag in action.moodTags" :key="tag" size="small" :color="phase.themeColor"
+                      <div v-if="action.Tools && action.Tools.length > 0" class="mt-4">
+                        <h4 class="text-subtitle-1 mb-2">Công cụ hỗ trợ:</h4>
+                        <v-list density="compact">
+                          <v-list-item v-for="tool in action.Tools" :key="tool.Id" :title="tool.Name"
+                            :subtitle="tool.Description" :to="tool.Link" link>
+                            <template v-slot:prepend>
+                              <v-icon :color="phase.themeColor">{{ tool.Icon || 'mdi-tools' }}</v-icon>
+                            </template>
+                          </v-list-item>
+                        </v-list>
+                      </div>
+
+                      <div v-if="action.MoodTags && action.MoodTags.length > 0" class="mt-2">
+                        <v-chip v-for="tag in action.MoodTags" :key="tag" size="small" :color="phase.themeColor"
                           class="mr-1 mb-1" variant="outlined">
                           {{ tag }}
                         </v-chip>
@@ -270,17 +281,16 @@ export default {
     });
 
     const parsedDescription = computed(() => {
-      if (!phase.value) return "";
-
-      if (typeof phase.value.description === 'string' && phase.value.description.startsWith('{') && phase.value.description.includes('Description')) {
-        try {
-          const parsedData = parseJsonString(phase.value.description);
-          return parsedData.Description || "";
-        } catch (e) {
-          return phase.value.description;
-        }
+      console.log("Phase value:", phase.value);
+      console.log("Description:", phase.value?.description);
+      
+      if (!phase.value || !phase.value.description) {
+        console.log("Returning empty string because:", {
+          hasPhase: !!phase.value,
+          hasDescription: !!phase.value?.description
+        });
+        return "";
       }
-
       return phase.value.description;
     });
 
@@ -347,85 +357,27 @@ export default {
 
     const fetchPhaseDetails = async () => {
       try {
-        currentPhase.value = parseInt(props.phaseId);
-        currentPhaseId.value = "phase" + currentPhase.value;
-
         const phaseData = await getPhaseDetailsById(props.phaseId);
 
         if (phaseData) {
-          const processedPhaseData = { ...phaseData };
+          phase.value = {
+            ...phaseData,
+            actions: Array.isArray(phaseData.actions) ? phaseData.actions : [],
+            tips: Array.isArray(phaseData.tips) ? phaseData.tips : [],
+            completionCriteria: Array.isArray(phaseData.completionCriteria) ? phaseData.completionCriteria : [],
+            resources: Array.isArray(phaseData.resources) ? phaseData.resources : [],
+            themeColor: phaseData.themeColor || 'primary'
+          };
 
-          if (typeof processedPhaseData.title === 'string' &&
-            (processedPhaseData.title.startsWith('[') || processedPhaseData.title.startsWith('{'))) {
-            try {
-              const parsedTitle = parseJsonString(processedPhaseData.title);
-              if (parsedTitle && typeof parsedTitle === 'object') {
-                processedPhaseData.originalTitle = processedPhaseData.title;
-                processedPhaseData.title = parsedTitle.Title || "Untitled Phase";
-              }
-            } catch (e) {
-              console.error("Error parsing title:", e);
-            }
+          currentPhase.value = phaseData.index + 1;
+          currentPhaseId.value = "phase" + currentPhase.value;
+          currentPhaseTitle.value = phaseData.title || "Phase " + currentPhase.value;
+          
+          if (phaseData.nextPhaseId) {
+            nextPhase.value = parseInt(phaseData.nextPhaseId);
           }
 
-          if (typeof processedPhaseData.description === 'string' &&
-            (processedPhaseData.description.startsWith('[') || processedPhaseData.description.startsWith('{'))) {
-            try {
-              const parsedDescription = parseJsonString(processedPhaseData.description);
-              if (parsedDescription && typeof parsedDescription === 'object') {
-                processedPhaseData.originalDescription = processedPhaseData.description;
-                processedPhaseData.description = parsedDescription.Description || "";
-              }
-            } catch (e) {
-              console.error("Error parsing description:", e);
-            }
-          }
-
-          if (!processedPhaseData.actions) {
-            processedPhaseData.actions = [];
-          } else if (typeof processedPhaseData.actions === 'string') {
-            try {
-              processedPhaseData.actions = parseJsonString(processedPhaseData.actions) || [];
-            } catch (e) {
-              console.error("Error parsing actions:", e);
-              processedPhaseData.actions = [];
-            }
-          }
-
-          phase.value = processedPhaseData;
-          currentPhaseTitle.value = processedPhaseData.title || "Phase " + currentPhase.value;
-
-          if (processedPhaseData.nextPhaseId) {
-            nextPhase.value = parseInt(processedPhaseData.nextPhaseId);
-          }
-
-          if (processedPhaseData.completionCriteria) {
-            if (typeof processedPhaseData.completionCriteria === 'string') {
-              try {
-                phaseCriteria.value = parseJsonString(processedPhaseData.completionCriteria) || [];
-              } catch (e) {
-                console.error("Error parsing completionCriteria:", e);
-                phaseCriteria.value = [];
-              }
-            } else {
-              phaseCriteria.value = processedPhaseData.completionCriteria;
-            }
-          }
-
-          if (processedPhaseData.resources) {
-            if (typeof processedPhaseData.resources === 'string') {
-              try {
-                phaseDocuments.value = parseJsonString(processedPhaseData.resources) || [];
-              } catch (e) {
-                console.error("Error parsing resources:", e);
-                phaseDocuments.value = [];
-              }
-            } else {
-              phaseDocuments.value = processedPhaseData.resources;
-            }
-          }
-
-          console.log("Phase data loaded successfully:", processedPhaseData);
+          console.log("Phase data loaded successfully:", phase.value);
         } else {
           console.warn(`No phase found with ID: ${props.phaseId}`);
           phase.value = {
@@ -544,7 +496,6 @@ export default {
       completePhase,
       submitPhaseEvaluation,
       syncCompletedPhasesWithRoadmapDetail,
-      // Add the parsed computed properties
       parsedTitle,
       parsedDescription,
       parsedIntroduction,

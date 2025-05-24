@@ -32,6 +32,7 @@
         <table class="data-table">
           <thead>
             <tr>
+              <th>Ảnh bìa</th>
               <th>Tiêu đề</th>
               <th>Số giai đoạn</th>
               <th>Trạng thái</th>
@@ -40,6 +41,16 @@
           </thead>
           <tbody>
             <tr v-for="roadmap in filteredRoadmaps" :key="roadmap.id">
+              <td>
+                <div class="thumb-container">
+                  <img 
+                    :src="roadmap.thumbUrl || '/images/default-roadmap.jpg'" 
+                    :alt="roadmap.title"
+                    class="thumb-image"
+                    @error="handleImageError"
+                  />
+                </div>
+              </td>
               <td>{{ roadmap.title }}</td>
               <td>{{ roadmap.phases?.length || 0 }}</td>
               <td>
@@ -170,6 +181,9 @@ export default {
       } catch (error) {
         console.error('Error deleting roadmap:', error);
       }
+    },
+    handleImageError(e) {
+      e.target.src = '/images/default-roadmap.jpg';
     }
   },
   mounted() {
@@ -181,6 +195,7 @@ export default {
 <style scoped>
 .roadmap-builder {
   margin-top: -15px;
+  margin-bottom: 15px;
   min-width: 1200px;
   min-height: 100vh;
   padding: 24px;
@@ -264,6 +279,7 @@ export default {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
 }
 
 .data-table th {
@@ -290,6 +306,7 @@ export default {
 }
 
 .actions {
+  margin-top: 25px;
   display: flex;
   gap: 8px;
 }
@@ -303,6 +320,7 @@ export default {
 }
 
 .btn-action.edit {
+  margin-bottom: 17px;
   background: #ebf8ff;
   color: #3182ce;
 }
@@ -312,6 +330,7 @@ export default {
 }
 
 .btn-action.delete {
+  margin-bottom: 17px;
   background: #fff5f5;
   color: #e53e3e;
 }
@@ -430,5 +449,24 @@ export default {
     display: block;
     overflow-x: auto;
   }
+}
+
+.thumb-container {
+  width: 100px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f7fafc;
+}
+
+.thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.thumb-image:hover {
+  transform: scale(1.1);
 }
 </style>

@@ -23,8 +23,47 @@
       </div>
 
       <div v-else-if="roadmap">
+        <!-- Payment Required Dialog -->
+        <v-dialog v-model="showPaymentDialog" max-width="500">
+          <v-card>
+            <v-card-title class="headline">Yêu cầu thanh toán</v-card-title>
+            <v-card-text>
+              <p class="mt-4">Để truy cập đầy đủ lộ trình "{{ roadmap.title }}", bạn cần thanh toán:</p>
+              <div class="price-section">
+                <span class="price">{{ formatPrice(roadmap.price) }}</span>
+                <span class="vat">(Đã bao gồm VAT)</span>
+              </div>
+              <div class="features mt-4" v-if="roadmap.features && roadmap.features.length">
+                <p class="font-weight-bold mb-2">Quyền lợi khi mua:</p>
+                <ul>
+                  <li v-for="(feature, index) in roadmap.features" :key="index">
+                    {{ feature }}
+                  </li>
+                </ul>
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="grey" variant="text" @click="showPaymentDialog = false">
+                Để sau
+              </v-btn>
+              <v-btn color="primary" @click="proceedToPayment">
+                Thanh toán ngay
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <div class="d-flex align-center mb-6">
           <h1 class="text-h4 font-weight-bold">{{ roadmap.title }}</h1>
+          <v-chip
+            v-if="roadmap.price > 0"
+            color="primary"
+            class="ml-4"
+          >
+            <v-icon start size="small">mdi-cash</v-icon>
+            {{ formatPrice(roadmap.price) }}
+          </v-chip>
         </div>
 
         <!-- Giới thiệu lộ trình -->
@@ -99,13 +138,17 @@
                 </v-card-text>
 
                 <v-card-actions>
-                  <v-btn :color="phase.current ? 'success' : undefined"
-                    :variant="phase.current ? 'elevated' : 'outlined'" :disabled="!phase.current && !phase.completed"
-                    @click="goToPhase(phase.id)">
-                    <v-icon v-if="phase.current" start>mdi-play</v-icon>
+                  <v-btn 
+                    :color="phase.current ? 'success' : undefined"
+                    :variant="phase.current ? 'elevated' : 'outlined'" 
+                    :disabled="(!phase.current && !phase.completed) || (roadmap.price > 0 && !isReturningUser)"
+                    @click="goToPhase(phase.id)"
+                  >
+                    <v-icon v-if="roadmap.price > 0 && !isReturningUser" start>mdi-lock</v-icon>
+                    <v-icon v-else-if="phase.current" start>mdi-play</v-icon>
                     {{
                       phase.current
-                        ? "Bắt đầu bước này"
+                        ? (roadmap.price > 0 && !isReturningUser ? "Yêu cầu thanh toán" : "Bắt đầu bước này")
                         : phase.completed
                           ? "Xem lại"
                           : "Đã khóa"
@@ -118,7 +161,13 @@
         </div>
 
         <div class="text-center mb-8">
-          <v-btn size="large" color="primary" prepend-icon="mdi-play" @click="startRoadmap">
+          <v-btn 
+            size="large" 
+            color="primary" 
+            prepend-icon="mdi-play" 
+            @click="handleStartRoadmap"
+          >
+            <v-icon v-if="roadmap.price > 0 && !isReturningUser" start>mdi-lock</v-icon>
             Bắt đầu lộ trình
           </v-btn>
         </div>
@@ -145,31 +194,33 @@ export default {
       required: true,
     },
   },
-  methods: {
-    isJsonArray(str) {
+  setup(props) {
+    const router = useRouter();
+    const showPaymentDialog = ref(false);
+    const isJsonArray = (str) => {
       try {
         const parsed = JSON.parse(str);
         return Array.isArray(parsed);
       } catch (e) {
         return false;
       }
-    },
-    parseJson(str) {
+    };
+
+    const parseJson = (str) => {
       try {
         return JSON.parse(str);
       } catch (e) {
         return [];
       }
-    }
-  },
-  setup(props) {
-    const router = useRouter();
+    };
+
     const roadmap = ref({
       id: "",
       title: "",
       description: "",
       introText: [],
       phases: [],
+      price: 0,
     });
     const completedPhases = ref({
       1: false,
@@ -179,6 +230,7 @@ export default {
       5: false,
     });
     const loading = ref(true);
+    const isReturningUser = ref(false);
 
     const getStorageKey = () => `completedPhases_roadmap_${props.id}`;
 
@@ -209,7 +261,7 @@ export default {
     };
 
     const updatePhaseStatus = () => {
-      if (!roadmap.value?.phases) return;
+      if (!roadmap.value?.phases || !Array.isArray(roadmap.value.phases)) return;
 
       const hasBEStatus = roadmap.value.phases.some(
         (p) => p.current || p.completed
@@ -221,6 +273,7 @@ export default {
 
       let foundCurrent = false;
       for (const phase of roadmap.value.phases) {
+        if (!phase || typeof phase !== 'object') continue;
         const phaseId = parseInt(phase.id);
         if (completedPhases.value[phaseId]) {
           phase.completed = true;
@@ -287,14 +340,38 @@ export default {
       }
     };
 
+    const handleStartRoadmap = () => {
+      if (roadmap.value.price > 0 && !isReturningUser.value) {
+        showPaymentDialog.value = true;
+      } else {
+        startRoadmap();
+      }
+    };
+
+    const proceedToPayment = () => {
+      showPaymentDialog.value = false;
+      router.push(`/payment/roadmap/${roadmap.value.id}`);
+    };
+
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(price);
+    };
+
     const goToPhase = (phaseId) => {
+      if (roadmap.value.price > 0 && !isReturningUser.value) {
+        showPaymentDialog.value = true;
+        return;
+      }
       router.push(`/roadmap/${roadmap.value.id}/phase/${phaseId}`);
     };
 
     const eventBus = useEventBus();
 
     const handleUpdateRoadmapPhases = (data) => {
-      if (data.roadmapId === props.id) {
+      if (data?.roadmapId === props.id && completedPhases.value) {
         console.log(
           `Received update for roadmap ${data.roadmapId}:`,
           data.phases
@@ -306,17 +383,22 @@ export default {
     };
 
     onMounted(() => {
-      loadCompletedPhases();
-      fetchRoadmap();
-
-      eventBus.on("update-roadmap-phases", handleUpdateRoadmapPhases);
-      console.log(
-        `RoadmapDetail mounted for roadmap ${props.id}, eventBus listener registered`
-      );
+      try {
+        loadCompletedPhases();
+        fetchRoadmap();
+        eventBus.on("update-roadmap-phases", handleUpdateRoadmapPhases);
+        console.log(
+          `RoadmapDetail mounted for roadmap ${props.id}, eventBus listener registered`
+        );
+      } catch (error) {
+        console.error('Error in RoadmapDetail onMounted:', error);
+      }
     });
 
     onBeforeUnmount(() => {
-      eventBus.off("update-roadmap-phases", handleUpdateRoadmapPhases);
+      if (eventBus && typeof eventBus.off === 'function') {
+        eventBus.off("update-roadmap-phases", handleUpdateRoadmapPhases);
+      }
       console.log(
         `RoadmapDetail unmounted for roadmap ${props.id}, eventBus listener removed`
       );
@@ -328,7 +410,14 @@ export default {
       getPhaseColor,
       startRoadmap,
       goToPhase,
-      advisorImg,
+      loading,
+      showPaymentDialog,
+      isReturningUser,
+      handleStartRoadmap,
+      proceedToPayment,
+      formatPrice,
+      isJsonArray,
+      parseJson,
     };
   },
 };

@@ -1,6 +1,6 @@
 import { getUserProfile } from "@/scripts/api/services/authService";
 import { getProgress } from '@/scripts/api/services/statisticsService';
-import { get, post, patch, del, postForm } from "@/scripts/api/apiClients"
+import { get, patchForm, del, postForm } from "@/scripts/api/apiClients"
 
 const API_BASE_URL = "/Roadmaps"
 
@@ -101,7 +101,7 @@ export const createRoadmap = async (formData) => {
   }
 }
 
-export const updateRoadmap = async (data) => patch(API_BASE_URL, data)
+export const updateRoadmap = async (data) => patchForm(API_BASE_URL, data)
 export const deleteRoadmap = async (id) => del(`${API_BASE_URL}/${id}`)
 export const getCompletionData = async () => get(`/recommendations/completion`)
 export const getCompletionViewData = async () => get(`/recommendations/completion-view`)

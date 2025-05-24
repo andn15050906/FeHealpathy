@@ -7,7 +7,7 @@
     </div>
 
     <div class="roadmap-content">
-      <form @submit.prevent="submitRoadmap" class="roadmap-form">
+      <form @submit.prevent="submitRoadmap" class="roadmap-form" novalidate>
         <div class="form-section">
           <div class="section-title">
             <v-icon>mdi-information-outline</v-icon>
@@ -23,6 +23,28 @@
           </div>
 
           <div class="form-group">
+            <label for="thumb">
+              <v-icon small>mdi-image</v-icon>
+              Ảnh bìa lộ trình
+            </label>
+            <div class="thumb-upload">
+              <input
+                type="file"
+                id="thumb"
+                @change="handleThumbUpload"
+                accept="image/*"
+                class="thumb-input"
+              />
+              <div class="thumb-preview" v-if="thumbPreview">
+                <img :src="thumbPreview" alt="Thumbnail preview" />
+                <v-btn icon small @click="removeThumb" class="remove-thumb">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label for="introText">
               <v-icon small>mdi-text-box-outline</v-icon>
               Giới thiệu
@@ -32,14 +54,28 @@
           </div>
 
           <div class="form-group">
+            <label for="description">
+              <v-icon small>mdi-text-box-outline</v-icon>
+              Mô tả
+            </label>
+            <textarea 
+              id="description" 
+              v-model="roadmap.description" 
+              placeholder="Nhập mô tả chi tiết cho roadmap" 
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
             <label for="isPaid">
               <v-icon small>mdi-cash</v-icon>
               Loại lộ trình
             </label>
             <div class="roadmap-type-selector">
               <v-radio-group v-model="roadmap.isPaid" inline>
-                <v-radio label="Miễn phí" :value="false"></v-radio>
-                <v-radio label="Trả phí" :value="true"></v-radio>
+                <v-radio :value="false" label="Miễn phí"></v-radio>
+                <v-radio :value="true" label="Trả phí"></v-radio>
               </v-radio-group>
             </div>
           </div>
@@ -49,30 +85,18 @@
               <v-icon small>mdi-currency-usd</v-icon>
               Giá (VND)
             </label>
-            <input type="number" id="price" v-model="roadmap.price" placeholder="Nhập giá roadmap" min="0"
-              step="10000" />
-          </div>
-
-          <div class="form-group" v-if="roadmap.isPaid">
-            <label for="features">
-              <v-icon small>mdi-check-circle-outline</v-icon>
-              Quyền lợi khi mua
-            </label>
-            <div v-for="(feature, index) in roadmap.features" :key="index" class="feature-item">
-              <div class="feature-input">
-                <input type="text" v-model="roadmap.features[index]" placeholder="Nhập quyền lợi" />
-                <v-btn icon small @click="removeFeature(index)" color="error">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </div>
-            </div>
-            <v-btn text color="primary" @click="addFeature" class="mt-2">
-              <v-icon left>mdi-plus</v-icon>
-              Thêm quyền lợi
-            </v-btn>
+            <input 
+              type="number" 
+              id="price" 
+              v-model.number="roadmap.price" 
+              placeholder="Nhập giá roadmap" 
+              min="0"
+              step="10000"
+              @keydown.enter.prevent
+              novalidate
+            />
           </div>
         </div>
-
         <div class="form-section">
           <div class="section-title">
             <v-icon>mdi-account-group-outline</v-icon>
@@ -127,26 +151,39 @@
               </label>
               <input type="text" v-model="phase.title" placeholder="Nhập tiêu đề giai đoạn" required />
             </div>
+
             <div class="form-group">
               <label>
                 <v-icon small>mdi-text-box-outline</v-icon>
                 Mô tả Giai Đoạn
               </label>
-              <textarea v-model="phase.description" placeholder="Mô tả chi tiết giai đoạn" rows="3" required></textarea>
+              <textarea 
+                :value="phase.description"
+                @input="handleDescriptionInput($event, phase)"
+                placeholder="Mô tả chi tiết giai đoạn" 
+                rows="3" 
+                required
+              ></textarea>
             </div>
 
-            <!-- Thêm phần công cụ (tools) -->
+            <div class="form-group">
+              <label>
+                <v-icon small>mdi-clock-outline</v-icon>
+                Thời gian dự kiến (ngày)
+              </label>
+              <input type="number" v-model="phase.timeSpan" min="1" placeholder="Nhập số ngày dự kiến" required />
+            </div>
+
             <div class="form-group">
               <label>
                 <v-icon small>mdi-tools</v-icon>
                 Công cụ hỗ trợ
               </label>
-              <v-select v-model="phase.tools" :items="availableTools" item-text="text" item-value="value" multiple chips
+              <v-select v-model="phase.tools" :items="availableTools" item-title="text" item-value="value" multiple chips
                 label="Chọn công cụ hỗ trợ (tùy chọn)" outlined></v-select>
               <div class="text-caption text-grey">Các công cụ giúp người dùng thực hành trong giai đoạn này</div>
             </div>
 
-            <!-- Thêm phần mẹo hữu ích -->
             <div class="form-group">
               <label>
                 <v-icon small>mdi-lightbulb-outline</v-icon>
@@ -156,6 +193,8 @@
                 rows="3"></textarea>
               <div class="text-caption text-grey">Các mẹo giúp người dùng vượt qua giai đoạn này dễ dàng hơn</div>
             </div>
+
+            
           </div>
 
           <div class="add-phase-container">
@@ -199,16 +238,19 @@ const allArticles = ref([]);
 const allConversations = ref([]);
 const allSurveys = ref([]);
 
+const fileInput = ref(null);
+const thumbPreview = ref(null);
 const roadmap = ref({
   id: "",
   title: "",
   introText: "",
+  description: "",
   isPaid: false,
   price: 500000,
-  features: [],
   targetUserTypes: [],
   targetIssues: [],
   phases: [],
+  thumb: null,
 });
 
 const userTypeOptions = ref([
@@ -261,13 +303,49 @@ const toastConfig = {
 };
 
 const isFormValid = computed(() => {
-  return roadmap.value.title.trim() !== '' &&
-    roadmap.value.introText.trim() !== '' &&
+  return (
+    roadmap.value.title.trim() !== "" &&
+    roadmap.value.introText.trim() !== "" &&
     roadmap.value.phases.length > 0 &&
     roadmap.value.targetUserTypes.length > 0 &&
     roadmap.value.targetIssues.length > 0 &&
-    (!roadmap.value.isPaid || (roadmap.value.isPaid && roadmap.value.price > 0 && roadmap.value.features.length > 0));
+    (!roadmap.value.isPaid ||
+      (roadmap.value.isPaid &&
+        roadmap.value.price > 0))
+  );
 });
+
+const isSubmitting = ref(false);
+
+function parseDescription(description) {
+  if (!description) return '';
+  
+  try {
+    if (typeof description === 'string' && description.startsWith('[')) {
+      const parsed = JSON.parse(description);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0].Description || parsed[0].Title || '';
+      }
+    }
+    
+    if (typeof description === 'string' && description.startsWith('{')) {
+      const parsed = JSON.parse(description);
+      return parsed.Description || parsed.Title || '';
+    }
+    
+    if (typeof description === 'object') {
+      if (Array.isArray(description) && description.length > 0) {
+        return description[0].Description || description[0].Title || '';
+      }
+      return description.Description || description.Title || '';
+    }
+    
+    return description;
+  } catch (e) {
+    console.error('Error parsing description:', e);
+    return description;
+  }
+}
 
 async function fetchRoadmapData() {
   try {
@@ -279,17 +357,27 @@ async function fetchRoadmapData() {
       id: response.id,
       title: response.title,
       introText: response.introText,
-      isPaid: response.isPaid || false,
+      description: response.description,
+      isPaid: response.price > 0,
       price: response.price || 500000,
-      features: response.features || [],
       targetUserTypes: response.targetUserTypes || [],
       targetIssues: response.targetIssues || [],
-      phases: response.phases || [],
+      phases: (response.phases || []).map(phase => ({
+        ...phase,
+        description: parseDescription(phase.description),
+        tools: phase.tools || [],
+        tips: phase.tips || "",
+      })),
+      thumb: response.thumbUrl ? {
+        url: response.thumbUrl,
+        title: response.thumbTitle || 'Thumbnail'
+      } : null
     };
 
-    console.log("Dữ liệu roadmap:", roadmap.value);
+    if (response.thumbUrl) {
+      thumbPreview.value = response.thumbUrl;
+    }
   } catch (error) {
-    console.error("Lỗi tải dữ liệu roadmap:", error);
     toast.error("Không thể tải dữ liệu roadmap", toastConfig);
   } finally {
     loadingSpinner.value.hideSpinner();
@@ -365,8 +453,7 @@ function addRecommendation(phaseIndex, milestoneIndex) {
   if (milestone) {
     const newRecommendation = {
       targetEntityId: "",
-      entityType: "",
-      milestoneId: "",
+      entityType: getEntityTypeByEventLabel(milestone.eventName),
       trait: "",
       traitDescription: ""
     };
@@ -374,8 +461,6 @@ function addRecommendation(phaseIndex, milestoneIndex) {
       milestone.recommendations = [];
     }
     milestone.recommendations.push(newRecommendation);
-  } else {
-    console.error("Pha hoặc mốc không hợp lệ");
   }
 }
 
@@ -383,29 +468,97 @@ function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
   roadmap.value.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
 }
 
-function addFeature() {
-  if (!roadmap.value.features) {
-    roadmap.value.features = [];
+function handleThumbUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    roadmap.value.thumb = {
+      file: file,
+      title: file.name,
+      url: null,
+      isNewUpload: true
+    };
+    thumbPreview.value = URL.createObjectURL(file);
   }
-  roadmap.value.features.push("");
 }
 
-function removeFeature(index) {
-  roadmap.value.features.splice(index, 1);
+function removeThumb() {
+  roadmap.value.thumb = null;
+  thumbPreview.value = null;
+  const input = document.getElementById('thumb');
+  if (input) input.value = '';
 }
 
-async function submitRoadmap() {
+async function submitRoadmap(event) {
+  if (isSubmitting.value) return;
+  
+  event.preventDefault();
+  event.stopPropagation();
+  
   if (!validateRoadmapBasicInfo() || !validatePhases()) {
     return;
   }
 
   try {
+    isSubmitting.value = true;
     loadingSpinner.value.showSpinner();
-    console.log("Dữ liệu roadmap gửi đi: ", roadmap.value);
+    const formData = new FormData();
 
-    await updateRoadmap(roadmap.value);
-    router.push({
-      name: 'ManageAdvisorContent',
+    formData.append("Id", roadmap.value.id);
+    formData.append("Title", roadmap.value.title);
+    formData.append("IntroText", roadmap.value.introText);
+    formData.append("Description", roadmap.value.description);
+    formData.append("Category", "mental-health");
+    
+    const price = roadmap.value.isPaid ? Number(roadmap.value.price) : 0;
+    formData.append("Price", price);
+
+    if (roadmap.value.thumb) {
+      if (roadmap.value.thumb.isNewUpload && roadmap.value.thumb.file) {
+        formData.append("Thumb.File", roadmap.value.thumb.file);
+        formData.append("Thumb.Title", roadmap.value.thumb.title);
+      } else if (roadmap.value.thumb.url) {
+        formData.append("ThumbUrl", roadmap.value.thumb.url);
+        formData.append("ThumbTitle", roadmap.value.thumb.title);
+      }
+    }
+
+    roadmap.value.targetUserTypes.forEach((type, index) => {
+      formData.append(`TargetUserTypes[${index}]`, type);
+    });
+
+    roadmap.value.targetIssues.forEach((issue, index) => {
+      formData.append(`TargetIssues[${index}]`, issue);
+    });
+
+    roadmap.value.phases.forEach((phase, phaseIndex) => {
+      formData.append(`Phases[${phaseIndex}].Title`, phase.title);
+      formData.append(`Phases[${phaseIndex}].Description`, phase.description);
+      formData.append(`Phases[${phaseIndex}].Introduction`, phase.tips || "");
+      formData.append(`Phases[${phaseIndex}].Index`, phaseIndex);
+      formData.append(`Phases[${phaseIndex}].TimeSpan`, Number(phase.timeSpan) || 7);
+      formData.append(`Phases[${phaseIndex}].IsRequiredToAdvance`, false);
+
+      if (phase.tools && phase.tools.length > 0) {
+        phase.tools.forEach((toolValue, toolIndex) => {
+          const tool = availableTools.value.find(t => t.value === toolValue);
+          if (tool) {
+            formData.append(`Phases[${phaseIndex}].Tools[${toolIndex}]`, toolValue);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].Title`, tool.text);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].Description`, tool.description);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].IsAction`, true);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].Duration`, 30);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].MoodTags`, JSON.stringify(["Công cụ hỗ trợ"]));
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].IsGeneralTip`, false);
+            formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].Source`, tool.route);
+          }
+        });
+      }
+    });
+
+    await updateRoadmap(formData);
+
+    await router.push({
+      name: 'RoadmapBuilder',
       query: {
         updateSuccess: true,
         message: 'Cập nhật roadmap thành công!'
@@ -415,6 +568,7 @@ async function submitRoadmap() {
     console.error('Lỗi cập nhật roadmap:', error);
     toast.error("Cập nhật roadmap thất bại! " + (error.message || ''), toastConfig);
   } finally {
+    isSubmitting.value = false;
     loadingSpinner.value.hideSpinner();
   }
 }
@@ -448,10 +602,6 @@ function validateRoadmapBasicInfo() {
     toast.error("Giá roadmap phải lớn hơn 0!", toastConfig);
     return false;
   }
-  if (roadmap.value.isPaid && (!roadmap.value.features || roadmap.value.features.length === 0)) {
-    toast.error("Vui lòng thêm ít nhất một quyền lợi khi mua roadmap!", toastConfig);
-    return false;
-  }
   return true;
 }
 
@@ -479,47 +629,6 @@ function validatePhases() {
     if (phase.timeSpan <= 0) {
       toast.error(`Thời gian dự kiến của giai đoạn ${i + 1} phải lớn hơn 0!`, toastConfig);
       return false;
-    }
-
-    if (!validateMilestones(phase.milestones, i)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function validateMilestones(milestones, phaseIndex) {
-  if (!milestones || milestones.length === 0) {
-    toast.error(`Vui lòng thêm ít nhất một mốc cho giai đoạn ${phaseIndex + 1}!`, toastConfig);
-    return false;
-  }
-
-  for (let i = 0; i < milestones.length; i++) {
-    const milestone = milestones[i];
-
-    if (!milestone.title.trim()) {
-      toast.error(`Vui lòng nhập tiêu đề cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
-      return false;
-    }
-    if (!milestone.eventName) {
-      toast.error(`Vui lòng chọn sự kiện cho mốc ${i + 1} của giai đoạn ${phaseIndex + 1}!`, toastConfig);
-      return false;
-    }
-    if (milestone.repeatTimesRequired <= 0) {
-      toast.error(`Số lần lặp lại của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
-      return false;
-    }
-    if (milestone.timeSpentRequired <= 0) {
-      toast.error(`Thời gian cần thiết của mốc ${i + 1} giai đoạn ${phaseIndex + 1} phải lớn hơn 0!`, toastConfig);
-      return false;
-    }
-
-    if (isRecommendationAvailable(milestone.eventName) &&
-      milestone.recommendations &&
-      milestone.recommendations.length > 0) {
-      if (!validateRecommendations(milestone.recommendations, phaseIndex, i)) {
-        return false;
-      }
     }
   }
   return true;
@@ -574,20 +683,54 @@ function getPreloadedEntities(eventLabel) {
 function updateEventList(phaseIndex, milestoneIndex, eventName) {
   const milestone = roadmap.value.phases[phaseIndex].milestones[milestoneIndex];
   milestone.entityType = getEntityTypeByEventLabel(eventName);
+  
+  // Reset recommendations when event type changes
+  milestone.recommendations = [];
 }
 
 function getAvailableContents(phaseIndex, milestoneIndex, recIndex, eventLabel) {
-  return getPreloadedEntities(getEntityTypeByEventLabel(eventLabel));
+  const entityType = getEntityTypeByEventLabel(eventLabel);
+  switch (entityType) {
+    case ENTITY_TYPES.Course.en:
+      return allCourses.value;
+    case ENTITY_TYPES.MediaResource.en:
+      return allMediaResources.value;
+    case ENTITY_TYPES.Article.en:
+      return allArticles.value;
+    case ENTITY_TYPES.Conversation.en:
+      return allConversations.value;
+    case ENTITY_TYPES.Survey.en:
+      return allSurveys.value;
+    default:
+      return [];
+  }
+}
+
+const computedPrice = computed({
+  get: () => roadmap.value.price,
+  set: (val) => {
+    if (roadmap.value.isPaid) {
+      roadmap.value.price = val > 0 ? val : roadmap.value.price;
+    } else {
+      roadmap.value.price = 0;
+    }
+  }
+});
+
+function handleDescriptionInput(event, phase) {
+  const value = event.target.value;
+  const parsedValue = parseDescription(value);
+  phase.description = parsedValue;
 }
 
 onMounted(async () => {
   await fetchRoadmapData();
 
-  allCourses.value = await getCourses({ pageIndex: 0, pageSize: 10 });
-  allMediaResources.value = await getPagedMediaResources({ pageIndex: 0, pageSize: 10 });
-  allArticles.value = await getPagedArticles({ pageIndex: 0, pageSize: 10 });
-  allConversations.value = await getPagedConversations({ pageIndex: 0, pageSize: 10 });
-  allSurveys.value = await getPagedSurveys({ pageIndex: 0, pageSize: 10 });
+  // allCourses.value = await getCourses({ pageIndex: 0, pageSize: 10 });
+  // allMediaResources.value = await getPagedMediaResources({ pageIndex: 0, pageSize: 10 });
+  // allArticles.value = await getPagedArticles({ pageIndex: 0, pageSize: 10 });
+  // allConversations.value = await getPagedConversations({ pageIndex: 0, pageSize: 10 });
+  // allSurveys.value = await getPagedSurveys({ pageIndex: 0, pageSize: 10 });
 });
 </script>
 
@@ -815,6 +958,65 @@ onMounted(async () => {
   display: none;
 }
 
+.cover-image-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  cursor: pointer;
+  position: relative;
+}
+
+.cover-placeholder {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.cover-placeholder:hover {
+  border-color: #2196F3;
+  background-color: #f0f7fa;
+}
+
+.cover-placeholder .v-icon {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.cover-preview-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1200/630;
+}
+
+.cover-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cover-preview-container:hover .cover-overlay {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .roadmap-content {
     padding: 15px;
@@ -837,5 +1039,48 @@ onMounted(async () => {
   .submit-btn {
     width: 100%;
   }
+}
+
+.thumb-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thumb-input {
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.thumb-input:hover {
+  border-color: #2196f3;
+}
+
+.thumb-preview {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumb-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-thumb {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.remove-thumb .v-icon {
+  color: white;
 }
 </style>

@@ -29,6 +29,28 @@
           </div>
 
           <div class="form-group">
+            <label for="thumb">
+              <v-icon small>mdi-image</v-icon>
+              Ảnh bìa lộ trình
+            </label>
+            <div class="thumb-upload">
+              <input
+                type="file"
+                id="thumb"
+                @change="handleThumbUpload"
+                accept="image/*"
+                class="thumb-input"
+              />
+              <div class="thumb-preview" v-if="thumbPreview">
+                <img :src="thumbPreview" alt="Thumbnail preview" />
+                <v-btn icon small @click="removeThumb" class="remove-thumb">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label for="introText">
               <v-icon small>mdi-text-box-outline</v-icon>
               Giới thiệu
@@ -38,6 +60,20 @@
               v-model="roadmap.introText"
               placeholder="Nhập giới thiệu cho roadmap"
               rows="3"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="description">
+              <v-icon small>mdi-text-box-outline</v-icon>
+              Mô tả
+            </label>
+            <textarea
+              id="description"
+              v-model="roadmap.description"
+              placeholder="Nhập mô tả chi tiết cho roadmap"
+              rows="5"
               required
             ></textarea>
           </div>
@@ -55,46 +91,13 @@
             </div>
           </div>
 
-          <div class="form-group" v-if="isPaidLocal">
+          <div class="form-group" v-if="roadmap.isPaid">
             <label for="price">
               <v-icon small>mdi-currency-usd</v-icon>
               Giá (VND)
             </label>
-            <input
-              type="number"
-              id="price"
-              v-model="roadmap.price"
-              placeholder="Nhập giá roadmap"
-              min="0"
-              step="10000"
-            />
-          </div>
-
-          <div class="form-group" v-if="isPaidLocal">
-            <label for="features">
-              <v-icon small>mdi-check-circle-outline</v-icon>
-              Quyền lợi khi mua
-            </label>
-            <div
-              v-for="(feature, index) in roadmap.features"
-              :key="index"
-              class="feature-item"
-            >
-              <div class="feature-input">
-                <input
-                  type="text"
-                  v-model="roadmap.features[index]"
-                  placeholder="Nhập quyền lợi"
-                />
-                <v-btn icon small @click="removeFeature(index)" color="error">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </div>
-            </div>
-            <v-btn text color="primary" @click="addFeature" class="mt-2">
-              <v-icon left>mdi-plus</v-icon>
-              Thêm quyền lợi
-            </v-btn>
+            <input type="number" id="price" v-model="roadmap.price" placeholder="Nhập giá roadmap" min="0"
+              step="10000" />
           </div>
         </div>
 
@@ -307,13 +310,9 @@ const allSurveys = ref([]);
 const roadmap = ref({
   title: "",
   introText: "",
+  description: "",
   isPaid: false,
   price: 500000,
-  features: [
-    "5 bước chi tiết với hướng dẫn chuyên sâu",
-    "Bài tập thực hành hàng ngày",
-    "Tài liệu tham khảo chuyên môn",
-  ],
   targetUserTypes: [],
   targetIssues: [],
   phases: [
@@ -322,6 +321,7 @@ const roadmap = ref({
       tips: "",
     },
   ],
+  thumb: null,
 });
 
 const isPaidLocal = ref(roadmap.value.isPaid);
@@ -383,8 +383,7 @@ const isFormValid = computed(() => {
     roadmap.value.targetIssues.length > 0 &&
     (!isPaidLocal.value ||
       (isPaidLocal.value &&
-        roadmap.value.price > 0 &&
-        roadmap.value.features.length > 0))
+        roadmap.value.price > 0))
   );
 });
 
@@ -429,6 +428,8 @@ const availableTools = ref([
     route: "habit-tracking",
   },
 ]);
+
+const thumbPreview = ref(null);
 
 function addPhase() {
   roadmap.value.phases.push({
@@ -524,12 +525,23 @@ function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
   ].recommendations.splice(recommendationIndex, 1);
 }
 
-function addFeature() {
-  roadmap.value.features.push("");
+function handleThumbUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    roadmap.value.thumb = {
+      file: file,
+      title: file.name,
+      url: null
+    };
+    thumbPreview.value = URL.createObjectURL(file);
+  }
 }
 
-function removeFeature(index) {
-  roadmap.value.features.splice(index, 1);
+function removeThumb() {
+  roadmap.value.thumb = null;
+  thumbPreview.value = null;
+  const input = document.getElementById('thumb');
+  if (input) input.value = '';
 }
 
 async function submitRoadmap() {
@@ -544,18 +556,20 @@ async function submitRoadmap() {
 
     formData.append("Title", roadmap.value.title);
     formData.append("IntroText", roadmap.value.introText);
-    formData.append("Description", roadmap.value.introText);
+    formData.append("Description", roadmap.value.description);
     formData.append("Category", "mental-health");
     formData.append("IsPaid", roadmap.value.isPaid);
 
-    if (roadmap.value.isPaid) {
-      formData.append("Price", roadmap.value.price);
+    if (roadmap.value.thumb) {
+      formData.append("Thumb.File", roadmap.value.thumb.file);
+      formData.append("Thumb.Title", roadmap.value.thumb.title);
     }
 
-    if (roadmap.value.features && roadmap.value.features.length > 0) {
-      roadmap.value.features.forEach((feature, index) => {
-        formData.append(`Features[${index}]`, feature);
-      });
+    if (roadmap.value.isPaid) {
+      formData.append("Price", roadmap.value.price);
+      if (roadmap.value.discount) formData.append("Discount", roadmap.value.discount);
+      if (roadmap.value.discountExpiry) formData.append("DiscountExpiry", roadmap.value.discountExpiry.toISOString());
+      if (roadmap.value.coupons) formData.append("Coupons", roadmap.value.coupons);
     }
 
     roadmap.value.phases.forEach((phase, index) => {
@@ -635,10 +649,7 @@ function validateRoadmapBasicInfo() {
     return false;
   }
   if (roadmap.value.introText.length > 1000) {
-    toast.error(
-      "Giới thiệu roadmap không được vượt quá 1000 ký tự!",
-      toastConfig
-    );
+    toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!", toastConfig);
     return false;
   }
   if (roadmap.value.targetUserTypes.length === 0) {
@@ -646,24 +657,11 @@ function validateRoadmapBasicInfo() {
     return false;
   }
   if (roadmap.value.targetIssues.length === 0) {
-    toast.error(
-      "Vui lòng chọn ít nhất một vấn đề mà roadmap giải quyết!",
-      toastConfig
-    );
+    toast.error("Vui lòng chọn ít nhất một vấn đề mà roadmap giải quyết!", toastConfig);
     return false;
   }
-  if (isPaidLocal.value && roadmap.value.price <= 0) {
+  if (roadmap.value.isPaid && roadmap.value.price <= 0) {
     toast.error("Giá roadmap phải lớn hơn 0!", toastConfig);
-    return false;
-  }
-  if (
-    isPaidLocal.value &&
-    (!roadmap.value.features || roadmap.value.features.length === 0)
-  ) {
-    toast.error(
-      "Vui lòng thêm ít nhất một quyền lợi khi mua roadmap!",
-      toastConfig
-    );
     return false;
   }
   return true;
@@ -1051,5 +1049,48 @@ onMounted(async () => {
   .submit-btn {
     width: 100%;
   }
+}
+
+.thumb-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thumb-input {
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.thumb-input:hover {
+  border-color: #2196f3;
+}
+
+.thumb-preview {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumb-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-thumb {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.remove-thumb .v-icon {
+  color: white;
 }
 </style>
