@@ -31,30 +31,62 @@
         <v-tabs v-model="activeTab" class="mb-6">
           <v-tab value="overview">Tổng quan</v-tab>
           <v-tab value="actions">
-            Hành động ({{ completedActionsCount }}/{{ phase.actions ? phase.actions.length : 0 }})
+            Hành động ({{ completedActionsCount }}/{{ parsedActions.length }})
           </v-tab>
         </v-tabs>
 
         <v-window v-model="activeTab">
           <v-window-item value="overview">
             <div class="step-tab-wrapper">
-              <v-card class="mb-6" :color="phase.themeColor + '-lighten-5'">
-                <v-card-title>Giới thiệu phase</v-card-title>
-                <v-card-text>
-                  <p class="text-body-1 mb-4">
-                    {{ phase.introduction || phase.description }}
-                  </p>
+              <v-card
+                class="mb-6 phase-intro-card"
+                elevation="2"
+                :style="{ 
+                  backgroundColor: '#fff',
+                  borderRadius: '16px'
+                }"
+              >
+                <v-card-text class="phase-intro-content">
+                  <!-- Giới thiệu bước section -->
+                  <div class="intro-section">
+                    <h3 class="intro-title">
+                      <v-icon :color="phaseColor" class="mr-2">mdi-information-outline</v-icon>
+                      Giới thiệu bước
+                    </h3>
+                    <p class="intro-description">
+                      {{ parsedDescription }}
+                    </p>
+                  </div>
 
-                  <div v-if="parsedTips && parsedTips.length > 0" class="mt-6">
-                    <h3 class="text-h6 mb-3">Mẹo hữu ích</h3>
-                    <v-list :bg-color="phase.themeColor + '-lighten-5'" rounded="lg">
-                      <v-list-item v-for="(tip, index) in parsedTips" :key="index" :title="tip.Title"
-                        :subtitle="tip.Content" class="mb-2">
-                        <template v-slot:prepend>
-                          <v-icon :color="phase.themeColor">{{ tip.Icon || 'mdi-lightbulb' }}</v-icon>
-                        </template>
-                      </v-list-item>
-                    </v-list>
+                  <!-- Hướng dẫn video section -->
+                  <div v-if="phase.videoUrl" class="video-section">
+                    <h3 class="section-title">
+                      <v-icon :color="phaseColor" class="mr-2">mdi-play-circle-outline</v-icon>
+                      Hướng dẫn video
+                    </h3>
+                    <div class="video-placeholder">
+                      <v-btn
+                        icon="mdi-play"
+                        :color="phaseColor"
+                        size="large"
+                        variant="flat"
+                        elevation="2"
+                      ></v-btn>
+                    </div>
+                  </div>
+
+                  <!-- Mẹo hữu ích section -->
+                  <div v-if="parsedIntroduction" class="tips-section">
+                    <h3 class="section-title">
+                      <v-icon :color="phaseColor" class="mr-2">mdi-lightbulb-outline</v-icon>
+                      Mẹo hữu ích
+                    </h3>
+                    <div class="tips-content">
+                      <div class="tip-item" v-for="(tip, index) in parsedTipsArray" :key="index">
+                        <v-icon :color="phaseColor" size="20" class="tip-icon">mdi-check-circle</v-icon>
+                        <span class="tip-text">{{ tip }}</span>
+                      </div>
+                    </div>
                   </div>
                 </v-card-text>
               </v-card>
@@ -64,11 +96,11 @@
           <v-window-item value="actions">
             <div class="step-tab-wrapper">
               <v-row>
-                <v-col v-for="action in parsedActions" :key="action.id" cols="12" md="6">
+                <v-col v-for="action in parsedActions" :key="action.id || action.Id || action.Title" cols="12" md="6">
                   <v-card :class="{ 'bg-success-subtle': action.completed }">
                     <v-card-title class="d-flex justify-space-between align-center">
                       {{ action.Title || action.title }}
-                      <v-chip :color="action.Required ? 'error' : phase.themeColor" size="small">
+                      <v-chip :color="action.Required ? 'error' : phaseColor" size="small">
                         {{ action.Required ? "Bắt buộc" : "Tùy chọn" }}
                       </v-chip>
                     </v-card-title>
@@ -85,14 +117,14 @@
                           <v-list-item v-for="tool in action.Tools" :key="tool.Id" :title="tool.Name"
                             :subtitle="tool.Description" :to="tool.Link" link>
                             <template v-slot:prepend>
-                              <v-icon :color="phase.themeColor">{{ tool.Icon || 'mdi-tools' }}</v-icon>
+                              <v-icon :color="phaseColor">{{ tool.Icon || 'mdi-tools' }}</v-icon>
                             </template>
                           </v-list-item>
                         </v-list>
                       </div>
 
                       <div v-if="action.MoodTags && action.MoodTags.length > 0" class="mt-2">
-                        <v-chip v-for="tag in action.MoodTags" :key="tag" size="small" :color="phase.themeColor"
+                        <v-chip v-for="tag in action.MoodTags" :key="tag" size="small" :color="phaseColor"
                           class="mr-1 mb-1" variant="outlined">
                           {{ tag }}
                         </v-chip>
@@ -146,7 +178,7 @@
           </v-btn>
           <div v-else></div>
 
-          <v-btn size="large" :color="canContinue ? 'success' : phase.themeColor" :disabled="!canContinue"
+          <v-btn size="large" :color="canContinue ? 'success' : phaseColor" :disabled="!canContinue"
             @click="completePhase">
             <v-icon start>{{
               isLastPhase ? "mdi-check-circle" : "mdi-arrow-right"
@@ -227,6 +259,26 @@ export default {
       5: false
     });
 
+    const phaseColors = [
+      'primary', 'success', 'info', 'warning', 'error'
+    ];
+    const phaseColor = computed(() => {
+      if (!phase.value || typeof phase.value.index !== 'number') return 'primary';
+      return phaseColors[phase.value.index % phaseColors.length];
+    });
+
+    const phasePastelColors = [
+      "#e3e0f7", // tím nhạt
+      "#e0f7fa", // xanh ngọc nhạt
+      "#fff9e5", // vàng nhạt
+      "#e6f7e0", // xanh lá nhạt
+      "#ffe0e0", // hồng nhạt
+    ];
+    const phasePastelColor = computed(() => {
+      if (!phase.value || typeof phase.value.index !== 'number') return phasePastelColors[0];
+      return phasePastelColors[phase.value.index % phasePastelColors.length];
+    });
+
     const getStorageKey = () => `completedPhases_roadmap_${props.roadmapId}`;
 
     const saveCompletedPhases = () => {
@@ -281,16 +333,32 @@ export default {
     });
 
     const parsedDescription = computed(() => {
-      console.log("Phase value:", phase.value);
-      console.log("Description:", phase.value?.description);
-      
-      if (!phase.value || !phase.value.description) {
-        console.log("Returning empty string because:", {
-          hasPhase: !!phase.value,
-          hasDescription: !!phase.value?.description
-        });
-        return "";
+      if (!phase.value || !phase.value.description) return "";
+
+      // Nếu là chuỗi JSON array
+      if (typeof phase.value.description === 'string' && phase.value.description.trim().startsWith('[')) {
+        try {
+          const arr = parseJsonString(phase.value.description);
+          if (Array.isArray(arr)) {
+            // Ghép tất cả Description lại, mỗi cái xuống dòng
+            return arr.map(item => item.Description).filter(Boolean).join('\n');
+          }
+        } catch (e) {
+          return phase.value.description;
+        }
       }
+
+      // Nếu là object array
+      if (Array.isArray(phase.value.description)) {
+        return phase.value.description.map(item => item.Description).filter(Boolean).join('\n');
+      }
+
+      // Nếu là object
+      if (typeof phase.value.description === 'object' && phase.value.description.Description) {
+        return phase.value.description.Description;
+      }
+
+      // Nếu là chuỗi thường
       return phase.value.description;
     });
 
@@ -324,22 +392,25 @@ export default {
     });
 
     const parsedActions = computed(() => {
-      if (!phase.value || !phase.value.actions) return [];
-
-      if (typeof phase.value.actions === 'string' && phase.value.actions.startsWith('[')) {
+      if (!phase.value || !phase.value.recommendations) return [];
+      let recs = phase.value.recommendations;
+      if (typeof recs === 'string' && recs.startsWith('[')) {
         try {
-          return parseJsonString(phase.value.actions);
+          recs = JSON.parse(recs);
         } catch (e) {
           return [];
         }
       }
-
-      return phase.value.actions;
+      if (Array.isArray(recs)) {
+        // Lọc các recommendation là hành động (IsAction = true hoặc isAction = true)
+        return recs.filter(rec => rec.IsAction === true || rec.isAction === true);
+      }
+      return [];
     });
 
     const completedActionsCount = computed(() => {
       if (!parsedActions.value) return 0;
-      return parsedActions.value.filter((action) => action.completed).length;
+      return parsedActions.value.filter(action => action.completed).length;
     });
 
     const canContinue = computed(() => {
@@ -474,6 +545,18 @@ export default {
       loadCompletedPhases();
     });
 
+    const parsedTipsArray = computed(() => {
+      if (!parsedIntroduction.value) return [];
+      
+      // Split by common separators and filter out empty strings
+      const tips = parsedIntroduction.value
+        .split(/[.\n;]/)
+        .map(tip => tip.trim())
+        .filter(tip => tip.length > 0);
+        
+      return tips.length > 0 ? tips : [parsedIntroduction.value];
+    });
+
     return {
       phase,
       activeTab,
@@ -500,7 +583,10 @@ export default {
       parsedDescription,
       parsedIntroduction,
       parsedTips,
-      parsedActions
+      parsedActions,
+      phaseColor,
+      phasePastelColor,
+      parsedTipsArray
     };
   }
 };
@@ -509,14 +595,11 @@ export default {
 <style scoped>
 .roadmap-container {
   display: flex;
-  min-height: 100vh;
-  margin-bottom: 25px;
 }
 
 .roadmap-content {
   flex: 1;
   width: 100%;
-  padding: 0 40px;
 }
 
 .video-placeholder {
@@ -556,5 +639,102 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.phase-intro-card {
+  transition: all 0.3s ease;
+}
+
+.phase-intro-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.phase-intro-content {
+  padding: 32px !important;
+}
+
+.intro-section {
+  margin-bottom: 32px;
+}
+
+.intro-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.intro-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 0;
+}
+
+.video-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.video-placeholder {
+  background: rgba(255, 255, 255, 0.7);
+  height: 200px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.video-placeholder:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.02);
+}
+
+.tips-section {
+  margin-bottom: 16px;
+}
+
+.tips-content {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 8px 0;
+}
+
+.tip-item:last-child {
+  margin-bottom: 0;
+}
+
+.tip-icon {
+  margin-right: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #4a5568;
+  flex: 1;
 }
 </style>

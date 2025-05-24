@@ -247,37 +247,9 @@ const roadmap = ref({
   description: "",
   isPaid: false,
   price: 500000,
-  targetUserTypes: [],
-  targetIssues: [],
   phases: [],
   thumb: null,
 });
-
-const userTypeOptions = ref([
-  { text: "Học sinh", value: "student" },
-  { text: "Sinh viên", value: "university" },
-  { text: "Người đi làm", value: "worker" },
-  { text: "Phụ huynh", value: "parent" },
-  { text: "Người cao tuổi", value: "elderly" }
-]);
-
-const issueOptions = ref([
-  { text: "Áp lực học tập, thi cử", value: "study_pressure" },
-  { text: "Bị bắt nạt hoặc cô lập", value: "bullying" },
-  { text: "Không có bạn thân", value: "no_close_friend" },
-  { text: "Mâu thuẫn với cha mẹ", value: "parent_conflict" },
-  { text: "Mất động lực", value: "no_motivation" },
-  { text: "Lo lắng về tương lai", value: "future_worry" },
-  { text: "Mất định hướng nghề nghiệp", value: "career_confusion" },
-  { text: "Cô đơn", value: "loneliness" },
-  { text: "Chán học", value: "boredom" },
-  { text: "Stress vì thực tập/thi cử", value: "intern_stress" },
-  { text: "Căng thẳng công việc", value: "work_stress" },
-  { text: "Mâu thuẫn đồng nghiệp", value: "colleague_conflict" },
-  { text: "Cảm giác không được công nhận", value: "not_recognized" },
-  { text: "Không còn đam mê", value: "no_passion" },
-  { text: "Mất cân bằng cuộc sống – công việc", value: "work_life_balance" }
-]);
 
 const availableTools = ref([
   { text: "Viết nhật ký", value: "diary" },
@@ -307,8 +279,6 @@ const isFormValid = computed(() => {
     roadmap.value.title.trim() !== "" &&
     roadmap.value.introText.trim() !== "" &&
     roadmap.value.phases.length > 0 &&
-    roadmap.value.targetUserTypes.length > 0 &&
-    roadmap.value.targetIssues.length > 0 &&
     (!roadmap.value.isPaid ||
       (roadmap.value.isPaid &&
         roadmap.value.price > 0))
@@ -360,14 +330,17 @@ async function fetchRoadmapData() {
       description: response.description,
       isPaid: response.price > 0,
       price: response.price || 500000,
-      targetUserTypes: response.targetUserTypes || [],
-      targetIssues: response.targetIssues || [],
-      phases: (response.phases || []).map(phase => ({
-        ...phase,
-        description: parseDescription(phase.description),
-        tools: phase.tools || [],
-        tips: phase.tips || "",
-      })),
+      phases: (response.phases || []).map(phase => {
+        const toolRecs = (phase.recommendations || []).filter(rec =>
+          rec.moodTags && rec.moodTags.includes("Công cụ hỗ trợ")
+        );
+        return {
+          ...phase,
+          tools: toolRecs.map(rec => rec.title),
+          tips: phase.introduction || "",
+          description: parseDescription(phase.description),
+        };
+      }),
       thumb: response.thumbUrl ? {
         url: response.thumbUrl,
         title: response.thumbTitle || 'Thumbnail'
@@ -418,54 +391,6 @@ function movePhase(index, direction) {
   roadmap.value.phases.forEach((phase, idx) => {
     phase.index = idx;
   });
-}
-
-function removeMilestone(phaseIndex, milestoneIndex) {
-  roadmap.value.phases[phaseIndex].milestones.splice(milestoneIndex, 1);
-}
-
-function moveMilestone(phaseIndex, milestoneIndex, direction) {
-  const milestones = roadmap.value.phases[phaseIndex].milestones;
-  if ((direction < 0 && milestoneIndex === 0) || (direction > 0 && milestoneIndex === milestones.length - 1)) {
-    return;
-  }
-
-  const newIndex = milestoneIndex + direction;
-  const temp = milestones[milestoneIndex];
-  milestones[milestoneIndex] = milestones[newIndex];
-  milestones[newIndex] = temp;
-}
-
-function addMilestone(phaseIndex) {
-  const newMilestone = {
-    title: "",
-    eventName: "",
-    repeatTimesRequired: 1,
-    timeSpentRequired: 30,
-    recommendations: []
-  };
-  roadmap.value.phases[phaseIndex].milestones.push(newMilestone);
-}
-
-function addRecommendation(phaseIndex, milestoneIndex) {
-  const phase = roadmap.value.phases[phaseIndex];
-  const milestone = phase && phase.milestones[milestoneIndex];
-  if (milestone) {
-    const newRecommendation = {
-      targetEntityId: "",
-      entityType: getEntityTypeByEventLabel(milestone.eventName),
-      trait: "",
-      traitDescription: ""
-    };
-    if (!milestone.recommendations) {
-      milestone.recommendations = [];
-    }
-    milestone.recommendations.push(newRecommendation);
-  }
-}
-
-function removeRecommendation(phaseIndex, milestoneIndex, recommendationIndex) {
-  roadmap.value.phases[phaseIndex].milestones[milestoneIndex].recommendations.splice(recommendationIndex, 1);
 }
 
 function handleThumbUpload(event) {
@@ -522,15 +447,8 @@ async function submitRoadmap(event) {
       }
     }
 
-    roadmap.value.targetUserTypes.forEach((type, index) => {
-      formData.append(`TargetUserTypes[${index}]`, type);
-    });
-
-    roadmap.value.targetIssues.forEach((issue, index) => {
-      formData.append(`TargetIssues[${index}]`, issue);
-    });
-
     roadmap.value.phases.forEach((phase, phaseIndex) => {
+      formData.append(`Phases[${phaseIndex}].Id`, phase.id || "");
       formData.append(`Phases[${phaseIndex}].Title`, phase.title);
       formData.append(`Phases[${phaseIndex}].Description`, phase.description);
       formData.append(`Phases[${phaseIndex}].Introduction`, phase.tips || "");
@@ -551,6 +469,20 @@ async function submitRoadmap(event) {
             formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].IsGeneralTip`, false);
             formData.append(`Phases[${phaseIndex}].Recommendations[${toolIndex}].Source`, tool.route);
           }
+        });
+      }
+
+      if (phase.tips && phase.tips.trim() !== "") {
+        const tipsArr = phase.tips.split('\n').filter(t => t.trim() !== "");
+        tipsArr.forEach((tip, tipIndex) => {
+          const recIndex = (phase.tools?.length || 0) + tipIndex;
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].Title`, "Mẹo");
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].Description`, tip);
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].IsAction`, false);
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].Duration`, 0);
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].MoodTags`, JSON.stringify(["Mẹo"]));
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].IsGeneralTip`, true);
+          formData.append(`Phases[${phaseIndex}].Recommendations[${recIndex}].Source`, "");
         });
       }
     });
@@ -588,14 +520,6 @@ function validateRoadmapBasicInfo() {
   }
   if (roadmap.value.introText.length > 1000) {
     toast.error("Giới thiệu roadmap không được vượt quá 1000 ký tự!", toastConfig);
-    return false;
-  }
-  if (roadmap.value.targetUserTypes.length === 0) {
-    toast.error("Vui lòng chọn ít nhất một đối tượng phù hợp!", toastConfig);
-    return false;
-  }
-  if (roadmap.value.targetIssues.length === 0) {
-    toast.error("Vui lòng chọn ít nhất một vấn đề mà roadmap giải quyết!", toastConfig);
     return false;
   }
   if (roadmap.value.isPaid && roadmap.value.price <= 0) {
